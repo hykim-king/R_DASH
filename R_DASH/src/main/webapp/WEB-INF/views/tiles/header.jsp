@@ -6,7 +6,7 @@
       <!-- Brand -->
       <div class="sidenav-header  d-flex  align-items-center">
         <a class="navbar-brand" href="/ehr/resources/template/index.html">
-          <img src="/ehr/resources/template/dashboardassets/img/brand/dark.svg" height="40" class="navbar-brand-img" alt="...">
+          <img src="/ehr/resources/template/dashboard/assets/img/r_dash_logo.png" height="40" class="navbar-brand-img" alt="...">
         </a>
         <div class=" ml-auto ">
           <!-- Sidenav toggler -->
@@ -174,7 +174,7 @@
   <!-- Main content -->
   <div class="main-content" id="panel">
     <!-- Topnav -->
-    <nav class="navbar navbar-top navbar-expand navbar-dark bg-primary border-bottom">
+    <nav class="navbar navbar-horizontal navbar-expand-lg navbar-dark bg-warning mt-4">
       <div class="container-fluid">
         <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
 
@@ -183,7 +183,7 @@
               <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <div class="media align-items-center">
                   <span class="avatar avatar-sm rounded-circle">
-                    <img alt="Image placeholder" src="/ehr/resources/template/dashboardassets/img/theme/team-4.jpg">
+                    <img alt="Image placeholder" src="/ehr/resources/template/dashboard/assets/img/theme/team-4.jpg">
                   </span>
                   <div class="media-body  ml-2  d-none d-lg-block">
                     <span class="mb-0 text-sm  font-weight-bold">John Snow</span>
