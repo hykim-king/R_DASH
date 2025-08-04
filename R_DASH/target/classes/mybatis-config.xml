@@ -8,5 +8,9 @@
     <setting name="mapUnderscoreToCamelCase" value="true"/>
   </settings>
   
+ <typeAliases>
+    
+ </typeAliases>
+ 
  
 </configuration> 
