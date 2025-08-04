@@ -7,7 +7,7 @@ public class BoardDTO extends DTO{
 	private String title      ;
 	private String contents   ;
 	private String image ; //UUID로 저장     
-	private int views         ;
+	private int viewCnt     ;
 	private String regDt     ;
 	private String regId     ;
 	private String modDt     ;
@@ -22,7 +22,7 @@ public class BoardDTO extends DTO{
 		this.title = title;
 		this.contents = contents;
 		this.image = image;
-		this.views = views;
+		this.viewCnt = views;
 		this.regDt = regDt;
 		this.regId = regId;
 		this.modDt = modDt;
@@ -61,12 +61,12 @@ public class BoardDTO extends DTO{
 		this.image = image;
 	}
 
-	public int getViews() {
-		return views;
+	public int getViewCnt() {
+		return viewCnt;
 	}
 
-	public void setViews(int views) {
-		this.views = views;
+	public void setViewCnt(int viewCnt) {
+		this.viewCnt = viewCnt;
 	}
 
 	public String getRegDt() {
@@ -104,7 +104,7 @@ public class BoardDTO extends DTO{
 	@Override
 	public String toString() {
 		return "BoardDTO [boardNo=" + boardNo + ", title=" + title + ", contents=" + contents + ", image=" + image
-				+ ", views=" + views + ", regDt=" + regDt + ", regId=" + regId + ", modDt=" + modDt + ", modId=" + modId
+				+ ", viewCnt=" + viewCnt + ", regDt=" + regDt + ", regId=" + regId + ", modDt=" + modDt + ", modId=" + modId
 				+ ", toString()=" + super.toString() + "]";
 	}
 	
