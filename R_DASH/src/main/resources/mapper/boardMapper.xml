@@ -27,7 +27,7 @@
                    TT1.board_no,
                    TT1.title,
                    TT1.image,
-                   TT1.views,
+                   TT1.view_cnt,
                    DECODE(TO_CHAR(SYSDATE,'YYYY.MM.DD'),TO_CHAR(TT1.mod_dt,'YYYY.MM.DD')
                      ,  TO_CHAR(TT1.mod_dt,'HH24:MI')
                      ,  TO_CHAR(TT1.mod_dt,'YYYY.MM.DD')) mod_dt,
@@ -64,10 +64,9 @@
         INSERT INTO BOARD
             SELECT LEVEL board_no,
                     '제목'||LEVEL title,
-                DECODE(MOD(LEVEL,2),1,10,20) div,
                 '내용'||LEVEL contents,
                 '397839829850900'||LEVEL||'.png' image,
-                0 read_cnt,
+                Level AS viewCnt,
                 sysdate - LEVEL reg_dt,
                 DECODE(MOD(LEVEL,2),1,'james','admin') reg_id,
                 sysdate - LEVEL mod_dt,
@@ -82,7 +81,7 @@
             title,
             contents,
             image,
-            views,
+            view_cnt,
             TO_CHAR(mod_dt,'YY.MM.DD HH24:MI') as modDt,
             mod_id
         FROM
@@ -93,7 +92,7 @@
     <update id="updateViews" parameterType="BoardDTO">
         UPDATE board     
 		SET
-		    views = views+1
+		    view_cnt = view_cnt+1
 		WHERE
 		        board_no = #{boardNo}
     </update>
@@ -115,22 +114,24 @@
 
     <insert id="doSave" parameterType="BoardDTO">
        INSERT INTO board (
-            title,
-            contents,
-            image,
-            views,
-            reg_dt,
-            reg_id,
-            mod_dt,
-            mod_id
-        ) VALUES ( #{title},
-                   #{contents},
-                   #{image},
-                   0,
-                   SYSDATE,
-                   #{regId},
-                   SYSDATE,
-                   #{modId} )
+		    title,
+		    contents,
+		    image,
+		    view_cnt,
+		    reg_dt,
+		    reg_id,
+		    mod_dt,
+		    mod_id
+		) VALUES (
+		    #{title},
+		    #{contents},
+		    #{image},
+		    0,
+		    SYSDATE,
+		    #{regId},
+		    SYSDATE,
+		    #{modId}
+		)
     </insert>
 
 
