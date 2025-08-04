@@ -137,3 +137,47 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/java,windows,maven,eclipse
 /target/
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 가상환경
+.venv/
+env/
+ENV/
+venv/
+
+# 빌드
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# 테스트 및 캐시
+.pytest_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# mypy, pytype, pyre
+.mypy_cache/
+.pytype/
+.pyre/
+
+# pipenv, poetry
+Pipfile.lock
+poetry.lock
+
+# cython
+cython_debug/
