@@ -9,6 +9,8 @@
   </settings>
   
  <typeAliases>
+    <typeAlias alias="BoardDTO" type="com.pcwk.ehr.domain.BoardDTO"/>
+    <typeAlias alias="SearchDTO" type="com.pcwk.ehr.cmn.SearchDTO"/>
     
  </typeAliases>
  
