@@ -1,4 +1,4 @@
-package com.pcwk.ehr.temperature;
+package com.pcwk.ehr.domain;
 
 public class NowcastDTO {
 
