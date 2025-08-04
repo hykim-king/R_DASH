@@ -144,6 +144,7 @@ __pycache__/
 *$py.class
 
 # 가상환경
+.env
 .venv/
 env/
 ENV/
