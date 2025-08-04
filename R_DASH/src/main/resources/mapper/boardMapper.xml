@@ -4,53 +4,55 @@
     <sql id="boardWhere">
         <choose>
             <when test="searchDiv =='10'">
-                AND title LIKE '%' ||#{searchDiv}}} '%'
+                 title LIKE '%' ||#{searchWord} || '%'
             </when>
             <when test="searchDiv =='20'">
-                AND contents LIKE '%' ||#{searchDiv}}} '%'
+                 contents LIKE '%' ||#{searchWord} || '%'
             </when>
             <when test="searchDiv =='30'">
-                AND boardNo LIKE '%' ||#{searchDiv}}} '%'
+                 boardNo LIKE '%'||#{searchWord} || '%'
             </when>
             <when test="searchDiv =='40'">
-                 AND (title LIKE #{searchWord}||'%' 
+                  (title LIKE '%'||#{searchWord}||'%' 
                        OR 
-                      contents LIKE #{searchWord}||'%')
+                      contents LIKE '%'||#{searchWord}||'%')
             </when>
         </choose>
     </sql>
 
-    <select id="doRetrieve" parameterType="SearchDTO" resultType="BoardDTO">
-        SELECT A.*,B.*
+<select id="doRetrieve" parameterType="SearchDTO" resultType="BoardDTO">
+    SELECT A.*, B.*
+    FROM (
+        SELECT TT1.rnum AS no,
+               TT1.board_no,
+               TT1.title,
+               TT1.image,
+               TT1.view_cnt,
+               DECODE(TO_CHAR(SYSDATE, 'YYYY.MM.DD'), TO_CHAR(TT1.mod_dt, 'YYYY.MM.DD'),
+                 TO_CHAR(TT1.mod_dt, 'HH24:MI'),
+                 TO_CHAR(TT1.mod_dt, 'YYYY.MM.DD')) AS mod_dt,
+               TT1.mod_id
         FROM (
-            SELECT TT1.number AS no,
-                   TT1.board_no,
-                   TT1.title,
-                   TT1.image,
-                   TT1.view_cnt,
-                   DECODE(TO_CHAR(SYSDATE,'YYYY.MM.DD'),TO_CHAR(TT1.mod_dt,'YYYY.MM.DD')
-                     ,  TO_CHAR(TT1.mod_dt,'HH24:MI')
-                     ,  TO_CHAR(TT1.mod_dt,'YYYY.MM.DD')) mod_dt,
-                   TT1.mod_id
-              FROM (
-                SELECT ROWNUM AS number, T1.*
-                  FROM (
-                    SELECT *
-                      FROM board
-                       <include refid="boardWhere"></include> 
-                      ORDER BY mod_dt DESC
-                )T1  
-    <![CDATA[   WHERE ROWNUM <=( #{pageSize} * (#{pageNo} - 1)+ #{pageSize}  )
-            ) TT1
-            WHERE number >=( #{pageSize} * (#{pageNo} - 1)+ 1  )
-            ]]>    
-        )A
-        CROSS JOIN(
-            SELECT COUNT(*) total_cnt
-              FROM board
-             <include refid="boardWhere"></include> 
-        )B
-    </select>
+            SELECT ROWNUM AS rnum, T1.*
+            FROM (
+                SELECT *
+                FROM board
+                WHERE 
+              <include refid="boardWhere" />
+                ORDER BY mod_dt DESC
+            ) T1  
+      <![CDATA[      WHERE ROWNUM <= (#{pageSize} * #{pageNo}) 
+        ) TT1
+    WHERE TT1.rnum >= (#{pageSize} * (#{pageNo} - 1) + 1) ]]>
+    ) A
+    INNER JOIN (
+        SELECT COUNT(*) AS total_cnt
+        FROM board
+        WHERE 
+        <include refid="boardWhere" />
+    ) B ON 1=1
+</select>
+
     
     <select id="getCount" resultType="java.lang.Integer">
         select count(*) AS count from board
@@ -105,34 +107,34 @@
 		SET
 		    title = #{title},
 		    contents = #{contents},
-		    image = #{image}
+		    image = #{image},
 		    mod_dt = SYSDATE,
 		    mod_id = #{modId}
 		WHERE
 		        board_no = #{boardNo}
     </update>
 
-    <insert id="doSave" parameterType="BoardDTO">
-       INSERT INTO board (
-		    title,
-		    contents,
-		    image,
-		    view_cnt,
-		    reg_dt,
-		    reg_id,
-		    mod_dt,
-		    mod_id
-		) VALUES (
-		    #{title},
-		    #{contents},
-		    #{image},
-		    0,
-		    SYSDATE,
-		    #{regId},
-		    SYSDATE,
-		    #{modId}
-		)
-    </insert>
+    <insert id="doSave" parameterType="BoardDTO" useGeneratedKeys="true" keyProperty="boardNo" keyColumn="BOARD_NO">
+	  INSERT INTO board (
+	    title,
+	    contents,
+	    image,
+	    view_cnt,
+	    reg_dt,
+	    reg_id,
+	    mod_dt,
+	    mod_id
+	  ) VALUES (
+	    #{title},
+	    #{contents},
+	    #{image},
+	    0,
+	    SYSDATE,
+	    #{regId},
+	    SYSDATE,
+	    #{modId}
+	  )
+	</insert>
 
 
 </mapper>

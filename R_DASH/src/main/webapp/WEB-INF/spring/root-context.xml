@@ -162,8 +162,8 @@
         class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"></property>
     </bean>
-
-
+<!--218.144.130.138-->
+<!--192.168.100.30-->
     <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
         <property name="driverClassName"
             value="oracle.jdbc.driver.OracleDriver" />
