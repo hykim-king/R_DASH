@@ -30,12 +30,14 @@
 		<websocket:simple-broker prefix="/topic" />
 
 	</websocket:message-broker>
-
+    
+    
 	<!-- cron scheduler -->
+	<!-- 
 	<task:scheduler id="cronScheduler" pool-size="3" />
-
+     -->
 	<!-- Cron 스케줄링 -->
-	<task:scheduled-tasks scheduler="cronScheduler">
+	<!--  <task:scheduled-tasks scheduler="cronScheduler">
 		<task:scheduled ref="userServiceImpl"
 			method="upgradeLevels" cron="0 */3 * * 10 *" />
 
@@ -43,7 +45,7 @@
 		<task:scheduled ref="pcwkCron" method="runTask"
 			cron="0 */1 * * 10 *" />
 	</task:scheduled-tasks>
-
+    -->
 	<!-- DispatcherServlet Context: defines this servlet's request-processing 
 		infrastructure -->
 
@@ -55,8 +57,9 @@
 	<resources mapping="/resources/**" location="/resources/" />
 
 
-
+    
 	<!-- Tiles config -->
+	<!-- 
 	<beans:bean id="tilesConfigurer"
 		class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
 		<beans:property name="definitions">
@@ -65,15 +68,18 @@
 			</beans:list>
 		</beans:property>
 	</beans:bean>
-
-
+    -->
+    
+    
 	<!-- Tiles ViewResolver -->
+	<!-- 
 	<beans:bean id="tilesViewResolver"
 		class="org.springframework.web.servlet.view.tiles3.TilesViewResolver">
-		<beans:property name="order" value="1" /> <!--ViewResolver: 읽는 순서 1 -->
+		<beans:property name="order" value="1" /> 
 	</beans:bean>
-
-
+    -->
+    <!--ViewResolver: 읽는 순서 1 -->
+    
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources 
 		in the /WEB-INF/views directory -->
 	<beans:bean
