@@ -86,7 +86,7 @@
         <!-- mybatis-config -->
         <property name="configLocation" value="classpath:mybatis-config.xml"/>
         <!-- mypper:sql -->
-        <property name="mapperLocations" value="classpath:mapper/**/*.xml"></property>
+        <property name="mapperLocations" value="classpath:mapper/*.xml"></property>
     </bean>
 
     <tx:annotation-driven transaction-manager="transactionManager" 
