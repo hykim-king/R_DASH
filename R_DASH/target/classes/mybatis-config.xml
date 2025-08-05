@@ -13,6 +13,8 @@
     <typeAlias alias="SearchDTO" type="com.pcwk.ehr.cmn.SearchDTO"/>
     <typeAlias alias="PatientsDTO" type="com.pcwk.ehr.domain.PatientsDTO"/>
     <typeAlias alias="NowcastDTO" type="com.pcwk.ehr.domain.NowcastDTO"/>
+    <typeAlias alias="NewsDTO" type="com.pcwk.ehr.domain.NewsDTO"/>
+    <typeAlias alias="TopicDTO" type="com.pcwk.ehr.domain.TopicDTO"/>
  </typeAliases>
  
  
