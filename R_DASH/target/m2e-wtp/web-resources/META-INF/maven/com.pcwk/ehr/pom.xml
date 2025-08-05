@@ -41,6 +41,13 @@
 		<commons-fileupload-version>1.5</commons-fileupload-version>
 	</properties>
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
+		<dependency>
+		    <groupId>org.mockito</groupId>
+		    <artifactId>mockito-junit-jupiter</artifactId>
+		    <version>3.12.4</version>
+		    <scope>test</scope>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.springframework/spring-websocket -->
 		<dependency>
 			<groupId>org.springframework</groupId>

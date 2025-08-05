@@ -2,7 +2,7 @@ package com.pcwk.ehr.domain;
 
 public class PatientsDTO {
 
-	private int patientsNo;
+	private Integer patientsNo;
 	private String sidoNm;
 	private int year;
 	private int patientsTot;
@@ -95,7 +95,7 @@ public class PatientsDTO {
 	 * @param outSubtot
 	 * @param inSubtot
 	 */
-	public PatientsDTO(int patientsNo, String sidoNm, int year, int patientsTot, int outSubtot, int inSubtot) {
+	public PatientsDTO(Integer patientsNo, String sidoNm, int year, int patientsTot, int outSubtot, int inSubtot) {
 		super();
 		this.patientsNo = patientsNo;
 		this.sidoNm = sidoNm;
