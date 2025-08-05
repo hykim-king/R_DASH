@@ -114,7 +114,10 @@
 		        board_no = #{boardNo}
     </update>
 
-    <insert id="doSave" parameterType="BoardDTO" useGeneratedKeys="true" keyProperty="boardNo" keyColumn="BOARD_NO">
+    <insert id="doSave" parameterType="BoardDTO" 
+		  useGeneratedKeys="true" 
+		  keyProperty="boardNo" 
+		  keyColumn="BOARD_NO">
 	  INSERT INTO board (
 	    title,
 	    contents,
