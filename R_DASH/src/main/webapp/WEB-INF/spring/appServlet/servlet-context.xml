@@ -59,7 +59,6 @@
 
     
 	<!-- Tiles config -->
-	<!-- 
 	<beans:bean id="tilesConfigurer"
 		class="org.springframework.web.servlet.view.tiles3.TilesConfigurer">
 		<beans:property name="definitions">
@@ -68,16 +67,14 @@
 			</beans:list>
 		</beans:property>
 	</beans:bean>
-    -->
+
     
     
 	<!-- Tiles ViewResolver -->
-	<!-- 
 	<beans:bean id="tilesViewResolver"
 		class="org.springframework.web.servlet.view.tiles3.TilesViewResolver">
 		<beans:property name="order" value="1" /> 
 	</beans:bean>
-    -->
     <!--ViewResolver: 읽는 순서 1 -->
     
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources 
@@ -86,11 +83,13 @@
 		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<beans:property name="prefix" value="/WEB-INF/views/" />
 		<beans:property name="suffix" value=".jsp" />
-		<beans:property name="order" value="2" />  <!--ViewResolver: 읽는 순서 2 -->
+		<!-- <beans:property name="order" value="2" />  --> <!--ViewResolver: 읽는 순서 2 -->
 	</beans:bean>
 
+	
 	<context:component-scan
 		base-package="com.pcwk.ehr" />
+
 
 
 

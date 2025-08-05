@@ -13,9 +13,9 @@
     <task:scheduler id="cronScheduler" pool-size="3"/>
     
     <!-- Cron 스케줄링 -->
-    <task:scheduled-tasks scheduler="cronScheduler">
-        <task:scheduled ref="pcwkCron" method="runTask" cron="0 */1 * * * *"/>
-    </task:scheduled-tasks>
+<!--     <task:scheduled-tasks scheduler="cronScheduler"> -->
+<!--         <task:scheduled ref="pcwkCron" method="runTask" cron="0 */1 * * * *"/> -->
+<!--     </task:scheduled-tasks> -->
     
     
     <!-- DispatcherServlet Context: defines this servlet's request-processing 
@@ -35,8 +35,8 @@
         class="org.springframework.web.servlet.view.InternalResourceViewResolver">
         <beans:property name="prefix" value="/WEB-INF/views/" />
         <beans:property name="suffix" value=".jsp" />
-        <beans:property name="order" value="1" />  <!--ViewResolver: 읽는 순서 2 -->
-    </beans:bean>
+<!--         <beans:property name="order" value="1" />  ViewResolver: 읽는 순서 2
+ -->    </beans:bean>
 
     <context:component-scan base-package="com.pcwk.ehr" />
 

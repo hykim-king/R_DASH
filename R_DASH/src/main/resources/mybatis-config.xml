@@ -9,7 +9,13 @@
   </settings>
   
  <typeAliases>
-    
+    <typeAlias alias="BoardDTO" type="com.pcwk.ehr.domain.BoardDTO"/>
+    <typeAlias alias="SearchDTO" type="com.pcwk.ehr.cmn.SearchDTO"/>
+    <typeAlias alias="UserDTO" type="com.pcwk.ehr.domain.UserDTO"/>
+    <typeAlias alias="PatientsDTO" type="com.pcwk.ehr.domain.PatientsDTO"/>
+    <typeAlias alias="NowcastDTO" type="com.pcwk.ehr.domain.NowcastDTO"/>
+    <typeAlias alias="NewsDTO" type="com.pcwk.ehr.domain.NewsDTO"/>
+    <typeAlias alias="TopicDTO" type="com.pcwk.ehr.domain.TopicDTO"/>
  </typeAliases>
  
  
