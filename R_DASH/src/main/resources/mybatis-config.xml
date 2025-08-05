@@ -11,7 +11,8 @@
  <typeAliases>
     <typeAlias alias="BoardDTO" type="com.pcwk.ehr.domain.BoardDTO"/>
     <typeAlias alias="SearchDTO" type="com.pcwk.ehr.cmn.SearchDTO"/>
-    
+    <typeAlias alias="PatientsDTO" type="com.pcwk.ehr.domain.PatientsDTO"/>
+    <typeAlias alias="NowcastDTO" type="com.pcwk.ehr.domain.NowcastDTO"/>
  </typeAliases>
  
  
