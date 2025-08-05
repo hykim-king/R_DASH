@@ -27,7 +27,7 @@ public class BoardServiceImpl implements BoardService {
 		
 		//로그인이 되어 있으며,
 		//admin -> role == 1 일 경우만 조회수 오름.
-		int flag = boardMapper.updateViews();
+		int flag = boardMapper.updateViews(param);
 		log.debug("flag: {}",flag);
 		
 		return boardMapper.doSelectOne(param);
