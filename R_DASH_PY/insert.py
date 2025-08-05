@@ -2,6 +2,10 @@ import os
 import oracledb
 from dotenv import load_dotenv
 
+#import os
+#import oracledb
+#from dotenv import load_dotenv
+
 # 1. .env 파일 불러오기
 load_dotenv()
 
@@ -23,7 +27,6 @@ cursor = conn.cursor()
 # 예: SELECT 1 FROM DUAL
 cursor.execute("SELECT 1 FROM DUAL")
 rows = cursor.fetchall()
-
 
 for row in rows:
     print(row)
