@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pcwk.ehr.mapper.BoardMapper">
+    <sql id="boardWhere">
+        <choose>
+            <when test="searchDiv =='10'">
+                 title LIKE '%' ||#{searchWord} || '%'
+            </when>
+            <when test="searchDiv =='20'">
+                 contents LIKE '%' ||#{searchWord} || '%'
+            </when>
+            <when test="searchDiv =='30'">
+                 boardNo LIKE '%'||#{searchWord} || '%'
+            </when>
+            <when test="searchDiv =='40'">
+                  (title LIKE '%'||#{searchWord}||'%' 
+                       OR 
+                      contents LIKE '%'||#{searchWord}||'%')
+            </when>
+        </choose>
+    </sql>
+
+<select id="doRetrieve" parameterType="SearchDTO" resultType="BoardDTO">
+    SELECT A.*, B.*
+    FROM (
+        SELECT TT1.rnum AS no,
+               TT1.board_no,
+               TT1.title,
+               TT1.image,
+               TT1.view_cnt,
+               DECODE(TO_CHAR(SYSDATE, 'YYYY.MM.DD'), TO_CHAR(TT1.mod_dt, 'YYYY.MM.DD'),
+                 TO_CHAR(TT1.mod_dt, 'HH24:MI'),
+                 TO_CHAR(TT1.mod_dt, 'YYYY.MM.DD')) AS mod_dt,
+               TT1.mod_id
+        FROM (
+            SELECT ROWNUM AS rnum, T1.*
+            FROM (
+                SELECT *
+                FROM board
+                WHERE 
+              <include refid="boardWhere" />
+                ORDER BY mod_dt DESC
+            ) T1  
+      <![CDATA[      WHERE ROWNUM <= (#{pageSize} * #{pageNo}) 
+        ) TT1
+    WHERE TT1.rnum >= (#{pageSize} * (#{pageNo} - 1) + 1) ]]>
+    ) A
+    INNER JOIN (
+        SELECT COUNT(*) AS total_cnt
+        FROM board
+        WHERE 
+        <include refid="boardWhere" />
+    ) B ON 1=1
+</select>
+
+    
+    <select id="getCount" resultType="java.lang.Integer">
+        select count(*) AS count from board
+    </select>
+    
+    <delete id="deleteAll">
+        DELETE FROM board
+    </delete>
+    
+    <insert id="saveAll">
+        INSERT INTO BOARD
+            SELECT LEVEL board_no,
+                    '제목'||LEVEL title,
+                '내용'||LEVEL contents,
+                '397839829850900'||LEVEL||'.png' image,
+                Level AS viewCnt,
+                sysdate - LEVEL reg_dt,
+                DECODE(MOD(LEVEL,2),1,'james','admin') reg_id,
+                sysdate - LEVEL mod_dt,
+                DECODE(MOD(LEVEL,2),1,'james','admin') mod_id
+                FROM dual
+	    <![CDATA[CONNECT BY LEVEL <=502]]>
+	    
+    </insert>
+    <select id="doSelectOne" parameterType="BoardDTO" resultType="BoardDTO">
+        SELECT
+            board_no,
+            title,
+            contents,
+            image,
+            view_cnt,
+            TO_CHAR(mod_dt,'YY.MM.DD HH24:MI') as modDt,
+            mod_id
+        FROM
+            board
+        where board_no = #{boardNo}
+    </select>
+    
+    <update id="updateViews" parameterType="BoardDTO">
+        UPDATE board     
+		SET
+		    view_cnt = view_cnt+1
+		WHERE
+		        board_no = #{boardNo}
+    </update>
+
+    <delete id="doDelete" parameterType="BoardDTO">
+        DELETE FROM board WHERE board_no = #{boardNo}
+    </delete>
+    <update id="doUpdate" parameterType="BoardDTO">
+        UPDATE board
+		SET
+		    title = #{title},
+		    contents = #{contents},
+		    image = #{image},
+		    mod_dt = SYSDATE,
+		    mod_id = #{modId}
+		WHERE
+		        board_no = #{boardNo}
+    </update>
+
+    <insert id="doSave" parameterType="BoardDTO" 
+		  useGeneratedKeys="true" 
+		  keyProperty="boardNo" 
+		  keyColumn="BOARD_NO">
+	  INSERT INTO board (
+	    title,
+	    contents,
+	    image,
+	    view_cnt,
+	    reg_dt,
+	    reg_id,
+	    mod_dt,
+	    mod_id
+	  ) VALUES (
+	    #{title},
+	    #{contents},
+	    #{image},
+	    0,
+	    SYSDATE,
+	    #{regId},
+	    SYSDATE,
+	    #{modId}
+	  )
+	</insert>
+
+
+</mapper>
