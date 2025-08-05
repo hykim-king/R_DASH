@@ -16,17 +16,23 @@
                  </when>  
                  <!-- 권한 조회 -->
                  <when test=" searchDiv == '30'  ">
-                    role = #{searchWord}
+                    role = 1
                  </when>                                                            
               </choose>
           
           </if>
         </where>
    </sql>
+   
+   <!-- UserNo 얻기(test) -->
+   <select id="getUserNo" parameterType="String" resultType="java.lang.Integer">
+   	SELECT user_no FROM USER_JM
+	WHERE email = #{email}
+   </select>
 
     <!-- 전체 회원 조회, 페이징(관리자) -->
     <select id="userList" parameterType="SearchDTO" resultType="UserDTO">
-      SELECT A.*,B.*                                                        
+    SELECT A.*,B.*                                                        
        FROM (                                                              
          SELECT tt3.RNUM AS no,                                            
                 tt3.user_no AS userNo,                                               
@@ -34,33 +40,30 @@
                 tt3.email,                                                 
                 tt3.image,
                 tt3.role,
-                DECODE(TO_CHAR(tt3.reg_dt,'YYYY-MM-DD'),TO_CHAR(SYSDATE),
-                        (TO_CHAR(tt3.reg_dt,'HH23:MI:SS'),TO_CHAR(tt3.reg_dt,'YYYY-MM-DD')
+                DECODE(TO_CHAR(tt3.reg_dt,'YYYY-MM-DD'),TO_CHAR(SYSDATE,'YYYY-MM-DD'),
+                        TO_CHAR(tt3.reg_dt,'HH24:MI:SS'),TO_CHAR(tt3.reg_dt,'YYYY-MM-DD')) AS regDt
          FROM (                                                            
              SELECT ROWNUM as RNUM,                                        
                     tt2.*                                                  
                FROM(                                                       
                      SELECT t1.*                                           
-                      FROM USER_JM t1          
-                     ORDER BY t1.reg_dt DESC                               
+                      FROM USER_JM t1
+                      WHERE role = 1
+                     ORDER BY t1.reg_dt DESC
+                     <include refid="search"/>                              
              )tt2
-         <![CDATA[                                                          
-             WHERE ROWNUM <= ( #{pageSize} * (#{pageNo} - 1 ) + #{pageSize} )                                             
+    <![CDATA[                                                          
+         WHERE ROWNUM <= ( #{pageSize} * (#{pageNo} - 1 ) + #{pageSize} )                                             
          )tt3                                                              
          WHERE RNUM >= ( #{pageSize} * (#{pageNo} - 1 ) + 1 )
-         ]]>                                                       
-     )A                                                                    
-     CROSS JOIN                                                            
-     (                                                                     
+         ]]>                                               
+     )A
+     CROSS JOIN    
+     (
        SELECT COUNT(*) AS total_cnt                                        
          FROM USER_JM
-       <where>
-           <if test="searchWord != null">
-                email LIKE '%'|| #{searchWord} ||'%' 
-           </if>
-       </where>
-                                                          
-     )B        
+         <include refid="search"/>
+     )B
     </select>
     
     <!-- 로그인 시 비밀번호 확인 -->
@@ -129,7 +132,7 @@
 
     <!-- 전체 회원 조회 -->
     <select id="getAll" resultType="UserDTO">
-        SELECT * FROM USER_JM;
+        SELECT * FROM USER_JM
     </select>
 
     <!-- 전체 회원 수 조회 -->
