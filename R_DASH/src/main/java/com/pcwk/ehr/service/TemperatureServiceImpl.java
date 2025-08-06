@@ -1,6 +1,7 @@
 package com.pcwk.ehr.service;
 
 import java.net.URI;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -88,12 +89,12 @@ public class TemperatureServiceImpl implements TemperatureService {
     }
     
 	@Override
-	public void savePatient(PatientsDTO dto) {
+	public void savePatient(PatientsDTO dto) throws SQLException {
 		temperatureMapper.insertPatient(dto);
 	}
 
 	@Override
-	public List<PatientsDTO> getAllPatients() {
+	public List<PatientsDTO> getAllPatients() throws SQLException {
 		return temperatureMapper.selectAllPatients();
 	}
 
