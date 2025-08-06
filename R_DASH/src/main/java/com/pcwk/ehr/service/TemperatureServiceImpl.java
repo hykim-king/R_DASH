@@ -1,9 +1,14 @@
 package com.pcwk.ehr.service;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -19,11 +24,10 @@ public class TemperatureServiceImpl implements TemperatureService {
     private RestTemplate restTemplate;
 	private TemperatureMapper temperatureMapper;
 	
-    private static final String BASE_URL = "https://apis.data.go.kr/1741000/HeatWaveCasualtiesRegion";
-    private static final String SERVICE_KEY = "VJxg5p3Iyzp7FA0pzgtVA7AYRfaM2YSuLU4h8TMQAvQIJMGkIN7qEpL/QoDBEqo1MnsWnxGR+lN/9SsKlSmbZg==\r\n";
+    private static final String BASE_URL = "http://apis.data.go.kr/1741000/HeatWaveCasualtiesRegion/getHeatWaveCasualtiesRegionList";
+    private static final String SERVICE_KEY = "VJxg5p3Iyzp7FA0pzgtVA7AYRfaM2YSuLU4h8TMQAvQIJMGkIN7qEpL/QoDBEqo1MnsWnxGR+lN/9SsKlSmbZg==";
     
-    
-
+   
     public TemperatureServiceImpl(RestTemplate restTemplate, TemperatureMapper temperatureMapper ) {
         this.restTemplate = restTemplate;
         this.temperatureMapper  = temperatureMapper ;
@@ -31,24 +35,43 @@ public class TemperatureServiceImpl implements TemperatureService {
 
     public void fetchAndSaveData() {
     	int pageNo = 1;
-    	int numOfRows = 100;
+        int numOfRows = 100;
+
         String url = UriComponentsBuilder.fromHttpUrl(BASE_URL)
-                .queryParam("serviceKey", SERVICE_KEY)
+                .queryParam("ServiceKey", SERVICE_KEY)
+                .queryParam("bas_yy", "2024")
                 .queryParam("type", "json")
                 .queryParam("pageNo", pageNo)
                 .queryParam("numOfRows", numOfRows)
                 .toUriString();
 
-        PatientsApiResponse response = restTemplate.getForObject(url, PatientsApiResponse.class);
+        System.out.println("최종 요청 URL: " + url);
 
-        if (response != null && response.getRow() != null) {
-            for (PatientsApiResponse.Row row : response.getRow()) {
-                PatientsDTO dto = convertToDTO(row);
-                savePatient(dto);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON)); // JSON으로 바꿔야 함
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<PatientsApiResponse> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                entity,
+                PatientsApiResponse.class
+        );
+
+        PatientsApiResponse responseBody = response.getBody();
+
+        if (responseBody != null && responseBody.getHeatWaveCasualtiesRegion() != null) {
+            for (PatientsApiResponse.HeatWaveCasualtiesRegionItem item : responseBody.getHeatWaveCasualtiesRegion()) {
+                List<PatientsApiResponse.Row> rowList = item.getRow(); // row가 있을 때만
+                if (rowList != null) {
+                    for (PatientsApiResponse.Row row : rowList) {
+                        PatientsDTO dto = convertToDTO(row);
+                        savePatient(dto);
+                    }
+                }
             }
         }
         
-        System.out.println("6시간마다 데이터 갱신");
     }
 
     private PatientsDTO convertToDTO(PatientsApiResponse.Row row) {
@@ -82,3 +105,4 @@ public class TemperatureServiceImpl implements TemperatureService {
 
 
 }
+
