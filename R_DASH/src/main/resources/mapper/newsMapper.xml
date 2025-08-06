@@ -11,7 +11,7 @@
 		    '주제' || (LEVEL + 1) AS title,
 		    '신문사' || MOD(LEVEL, 3) AS company,
 		    'naver.com' || (LEVEL + 1) AS url,
-		    TO_DATE('2025-08-05', 'YYYY-MM-DD') - 1 AS pub_dt,
+		    SYSDATE || (LEVEL - 1)AS pub_dt,
 		    SYSDATE  AS reg_dt
 		FROM dual
 	<![CDATA[	CONNECT BY LEVEL <= 100 ]]>
