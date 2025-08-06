@@ -1,17 +1,18 @@
 package com.pcwk.ehr.Response;
 
 import java.util.List;
+import java.util.Map;
 
 import com.pcwk.ehr.domain.PatientsDTO;
 
 public class PatientsApiResponse {
-	private List<HeatWaveCasualtiesRegionItem> HeatWaveCasualtiesRegion;
+	private List<Map<String, Object>> HeatWaveCasualtiesRegion;
 
-    public List<HeatWaveCasualtiesRegionItem> getHeatWaveCasualtiesRegion() {
+    public List<Map<String, Object>> getHeatWaveCasualtiesRegion() {
         return HeatWaveCasualtiesRegion;
     }
 
-    public void setHeatWaveCasualtiesRegion(List<HeatWaveCasualtiesRegionItem> heatWaveCasualtiesRegion) {
+    public void setHeatWaveCasualtiesRegion(List<Map<String, Object>> heatWaveCasualtiesRegion) {
         HeatWaveCasualtiesRegion = heatWaveCasualtiesRegion;
     }
 

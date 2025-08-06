@@ -8,5 +8,5 @@ public interface TemperatureService {
 
 	void savePatient(PatientsDTO dto);
     List<PatientsDTO> getAllPatients();
-    void fetchAndSaveData();
+    String fetchAndSaveData();
 }

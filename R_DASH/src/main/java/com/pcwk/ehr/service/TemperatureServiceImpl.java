@@ -1,7 +1,9 @@
 package com.pcwk.ehr.service;
 
+import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -25,53 +27,45 @@ public class TemperatureServiceImpl implements TemperatureService {
 	private TemperatureMapper temperatureMapper;
 	
     private static final String BASE_URL = "http://apis.data.go.kr/1741000/HeatWaveCasualtiesRegion/getHeatWaveCasualtiesRegionList";
-    private static final String SERVICE_KEY = "VJxg5p3Iyzp7FA0pzgtVA7AYRfaM2YSuLU4h8TMQAvQIJMGkIN7qEpL/QoDBEqo1MnsWnxGR+lN/9SsKlSmbZg==";
+    private static final String SERVICE_KEY = "VJxg5p3Iyzp7FA0pzgtVA7AYRfaM2YSuLU4h8TMQAvQIJMGkIN7qEpL%2FQoDBEqo1MnsWnxGR%2BlN%2F9SsKlSmbZg%3D%3D";
     
    
     public TemperatureServiceImpl(RestTemplate restTemplate, TemperatureMapper temperatureMapper ) {
         this.restTemplate = restTemplate;
         this.temperatureMapper  = temperatureMapper ;
     }
+    
+  
+    public String fetchAndSaveData() {
+    	try {
+            URI uri = new URI(BASE_URL +
+                    "?serviceKey=" + SERVICE_KEY +
+                    "&type=json" + 
+                    "&bas_yy=2022" +
+                    "&pageNo=1" +
+                    "&numOfRows=100");
 
-    public void fetchAndSaveData() {
-    	int pageNo = 1;
-        int numOfRows = 100;
+            // HttpHeaders 설정
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Accept", "text/html");  // 여기서 핵심!
 
-        String url = UriComponentsBuilder.fromHttpUrl(BASE_URL)
-                .queryParam("ServiceKey", SERVICE_KEY)
-                .queryParam("bas_yy", "2024")
-                .queryParam("type", "json")
-                .queryParam("pageNo", pageNo)
-                .queryParam("numOfRows", numOfRows)
-                .toUriString();
+            HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        System.out.println("최종 요청 URL: " + url);
+            // RestTemplate로 GET 요청
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    entity,
+                    String.class
+            );
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON)); // JSON으로 바꿔야 함
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+            return response.getBody();
 
-        ResponseEntity<PatientsApiResponse> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                entity,
-                PatientsApiResponse.class
-        );
-
-        PatientsApiResponse responseBody = response.getBody();
-
-        if (responseBody != null && responseBody.getHeatWaveCasualtiesRegion() != null) {
-            for (PatientsApiResponse.HeatWaveCasualtiesRegionItem item : responseBody.getHeatWaveCasualtiesRegion()) {
-                List<PatientsApiResponse.Row> rowList = item.getRow(); // row가 있을 때만
-                if (rowList != null) {
-                    for (PatientsApiResponse.Row row : rowList) {
-                        PatientsDTO dto = convertToDTO(row);
-                        savePatient(dto);
-                    }
-                }
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "오류 발생: " + e.getMessage();
         }
-        
     }
 
     private PatientsDTO convertToDTO(PatientsApiResponse.Row row) {
