@@ -1,5 +1,7 @@
 package com.pcwk.ehr.controller;
 
+import java.util.ArrayList;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Controller;
@@ -43,7 +45,7 @@ public class MainController {
         // 여기서 DB 검색 또는 API 연동 로직 수행
         // 예: 검색어를 그대로 결과로 반환
         model.addAttribute("keyword", keyword);
-        model.addAttribute("results", null); // 결과 리스트 넣기
+        model.addAttribute("results", new ArrayList<>()); // 결과 리스트 넣기
 
         return "searchResults"; // /WEB-INF/views/searchResults.jsp
     }
