@@ -17,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.pcwk.ehr.domain.BoardDTO;
+import com.pcwk.ehr.domain.UserDTO;
 import com.pcwk.ehr.mapper.BoardMapper;
 
 @WebAppConfiguration
@@ -34,9 +35,10 @@ class BoardServiceTest {
 	BoardMapper mapper;
 	
 	@Autowired
-	BoardService service;
+	BoardServiceImpl service;
 	
 	BoardDTO dto;
+
 	
 
 	@BeforeEach
@@ -62,8 +64,28 @@ class BoardServiceTest {
 	 */
 	@Test
 	void doSelectOneGetView() {
+		//1.
 		mapper.deleteAll();
 		assertEquals(0, mapper.getCount());
+		
+		//2.
+		mapper.doSave(dto);
+		assertEquals(1, mapper.getCount());
+		
+		//3.조회
+		BoardDTO outVo = mapper.doSelectOne(dto);
+		int boardNo = outVo.getBoardNo();
+		log.debug("boardNo: {}"+boardNo);
+		
+		//3. 사용자 객체 생성
+		UserDTO user = new UserDTO();
+		
+		user.setNickname("ADMIN");
+		user.setRole(1);
+		
+		service.session.setAttribute("user", user);
+		
+		
 	}
 	
 	@Disabled
