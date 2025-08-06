@@ -33,7 +33,7 @@ public class TemperatureController {
         return temperatureService.getAllPatients();
     }
     
-    @GetMapping("/test-insert")
+    @GetMapping(value = "/test-insert", produces ="text/plain;charset=UTF-8")
     public String testInsert() {
         temperatureService.fetchAndSaveData();
         return "실행 완료";
