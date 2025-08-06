@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pcwk.ehr.mapper.TopicMapper">
+    <select id="getTodayTopics" parameterType="TopicDTO" resultType="TopicDTO">
+            SELECT
+		        topic_no,
+		        title,
+		        TO_CHAR(reg_dt, 'YYYY-MM-DD') AS reg_dt
+		    FROM
+		        topic
+		    WHERE
+		        TRUNC(reg_dt) = TRUNC(SYSDATE)
+		    ORDER BY
+		        topic_no DESC
+    </select>
+    
+    <select id="doSelectOne" parameterType="TopicDTO" resultType="TopicDTO">
+        SELECT
+		    topic_no,
+		    title,
+		    contents,
+		    TO_CHAR(reg_dt, 'YYYY-MM-DD') AS reg_dt,
+            reg_id,
+		    TO_CAHR(mod_dt,'YYYY-MM-DD) as modDt,
+		    mod_id,
+		    topic_ratio
+		FROM
+		    topic
+		WHERE topic_no = #{topicNo}
+    </select>
+    
+    <insert id="doSave" useGeneratedKeys="true" 
+					  keyProperty="topicNo" 
+					  keyColumn="TOPIC_NO">
+        INSERT INTO topic (
+		    title,
+		    contents,
+		    reg_dt,
+		    reg_id,
+		    mod_dt,
+		    mod_id,
+		    topic_ratio
+		) VALUES ( 
+		           #{title},
+		           #{contents},
+		           #{regDt},
+		           #{regId},
+		           #{modDt},
+		           #{regId},
+		           #{topicRatio} )
+    </insert>
+    <update id="doUpdate" parameterType="TopicDTO">
+        UPDATE topic
+		SET
+		    title = #{title},
+		    contents = #{contents},
+		    mod_dt = SYSDATE,
+		    mod_id = #{modId},
+		    topic_ratio = NULL
+		WHERE TOPIC_NO = #{topicNo}
+    </update>
+    
+    <delete id="doDelete" parameterType="TopicDTO">
+         DELETE FROM TOPIC
+         WHERE 
+            topic_no =  #{topicNo}
+    </delete>
+    <select id="getCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) cnt FROM TOPIC
+    </select>
+    <delete id="deleteAll" >
+        DELETE FROM TOPIC
+    </delete>
+    <insert id="saveAll">
+        INSERT INTO TOPIC (
+            title,contents,reg_id,reg_dt,mod_id,mod_dt,topic_ratio
+            )
+	        SELECT 
+	            '주제' || LEVEL as title,
+	            '주제의 내용'|| LEVEL as contents,
+	            'ADMIN' as regId,
+	            SYSDATE as regDt,
+	            'ADMIN' as modId,
+	            SYSDATE as modDt
+	        FROM dual
+   <![CDATA[   CONNECT BY LEVEL <= 100 ]]>           
+    </insert>
+    
+</mapper>

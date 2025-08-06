@@ -41,6 +41,10 @@
 		<commons-fileupload-version>1.5</commons-fileupload-version>
 	</properties>
 	<dependencies>
+	   <dependency>
+		    <groupId>com.fasterxml.jackson.core</groupId>
+		    <artifactId>jackson-databind</artifactId>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
 		<dependency>
 		    <groupId>org.mockito</groupId>

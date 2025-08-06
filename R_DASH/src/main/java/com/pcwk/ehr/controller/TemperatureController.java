@@ -28,7 +28,7 @@ public class TemperatureController {
         return "등록 완료";
     }
     
-    @GetMapping("/patients.do")
+    @GetMapping("/patients.do" )
     public List<PatientsDTO> getPatients() {
         return temperatureService.getAllPatients();
     }
