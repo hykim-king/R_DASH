@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.BoardDTO;
 
-@Service
 public interface BoardService {
 	List<BoardDTO> doRetrieve(SearchDTO param);
 	
