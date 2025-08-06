@@ -16,6 +16,7 @@
     <typeAlias alias="NowcastDTO" type="com.pcwk.ehr.domain.NowcastDTO"/>
     <typeAlias alias="NewsDTO" type="com.pcwk.ehr.domain.NewsDTO"/>
     <typeAlias alias="TopicDTO" type="com.pcwk.ehr.domain.TopicDTO"/>
+    <typeAlias alias="ChatDTO" type="com.pcwk.ehr.domain.ChatDTO"/>
  </typeAliases>
  
  
