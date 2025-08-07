@@ -1,11 +1,16 @@
 import requests
 import json
 import datetime
-import pandas as pd  # pandas 라이브러리 추가
+import pandas as pd
 
 
 # --- base_date와 base_time 계산 함수 (이전과 동일) ---
-def get_base_datetime():
+def base_datetime():
+    """
+    현재 날짜와 시간을 구하고, 현재 분이 40분이 안될 시 이전 현재 시 - 1 후 30분 추가
+    현재 시가 0시 일 시, 전날 23시30분 데이터를 가져옴.
+    30분에 데이터 수집, 40분에 발표 ex) 23시30분에 데이터를 수집하면 23시 40분에 업데이트
+    """
     now = datetime.datetime.now()
     current_hour = now.hour
     current_minute = now.minute
@@ -24,32 +29,28 @@ def get_base_datetime():
     return base_date, base_time
 
 
-# --- API 요청 URL ---
 URL = 'http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst'
 SERVICE_KEY = 'VJxg5p3Iyzp7FA0pzgtVA7AYRfaM2YSuLU4h8TMQAvQIJMGkIN7qEpL/QoDBEqo1MnsWnxGR+lN/9SsKlSmbZg=='
 
 # --- 엑셀 파일에서 시군구별 NX, NY 좌표 읽기 ---
-excel_file_path = 'NowCast.xlsx'  # 본인의 엑셀 파일 경로와 이름을 여기에 입력하세요.
+nowcast_excel = 'NowCast.xlsx'
 
 try:
-    # 엑셀 파일 읽기 (헤더가 첫 번째 행에 있다고 가정)
-    df = pd.read_excel(excel_file_path)
-    print(f"✔️ 엑셀 파일 '{excel_file_path}' 로드 성공.")
-    # 🌟 '시군구' 컬럼이 NaN인 행을 제거합니다. (가장 중요!)
+    # 엑셀 파일 읽기
+    df = pd.read_excel(nowcast_excel)
+    print(f"{nowcast_excel}' 로드 성공.")
+    # '시군구' 컬럼이 NaN인 행을 제거
     df_cleaned = df.dropna(subset=['2단계'])
 
-    # 엑셀 파일의 데이터 미리보기 (확인용)
-    # print(df.head())
-
-    # 2단계(시군구)까지의 데이터만 추출하고 중복 제거 (NX, NY는 시군구 단위로 대표값 하나만 필요할 것이므로)
-    # 실제 엑셀 파일의 컬럼명에 따라 '시도', '시군구', 'NX', 'NY'를 수정해야 합니다.
-    # 동읍면까지 있으니 시군구 단위로 nx,ny를 대표하는 값이 있다고 가정하고 중복 제거
+    # 2단계(시군구)까지의 데이터만 추출하고 중복 제거 (NX, NY는 시군구 단위로 대표값 하나만 필요)
+    # 실제 엑셀 파일의 컬럼명.
+    # 시군구 단위로 nx,ny를 대표하는 값 중복 제거
     sigungu_coords_df = df_cleaned[['1단계', '2단계', '격자 X', '격자 Y']].drop_duplicates(subset=['1단계', '2단계'])
 
     # DataFrame을 순회하며 API 호출
-    all_sigungu_temperatures = {}  # 결과를 저장할 딕셔너리
+    all_temperatures = {}  # 결과를 저장할 딕셔너리
 
-    base_date, base_time = get_base_datetime()
+    base_date, base_time = base_datetime()
     display_time = base_time[:2]
 
     print(f"\n✔️ {base_date} {display_time}시 기준 전국 시군구 초단기 실황 데이터 수집 시작...")
@@ -61,7 +62,7 @@ try:
         nx = str(row['격자 X'])  # NX, NY가 숫자인 경우 문자열로 변환 필요
         ny = str(row['격자 Y'])
 
-        full_region_name = f"{sido_name} {sigungu_name}"  # 출력용 지역 이름
+        region_name = f"{sido_name} {sigungu_name}"  # 출력용 지역 이름
 
         params = {
             'serviceKey': SERVICE_KEY,
@@ -83,7 +84,7 @@ try:
                 result_code = data['response']['header']['resultCode']
                 if result_code != '00':  # '00'이 아니면 오류 발생
                     print(
-                        f"  ❌ {full_region_name} API 응답 오류: {data['response']['header']['resultMsg']} (코드: {result_code})")
+                        f"  ❌ {region_name} API 응답 오류: {data['response']['header']['resultMsg']} (코드: {result_code})")
                     continue  # 다음 지역으로 넘어감
 
                 items = data['response']['body']['items']['item']
@@ -95,29 +96,26 @@ try:
                         break
 
                 if current_temp is not None:
-                    all_sigungu_temperatures[full_region_name] = current_temp
-                    print(f"  ✅ {full_region_name}: {current_temp}℃")
+                    all_temperatures[region_name] = current_temp
+                    print(f"  ✅ {region_name}: {current_temp}℃")
                 else:
-                    print(f"  ⚠️ {full_region_name}: 기온 데이터(T1H)를 찾을 수 없습니다.")
+                    print(f"  ⚠️ {region_name}: 기온 데이터(T1H)를 찾을 수 없습니다.")
 
             else:
-                print(f"  ❌ {full_region_name} HTTP 요청 실패: {response.status_code}")
+                print(f"  ❌ {region_name} HTTP 요청 실패: {response.status_code}")
 
         except Exception as e:
-            print(f"  🚨 {full_region_name} 데이터 처리 중 예외 발생: {e}")
+            print(f"  🚨 {region_name} 데이터 처리 중 예외 발생: {e}")
 
 except FileNotFoundError:
-    print(f"❌ 오류: 엑셀 파일 '{excel_file_path}'을(를) 찾을 수 없습니다. 경로를 확인해주세요.")
+    print(f"❌ 오류: 엑셀 파일 '{nowcast_excel}'을(를) 찾을 수 없습니다. 경로를 확인해주세요.")
 except KeyError as e:
     print(f"❌ 오류: 엑셀 파일의 컬럼명 오류입니다. '{e}' 컬럼이 존재하지 않거나 이름을 확인해주세요. ")
     print("엑셀 파일의 컬럼명('시도', '시군구', 'NX', 'NY')을 코드에 맞게 수정해야 합니다.")
 except Exception as e:
     print(f"❌ 엑셀 파일 처리 중 예상치 못한 오류 발생: {e}")
 
-print(f"\n--- 전국 시군구 기온 데이터 수집 완료 ({len(all_sigungu_temperatures)}개 시군구) ---")
-# 최종 수집된 데이터를 출력하거나 파일로 저장, DB에 넣는 등의 후처리 가능
-# for name, temp in all_sigungu_temperatures.items():
-#     print(f"{name}: {temp}℃")
+print(f"\n--- 전국 기온 데이터 수집 완료) ---")
 
 # 수집된 데이터를 새로운 DataFrame으로 만들어 엑셀로 저장할 수도 있습니다.
 # output_df = pd.DataFrame(list(all_sigungu_temperatures.items()), columns=['지역', '현재기온'])
