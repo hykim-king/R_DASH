@@ -2,6 +2,24 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pcwk.ehr.mapper.TemperatureMapper">
     
+    <insert id="insertNowcast" parameterType="NowcastDTO">
+        INSERT INTO PATIENTS (
+			BASE_DATE
+			BASE_TIME
+			NX
+			NY
+			CATEGORY
+			OBSR_VALUE
+        ) VALUES (
+            #{baseDate}, 
+            #{baseTime}, 
+            #{nx}, 
+            #{ny}, 
+            #{category},
+            #{obsrValue}
+        )
+    </insert>
+    
     <insert id="insertPatient" parameterType="PatientsDTO">
         INSERT INTO PATIENTS (
             YEAR, 
