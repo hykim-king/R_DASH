@@ -17,6 +17,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.pcwk.ehr.Response.PatientsApiResponse;
+import com.pcwk.ehr.domain.NowcastDTO;
 import com.pcwk.ehr.domain.PatientsDTO;
 import com.pcwk.ehr.mapper.TemperatureMapper;
 
@@ -25,6 +26,8 @@ public class TemperatureServiceImpl implements TemperatureService {
 
 	@Autowired
     private RestTemplate restTemplate;
+	
+	@Autowired
 	private TemperatureMapper temperatureMapper;
 	
     private static final String BASE_URL = "http://apis.data.go.kr/1741000/HeatWaveCasualtiesRegion/getHeatWaveCasualtiesRegionList";
@@ -60,7 +63,7 @@ public class TemperatureServiceImpl implements TemperatureService {
                     entity,
                     String.class
             );
-
+            
             return response.getBody();
 
         } catch (Exception e) {
@@ -69,7 +72,7 @@ public class TemperatureServiceImpl implements TemperatureService {
         }
     }
 
-    private PatientsDTO convertToDTO(PatientsApiResponse.Row row) {
+    private PatientsDTO patientsConvertToDTO(PatientsApiResponse.Row row) {
     	String region = row.getRegi();
         int year = Integer.parseInt(row.getBas_yy());
         int total = parseIntSafe(row.getTot());
@@ -96,6 +99,13 @@ public class TemperatureServiceImpl implements TemperatureService {
 	@Override
 	public List<PatientsDTO> getAllPatients() throws SQLException {
 		return temperatureMapper.selectAllPatients();
+	}
+
+
+	@Override
+	public void saveNowcast(NowcastDTO dto) throws SQLException {
+		temperatureMapper.insertNowcast(dto);
+		
 	}
 
 
