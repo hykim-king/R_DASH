@@ -60,10 +60,10 @@ class BoardServiceTest {
 		
 	}
 	/**
-	 * 관리자가 아닌 사용자일 때만 조회수 증가
+	 * 일반 유저 조회 => 조회수 증가X
 	 */
 	@Test
-	void doSelectOneGetView() {
+	void userGetView() {
 		//1.
 		mapper.deleteAll();
 		assertEquals(0, mapper.getCount());
@@ -75,7 +75,52 @@ class BoardServiceTest {
 		//3.조회
 		BoardDTO outVo = mapper.doSelectOne(dto);
 		int boardNo = outVo.getBoardNo();
+		int getView = outVo.getViewCnt();
+		log.debug("outVo: {}"+outVo);
 		log.debug("boardNo: {}"+boardNo);
+		log.debug("getView: {}"+getView);
+		assertEquals(0, getView);
+		
+		//3. 사용자 객체 생성
+		UserDTO user = new UserDTO();
+		
+		user.setNickname("user01");
+		user.setRole(2);
+		
+		//로그인 여부 상관없이 조회수 오름.
+		service.session.setAttribute("user", user);
+		
+		//4. 조회수 확인(관리자일 때는 조회수 오르지 X)
+		BoardDTO inVo = service.doSelectOne(outVo);
+		log.debug("inVo: {}"+inVo);
+		
+		int afterView = inVo.getViewCnt();
+		log.debug("afterView: {}"+afterView);
+		assertEquals(1, afterView);
+	}
+	
+	/**
+	 * 관리자 조회 => 조회수 증가 X
+	 */
+	//@Disabled
+	@Test
+	void adminGetView() {
+		//1.
+		mapper.deleteAll();
+		assertEquals(0, mapper.getCount());
+		
+		//2.
+		mapper.doSave(dto);
+		assertEquals(1, mapper.getCount());
+		
+		//3.조회
+		BoardDTO outVo = mapper.doSelectOne(dto);
+		int boardNo = outVo.getBoardNo();
+		int getView = outVo.getViewCnt();
+		log.debug("outVo: {}"+outVo);
+		log.debug("boardNo: {}"+boardNo);
+		log.debug("getView: {}"+getView);
+		assertEquals(0, getView);
 		
 		//3. 사용자 객체 생성
 		UserDTO user = new UserDTO();
@@ -85,10 +130,16 @@ class BoardServiceTest {
 		
 		service.session.setAttribute("user", user);
 		
+		//4. 조회수 확인(관리자일 때는 조회수 오르지 X)
+		BoardDTO inVo = service.doSelectOne(outVo);
+		log.debug("inVo: {}"+inVo);
 		
+		int afterView = inVo.getViewCnt();
+		log.debug("afterView: {}"+afterView);
+		assertEquals(0, afterView);
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");
