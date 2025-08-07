@@ -35,6 +35,8 @@ SERVICE_KEY = 'VJxg5p3Iyzp7FA0pzgtVA7AYRfaM2YSuLU4h8TMQAvQIJMGkIN7qEpL/QoDBEqo1M
 # --- 엑셀 파일에서 시군구별 NX, NY 좌표 읽기 ---
 nowcast_excel = 'NowCast.xlsx'
 
+all_data = []
+
 try:
     # 엑셀 파일 읽기
     df = pd.read_excel(nowcast_excel)
@@ -115,9 +117,17 @@ except KeyError as e:
 except Exception as e:
     print(f"❌ 엑셀 파일 처리 중 예상치 못한 오류 발생: {e}")
 
-print(f"\n--- 전국 기온 데이터 수집 완료) ---")
+print(f"\n--- 전국 기온 데이터 수집 완료 ---")
 
-# 수집된 데이터를 새로운 DataFrame으로 만들어 엑셀로 저장할 수도 있습니다.
-# output_df = pd.DataFrame(list(all_sigungu_temperatures.items()), columns=['지역', '현재기온'])
-# output_df.to_excel("sigungu_current_temperatures.xlsx", index=False)
-# print("\n수집된 데이터가 'sigungu_current_temperatures.xlsx' 파일로 저장되었습니다.")
+# 수집된 데이터를 CSV 파일로 저장
+if all_data:  # 수집된 데이터가 있을 경우에만 CSV 저장
+    output_df = pd.DataFrame(all_data)
+    csv_file_name = f"nowcast_{base_date}_{base_time}.csv"
+
+    try:
+        output_df.to_csv(csv_file_name, index=False, encoding='utf-8-sig')  # 한글 깨짐 방지를 위해 'utf-8-sig' 사용
+        print(f"\n✅ 수집된 데이터가 '{csv_file_name}' 파일로 성공적으로 저장되었습니다.")
+    except Exception as e:
+        print(f"❌ CSV 파일 저장 중 오류 발생: {e}")
+else:
+    print("\n❗ 수집된 데이터가 없어서 CSV 파일을 생성하지 않습니다.")
