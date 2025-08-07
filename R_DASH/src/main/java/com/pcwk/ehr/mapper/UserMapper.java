@@ -17,23 +17,26 @@ public interface UserMapper{
 	
 	// 회원 삭제 OO
 	public int deleteUser(int userNo);
+	
+	// 비밀번호 확인 OO
+	public String findPw(String email);
 
-	// 회원 정보 수정 O
+	// 회원 정보 수정 OO
 	public int updateUser(UserDTO param);
 
-	// 이메일 확인(회원가입 시 중복체크, 비밀번호 찾기) O 
+	// 이메일 확인(회원가입 시 중복체크, 비밀번호 찾기) OO 
 	public int checkEmail(String email);
 	
-	// 로그인 시 비밀번호 확인 O
+	// 로그인 시 비밀번호 확인 OO
 	public int checkPw(UserDTO param);
 	
-	// 전체 회원 조회, 페이징(관리자) O
+	// 전체 회원 조회, 페이징(관리자) OO
 	public List<UserDTO> userList(SearchDTO param);
 
 	// 회원 전체 삭제(test) OO
 	public int deleteAll();
 	
-	//다건 등록(test) O
+	//다건 등록(test) OO
 	public int saveAll();
 	
 	//UserNo 얻기(test) OO
@@ -44,6 +47,9 @@ public interface UserMapper{
 	
 	//전체 회원 조회 OO
 	public List<UserDTO> getAll();
+	
+	//권한 변경 OO
+	public int updateRole(UserDTO param);
 	
 
 	

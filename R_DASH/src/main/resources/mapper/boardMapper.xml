@@ -105,11 +105,11 @@
     <update id="doUpdate" parameterType="BoardDTO">
         UPDATE board
 		SET
-		    title = #{title},
-		    contents = #{contents},
-		    image = #{image},
+		    title = #{title, jdbcType=VARCHAR},
+		    contents = #{contents, jdbcType=VARCHAR},
+		    image = #{image, jdbcType=VARCHAR},
 		    mod_dt = SYSDATE,
-		    mod_id = #{modId}
+		    mod_id = #{modId, jdbcType=VARCHAR}
 		WHERE
 		        board_no = #{boardNo}
     </update>
@@ -128,14 +128,14 @@
 	    mod_dt,
 	    mod_id
 	  ) VALUES (
-	    #{title},
-	    #{contents},
-	    #{image},
+	    #{title, jdbcType=VARCHAR},
+	    #{contents, jdbcType=VARCHAR},
+	    #{image, jdbcType=VARCHAR},
 	    0,
 	    SYSDATE,
-	    #{regId},
+	    #{regId, jdbcType=VARCHAR},
 	    SYSDATE,
-	    #{modId}
+	    #{modId, jdbcType=VARCHAR}
 	  )
 	</insert>
 

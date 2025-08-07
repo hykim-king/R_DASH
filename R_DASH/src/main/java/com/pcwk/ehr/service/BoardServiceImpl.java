@@ -34,14 +34,15 @@ public class BoardServiceImpl implements BoardService {
 	 */
 	@Override
 	public BoardDTO doSelectOne(BoardDTO param) {
-		//로그인이 되어 있으며,
 		//admin -> role == 1 일 경우만 조회수 오름.
 		UserDTO user = (UserDTO) session.getAttribute("user"); 
 		
-		if(user.getRole() != 1) {
-		int flag = boardMapper.updateViews(param);
-		log.debug("flag: {}",flag);
+		if(user == null) {
+			boardMapper.updateViews(param);
+		}else if(user.getRole() != 1) {
+			boardMapper.updateViews(param);
 		}
+		
 		return boardMapper.doSelectOne(param);
 	}
 

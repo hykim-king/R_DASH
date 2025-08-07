@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,8 @@ public class NewsServiceImpl implements NewsService {
 	TopicMapper topicMapper;
 	
 	UserDTO userDTO;
+	
+	Logger log = LogManager.getLogger(getClass());
 	
 	@Autowired
 	HttpSession session;
@@ -56,9 +60,10 @@ public class NewsServiceImpl implements NewsService {
 	public int doSave(TopicDTO param) {
 		//컨트롤러에서 세션 설정되면 변경하기.
 		UserDTO user = (UserDTO) session.getAttribute("user"); 
-
-		if (user == null || user.getRole() != 1) {
-			throw new RuntimeException("관리자만 삭제할 수 있습니다.");
+		if(user==null) {
+			throw new NullPointerException("로그인 필요");
+		}else if(user.getRole() != 1) {
+			throw new RuntimeException("관리자 권한 필요");
 		}
 		param.setRegId(user.getNickname());
 		return topicMapper.doSave(param);
@@ -66,7 +71,14 @@ public class NewsServiceImpl implements NewsService {
 
 	@Override
 	public int doUpdate(TopicDTO param) {
-		param.setRegId(userDTO.getNickname());
+		UserDTO user = (UserDTO) session.getAttribute("user"); 
+
+		if(user==null) {
+			throw new NullPointerException("로그인 필요");
+		}else if(user.getRole() != 1) {
+			throw new RuntimeException("관리자 권한 필요");
+		}
+		param.setModId(user.getNickname());
 		return topicMapper.doUpdate(param);
 	}
 
