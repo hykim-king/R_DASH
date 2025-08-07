@@ -2,7 +2,7 @@ package com.pcwk.ehr.domain;
 
 public class NowcastDTO {
 
-	private int nowcastNo;
+	private Integer nowcastNo;
 	private String baseDate;
 	private String baseTime;
 	private int nx;
@@ -14,7 +14,7 @@ public class NowcastDTO {
 	}
 
 	
-	public int getNowcastNo() {
+	public Integer getNowcastNo() {
 		return nowcastNo;
 	}
 
@@ -70,7 +70,7 @@ public class NowcastDTO {
 		this.obsrValue = obsrValue;
 	}
 
-	public NowcastDTO(int nowcastNo, String baseDate, String baseTime, int nx, int ny, String category, int obsrValue) {
+	public NowcastDTO(Integer nowcastNo, String baseDate, String baseTime, int nx, int ny, String category, int obsrValue) {
 		super();
 		this.nowcastNo = nowcastNo;
 		this.baseDate = baseDate;
