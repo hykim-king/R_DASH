@@ -19,10 +19,24 @@
                     role = 1
                  </when>                                                            
               </choose>
-          
           </if>
         </where>
    </sql>
+   
+   <!-- 비밀번호 확인 -->
+   <select id="findPw" parameterType="String" resultType="String">
+    SELECT password FROM USER_JM
+    WHERE email = #{email}
+   </select>
+   
+   
+   <!-- 권한 변경 -->
+   <update id="updateRole" parameterType="UserDTO">
+    UPDATE USER_JM
+	SET 
+	    role = #{role}
+	WHERE user_no = #{userNo}
+   </update>
    
    <!-- UserNo 얻기(test) -->
    <select id="getUserNo" parameterType="String" resultType="java.lang.Integer">
@@ -48,9 +62,8 @@
                FROM(                                                       
                      SELECT t1.*                                           
                       FROM USER_JM t1
-                      WHERE role = 1
-                     ORDER BY t1.reg_dt DESC
-                     <include refid="search"/>                              
+                      <include refid="search"/>
+                     ORDER BY t1.reg_dt DESC                            
              )tt2
     <![CDATA[                                                          
          WHERE ROWNUM <= ( #{pageSize} * (#{pageNo} - 1 ) + #{pageSize} )                                             
@@ -89,9 +102,9 @@
             <if test="nickname != null">nickname=#{nickname},</if>
 			<if test="image != null">image=#{image},</if>
 			<if test="tel != null">tel=#{tel},</if>
-			<if test="zipCode != null">zipCode=#{zipCode},</if>
+			<if test="zipCode != null">zip_code=#{zipCode},</if>
 			<if test="address != null">address=#{address},</if>
-			<if test="detailAddress != null">detailAddress=#{detailAddress},</if>
+			<if test="detailAddress != null">detail_address=#{detailAddress},</if>
 			</set>
 			WHERE
 			user_no = #{userNo}
