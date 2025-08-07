@@ -19,6 +19,20 @@ public class DTO {
 	}
 
 	/**
+	 * @param no
+	 * @param totalCnt
+	 * @param pageSize
+	 * @param pageNo
+	 */
+	public DTO(int no, int totalCnt, int pageSize, int pageNo) {
+		super();
+		this.no = no;
+		this.totalCnt = totalCnt;
+		this.pageSize = pageSize;
+		this.pageNo = pageNo;
+	}
+
+	/**
 	 * @return the pageSize
 	 */
 	public int getPageSize() {

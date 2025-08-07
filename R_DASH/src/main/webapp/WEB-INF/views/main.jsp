@@ -47,42 +47,188 @@ html, body {
     justify-content: center;
     align-items: center;
     text-align: center;
+    padding-top: 80px;
     position: relative;
 }
 
-/* 상단 네비게이션 */
+/* 상단 네비게이션 바 */
 .top-bar {
-    position: absolute;
+    position: fixed;
     top: 0;
+    left: 0;
     width: 100%;
     padding: 10px 30px;
-    background: rgba(0, 0, 0, 0.3);
+    background: rgba(0, 0, 0, 0.4);
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+/* 언어/로그인 버튼 */
+.right-menu {
+    position: absolute;
+    right: 30px;
+    display: flex;
+    gap: 10px;
     align-items: center;
 }
 
-.nav-button-group a {
-    margin-right: 10px;
-    color: white;
-    text-decoration: none;
-}
-
-.nav-button-group a:hover {
-    text-decoration: underline;
-}
-
 .lang-btn, .login-btn {
-    margin-left: 10px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
+.lang-btn {
+    background-color: #6c757d;
+    color: white;
 }
 
 .login-btn {
     background-color: #dc3545;
     color: white;
-    border: none;
 }
 
-/* 메인 타이틀 */
+/* 상단 메뉴 */
+.center-menu {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    z-index: 1;
+}
+
+.center-menu a {
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* 드롭다운 메뉴 전체 묶음 */
+.dropdown-wrapper {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    padding-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    z-index: 999;
+    background: transparent;
+}
+
+/* 각 세로 드롭다운 그룹 */
+.dropdown-column {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 드롭다운 항목 */
+.dropdown-column a {
+    color: white;
+    text-decoration: none;
+    padding: 6px 12px;
+    white-space: nowrap;
+    font-size: 0.9rem;
+}
+
+.dropdown-column a:hover {
+    text-decoration: underline;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+
+.dropdown-wrap:hover .mega-dropdown {
+  display: flex;
+}
+/* 각각의 nav-item 안에 있을 때만 드롭다운 표시 */
+.nav-item {
+  position: relative;
+}
+
+.submenu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  display: none;
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 10px 0;
+  border-radius: 6px;
+  min-width: 160px;
+  z-index: 1000;
+}
+
+.submenu a {
+  color: white;
+  padding: 8px 20px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.submenu a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.dropdown:hover .submenu {
+  display: flex;
+}
+
+/* 드롭다운 메뉴 표시 트리거 */
+.top-bar:hover + .dropdown-wrapper,
+.center-menu:hover + .dropdown-wrapper,
+.dropdown-wrapper:hover {
+    display: flex !important;
+}
+
+/* 기본은 숨김 */
+.mega-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  padding: 15px 20px;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 999;
+  flex-direction: row;
+  gap: 40px;
+}
+
+/* 드롭다운 내부 세로 컬럼 */
+.mega-dropdown .dropdown-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.mega-dropdown .dropdown-column a {
+  color: white;
+  text-decoration: none;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+}
+
+.mega-dropdown .dropdown-column a:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+//* 모든 상단 메뉴에 마우스를 올렸을 때 전체 드롭다운 표시 */
+.top-bar:hover ~ .mega-dropdown,
+.mega-dropdown:hover {
+  display: flex;
+}
+
+/* 검색창 */
+.search-container {
+    margin-top: 150px;
+    text-align: center;
+}
+
 .search-container h1 {
     font-size: 1.6rem;
     font-weight: bold;
@@ -90,16 +236,10 @@ html, body {
     text-shadow: 1px 1px 4px rgba(0,0,0,0.5);
 }
 
-/* 검색창 */
-.search-container {
-    margin-top: 150px;
-}
-
 .search-box {
     display: flex;
-    flex-direction: row;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     width: 320px;
     margin: 15px auto;
 }
@@ -118,10 +258,6 @@ html, body {
     padding: 10px 18px;
     background-color: #dc3545;
     color: white;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-size: 0.9rem;
 }
 
@@ -143,7 +279,7 @@ html, body {
     text-shadow: 1px 1px 3px black;
 }
 
-/* FAQ */
+/* FAQ 섹션 */
 .faq-section {
     background-color: #212529;
     color: white;
@@ -176,20 +312,62 @@ img.card-img-top {
 
 <!-- 메인 화면 -->
 <div class="main-section main-background">
-    <div class="top-bar">
-        <div class="d-flex align-items-center">
-            <a class="btn btn-sm btn-light me-2">메뉴</a>
-            <div class="nav-button-group d-none d-md-inline">
-                <a href="#news">통계 페이지</a>
-                <a href="#news">지도 페이지</a>
-                <a href="#faq">조회 페이지</a>
-            </div>
-        </div>
-        <div>
-            <button class="btn btn-sm btn-secondary lang-btn">🌐 한국어 ▼</button>
-            <button class="btn btn-sm login-btn">로그인</button>
-        </div>
-    </div>
+   <!-- 상단 네비게이션 -->
+<!-- ✅ 상단 메뉴에 마우스를 올리면 전체 드롭다운이 한 번에 열리는 구조로 수정된 버전 -->
+
+<!-- 기존 코드 유지하며 변경된 부분만 반영 -->
+
+<!-- ✅ HTML 구조 정리: mega-dropdown을 하나만 선언하고 공통으로 노출 -->
+<div class="top-bar">
+  <div class="center-menu">
+    <div class="nav-item"><a href="#">통계 페이지</a></div>
+    <div class="nav-item"><a href="#">재난 페이지</a></div>
+    <div class="nav-item"><a href="#">뉴스 페이지</a></div>
+    <div class="nav-item"><a href="#">토픽 페이지</a></div>
+    <div class="nav-item"><a href="#">지도 페이지</a></div>
+    <div class="nav-item"><a href="#">마이 페이지</a></div>
+  </div>
+
+  <div class="right-menu">
+    <button class="lang-btn">🌐 한국어 ▾</button>
+    <button class="login-btn">로그인</button>
+  </div>
+</div>
+
+<!-- ✅ 전체 드롭다운: 메뉴에 마우스 오버 시 한 번에 노출 -->
+<div class="mega-dropdown">
+  <div class="dropdown-column">
+    <a href="#">온여지료환자 통계</a>
+    <a href="#">초단기 실화 통계</a>
+    <a href="#">공공시설 복구현황</a>
+    <a href="#">화장 재난 통계</a>
+    <a href="#">소화기 통계</a>
+  </div>
+  <div class="dropdown-column">
+    <a href="#">지진</a>
+    <a href="#">황사</a>
+    <a href="#">싱크홀</a>
+  </div>
+  <div class="dropdown-column">
+    <a href="#">오늘의 뉴스</a>
+    <a href="#">재난 뉴스</a>
+    <a href="#">그것이 알고싶다!</a>
+  </div>
+  <div class="dropdown-column">
+    <a href="#">안녕</a>
+    <a href="#">클레오파트라</a>
+    <a href="#">세상에서 제일가는 포테이토치프</a>
+  </div>
+  <div class="dropdown-column">
+    <a href="#">지진은 어디인가?</a>
+    <a href="#">황사 바람 온다.</a>
+    <a href="#">싱크홀 땅 긴진~</a>
+  </div>
+  <div class="dropdown-column">
+    <a href="#">게시판</a>
+  </div>
+</div>
+
 
     <div class="search-container backInUp">
         <h1>저희 재난 알림 사이트를 방문해주셔서 감사합니다.</h1>
@@ -209,7 +387,7 @@ img.card-img-top {
         <div class="row">
             <div class="col-md-4 mb-3">
                 <div class="card h-100">
-                    <img src="https://source.unsplash.com/600x400/?earthquake,nature" class="card-img-top" alt="지진 이미지">
+                    <img src="${CP}/resources/image/earth.jpg" class="card-img-top" alt="지진 이미지">
                     <div class="card-body">
                         <h5 class="card-title">[속보] 강진 발생</h5>
                         <p class="card-text">해당 지역 주민은 안전한 곳으로 대피 바랍니다.</p>
@@ -218,7 +396,7 @@ img.card-img-top {
             </div>
             <div class="col-md-4 mb-3">
                 <div class="card h-100">
-                    <img src="https://source.unsplash.com/600x400/?fire,emergency" class="card-img-top" alt="화재 이미지">
+                    <img src="${CP}/resources/image/dis.jpg" class="card-img-top" alt="화재 이미지">
                     <div class="card-body">
                         <h5 class="card-title">화재 시 행동요령 안내</h5>
                         <p class="card-text">119 긴급 행동요령 숙지로 생명을 지키세요.</p>
@@ -227,7 +405,7 @@ img.card-img-top {
             </div>
             <div class="col-md-4 mb-3">
                 <div class="card h-100">
-                    <img src="https://source.unsplash.com/600x400/?ambulance,emergency" class="card-img-top" alt="응급 이미지">
+                    <img src="${CP}/resources/image/med.jpg" class="card-img-top" alt="응급 이미지">
                     <div class="card-body">
                         <h5 class="card-title">응급상황 대응 시스템 강화</h5>
                         <p class="card-text">최근 대응 시간 단축을 위한 시스템 개편 발표.</p>
