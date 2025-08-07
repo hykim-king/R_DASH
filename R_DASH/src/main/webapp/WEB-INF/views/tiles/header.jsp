@@ -1,7 +1,7 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
   <!-- Sidenav -->
-  <nav class="sidenav navbar navbar-vertical  fixed-left  navbar-expand-xs navbar-light bg-white" id="sidenav-main">
+<nav class="sidenav navbar navbar-vertical  fixed-left  navbar-expand-xs navbar-light bg-white" id="sidenav-main">
     <div class="scrollbar-inner">
       <!-- Brand -->
       <div class="sidenav-header  d-flex  align-items-center">
@@ -29,7 +29,7 @@
                 <i class="ni ni-map-big text-primary"></i>
                 <span class="nav-link-text">지도</span>
               </a>
-              <div class="collapse show" id="navbar-dashboards">
+              <div class="collapse" id="navbar-dashboards">
                 <ul class="nav nav-sm flex-column">
                   <li class="nav-item">
                     <a href="#" class="nav-link">
@@ -172,9 +172,9 @@
     </div>
   </nav>
   <!-- Main content -->
-  <div class="main-content" id="panel">
+  <div class="main-content fixed-top" id="panel">
     <!-- Topnav -->
-    <nav class="navbar navbar-horizontal navbar-expand-lg navbar-dark bg-warning mt-4">
+    <nav class="navbar navbar-horizontal navbar-expand-lg navbar-dark bg-warning fixed-top">
       <div class="container-fluid">
         <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
 
@@ -183,7 +183,14 @@
               <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 <div class="media align-items-center">
                   <span class="avatar avatar-sm rounded-circle">
-                    <img alt="Image placeholder" src="/ehr/resources/template/dashboard/assets/img/theme/team-4.jpg">
+                    <c:choose>
+                        <c:when test="${empty sessionScope.loginUser}">
+                            <img alt="Image placeholder" src="/ehr/resources/image/defaultProfile.jpg">
+                        </c:when>
+                        <c:otherwise>
+                            <img alt="Image placeholder" src="/ehr/resources/template/dashboard/assets/img/theme/team-4.jpg">    
+                        </c:otherwise>
+                    </c:choose>
                   </span>
                   <div class="media-body  ml-2  d-none d-lg-block">
                     <span class="mb-0 text-sm  font-weight-bold">John Snow</span>
@@ -192,15 +199,15 @@
               </a>
               <div class="dropdown-menu  dropdown-menu-right ">
                 <div class="dropdown-header noti-title">
-                  <h6 class="text-overflow m-0">Welcome!</h6>
+                  <h6 class="text-overflow m-0">환영합니다!</h6>
                 </div>
                 <a href="#!" class="dropdown-item">
                   <i class="ni ni-single-02"></i>
-                  <span>My profile</span>
+                  <span>마이페이지</span>
                 </a>
                 <a href="#!" class="dropdown-item">
                   <i class="ni ni-settings-gear-65"></i>
-                  <span>Settings</span>
+                  <span>비밀번호 변경</span>
                 </a>
                 <a href="#!" class="dropdown-item">
                   <i class="ni ni-calendar-grid-58"></i>
@@ -213,7 +220,7 @@
                 <div class="dropdown-divider"></div>
                 <a href="#!" class="dropdown-item">
                   <i class="ni ni-user-run"></i>
-                  <span>Logout</span>
+                  <span>로그아웃</span>
                 </a>
               </div>
             </li>
