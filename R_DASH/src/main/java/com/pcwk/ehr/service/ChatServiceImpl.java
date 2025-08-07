@@ -13,35 +13,35 @@ import com.pcwk.ehr.mapper.ChatMapper;
 public class ChatServiceImpl implements ChatService {
 
 	@Autowired
-	ChatMapper chatMapper;
+    ChatMapper chatMapper;
 
-	@Override
-	public int insertChat(ChatDTO chat) {
-		return chatMapper.insertChat(chat);
-	}
+    @Override
+    public int insertChat(ChatDTO chat) {
+        return chatMapper.insertChat(chat);
+    }
 
-	@Override
-	public ChatDTO selectChat(Integer logNo) {
-		return chatMapper.selectChat(logNo);
-	}
+    @Override
+    public ChatDTO selectChat(Long logNo) { // ✅ Integer → Long
+        return chatMapper.selectChat(logNo);
+    }
 
-	@Override
-	public List<ChatDTO> chatList(SearchDTO search) {
-		return chatMapper.chatList(search);
-	}
+    @Override
+    public List<ChatDTO> chatList(SearchDTO search) {
+        return chatMapper.chatList(search);
+    }
 
-	@Override
-	public int updateChat(ChatDTO chat) {
-		return chatMapper.updateChat(chat);
-	}
+    @Override
+    public int updateChat(ChatDTO chat) {
+        return chatMapper.updateChat(chat);
+    }
 
-	@Override
-	public int deleteChat(Integer logNo) {
-		return chatMapper.deleteChat(logNo);
-	}
+    @Override
+    public int deleteChat(Long logNo) { // ✅ Integer → Long
+        return chatMapper.deleteChat(logNo);
+    }
 
-	@Override
-	public int deleteAll() {
-		return chatMapper.deleteAll();
-	}
+    @Override
+    public int deleteAll() {
+        return chatMapper.deleteAll();
+    }
 }
