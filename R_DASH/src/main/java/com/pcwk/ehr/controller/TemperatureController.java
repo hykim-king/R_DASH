@@ -1,5 +1,6 @@
 package com.pcwk.ehr.controller;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,18 +24,18 @@ public class TemperatureController {
     private TemperatureService temperatureService;
 
     @PostMapping
-    public String insertPatient(@RequestBody PatientsDTO dto) {
+    public String insertPatient(@RequestBody PatientsDTO dto) throws SQLException {
     	temperatureService.savePatient(dto);
         return "등록 완료";
     }
     
     @GetMapping("/patients.do")
-    public List<PatientsDTO> getPatients() {
+    public List<PatientsDTO> getPatients() throws SQLException {
         return temperatureService.getAllPatients();
     }
     
-    @GetMapping("/test-insert")
-    public String testInsert() {
+    @GetMapping(value = "/test-insert", produces ="text/plain;charset=UTF-8")
+    public String testInsert() throws SQLException {
         temperatureService.fetchAndSaveData();
         return "실행 완료";
     }
