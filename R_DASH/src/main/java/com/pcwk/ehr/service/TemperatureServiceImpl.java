@@ -1,14 +1,23 @@
 package com.pcwk.ehr.service;
 
+import java.net.URI;
+import java.sql.SQLException;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.pcwk.ehr.Response.PatientsApiResponse;
+import com.pcwk.ehr.domain.NowcastDTO;
 import com.pcwk.ehr.domain.PatientsDTO;
 import com.pcwk.ehr.mapper.TemperatureMapper;
 
@@ -17,41 +26,53 @@ public class TemperatureServiceImpl implements TemperatureService {
 
 	@Autowired
     private RestTemplate restTemplate;
+	
+	@Autowired
 	private TemperatureMapper temperatureMapper;
 	
-    private static final String BASE_URL = "https://apis.data.go.kr/1741000/HeatWaveCasualtiesRegion";
-    private static final String SERVICE_KEY = "VJxg5p3Iyzp7FA0pzgtVA7AYRfaM2YSuLU4h8TMQAvQIJMGkIN7qEpL/QoDBEqo1MnsWnxGR+lN/9SsKlSmbZg==\r\n";
+    private static final String BASE_URL = "http://apis.data.go.kr/1741000/HeatWaveCasualtiesRegion/getHeatWaveCasualtiesRegionList";
+    private static final String SERVICE_KEY = "VJxg5p3Iyzp7FA0pzgtVA7AYRfaM2YSuLU4h8TMQAvQIJMGkIN7qEpL%2FQoDBEqo1MnsWnxGR%2BlN%2F9SsKlSmbZg%3D%3D";
     
-    
-
+   
     public TemperatureServiceImpl(RestTemplate restTemplate, TemperatureMapper temperatureMapper ) {
         this.restTemplate = restTemplate;
         this.temperatureMapper  = temperatureMapper ;
     }
+    
+  
+    public String fetchAndSaveData() {
+    	try {
+            URI uri = new URI(BASE_URL +
+                    "?serviceKey=" + SERVICE_KEY +
+                    "&type=json" + 
+                    "&bas_yy=2022" +
+                    "&pageNo=1" +
+                    "&numOfRows=100");
 
-    public void fetchAndSaveData() {
-    	int pageNo = 1;
-    	int numOfRows = 100;
-        String url = UriComponentsBuilder.fromHttpUrl(BASE_URL)
-                .queryParam("serviceKey", SERVICE_KEY)
-                .queryParam("type", "json")
-                .queryParam("pageNo", pageNo)
-                .queryParam("numOfRows", numOfRows)
-                .toUriString();
+            // HttpHeaders 설정
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Accept", "text/html");  // 여기서 핵심!
 
-        PatientsApiResponse response = restTemplate.getForObject(url, PatientsApiResponse.class);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
 
-        if (response != null && response.getRow() != null) {
-            for (PatientsApiResponse.Row row : response.getRow()) {
-                PatientsDTO dto = convertToDTO(row);
-                savePatient(dto);
-            }
+            // RestTemplate로 GET 요청
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<String> response = restTemplate.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    entity,
+                    String.class
+            );
+            
+            return response.getBody();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "오류 발생: " + e.getMessage();
         }
-        
-        System.out.println("6시간마다 데이터 갱신");
     }
 
-    private PatientsDTO convertToDTO(PatientsApiResponse.Row row) {
+    private PatientsDTO patientsConvertToDTO(PatientsApiResponse.Row row) {
     	String region = row.getRegi();
         int year = Integer.parseInt(row.getBas_yy());
         int total = parseIntSafe(row.getTot());
@@ -71,14 +92,22 @@ public class TemperatureServiceImpl implements TemperatureService {
     }
     
 	@Override
-	public void savePatient(PatientsDTO dto) {
+	public void savePatient(PatientsDTO dto) throws SQLException {
 		temperatureMapper.insertPatient(dto);
 	}
 
 	@Override
-	public List<PatientsDTO> getAllPatients() {
+	public List<PatientsDTO> getAllPatients() throws SQLException {
 		return temperatureMapper.selectAllPatients();
 	}
 
 
+	@Override
+	public void saveNowcast(NowcastDTO dto) throws SQLException {
+		temperatureMapper.insertNowcast(dto);
+		
+	}
+
+
 }
+
