@@ -6,14 +6,14 @@
 <mapper namespace="com.pcwk.ehr.mapper.ChatMapper">
 
     <!-- ResultMap: CHAT_LOG → ChatDTO 매핑 -->
-    <resultMap id="chatResultMap" type="com.pcwk.ehr.domain.ChatDTO">
-        <result property="logNo" column="log_no"/>
-        <result property="userNo" column="user_no"/>
-        <result property="sessionId" column="session_id"/>
-        <result property="question" column="question"/>
-        <result property="answer" column="answer"/>
-        <result property="regDt" column="reg_dt"/>
-    </resultMap>
+   <resultMap id="chatResultMap" type="com.pcwk.ehr.domain.ChatDTO">
+    <result property="logNo" column="log_no"/>
+    <result property="userNo" column="user_no"/>
+    <result property="sessionId" column="session_id"/>
+    <result property="question" column="question"/>
+    <result property="answer" column="answer"/>
+    <result property="regDt" column="reg_dt"/>
+</resultMap>
 
     <!-- 검색 조건 -->
     <sql id="search">
@@ -38,7 +38,7 @@
     </sql>
 
     <!-- 채팅 로그 단건 조회 -->
-    <select id="selectChat" parameterType="java.lang.Integer" resultMap="chatResultMap">
+    <select id="selectChat" parameterType="java.lang.Long" resultMap="chatResultMap">
         SELECT log_no,
                user_no,
                session_id,
@@ -88,22 +88,13 @@
     </select>
 
     <!-- 채팅 로그 등록 -->
-    <insert id="insertChat" parameterType="ChatDTO" useGeneratedKeys="true" 
-            keyProperty="logNo" keyColumn="LOG_NO">
-        INSERT INTO CHAT_LOG (
-            user_no, 
-            session_id, 
-            question, 
-            answer, 
-            reg_dt
-        ) VALUES (
-            #{userNo},
-            #{sessionId}, 
-            #{question}, 
-            #{answer}, 
-            SYSDATE
-        )
-    </insert>
+   <insert id="insertChat" parameterType="ChatDTO">
+  INSERT INTO CHAT_LOG (
+    user_no, session_id, question, answer, reg_dt
+  ) VALUES (
+    #{userNo}, #{sessionId}, #{question}, #{answer}, SYSDATE
+  )
+</insert>
 
     <!-- 채팅 로그 수정 -->
     <update id="updateChat" parameterType="ChatDTO">
@@ -118,7 +109,7 @@
     </update>
 
     <!-- 채팅 로그 삭제 -->
-    <delete id="deleteChat" parameterType="java.lang.Integer">
+    <delete id="deleteChat" parameterType="java.lang.Long">
         DELETE FROM CHAT_LOG
         WHERE log_no = #{logNo}
     </delete>
