@@ -2,26 +2,31 @@ package com.pcwk.ehr.service;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.ChatDTO;
 import com.pcwk.ehr.mapper.ChatMapper;
 
 @Service
+@Transactional(readOnly = true) // 기본은 조회 전용
 public class ChatServiceImpl implements ChatService {
 
-	@Autowired
-    ChatMapper chatMapper;
+    private final ChatMapper chatMapper;
+
+    public ChatServiceImpl(ChatMapper chatMapper) {
+        this.chatMapper = chatMapper;
+    }
 
     @Override
+    @Transactional // 쓰기 작업만 트랜잭션
     public int insertChat(ChatDTO chat) {
         return chatMapper.insertChat(chat);
     }
 
     @Override
-    public ChatDTO selectChat(Long logNo) { // ✅ Integer → Long
+    public ChatDTO selectChat(Long logNo) {
         return chatMapper.selectChat(logNo);
     }
 
@@ -31,16 +36,19 @@ public class ChatServiceImpl implements ChatService {
     }
 
     @Override
+    @Transactional
     public int updateChat(ChatDTO chat) {
         return chatMapper.updateChat(chat);
     }
 
     @Override
-    public int deleteChat(Long logNo) { // ✅ Integer → Long
+    @Transactional
+    public int deleteChat(Long logNo) {
         return chatMapper.deleteChat(logNo);
     }
 
     @Override
+    @Transactional
     public int deleteAll() {
         return chatMapper.deleteAll();
     }
