@@ -13,36 +13,49 @@
 <head>
 <meta charset="UTF-8">
 <title>board_reg</title>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+ <link href="/ehr/resources/ckeditor/contents.css" rel="stylesheet" >
 <link rel="icon" href="${CP}/resources/image/Jaemini_face.ico" type="image/x-icon"/>
 </head>
 <body>
-<div>
-    <h4>게시글 등록하기</h4>
+<div class="container px-5 my-5 px-5">
+    <h2>게시글 등록하기</h2>
     <!-- form area -->
     <form action="#" method="post" enctype="multipart/form-data">
-    <div>
+    <div class="mb-3">
         <label for="name" >제목</label>
-        <input type="text" name="name" id="name" autocomplete="name" maxlength="50" required placeholder="제목" >
+        <input type="text" name="name" id="name" autocomplete="name" maxlength="50" required placeholder="제목을 입력해주세요." >
     </div>
-    <div>
+    <div class="mb-3">
         <label for="modId">등록자</label>
         <input type="text" name="modId" id="modId" autocomplete="modId" maxlength="50" required placeholder="등록자" >
     </div>
-    <div>
+    <div class="mb-3">
         <label>공지</label><input type="checkbox" name="notice" value="30">
     </div>
-    <div>
+    <div class="mb-3">
         <label for="contents" >내용</label>
-        <textarea id="contents" name="contents"  placeholder="내용" class="contents"></textarea>
+        <textarea class="form-control" id="ckeditor" name="contents"  placeholder="내용" class="contents"></textarea>
     </div>
     </form>
     <!-- //form area -->
     <!-- button area -->
     <div>
-        <input type="button" id="doSave" value="등록">
-        <input type="button" id="moveToList" value="목록">
+        <input type="button" class="btn btn-sm btn-success" id="doSave" value="등록">
+        <input type="button" class="btn btn-sm btn-success" id="moveToList" value="목록">
     </div>
     <!-- //button area -->
+<script>
+    $(document).ready(function() {
+        CKEDITOR.replace("ckeditor", {
+            width: "100%",
+            height: "400px",
+            filebrowserUploadUrl: "/bbs/ckeditor/ckEditorUpload",
+            image_previewText: " "
+        });
+    });
+</script>
+<script src="/ehr/resources/ckeditor/ckeditor.js"></script>
 </div>
 
 </body>
