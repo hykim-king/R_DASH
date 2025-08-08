@@ -259,6 +259,11 @@ html, body {
     background-color: #dc3545;
     color: white;
     font-size: 0.9rem;
+
+    /* 가로 정렬 고정 */
+    writing-mode: horizontal-tb; /* 세로쓰기 방지 */
+    line-height: 1; /* 글자 높이 정상화 */
+    white-space: nowrap; /* 줄바꿈 방지 */
 }
 
 /* 뉴스 섹션 */
