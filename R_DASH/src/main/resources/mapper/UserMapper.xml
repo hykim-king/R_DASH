@@ -126,6 +126,7 @@
         INSERT INTO USER_JM (
 				    email,
 				    password,
+				    image,
 				    name,
 				    zip_code,
 				    address,
@@ -134,6 +135,7 @@
 				    reg_dt
 				) VALUES ( #{email},
 				           #{password},
+				           'defaultProfile.jpg',
 				           #{name},
 				           #{zipCode},
 				           #{address},
