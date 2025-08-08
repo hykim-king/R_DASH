@@ -1,23 +1,94 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
   <meta name="author" content="Creative Tim">
   <title>Login</title>
-  <!-- Favicon -->
-  <link rel="icon" href="/ehr/resources/template/dashboard/assets/img/brand/favicon.png" type="image/png">
-  <!-- Fonts -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
-  <!-- Icons -->
-  <link rel="stylesheet" href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo.css" type="text/css">
-  <link rel="stylesheet" href="/ehr/resources/template/dashboard/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" type="text/css">
-  <!-- Page plugins -->
-  <link rel="stylesheet" href="/ehr/resources/template/dashboard/assets/vendor/fullcalendar/dist/fullcalendar.min.css">
-  <link rel="stylesheet" href="/ehr/resources/template/dashboard/assets/vendor/sweetalert2/dist/sweetalert2.min.css">
-  <!-- Argon CSS -->
-  <link rel="stylesheet" href="/ehr/resources/template/dashboard/css/dashboard.css" type="text/css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script>
+  document.addEventListener('DOMContentLoaded',function(){
+	 //로그인form 
+	 const loginForm = document.querySelector("#loginForm");
+	 //이메일 input
+	 const emailInput = document.querySelector("#email");
+	 //비밀번호 input
+	 const passwordInput = document.querySelector("#password");
+	 //이메일 형식 체크
+	 const valid_email = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
+	 //비밀번호 형식 체크 (영문 대/소문자 하나이상 포함, 특수문자 하나이상 포함)
+	 const valid_password = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+~`=\-{}\[\]:;"'<>,.?\/\\])\S{8,16}$/;
+	 
+	 loginForm.addEventListener("submit",function(event){
+		 event.preventDefault(); // 실제 폼 제출 막음
+		 
+		 if(emailInput.value === ''){
+			 alert('이메일을 입력하세요');
+			 emailInput.focus();
+			 return;
+		 }
+
+		 
+		 
+		 if(passwordInput.value === ''){
+			 alert('비밀번호를 입력하세요');
+			 passwordInput.focus();
+			 return;
+		 }
+		 //관리자일경우 pass
+		 if(emailInput.value !== 'admin'){
+			 
+			 if(valid_email.test(emailInput.value)===false){
+				 alert('이메일 형식이 올바르지 않습니다.');
+				 emailInput.focus();
+				 
+				 return;
+			 }
+			 
+			 if(valid_password.test(passwordInput.value)===false){
+				 alert('비밀번호 형식이 올바르지 않습니다.\n(영문 대/소문자 하나이상 포함, 특수문자 하나이상 포함)\n(8자 이상 16자 이하)');
+				 passwordInput.focus();
+				 return;
+			 }
+		 
+		 }
+		 
+		 
+		 
+		 $.ajax({
+	            method:"POST",    //GET/POST
+	            url:"/ehr/user/login", //서버측 URL
+	            dataType:"json",//서버에서 받을 데이터 타입
+	            data:{          //파라메터
+	                "email": emailInput.value,
+	                "password":passwordInput.value
+	            },
+	            success:function(result){//요청 성공
+	                if(false === result.success){
+	                	alert(result.message);
+	  
+	                	return;
+	                }else{
+	                	alert(result.message);
+	                	
+	                	//로그인 페이지로 이동(임시)
+	                	window.location.href='/ehr/user/login';
+	                } 
+	                	
+	            },
+	            error:function(result){//요청 실패
+	                console.log("error:"+result)
+	                alert(result);
+	            }
+	            
+	            
+	        });
+	 });
+	 
+  });
+  </script>
 </head>
 <body class="bg-white">
   <!-- Main content -->
@@ -62,13 +133,13 @@
               <div class="text-center mb-4">
                 <small>Or sign in with credentials</small>
               </div>
-              <form role="form">
+              <form method="post" id="loginForm">
                 <div class="form-group mb-3">
                   <div class="input-group input-group-merge input-group-alternative">
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Email" type="email">
+                    <input class="form-control" placeholder="Email" id="email" name="email">
                   </div>
                 </div>
                 <div class="form-group">
@@ -76,42 +147,26 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Password" type="password">
+                    <input class="form-control" placeholder="Password" id="password" type="password" name="password">
                   </div>
                 </div>
-                <div class="custom-control custom-control-alternative custom-checkbox">
-                  <input class="custom-control-input" id=" customCheckLogin" type="checkbox">
-                  <label class="custom-control-label" for=" customCheckLogin">
-                    <span>Remember me</span>
-                  </label>
-                </div>
                 <div class="text-center">
-                  <button type="button" class="btn btn-primary my-4">Sign in</button>
+                  <button type="submit" id="loginButton" class="btn btn-default my-4">login</button>
                 </div>
               </form>
             </div>
           </div>
           <div class="row mt-3">
             <div class="col-6">
-              <a href="#" class="text-gray"><small>Forgot password?</small></a>
+              <a href="#" class="text-gray"><small>비밀번호 찾기</small></a>
             </div>
             <div class="col-6 text-right">
-              <a href="#" class="text-gray"><small>Create new account</small></a>
+              <a href="regist" class="text-gray"><small>회원가입</small></a>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <!-- Core -->
-  <script src="/ehr/resources/template/dashboard/assets/vendor/jquery/dist/jquery.min.js"></script>
-  <script src="/ehr/resources/template/dashboard/assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="/ehr/resources/template/dashboard/assets/vendor/js-cookie/js.cookie.js"></script>
-  <script src="/ehr/resources/template/dashboard/assets/vendor/jquery.scrollbar/jquery.scrollbar.min.js"></script>
-  <script src="/ehr/resources/template/dashboard/assets/vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js"></script>
-  <!-- Argon JS -->
-  <script src="/ehr/resources/template/dashboard/assets/js/dashboard.js?v=1.2.0"></script>
-  <!-- Demo JS - remove this in your project -->
-  <script src="/ehr/resources/template/dashboard/assets/js/demo.min.js"></script>
 </body>
 </html>
