@@ -22,22 +22,16 @@ public class TemperatureController {
 
     @Autowired
     private TemperatureService temperatureService;
-
-    @PostMapping
-    public String insertPatient(@RequestBody PatientsDTO dto) throws SQLException {
-    	temperatureService.savePatient(dto);
+    
+    @PostMapping("/save-patients.do")
+    public String insertPatient() throws SQLException {
+    	temperatureService.insertPatient();
         return "등록 완료";
     }
     
     @GetMapping("/patients.do")
     public List<PatientsDTO> getPatients() throws SQLException {
         return temperatureService.getAllPatients();
-    }
-    
-    @GetMapping(value = "/test-insert", produces ="text/plain;charset=UTF-8")
-    public String testInsert() throws SQLException {
-        temperatureService.fetchAndSaveData();
-        return "실행 완료";
     }
     
 }
