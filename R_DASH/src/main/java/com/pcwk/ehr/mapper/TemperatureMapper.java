@@ -5,12 +5,15 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.pcwk.ehr.domain.NowcastDTO;
 import com.pcwk.ehr.domain.PatientsDTO;
 
 @Mapper
 public interface TemperatureMapper {
 	
-	int insertPatient(PatientsDTO patient) throws SQLException;
+	int insertNowcast(NowcastDTO dto) throws SQLException;
+	
+	int insertPatient(PatientsDTO dto) throws SQLException;
 	
     List<PatientsDTO> selectAllPatients() throws SQLException;
 	
