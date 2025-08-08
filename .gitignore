@@ -144,9 +144,9 @@ __pycache__/
 *$py.class
 
 # 가상환경
-## .env - 나중에 배포할 때는 숨겨야 함.
+.env 
 .venv/
-## env/
+env/
 ENV/
 venv/
 
