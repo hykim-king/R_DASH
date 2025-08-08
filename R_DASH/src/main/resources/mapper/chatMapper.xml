@@ -1,122 +1,110 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper 
-    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
-    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pcwk.ehr.mapper.ChatMapper">
 
-    <!-- ResultMap: CHAT_LOG → ChatDTO 매핑 -->
-   <resultMap id="chatResultMap" type="com.pcwk.ehr.domain.ChatDTO">
-    <result property="logNo" column="log_no"/>
-    <result property="userNo" column="user_no"/>
-    <result property="sessionId" column="session_id"/>
-    <result property="question" column="question"/>
-    <result property="answer" column="answer"/>
-    <result property="regDt" column="reg_dt"/>
-</resultMap>
+  <resultMap id="chatResultMap" type="com.pcwk.ehr.domain.ChatDTO">
+    <id     property="logNo"    column="LOG_NO"/>
+    <result property="userNo"    column="USER_NO"/>
+    <result property="sessionId" column="SESSION_ID"/>
+    <result property="question"  column="QUESTION"/>
+    <result property="answer"    column="ANSWER"/>
+    <result property="regDt"     column="REG_DT"/>
+  </resultMap>
 
-    <!-- 검색 조건 -->
-    <sql id="search">
-        <where>
-            <if test="searchDiv != null and searchDiv != ''">
-                <choose>
-                    <!-- 질문 검색 -->
-                    <when test="searchDiv eq '10'">
-                        question LIKE '%' || #{searchWord} || '%'
-                    </when>
-                    <!-- 답변 검색 -->
-                    <when test="searchDiv eq '20'">
-                        answer LIKE '%' || #{searchWord} || '%'
-                    </when>
-                    <!-- 회원 번호 검색 -->
-                    <when test="searchDiv eq '30'">
-                        user_no = #{searchWord}
-                    </when>
-                </choose>
-            </if>
-        </where>
-    </sql>
+  <sql id="search">
+    <where>
+      <if test="searchDiv != null and searchDiv != '' and searchWord != null and searchWord != ''">
+        <choose>
+          <when test="searchDiv == '10'">
+            (QUESTION LIKE '%' || #{searchWord} || '%')
+          </when>
+          <when test="searchDiv == '20'">
+            (ANSWER  LIKE '%' || #{searchWord} || '%')
+          </when>
+          <when test="searchDiv == '30'">
+            (USER_NO = TO_NUMBER(#{searchWord}))
+          </when>
+        </choose>
+      </if>
+    </where>
+  </sql>
 
-    <!-- 채팅 로그 단건 조회 -->
-    <select id="selectChat" parameterType="java.lang.Long" resultMap="chatResultMap">
-        SELECT log_no,
-               user_no,
-               session_id,
-               question,
-               answer,
-               TO_CHAR(reg_dt, 'YYYY-MM-DD HH24:MI:SS') AS reg_dt
-        FROM CHAT_LOG
-        WHERE log_no = #{logNo}
-    </select>
+  <select id="selectChat" parameterType="java.lang.Long" resultMap="chatResultMap">
+    SELECT LOG_NO,
+           USER_NO,
+           SESSION_ID,
+           QUESTION,
+           ANSWER,
+           TO_CHAR(REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
+      FROM CHAT_LOG
+     WHERE LOG_NO = #{logNo}
+  </select>
 
-    <!-- 전체 채팅 로그 조회 + 페이징 -->
-    <select id="chatList" parameterType="SearchDTO" resultMap="chatResultMap">
-        SELECT A.*, B.total_cnt
-        FROM (
-            SELECT tt3.RNUM AS no,
-                   tt3.log_no,
-                   tt3.user_no,
-                   tt3.session_id,
-                   tt3.question,
-                   tt3.answer,
-                   DECODE(TO_CHAR(tt3.reg_dt,'YYYY-MM-DD'),
-                          TO_CHAR(SYSDATE,'YYYY-MM-DD'),
-                          TO_CHAR(tt3.reg_dt,'HH24:MI:SS'),
-                          TO_CHAR(tt3.reg_dt,'YYYY-MM-DD')) AS reg_dt
-            FROM (
-                SELECT ROWNUM AS RNUM,
-                       tt2.*
-                FROM (
-                    SELECT t1.*
-                    FROM CHAT_LOG t1
-                    <include refid="search"/>
-                    ORDER BY t1.reg_dt DESC
-                ) tt2
-                <![CDATA[
-                    WHERE ROWNUM <= ( #{pageSize} * (#{pageNo} - 1) + #{pageSize} )
-                ]]>
-            ) tt3
-            <![CDATA[
-            WHERE RNUM >= ( #{pageSize} * (#{pageNo} - 1) + 1 )
-            ]]>
-        ) A
-        CROSS JOIN (
-            SELECT COUNT(*) AS total_cnt
-            FROM CHAT_LOG
-            <include refid="search"/>
-        ) B
-    </select>
+  <select id="chatList" parameterType="com.pcwk.ehr.cmn.SearchDTO" resultMap="chatResultMap">
+    SELECT A.*, B.TOTAL_CNT
+      FROM (
+        SELECT TT3.RNUM AS NO,
+               TT3.LOG_NO,
+               TT3.USER_NO,
+               TT3.SESSION_ID,
+               TT3.QUESTION,
+               TT3.ANSWER,
+               DECODE(TO_CHAR(TT3.REG_DT,'YYYY-MM-DD'),
+                      TO_CHAR(SYSDATE,'YYYY-MM-DD'),
+                      TO_CHAR(TT3.REG_DT,'HH24:MI:SS'),
+                      TO_CHAR(TT3.REG_DT,'YYYY-MM-DD')) AS REG_DT
+          FROM (
+            SELECT ROWNUM AS RNUM, TT2.*
+              FROM (
+                SELECT T1.*
+                  FROM CHAT_LOG T1
+                  <include refid="search"/>
+                 ORDER BY T1.REG_DT DESC
+              ) TT2
+              <![CDATA[
+             WHERE ROWNUM <= ( NVL(#{pageSize},10) * (NVL(#{pageNo},1) - 1) + NVL(#{pageSize},10) )]]>
+          ) TT3
+          <![CDATA[
+         WHERE RNUM >= ( NVL(#{pageSize},10) * (NVL(#{pageNo},1) - 1) + 1 )
+         ]]>
+      ) A
+ CROSS JOIN (
+    SELECT COUNT(*) AS TOTAL_CNT
+      FROM CHAT_LOG
+      <include refid="search"/>
+ ) B
+  </select>
 
-    <!-- 채팅 로그 등록 -->
-   <insert id="insertChat" parameterType="ChatDTO">
-  INSERT INTO CHAT_LOG (
-    user_no, session_id, question, answer, reg_dt
-  ) VALUES (
-    #{userNo}, #{sessionId}, #{question}, #{answer}, SYSDATE
-  )
-</insert>
+  <!-- IDENTITY: LOG_NO는 DB가 생성 → 컬럼/값에서 제외 -->
+  <insert id="insertChat" parameterType="com.pcwk.ehr.domain.ChatDTO">
+    INSERT INTO CHAT_LOG (
+      USER_NO, SESSION_ID, QUESTION, ANSWER, REG_DT
+    ) VALUES (
+      #{userNo}, #{sessionId}, #{question}, #{answer}, SYSDATE
+    )
+  </insert>
 
-    <!-- 채팅 로그 수정 -->
-    <update id="updateChat" parameterType="ChatDTO">
-        UPDATE CHAT_LOG
-        <set>
-            <if test="userNo != null">user_no = #{userNo},</if>
-            <if test="sessionId != null">session_id = #{sessionId},</if>
-            <if test="question != null">question = #{question},</if>
-            <if test="answer != null">answer = #{answer},</if>
-        </set>
-        WHERE log_no = #{logNo}
-    </update>
+  <update id="updateChat" parameterType="com.pcwk.ehr.domain.ChatDTO">
+    UPDATE CHAT_LOG
+       SET
+         <trim suffixOverrides=",">
+           <if test="userNo != null">USER_NO = #{userNo},</if>
+           <if test="sessionId != null and sessionId != ''">SESSION_ID = #{sessionId},</if>
+           <if test="question != null">QUESTION = #{question},</if>
+           <if test="answer != null">ANSWER = #{answer},</if>
+         </trim>
+     WHERE LOG_NO = #{logNo}
+  </update>
 
-    <!-- 채팅 로그 삭제 -->
-    <delete id="deleteChat" parameterType="java.lang.Long">
-        DELETE FROM CHAT_LOG
-        WHERE log_no = #{logNo}
-    </delete>
+  <delete id="deleteChat" parameterType="java.lang.Long">
+    DELETE FROM CHAT_LOG WHERE LOG_NO = #{logNo}
+  </delete>
 
-    <!-- 전체 채팅 로그 삭제 (테스트용) -->
-    <delete id="deleteAll">
-        DELETE FROM CHAT_LOG
-    </delete>
+  <delete id="deleteAll">
+    DELETE FROM CHAT_LOG
+  </delete>
 
 </mapper>
