@@ -14,7 +14,12 @@ public class PcwkString {
 	 * @return
 	 */
 	public static boolean isImageExtension(String fileName) {
-	    String ext = getExt(fileName).toLowerCase();  // 확장자를 소문자로 변환
+	    if (fileName == null || fileName.isEmpty()) return false;
+
+	    // 앞뒤 공백/따옴표 제거
+	    fileName = fileName.trim().replace("\"", "");
+
+	    String ext = getExt(fileName).toLowerCase();
 	    return ext.equals("jpg") || ext.equals("jpeg") || ext.equals("png")
 	        || ext.equals("gif") || ext.equals("bmp") || ext.equals("webp");
 	}
