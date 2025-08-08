@@ -10,10 +10,10 @@ public interface TemperatureService {
 
 	void saveNowcast(NowcastDTO dto) throws SQLException;
 	
-	void savePatient(PatientsDTO dto) throws SQLException;
-	
     List<PatientsDTO> getAllPatients() throws SQLException;
     
     void insertPatient() throws SQLException;
+    
+    void insertNowcast() throws SQLException;
 
 }
