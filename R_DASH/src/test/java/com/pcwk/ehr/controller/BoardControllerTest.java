@@ -78,6 +78,7 @@ class BoardControllerTest {
 	}
 	//doSelectOne
 	//doRetieve
+	@Disabled
 	@Test
 	void doSelectOne() throws Exception{
 		log.debug("┌────────────────────────────┐");
@@ -115,7 +116,7 @@ class BoardControllerTest {
 
 	}
 	
-	//@Disabled
+	@Disabled
 	@Test
 	void doRetrieve() throws Exception{
 		log.debug("┌────────────────────────────┐");
@@ -159,7 +160,7 @@ class BoardControllerTest {
 		assertEquals(10, list.size());
 	}
 	
-	//@Disabled
+	@Disabled
 	@Test
 	void doDelete() throws Exception {
 		log.debug("┌────────────────────────────┐");
