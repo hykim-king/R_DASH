@@ -4,16 +4,16 @@
     <sql id="boardWhere">
         <choose>
             <when test="searchDiv =='10'">
-                 title LIKE '%' ||#{searchWord} || '%'
+                 WHERE title LIKE '%' ||#{searchWord} || '%'
             </when>
             <when test="searchDiv =='20'">
-                 contents LIKE '%' ||#{searchWord} || '%'
+                 WHERE contents LIKE '%' ||#{searchWord} || '%'
             </when>
             <when test="searchDiv =='30'">
-                 boardNo LIKE '%'||#{searchWord} || '%'
+                 WHERE boardNo LIKE '%'||#{searchWord} || '%'
             </when>
             <when test="searchDiv =='40'">
-                  (title LIKE '%'||#{searchWord}||'%' 
+                  WHERE (title LIKE '%'||#{searchWord}||'%' 
                        OR 
                       contents LIKE '%'||#{searchWord}||'%')
             </when>
@@ -28,16 +28,16 @@
                TT1.title,
                TT1.image,
                TT1.view_cnt,
-               DECODE(TO_CHAR(SYSDATE, 'YYYY.MM.DD'), TO_CHAR(TT1.mod_dt, 'YYYY.MM.DD'),
-                 TO_CHAR(TT1.mod_dt, 'HH24:MI'),
-                 TO_CHAR(TT1.mod_dt, 'YYYY.MM.DD')) AS mod_dt,
+               DECODE(TO_CHAR(SYSDATE, 'YYYY.MM.DD'), 
+                     TO_CHAR(TT1.mod_dt, 'YYYY.MM.DD'),
+                     TO_CHAR(TT1.mod_dt, 'HH24:MI'),
+                     TO_CHAR(TT1.mod_dt, 'YYYY.MM.DD')) AS mod_dt,
                TT1.mod_id
         FROM (
             SELECT ROWNUM AS rnum, T1.*
             FROM (
                 SELECT *
                 FROM board
-                WHERE 
               <include refid="boardWhere" />
                 ORDER BY mod_dt DESC
             ) T1  
@@ -48,7 +48,6 @@
     INNER JOIN (
         SELECT COUNT(*) AS total_cnt
         FROM board
-        WHERE 
         <include refid="boardWhere" />
     ) B ON 1=1
 </select>

@@ -3,13 +3,13 @@ package com.pcwk.ehr.domain;
 public class ChatDTO {
 
 	/** 기록 번호 (PK) */
-	private Integer logNo;
+	private Long logNo;
 
 	/** 회원 번호 */
 	private Integer userNo;
 
 	/** 세션 아이디 */
-	private Integer sessionId;
+	private String sessionId;
 
 	/** 질문 */
 	private String question;
@@ -34,7 +34,7 @@ public class ChatDTO {
 	 * @param answer
 	 * @param regDt
 	 */
-	public ChatDTO(Integer logNo, Integer userNo, Integer sessionId, String question, String answer, String regDt) {
+	public ChatDTO(Long logNo, Integer userNo, String sessionId, String question, String answer, String regDt) {
 		super();
 		this.logNo = logNo;
 		this.userNo = userNo;
@@ -47,14 +47,14 @@ public class ChatDTO {
 	/**
 	 * @return the logNo
 	 */
-	public Integer getLogNo() {
+	public Long getLogNo() {
 		return logNo;
 	}
 
 	/**
 	 * @param logNo the logNo to set
 	 */
-	public void setLogNo(Integer logNo) {
+	public void setLogNo(Long logNo) {
 		this.logNo = logNo;
 	}
 
@@ -75,14 +75,14 @@ public class ChatDTO {
 	/**
 	 * @return the sessionId
 	 */
-	public Integer getSessionId() {
+	public String getSessionId() {
 		return sessionId;
 	}
 
 	/**
 	 * @param sessionId the sessionId to set
 	 */
-	public void setSessionId(Integer sessionId) {
+	public void setSessionId(String sessionId) {
 		this.sessionId = sessionId;
 	}
 

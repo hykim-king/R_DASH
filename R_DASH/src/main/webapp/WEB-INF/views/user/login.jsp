@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
   <meta name="author" content="Creative Tim">
-  <title>Impact Dashboard - Login</title>
+  <title>Login</title>
   <!-- Favicon -->
   <link rel="icon" href="/ehr/resources/template/dashboard/assets/img/brand/favicon.png" type="image/png">
   <!-- Fonts -->
@@ -18,10 +18,7 @@
   <link rel="stylesheet" href="/ehr/resources/template/dashboard/assets/vendor/sweetalert2/dist/sweetalert2.min.css">
   <!-- Argon CSS -->
   <link rel="stylesheet" href="/ehr/resources/template/dashboard/css/dashboard.css" type="text/css">
-
 </head>
-
-
 <body class="bg-white">
   <!-- Main content -->
   <div class="main-content">
@@ -117,5 +114,4 @@
   <!-- Demo JS - remove this in your project -->
   <script src="/ehr/resources/template/dashboard/assets/js/demo.min.js"></script>
 </body>
-
 </html>
