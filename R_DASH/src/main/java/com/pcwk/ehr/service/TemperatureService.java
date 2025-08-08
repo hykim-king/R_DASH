@@ -14,5 +14,6 @@ public interface TemperatureService {
 	
     List<PatientsDTO> getAllPatients() throws SQLException;
     
-    String fetchAndSaveData() throws SQLException;
+    void insertPatient() throws SQLException;
+
 }
