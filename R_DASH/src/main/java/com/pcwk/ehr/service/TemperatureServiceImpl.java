@@ -66,9 +66,9 @@ public class TemperatureServiceImpl implements TemperatureService {
 	        URI uri = new URI(BASE_URL +
 	                "?serviceKey=" + SERVICE_KEY +
 	                "&type=json" +
-	                "&bas_yy=2022" +
+	                "&bas_yy=" +
 	                "&pageNo=1" +
-	                "&numOfRows=100");
+	                "&numOfRows=500");
 
 	        HttpHeaders headers = new HttpHeaders();
 	        headers.set("Accept", "text/html");
