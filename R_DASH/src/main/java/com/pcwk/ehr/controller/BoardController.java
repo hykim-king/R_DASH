@@ -169,7 +169,23 @@ public class BoardController {
 		
 		log.debug("1. param:{}", param);
 		String jsonString = "";
+		//1. 이미지를 받으면
+		String image = param.getImage(); 
 		
+		if (image != null && !image.isEmpty()) {
+			boolean isImage = PcwkString.isImageExtension(image);
+			String imageExt = PcwkString.getExt(image);
+			
+			//2. 이미지 확장자인지 확인
+			if(isImage==false) {
+				log.debug("지원하지 않는 확장자 입니다.");
+			}	
+			//3. uuid + 확장자로 변경
+			String savedImageName = PcwkString.getUUID()+imageExt;
+			param.setImage(savedImageName);
+		}else {
+			log.debug("이미지 없음.");
+		}
 		int flag = service.doUpdate(param);
 		
 		String message = "";
