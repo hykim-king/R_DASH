@@ -74,7 +74,7 @@
 	                	alert(result.message);
 	                	
 	                	//로그인 페이지로 이동(임시)
-	                	window.location.href='/ehr/user/login';
+	                	window.location.href='/ehr/user/myPage';
 	                } 
 	                	
 	            },
