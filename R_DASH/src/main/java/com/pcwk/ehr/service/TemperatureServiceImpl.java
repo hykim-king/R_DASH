@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletContext;
 
@@ -53,7 +54,21 @@ public class TemperatureServiceImpl implements TemperatureService {
     private static final String PATIENTES_URL = "http://apis.data.go.kr/1741000/HeatWaveCasualtiesRegion/getHeatWaveCasualtiesRegionList";
     private static final String NOWCAST_URL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst";
     private static final String SERVICE_KEY = "VJxg5p3Iyzp7FA0pzgtVA7AYRfaM2YSuLU4h8TMQAvQIJMGkIN7qEpL%2FQoDBEqo1MnsWnxGR%2BlN%2F9SsKlSmbZg%3D%3D";
-    private static final String NOWCAST_EXCEL_PATH = "resources/excel/Nowcast.xlsx";
+    private static Map<String, List<Map<String, String>>> locationCache = new ConcurrentHashMap<>();
+    
+    
+    //한번 호출되면 캐시를 채우는 로직, insert를 할 때마다 readLocation호출해오는건 비효율적.
+    public TemperatureServiceImpl() {
+    	if (locationCache.isEmpty()) { 
+            try {
+                TemperatureServiceImpl.readLocation(); 
+            } catch (IOException e) {
+                System.err.println("위치 데이터 캐시 로드 중 오류 발생: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+    
     
     public TemperatureServiceImpl(RestTemplate restTemplate, TemperatureMapper temperatureMapper ) {
         this.restTemplate = restTemplate;
@@ -65,9 +80,8 @@ public class TemperatureServiceImpl implements TemperatureService {
      */
     public static List<Map<String, String>> readLocation() throws IOException {
     	List<Map<String, String>> result = new ArrayList<>();
-        Set<String> uniqueKeys = new HashSet<>();
-        
-        String excelFilePath = NOWCAST_EXCEL_PATH;
+        Set<String> sidoKeys = new HashSet<>();
+        Set<String> xyKeys = new HashSet<>(); 
         
         try (InputStream is = TemperatureServiceImpl.class.getClassLoader().getResourceAsStream("excel/Nowcast.xlsx")) {
             if (is == null) {
@@ -93,14 +107,12 @@ public class TemperatureServiceImpl implements TemperatureService {
                    String ny = getCellValue(row.getCell(6)); // 격자 Y
 
                    // 시군구명이 비어있으면 스킵
-                   if (sigungu == null || sigungu.isEmpty()) {                	   
-                	   continue;
-                   }
+                   if (sigungu == null || sigungu.isEmpty() || nx.isEmpty() || ny.isEmpty()) { continue; }
 
                    // 시도 + 시군구 중복 제거
                    String key = sido + "_" + sigungu;
-                   if (!uniqueKeys.contains(key)) {
-                       uniqueKeys.add(key);
+                   if (!sidoKeys.contains(key)) {
+                	   sidoKeys.add(key);
 
                        Map<String, String> map = new HashMap<>();
                        map.put("sido", sido);
@@ -110,6 +122,24 @@ public class TemperatureServiceImpl implements TemperatureService {
 
                        result.add(map);
                    }
+                   
+                   // 현재 읽은 엑셀 행이 (시도, 시군구, nx, ny)까지 완전히 동일한 중복이라면 스킵
+                   String fullRowKey = sido + "_" + sigungu + "_" + nx + "_" + ny;
+                   if (xyKeys.contains(fullRowKey)) {
+                       continue;
+                   }
+                   xyKeys.add(fullRowKey);
+
+                   String xyKey = nx + "_" + ny; // **nx_ny를 Map의 키로 사용**
+                   
+                   // locationCache에 xyKey가 없으면 새로운 ArrayList를 값으로 넣음
+                   locationCache.putIfAbsent(xyKey, new ArrayList<>());
+                   
+                   Map<String, String> locationInfo = new HashMap<>();
+                   locationInfo.put("sido", sido);
+                   locationInfo.put("sigungu", sigungu);
+                   
+                   locationCache.get(xyKey).add(locationInfo);
                }
             }
         }
@@ -167,21 +197,20 @@ public class TemperatureServiceImpl implements TemperatureService {
     /*
      * API에서 받은 Response를 DTO로 변환
      */
-    private NowcastDTO nowCastConvertToDTO(NowcastApiResponse.Item item) {
+    private NowcastDTO nowCastConvertToDTO(NowcastApiResponse.Item item, String sidoNm, String sigunguNm) {
     	String baseDate = item.getBaseDate();
         String baseTime = item.getBaseTime();
         String category = item.getCategory();
         int nx = item.getNx();
         int ny = item.getNy();
-        
         double obsrValue = 0.0;
         try {
             obsrValue = Double.parseDouble(item.getObsrValue());
         } catch (NumberFormatException e) {
             e.printStackTrace();
         }
-
-        NowcastDTO nowcastDTO = new NowcastDTO(null, baseDate, baseTime, nx, ny, category, obsrValue);
+        
+        NowcastDTO nowcastDTO = new NowcastDTO(null, baseDate, baseTime, sidoNm, sigunguNm, nx, ny, category, obsrValue);
         return nowcastDTO;
     }
     
@@ -223,8 +252,11 @@ public class TemperatureServiceImpl implements TemperatureService {
     		String baseTime = dateTime[1];
 
     	    for (Map<String, String> location : locations) {
+    	    	System.out.println("Location from readLocation: " + location.get("sido") + ", " + location.get("sigungu") + ", " + location.get("nx") + ", " + location.get("ny"));
     	        String nx = location.get("nx");
     	        String ny = location.get("ny");
+    	        String sido = location.get("sido");      // <-- sido
+    	        String sigungu = location.get("sigungu");
     	        
     	        // 1. API 호출
     	        URI uri = new URI(NOWCAST_URL +
@@ -240,7 +272,7 @@ public class TemperatureServiceImpl implements TemperatureService {
     	        NowcastApiResponse nowcastResponse = restTemplate.getForObject(uri, NowcastApiResponse.class);
 
         	    for (NowcastApiResponse.Item item : nowcastResponse.getResponse().getBody().getItems().getItem()) {
-        	        NowcastDTO dto = nowCastConvertToDTO(item);
+        	        NowcastDTO dto = nowCastConvertToDTO(item, sido, sigungu);
         	        temperatureMapper.insertNowcast(dto);
         	    }
     	    }			
@@ -319,4 +351,3 @@ public class TemperatureServiceImpl implements TemperatureService {
 	}
 
 }
-
