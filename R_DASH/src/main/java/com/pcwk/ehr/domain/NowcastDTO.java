@@ -8,7 +8,7 @@ public class NowcastDTO {
 	private int nx;
 	private int ny;
 	private String category;
-	private int obsrValue;
+	private double obsrValue;
 
 	public NowcastDTO() {
 	}
@@ -62,7 +62,7 @@ public class NowcastDTO {
 		this.category = category;
 	}
 
-	public int getObsrValue() {
+	public double getObsrValue() {
 		return obsrValue;
 	}
 
@@ -70,7 +70,7 @@ public class NowcastDTO {
 		this.obsrValue = obsrValue;
 	}
 
-	public NowcastDTO(Integer nowcastNo, String baseDate, String baseTime, int nx, int ny, String category, int obsrValue) {
+	public NowcastDTO(Integer nowcastNo, String baseDate, String baseTime, int nx, int ny, String category, double obsrValue) {
 		super();
 		this.nowcastNo = nowcastNo;
 		this.baseDate = baseDate;
