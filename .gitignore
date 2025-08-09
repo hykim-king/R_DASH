@@ -191,3 +191,8 @@ R_DASH/target/
 *.log
 *.jar
 *.war
+R_DASH/target/
+*.class
+*.log
+*.jar
+*.war
