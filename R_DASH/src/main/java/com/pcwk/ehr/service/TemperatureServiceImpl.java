@@ -5,6 +5,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -18,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.ServletContext;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +32,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pcwk.ehr.Response.NowcastApiResponse;
 import com.pcwk.ehr.Response.PatientsApiResponse;
 import com.pcwk.ehr.domain.NowcastDTO;
 import com.pcwk.ehr.domain.PatientsDTO;
@@ -39,6 +43,9 @@ public class TemperatureServiceImpl implements TemperatureService {
 
 	@Autowired
     private RestTemplate restTemplate;
+	
+	@Autowired
+	private ServletContext servletContext;
 	
 	@Autowired
 	private TemperatureMapper temperatureMapper;
@@ -62,8 +69,12 @@ public class TemperatureServiceImpl implements TemperatureService {
         
         String excelFilePath = NOWCAST_EXCEL_PATH;
         
-        try (FileInputStream fis = new FileInputStream(excelFilePath);
-                Workbook workbook = new XSSFWorkbook(fis)) {
+        try (InputStream is = TemperatureServiceImpl.class.getClassLoader().getResourceAsStream("excel/Nowcast.xlsx")) {
+            if (is == null) {
+                throw new IOException("파일을 찾을 수 없습니다: excel/Nowcast.xlsx");
+            }
+            
+            try (Workbook workbook = new XSSFWorkbook(is)) {
 
                Sheet sheet = workbook.getSheetAt(0); // 첫 번째 시트
                Iterator<Row> rowIterator = sheet.iterator();
@@ -100,8 +111,9 @@ public class TemperatureServiceImpl implements TemperatureService {
                        result.add(map);
                    }
                }
-           }
-           return result;
+            }
+        }
+        return result;
     }
     
     /*
@@ -155,6 +167,27 @@ public class TemperatureServiceImpl implements TemperatureService {
     /*
      * API에서 받은 Response를 DTO로 변환
      */
+    private NowcastDTO nowCastConvertToDTO(NowcastApiResponse.Item item) {
+    	String baseDate = item.getBaseDate();
+        String baseTime = item.getBaseTime();
+        String category = item.getCategory();
+        int nx = item.getNx();
+        int ny = item.getNy();
+        
+        double obsrValue = 0.0;
+        try {
+            obsrValue = Double.parseDouble(item.getObsrValue());
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+        }
+
+        NowcastDTO nowcastDTO = new NowcastDTO(null, baseDate, baseTime, nx, ny, category, obsrValue);
+        return nowcastDTO;
+    }
+    
+    /*
+     * API에서 받은 Response를 DTO로 변환
+     */
     private PatientsDTO patientsConvertToDTO(PatientsApiResponse.Row row) {
     	String region = row.getRegi();
         int year = Integer.parseInt(row.getBas_yy());
@@ -199,10 +232,17 @@ public class TemperatureServiceImpl implements TemperatureService {
         				"&numOfRows=500" +
         				"&pageNo=1" +
         				"&dataType=json" +
-        				"&base_date" + baseDate +
-        				"&base_time" + baseTime +
-        				"&nx" + nx +
-        				"&ny" + ny);
+        				"&base_date=" + baseDate +
+        				"&base_time=" + baseTime +
+        				"&nx=" + nx +
+        				"&ny=" + ny);
+    	        
+    	        NowcastApiResponse nowcastResponse = restTemplate.getForObject(uri, NowcastApiResponse.class);
+
+        	    for (NowcastApiResponse.Item item : nowcastResponse.getResponse().getBody().getItems().getItem()) {
+        	        NowcastDTO dto = nowCastConvertToDTO(item);
+        	        temperatureMapper.insertNowcast(dto);
+        	    }
     	    }			
     	}
     	catch (Exception e) {
@@ -276,13 +316,6 @@ public class TemperatureServiceImpl implements TemperatureService {
 	@Override
 	public List<PatientsDTO> getAllPatients() throws SQLException {
 		return temperatureMapper.selectAllPatients();
-	}
-
-
-	@Override
-	public void saveNowcast(NowcastDTO dto) throws SQLException {
-		temperatureMapper.insertNowcast(dto);
-		
 	}
 
 }

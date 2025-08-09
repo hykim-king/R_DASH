@@ -186,3 +186,17 @@ cython_debug/
 # PyCharm 설정
 .idea/
 .idea/
+R_DASH/target/
+*.class
+*.log
+*.jar
+*.war
+R_DASH/target/
+*.class
+*.log
+*.jar
+*.war
+
+# Build output
+R_DASH/target/
+/target/
