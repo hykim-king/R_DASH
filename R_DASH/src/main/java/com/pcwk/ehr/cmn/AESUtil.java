@@ -1,5 +1,7 @@
 package com.pcwk.ehr.cmn;
 
+import java.util.Base64;
+
 /**
  *대칭 키 알고리즘(Advanced Encyption Standard)
  *대칭 키 알고리즘은 **암호화와 복호화 과정에서 동일한 키를 사용하는 암호화 방식**입니다. 
@@ -12,13 +14,10 @@ package com.pcwk.ehr.cmn;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
-import java.util.Base64;
+import org.springframework.beans.factory.annotation.Value;
 
 public class AESUtil {
 	Logger log = LogManager.getLogger(getClass());
@@ -75,11 +74,11 @@ public class AESUtil {
 		// encrypted 결과는 바이너리이므로, Base64로 인코딩하여 문자열로 반환
 		String encryptedBase64String = Base64.getEncoder().encodeToString(encrypted);
 		// log.debug("plainText:"+plainText);
-		log.debug("plainText.length:" + plainText.length());
+		//log.debug("plainText.length:" + plainText.length());
 
-		// log.debug("encrypted:"+encrypted);
-		// log.debug("encryptedBase64String:"+encryptedBase64String);
-		log.debug("encryptedBase64String.length():" + encryptedBase64String.length());
+		 log.debug("encrypted:"+encrypted);
+		 log.debug("encryptedBase64String:"+encryptedBase64String);
+		//log.debug("encryptedBase64String.length():" + encryptedBase64String.length());
 		return encryptedBase64String;
 
 	}
