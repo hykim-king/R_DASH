@@ -3,16 +3,20 @@
 <mapper namespace="com.pcwk.ehr.mapper.TemperatureMapper">
     
     <insert id="insertNowcast" parameterType="NowcastDTO">
-        INSERT INTO PATIENTS (
-			BASE_DATE
-			BASE_TIME
-			NX
-			NY
-			CATEGORY
+        INSERT INTO NOWCAST (
+			BASE_DATE,
+			BASE_TIME,
+			SIDO_NM,
+			SIGNGU_NM,
+			NX,
+			NY,
+			CATEGORY,
 			OBSR_VALUE
         ) VALUES (
             #{baseDate}, 
             #{baseTime}, 
+            #{sidoNm},
+            #{sigunguNm},
             #{nx}, 
             #{ny}, 
             #{category},

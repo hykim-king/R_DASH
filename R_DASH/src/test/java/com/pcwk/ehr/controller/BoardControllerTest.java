@@ -78,7 +78,7 @@ class BoardControllerTest {
 	}
 	//doSelectOne
 	//doRetieve
-	@Disabled
+	//@Disabled
 	@Test
 	void doSelectOne() throws Exception{
 		log.debug("┌────────────────────────────┐");
@@ -116,7 +116,7 @@ class BoardControllerTest {
 
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void doRetrieve() throws Exception{
 		log.debug("┌────────────────────────────┐");
@@ -196,7 +196,7 @@ class BoardControllerTest {
 		assertEquals("삭제 되었습니다.", resultMessage.getMessage());
 	}
 	
-	//@Disabled
+	@Disabled
 	@Test
 	void doUpdate() throws Exception {
 		log.debug("┌───────────────────────┐");
@@ -281,7 +281,7 @@ class BoardControllerTest {
 		assertEquals("제목1등록되었습니다.", resultMessage.getMessage());
 	}
 	
-	//@Disabled
+	@Disabled
 	@Test
 	void beans() {
 		log.debug("┌───────────────────────┐");
