@@ -196,3 +196,7 @@ R_DASH/target/
 *.log
 *.jar
 *.war
+
+# Build output
+R_DASH/target/
+/target/
