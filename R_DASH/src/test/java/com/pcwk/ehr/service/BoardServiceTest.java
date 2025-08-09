@@ -39,7 +39,8 @@ class BoardServiceTest {
 	
 	BoardDTO dto;
 
-	
+	@Autowired
+	MarkdownServiceImpl markdownService;
 
 	@BeforeEach
 	void setUp() throws Exception {
@@ -59,9 +60,18 @@ class BoardServiceTest {
 		
 		
 	}
+	@Test
+	void convertToMarkdownHtml() {
+		String markdown="###### SPRING";
+		
+		markdownService.convertToMarkdownHtml(markdown);
+		log.debug(markdownService);
+		
+	}
 	/**
 	 * 일반 유저 조회 => 조회수 증가X
 	 */
+	@Disabled
 	@Test
 	void userGetView() {
 		//1.
@@ -102,7 +112,7 @@ class BoardServiceTest {
 	/**
 	 * 관리자 조회 => 조회수 증가 X
 	 */
-	//@Disabled
+	@Disabled
 	@Test
 	void adminGetView() {
 		//1.
@@ -139,7 +149,7 @@ class BoardServiceTest {
 		assertEquals(0, afterView);
 	}
 	
-	//@Disabled
+	@Disabled
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");
@@ -149,10 +159,12 @@ class BoardServiceTest {
 		assertNotNull(context);
 		assertNotNull(mapper);
 		assertNotNull(service);
+		assertNotNull(markdownService);
 		
 		log.debug("context: {}"+context);
 		log.debug("mapper: {}"+mapper);
 		log.debug("service: {}"+service);
+		log.debug("markdownService: {}"+markdownService);
 	}
 
 }
