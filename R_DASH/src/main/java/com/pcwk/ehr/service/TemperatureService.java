@@ -7,8 +7,6 @@ import com.pcwk.ehr.domain.NowcastDTO;
 import com.pcwk.ehr.domain.PatientsDTO;
 
 public interface TemperatureService {
-
-	void saveNowcast(NowcastDTO dto) throws SQLException;
 	
     List<PatientsDTO> getAllPatients() throws SQLException;
     
