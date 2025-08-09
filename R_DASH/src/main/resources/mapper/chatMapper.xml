@@ -6,7 +6,7 @@
 <mapper namespace="com.pcwk.ehr.mapper.ChatMapper">
 
   <resultMap id="chatResultMap" type="com.pcwk.ehr.domain.ChatDTO">
-    <id     property="logNo"    column="LOG_NO"/>
+    <id     property="logNo"     column="LOG_NO"/>
     <result property="userNo"    column="USER_NO"/>
     <result property="sessionId" column="SESSION_ID"/>
     <result property="question"  column="QUESTION"/>
@@ -25,7 +25,9 @@
             (ANSWER  LIKE '%' || #{searchWord} || '%')
           </when>
           <when test="searchDiv == '30'">
-            (USER_NO = TO_NUMBER(#{searchWord}))
+            <if test="@java.util.regex.Pattern@matches('^\\d+$', searchWord)">
+              (USER_NO = TO_NUMBER(#{searchWord}))
+            </if>
           </when>
         </choose>
       </if>
@@ -33,34 +35,23 @@
   </sql>
 
   <select id="selectChat" parameterType="java.lang.Long" resultMap="chatResultMap">
-    SELECT LOG_NO,
-           USER_NO,
-           SESSION_ID,
-           QUESTION,
-           ANSWER,
+    SELECT LOG_NO, USER_NO, SESSION_ID, QUESTION, ANSWER,
            TO_CHAR(REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
-      FROM CHAT_LOG
+      FROM JM.CHAT_LOG
      WHERE LOG_NO = #{logNo}
   </select>
 
-  <select id="chatList" parameterType="com.pcwk.ehr.cmn.SearchDTO" resultMap="chatResultMap">
+  <select id="chatList" parameterType="SearchDTO" resultMap="chatResultMap">
     SELECT A.*, B.TOTAL_CNT
       FROM (
         SELECT TT3.RNUM AS NO,
-               TT3.LOG_NO,
-               TT3.USER_NO,
-               TT3.SESSION_ID,
-               TT3.QUESTION,
-               TT3.ANSWER,
-               DECODE(TO_CHAR(TT3.REG_DT,'YYYY-MM-DD'),
-                      TO_CHAR(SYSDATE,'YYYY-MM-DD'),
-                      TO_CHAR(TT3.REG_DT,'HH24:MI:SS'),
-                      TO_CHAR(TT3.REG_DT,'YYYY-MM-DD')) AS REG_DT
+               TT3.LOG_NO, TT3.USER_NO, TT3.SESSION_ID, TT3.QUESTION, TT3.ANSWER,
+               TO_CHAR(TT3.REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
           FROM (
             SELECT ROWNUM AS RNUM, TT2.*
               FROM (
                 SELECT T1.*
-                  FROM CHAT_LOG T1
+                  FROM JM.CHAT_LOG T1
                   <include refid="search"/>
                  ORDER BY T1.REG_DT DESC
               ) TT2
@@ -73,22 +64,22 @@
       ) A
  CROSS JOIN (
     SELECT COUNT(*) AS TOTAL_CNT
-      FROM CHAT_LOG
+      FROM JM.CHAT_LOG
       <include refid="search"/>
  ) B
   </select>
 
-  <!-- IDENTITY: LOG_NO는 DB가 생성 → 컬럼/값에서 제외 -->
-  <insert id="insertChat" parameterType="com.pcwk.ehr.domain.ChatDTO">
-    INSERT INTO CHAT_LOG (
-      USER_NO, SESSION_ID, QUESTION, ANSWER, REG_DT
-    ) VALUES (
-      #{userNo}, #{sessionId}, #{question}, #{answer}, SYSDATE
-    )
-  </insert>
+  <insert id="insertChat"
+        parameterType="ChatDTO"
+        useGeneratedKeys="true"
+        keyProperty="logNo"
+        keyColumn="LOG_NO">
+  INSERT INTO JM.CHAT_LOG (USER_NO, SESSION_ID, QUESTION, ANSWER, REG_DT)
+  VALUES (#{userNo, jdbcType=NUMERIC}, #{sessionId}, #{question}, #{answer}, SYSDATE)
+</insert>
 
-  <update id="updateChat" parameterType="com.pcwk.ehr.domain.ChatDTO">
-    UPDATE CHAT_LOG
+  <update id="updateChat" parameterType="ChatDTO">
+    UPDATE JM.CHAT_LOG
        SET
          <trim suffixOverrides=",">
            <if test="userNo != null">USER_NO = #{userNo},</if>
@@ -99,12 +90,25 @@
      WHERE LOG_NO = #{logNo}
   </update>
 
+  <select id="findRecentBySession" resultMap="chatResultMap">
+    SELECT *
+      FROM (
+        SELECT t.LOG_NO, t.USER_NO, t.SESSION_ID, t.QUESTION, t.ANSWER,
+               TO_CHAR(t.REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
+          FROM JM.CHAT_LOG t
+         WHERE t.SESSION_ID = #{sessionId}
+           <if test="userNo != null">AND t.USER_NO = #{userNo}</if>
+         ORDER BY t.REG_DT DESC
+      )
+     WHERE ROWNUM &lt;= #{limit}
+  </select>
+
   <delete id="deleteChat" parameterType="java.lang.Long">
-    DELETE FROM CHAT_LOG WHERE LOG_NO = #{logNo}
+    DELETE FROM JM.CHAT_LOG WHERE LOG_NO = #{logNo}
   </delete>
 
   <delete id="deleteAll">
-    DELETE FROM CHAT_LOG
+    DELETE FROM JM.CHAT_LOG
   </delete>
 
 </mapper>
