@@ -183,22 +183,27 @@ public class TemperatureServiceImpl implements TemperatureService {
     @Override
     public void insertNowcast() throws SQLException{
     	try {
-    		List<Map<String, String>> location = readLocation();
+    		List<Map<String, String>> locations = readLocation();
     		
     		String[] dateTime = getBaseDateTime();
     		String baseDate = dateTime[0];
     		String baseTime = dateTime[1];
-    		// 1. API 호출
-    		URI uri = new URI(NOWCAST_URL +
-    				"?serviceKey=" + SERVICE_KEY +
-    				"&numOfRows=500" +
-    				"&pageNo=1" +
-    				"&dataType=json" +
-    				"&base_date" + baseDate +
-    				"&base_time" + baseTime +
-    				"&nx" +
-    				"&ny");
-    				
+
+    	    for (Map<String, String> location : locations) {
+    	        String nx = location.get("nx");
+    	        String ny = location.get("ny");
+    	        
+    	        // 1. API 호출
+    	        URI uri = new URI(NOWCAST_URL +
+        				"?serviceKey=" + SERVICE_KEY +
+        				"&numOfRows=500" +
+        				"&pageNo=1" +
+        				"&dataType=json" +
+        				"&base_date" + baseDate +
+        				"&base_time" + baseTime +
+        				"&nx" + nx +
+        				"&ny" + ny);
+    	    }			
     	}
     	catch (Exception e) {
 			e.printStackTrace();
