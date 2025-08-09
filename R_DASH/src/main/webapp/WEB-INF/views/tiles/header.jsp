@@ -224,7 +224,7 @@
 	                <div class="dropdown-header noti-title">
 	                  <h6 class="text-overflow m-0">환영합니다!</h6>
 	                </div>
-	                <a href="#!" class="dropdown-item">
+	                <a href="/ehr/user/myPage" class="dropdown-item">
 	                  <i class="ni ni-single-02"></i>
 	                  <span>마이페이지</span>
 	                </a>

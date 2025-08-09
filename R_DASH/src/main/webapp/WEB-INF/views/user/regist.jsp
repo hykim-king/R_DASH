@@ -34,19 +34,21 @@ document.addEventListener('DOMContentLoaded',function(){
 	 const valid_email = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
 	 //비밀번호 형식 체크 (영문 대/소문자 하나이상 포함, 특수문자 하나이상 포함)
 	 const valid_password = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+~`=\-{}\[\]:;"'<>,.?\/\\])\S{8,16}$/;
- 
+	 
+	 //이메일 체크 버튼
+     const checkEmailButton = document.querySelector("#checkEmailButton");
 	 
 	 regForm.addEventListener("submit",function(event){
 		 event.preventDefault(); // 실제 폼 제출 막음
 		 
 		 if(nameInput.value === ''){
-			 alert('이름을 입력하세요');
+			 alert('이름을 입력하세요.');
 			 nameInput.focus();
 			 return;
 		 }
 
 		 if(emailInput.value === ''){
-			 alert('이메일을 입력하세요');
+			 alert('이메일을 입력하세요.');
 			 emailInput.focus();
 			 return;
 		 }
@@ -54,7 +56,7 @@ document.addEventListener('DOMContentLoaded',function(){
 		 
 		 
 		 if(passwordInput.value === ''){
-			 alert('비밀번호를 입력하세요');
+			 alert('비밀번호를 입력하세요.');
 			 passwordInput.focus();
 			 return;
 		 }
@@ -75,6 +77,12 @@ document.addEventListener('DOMContentLoaded',function(){
 		 if(valid_password.test(passwordInput.value)===false){
 			 alert('비밀번호 형식이 올바르지 않습니다.\n(영문 대/소문자 하나이상 포함, 특수문자 하나이상 포함)\n(8자 이상 16자 이하)');
 			 passwordInput.focus();
+			 return;
+		 }
+		 
+		 if(checkEmailButton.value !== '가능한 이메일입니다.'){
+			 alert('메일 중복을 확인하세요.');
+			 
 			 return;
 		 }
 		 
@@ -114,16 +122,65 @@ document.addEventListener('DOMContentLoaded',function(){
 	 });
 	 
 });
-	function searchAddress(){
-		new daum.Postcode({
-	        oncomplete: function(data) {
-	            // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다.
-	            document.querySelector('#zipCode').value = data.zonecode; //우편번호
-	            document.querySelector('#address').value = data.address; //주소
-	            // 예제를 참고하여 다양한 활용법을 확인해 보세요.
-	        }
-	    }).open();
-	}
+function checkEmail(){
+	//이메일 input
+    const emailInput = document.querySelector("#email");
+    const duplicateInput = document.querySelector("#duplicate");
+    //이메일 형식 체크
+    const valid_email = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
+    
+    if(emailInput.value === ''){
+    	alert('이메일을 입력하세요');
+    	
+    	return;
+    }
+    
+    if(valid_email.test(emailInput.value)===false){
+        alert('이메일 형식이 올바르지 않습니다.');
+        emailInput.focus();
+        
+        return;
+    }
+    
+	$.ajax({
+        method:"POST",    //GET/POST
+        url:"/ehr/user/checkEmail", //서버측 URL
+        dataType:"json",//서버에서 받을 데이터 타입
+        data:{          //파라메터
+            "email": emailInput.value
+        },
+        success:function(result){//요청 성공
+            if(false === result.success){
+                duplicateInput.textContent = result.message;
+                duplicateInput.style.color = "red";
+                return;
+            }else{
+            	duplicateInput.textContent = result.message;
+            	duplicateInput.style.color = "green";
+            	return;
+            } 
+                
+        },
+        error:function(result){//요청 실패
+            console.log("error:"+result)
+            alert(result);
+        }
+        
+        
+    });
+}
+
+
+function searchAddress(){
+	new daum.Postcode({
+	    oncomplete: function(data) {
+	        // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분입니다.
+	        document.querySelector('#zipCode').value = data.zonecode; //우편번호
+	        document.querySelector('#address').value = data.address; //주소
+	        // 예제를 참고하여 다양한 활용법을 확인해 보세요.
+	    }
+	}).open();
+}
 </script>
 </head>
 <body class="bg-white">
@@ -185,7 +242,7 @@ document.addEventListener('DOMContentLoaded',function(){
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
                     <input class="form-control" name="email" id="email" placeholder="Email" type="email">
-                    <input type="button" class="btn btn-default btn-sm" value="메일중복 확인" style="margin-left: 10px;">
+                    <input type="button" onclick="checkEmail()" id="checkEmailButton" class="btn btn-default btn-sm" value="메일중복 확인" style="margin-left: 10px;">
                   </div>
                 </div>
                 <div id="duplicate" >
