@@ -14,13 +14,13 @@ public interface ChatMapper extends WorkDiv<ChatDTO> {
 
 	int insertChat(ChatDTO chat);
 
-	ChatDTO selectChat(Long logNo); // ✅ Integer → Long
+	ChatDTO selectChat(@Param("logNo") Long logNo); // ✅ Integer → Long
 
 	List<ChatDTO> chatList(SearchDTO search);
 
 	int updateChat(ChatDTO chat);
 
-	int deleteChat(Long logNo); // ✅ Integer → Long
+	int deleteChat(@Param("logNo") Long logNo); // ✅ Integer → Long
 
 	int deleteAll();
 	
