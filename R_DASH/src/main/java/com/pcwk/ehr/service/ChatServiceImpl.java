@@ -15,7 +15,7 @@ import com.pcwk.ehr.mapper.ChatMapper;
 @Transactional(readOnly = true) // 기본은 조회 전용
 public class ChatServiceImpl implements ChatService {
 
-	private static final Logger log = LogManager.getLogger(ChatServiceImpl.class);
+	Logger log = LogManager.getLogger(ChatServiceImpl.class);
 
 	private final ChatMapper chatMapper;
 
