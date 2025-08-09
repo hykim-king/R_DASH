@@ -98,6 +98,23 @@
          </trim>
      WHERE LOG_NO = #{logNo}
   </update>
+  
+  <!-- 세션/사용자 기준 최근 N건: 오래된 순(대화 재생용) -->
+<select id="findRecentBySession" resultMap="chatResultMap">
+  SELECT *
+  FROM (
+    SELECT t.*
+    FROM CHAT_LOG t
+    WHERE t.session_id = #{sessionId}
+      <if test="userNo != null">
+        AND t.user_no = #{userNo}
+      </if>
+    ORDER BY t.reg_dt DESC
+  )
+  WHERE ROWNUM &lt;= #{limit}
+</select>
+  
+  
 
   <delete id="deleteChat" parameterType="java.lang.Long">
     DELETE FROM CHAT_LOG WHERE LOG_NO = #{logNo}
