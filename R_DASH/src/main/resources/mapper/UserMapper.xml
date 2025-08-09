@@ -137,7 +137,7 @@
 				           #{password},
 				           'defaultProfile.jpg',
 				           #{name},
-				           #{zipCode},
+				           #{zipCode, jdbcType=INTEGER},
 				           #{address},
 				           #{detailAddress},
 				           2,

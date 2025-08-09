@@ -32,4 +32,7 @@ public interface UserService {
 	
 	// 권한 변경
 	public int updateRole(UserDTO param);
+	
+	// 이메일 중복 확인
+	public int checkEmail(String email);
 }
