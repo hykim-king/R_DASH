@@ -2,6 +2,8 @@ package com.pcwk.ehr.service;
 
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,47 +11,50 @@ import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.ChatDTO;
 import com.pcwk.ehr.mapper.ChatMapper;
 
-@Service
+@Service("chatService")
 @Transactional(readOnly = true) // 기본은 조회 전용
 public class ChatServiceImpl implements ChatService {
 
-    private final ChatMapper chatMapper;
+	private static final Logger log = LogManager.getLogger(ChatServiceImpl.class);
 
-    public ChatServiceImpl(ChatMapper chatMapper) {
-        this.chatMapper = chatMapper;
-    }
+	private final ChatMapper chatMapper;
 
-    @Override
-    @Transactional // 쓰기 작업만 트랜잭션
-    public int insertChat(ChatDTO chat) {
-        return chatMapper.insertChat(chat);
-    }
+	public ChatServiceImpl(ChatMapper chatMapper) {
+		this.chatMapper = chatMapper;
+	}
 
-    @Override
-    public ChatDTO selectChat(Long logNo) {
-        return chatMapper.selectChat(logNo);
-    }
+	@Override
+	@Transactional // 쓰기 작업만 트랜잭션
+	public int insertChat(ChatDTO chat) {
+		log.debug("inserChat 호출:{}", chat);
+		return chatMapper.insertChat(chat);
+	}
 
-    @Override
-    public List<ChatDTO> chatList(SearchDTO search) {
-        return chatMapper.chatList(search);
-    }
+	@Override
+	public ChatDTO selectChat(Long logNo) {
+		return chatMapper.selectChat(logNo);
+	}
 
-    @Override
-    @Transactional
-    public int updateChat(ChatDTO chat) {
-        return chatMapper.updateChat(chat);
-    }
+	@Override
+	public List<ChatDTO> chatList(SearchDTO search) {
+		return chatMapper.chatList(search);
+	}
 
-    @Override
-    @Transactional
-    public int deleteChat(Long logNo) {
-        return chatMapper.deleteChat(logNo);
-    }
+	@Override
+	@Transactional
+	public int updateChat(ChatDTO chat) {
+		return chatMapper.updateChat(chat);
+	}
 
-    @Override
-    @Transactional
-    public int deleteAll() {
-        return chatMapper.deleteAll();
-    }
+	@Override
+	@Transactional
+	public int deleteChat(Long logNo) {
+		return chatMapper.deleteChat(logNo);
+	}
+
+	@Override
+	@Transactional
+	public int deleteAll() {
+		return chatMapper.deleteAll();
+	}
 }
