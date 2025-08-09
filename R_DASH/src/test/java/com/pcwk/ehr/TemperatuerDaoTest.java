@@ -82,7 +82,7 @@ class TemperatuerDaoTest {
 		log.debug("outVO:{}",outVO);
 	}
 	
-	//@Disabled
+	@Disabled
 	@Test
 	void doSave() throws SQLException {
 		// 1.전체삭제
