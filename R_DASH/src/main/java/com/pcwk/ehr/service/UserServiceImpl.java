@@ -79,4 +79,9 @@ public class UserServiceImpl implements UserService {
 		return mapper.updateRole(param);
 	}
 
+	@Override
+	public int checkEmail(String email) {
+		return mapper.checkEmail(email);
+	}
+
 }
