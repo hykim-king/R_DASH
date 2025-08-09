@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pcwk.ehr.mapper.TemperatureMapper">
+    
+    <insert id="insertNowcast" parameterType="NowcastDTO">
+        INSERT INTO PATIENTS (
+			BASE_DATE
+			BASE_TIME
+			NX
+			NY
+			CATEGORY
+			OBSR_VALUE
+        ) VALUES (
+            #{baseDate}, 
+            #{baseTime}, 
+            #{nx}, 
+            #{ny}, 
+            #{category},
+            #{obsrValue}
+        )
+    </insert>
+    
+    <insert id="insertPatient" parameterType="PatientsDTO">
+        INSERT INTO PATIENTS (
+            YEAR, 
+            SIDO_NM, 
+            PATIENTS_TOT, 
+            OUT_SUBTOT, 
+            IN_SUBTOT
+        ) VALUES (
+            #{year}, 
+            #{sidoNm}, 
+            #{patientsTot}, 
+            #{outSubtot}, 
+            #{inSubtot}
+        )
+    </insert>
+
+    <select id="selectAllPatients" resultType="PatientsDTO">
+        SELECT 
+            PATIENTS_NO, 
+            YEAR, 
+            SIDO_NM, 
+            PATIENTS_TOT, 
+            OUT_SUBTOT, 
+            IN_SUBTOT
+        FROM PATIENTS
+    </select>
+    
+    <select id="selectSidoPatients" parameterType="String" resultType="PatientsDTO">
+        SELECT 
+            PATIENTS_NO, 
+            YEAR, 
+            SIDO_NM, 
+            PATIENTS_TOT, 
+            OUT_SUBTOT, 
+            IN_SUBTOT
+        FROM PATIENTS
+        WHERE SIDO_NM = #{sidoNm}
+    </select>
+   
+    <select id="getCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) AS totalCnt FROM PATIENTS
+    </select>
+    
+    <delete id="deleteAll">
+        DELETE FROM PATIENTS
+    </delete>
+    
+</mapper>

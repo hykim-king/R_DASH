@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
+<<<<<<< HEAD
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -17,6 +18,25 @@
         <org.aspectj-version>1.8.13</org.aspectj-version>
         <log4j-core-version>2.23.1</log4j-core-version>
         <org.slf4j-version>1.6.6</org.slf4j-version>
+=======
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.pcwk</groupId>
+	<artifactId>ehr</artifactId>
+	<name>R_DASH</name>
+	<packaging>war</packaging>
+	<version>1.0.0-BUILD-SNAPSHOT</version>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<java-version>1.8</java-version>
+		<org.springframework-version>5.3.37</org.springframework-version>
+		<org.aspectj-version>1.8.13</org.aspectj-version>
+		<log4j-core-version>2.23.1</log4j-core-version>
+		<org.slf4j-version>1.6.6</org.slf4j-version>
+>>>>>>> branch 'feature/map' of https://github.com/hykim-king/R_DASH.git
 
         <mybatis-version>3.5.16</mybatis-version>
         <mybatis-spring-version>2.1.2</mybatis-spring-version>
@@ -29,6 +49,7 @@
         <junit-jupiter-version>5.11.0</junit-jupiter-version>
         <aspectjweaver-version>1.9.22</aspectjweaver-version>
 
+<<<<<<< HEAD
         <junit-version>5.11.0</junit-version>
         <jstl-version>1.2</jstl-version>
         <jsp-api-version>2.1</jsp-api-version>
@@ -78,6 +99,57 @@
             <artifactId>spring-websocket</artifactId>
             <version>5.3.37</version>
         </dependency>
+=======
+		<junit-version>5.11.0</junit-version>
+		<jstl-version>1.2</jstl-version>
+		<jsp-api-version>2.1</jsp-api-version>
+		<servlet-api-version>2.5</servlet-api-version>
+		<javax.servlet-api-version>3.1.0</javax.servlet-api-version>
+		<mockito-all-version>1.10.19</mockito-all-version>
+		<guava-version>33.3.1-jre</guava-version>
+		<jackson-databind-version>2.18.2</jackson-databind-version>
+		<commonmark-version>0.18.2</commonmark-version>
+		<commons-fileupload-version>1.5</commons-fileupload-version>
+	</properties>
+	<dependencies>
+		<!-- OpenAI HTTP 호출용 -->
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>4.12.0</version>
+		</dependency>
+		<!-- (선택) 요청/응답 로깅 -->
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>logging-interceptor</artifactId>
+			<version>4.12.0</version>
+		</dependency>
+		<!-- Bean Validation API -->
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.1.Final</version>
+		</dependency>
+		<!-- 구현체 -->
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>6.2.5.Final</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter -->
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-junit-jupiter</artifactId>
+			<version>3.12.4</version>
+			<scope>test</scope>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.springframework/spring-websocket -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-websocket</artifactId>
+			<version>5.3.37</version>
+		</dependency>
+>>>>>>> branch 'feature/map' of https://github.com/hykim-king/R_DASH.git
 
         <!-- https://mvnrepository.com/artifact/org.springframework/spring-messaging -->
         <dependency>
