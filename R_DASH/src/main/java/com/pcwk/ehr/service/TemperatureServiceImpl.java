@@ -237,9 +237,7 @@ public class TemperatureServiceImpl implements TemperatureService {
         				"&nx=" + nx +
         				"&ny=" + ny);
     	        
-    	        String response = restTemplate.getForObject(uri, String.class);
-        	    ObjectMapper objectMapper = new ObjectMapper();
-        	    NowcastApiResponse nowcastResponse = objectMapper.readValue(response, NowcastApiResponse.class);
+    	        NowcastApiResponse nowcastResponse = restTemplate.getForObject(uri, NowcastApiResponse.class);
 
         	    for (NowcastApiResponse.Item item : nowcastResponse.getResponse().getBody().getItems().getItem()) {
         	        NowcastDTO dto = nowCastConvertToDTO(item);
