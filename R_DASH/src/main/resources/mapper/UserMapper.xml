@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pcwk.ehr.mapper.UserMapper">
+
+    <sql id="search">
+        <where>
+          <if test="searchDiv !='' ">
+              <choose>
+                <!-- email 조회 -->
+                 <when test=" searchDiv == '10'  ">
+                    email LIKE '%'|| #{searchWord} ||'%'
+                 </when>
+                 <!-- 이름 조회 -->
+                 <when test=" searchDiv == '20'  ">
+                    name LIKE '%'|| #{searchWord} ||'%'
+                 </when>  
+                 <!-- 권한 조회 -->
+                 <when test=" searchDiv == '30'  ">
+                    role = 1
+                 </when>                                                            
+              </choose>
+          </if>
+        </where>
+   </sql>
+   
+   <!-- 비밀번호 확인 -->
+   <select id="findPw" parameterType="String" resultType="String">
+    SELECT password FROM USER_JM
+    WHERE email = #{email}
+   </select>
+   
+   
+   <!-- 권한 변경 -->
+   <update id="updateRole" parameterType="UserDTO">
+    UPDATE USER_JM
+	SET 
+	    role = #{role}
+	WHERE user_no = #{userNo}
+   </update>
+   
+   <!-- UserNo 얻기(test) -->
+   <select id="getUserNo" parameterType="String" resultType="java.lang.Integer">
+   	SELECT user_no FROM USER_JM
+	WHERE email = #{email}
+   </select>
+
+    <!-- 전체 회원 조회, 페이징(관리자) -->
+    <select id="userList" parameterType="SearchDTO" resultType="UserDTO">
+    SELECT A.*,B.*                                                        
+       FROM (                                                              
+         SELECT tt3.RNUM AS no,                                            
+                tt3.user_no AS userNo,                                               
+                tt3.name,                                                                                               
+                tt3.email,                                                 
+                tt3.image,
+                tt3.role,
+                DECODE(TO_CHAR(tt3.reg_dt,'YYYY-MM-DD'),TO_CHAR(SYSDATE,'YYYY-MM-DD'),
+                        TO_CHAR(tt3.reg_dt,'HH24:MI:SS'),TO_CHAR(tt3.reg_dt,'YYYY-MM-DD')) AS regDt
+         FROM (                                                            
+             SELECT ROWNUM as RNUM,                                        
+                    tt2.*                                                  
+               FROM(                                                       
+                     SELECT t1.*                                           
+                      FROM USER_JM t1
+                      <include refid="search"/>
+                     ORDER BY t1.reg_dt DESC                            
+             )tt2
+    <![CDATA[                                                          
+         WHERE ROWNUM <= ( #{pageSize} * (#{pageNo} - 1 ) + #{pageSize} )                                             
+         )tt3                                                              
+         WHERE RNUM >= ( #{pageSize} * (#{pageNo} - 1 ) + 1 )
+         ]]>                                               
+     )A
+     CROSS JOIN    
+     (
+       SELECT COUNT(*) AS total_cnt                                        
+         FROM USER_JM
+         <include refid="search"/>
+     )B
+    </select>
+    
+    <!-- 로그인 시 비밀번호 확인 -->
+    <select id="checkPw" parameterType="UserDTO" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM USER_JM
+		WHERE
+		    email = #{email}
+	    AND password = #{password}
+    </select>
+    
+    <!-- 이메일 확인(회원가입 시 중복체크, 비밀번호 찾기) -->
+    <select id="checkEmail" parameterType="String" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM USER_JM
+		WHERE
+		    email = #{email}
+    </select>
+
+    <!-- 회원 정보 수정 -->
+    <update id="updateUser" parameterType="UserDTO">
+        UPDATE USER_JM
+			<set>
+            <if test="password != null">password=#{password},</if>
+            <if test="nickname != null">nickname=#{nickname},</if>
+			<if test="image != null">image=#{image},</if>
+			<if test="tel != null">tel=#{tel},</if>
+			<if test="zipCode != null">zip_code=#{zipCode},</if>
+			<if test="address != null">address=#{address},</if>
+			<if test="detailAddress != null">detail_address=#{detailAddress},</if>
+			</set>
+			WHERE
+			user_no = #{userNo}
+    </update>
+    <!-- 회원 삭제 -->
+    <delete id="deleteUser" parameterType="Integer">
+        DELETE FROM USER_JM
+        WHERE USER_NO = #{userNo}
+    </delete>
+    
+    <!-- 회원 조회 -->
+    <select id="selectUser" parameterType="java.lang.Integer" resultType="UserDTO">
+        SELECT * FROM USER_JM
+        WHERE USER_NO = #{userNo}
+    </select>
+
+    <!-- 회원가입 -->
+    <insert id="insertUser" parameterType="UserDTO">
+        INSERT INTO USER_JM (
+				    email,
+				    password,
+				    name,
+				    zip_code,
+				    address,
+				    detail_address,
+				    role,
+				    reg_dt
+				) VALUES ( #{email},
+				           #{password},
+				           #{name},
+				           #{zipCode},
+				           #{address},
+				           #{detailAddress},
+				           2,
+				           SYSDATE
+				        )
+    </insert>
+
+    <!-- 전체 회원 조회 -->
+    <select id="getAll" resultType="UserDTO">
+        SELECT * FROM USER_JM
+    </select>
+
+    <!-- 전체 회원 수 조회 -->
+    <select id="getCount" resultType="java.lang.Integer">
+        SELECT COUNT(*) FROM USER_JM
+    </select>
+    
+    <!-- 다건 등록(test) -->
+    <insert id="saveAll">
+        INSERT INTO USER_JM(name, password,email, reg_dt,role)
+         SELECT '이상무'|| level  AS name,                          
+                '1234' AS password,                    
+                'pcwk'||level||'@paran.com' AS email,                     
+                SYSDATE - level AS reg_dt,
+                2
+           FROM dual                        
+         <![CDATA[CONNECT BY LEVEL <=100 ]]>
+    </insert>
+    
+    <!-- 회원 전체 삭제(test) -->
+    <delete id="deleteAll">
+        DELETE FROM USER_JM
+    </delete>
+</mapper>

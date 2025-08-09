@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pcwk.ehr.mapper.ChatMapper">
+
+  <resultMap id="chatResultMap" type="com.pcwk.ehr.domain.ChatDTO">
+    <id     property="logNo"    column="LOG_NO"/>
+    <result property="userNo"    column="USER_NO"/>
+    <result property="sessionId" column="SESSION_ID"/>
+    <result property="question"  column="QUESTION"/>
+    <result property="answer"    column="ANSWER"/>
+    <result property="regDt"     column="REG_DT"/>
+  </resultMap>
+
+  <sql id="search">
+    <where>
+      <if test="searchDiv != null and searchDiv != '' and searchWord != null and searchWord != ''">
+        <choose>
+          <when test="searchDiv == '10'">
+            (QUESTION LIKE '%' || #{searchWord} || '%')
+          </when>
+          <when test="searchDiv == '20'">
+            (ANSWER  LIKE '%' || #{searchWord} || '%')
+          </when>
+          <when test="searchDiv == '30'">
+            (USER_NO = TO_NUMBER(#{searchWord}))
+          </when>
+        </choose>
+      </if>
+    </where>
+  </sql>
+
+  <select id="selectChat" parameterType="java.lang.Long" resultMap="chatResultMap">
+    SELECT LOG_NO,
+           USER_NO,
+           SESSION_ID,
+           QUESTION,
+           ANSWER,
+           TO_CHAR(REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
+      FROM CHAT_LOG
+     WHERE LOG_NO = #{logNo}
+  </select>
+
+  <select id="chatList" parameterType="com.pcwk.ehr.cmn.SearchDTO" resultMap="chatResultMap">
+    SELECT A.*, B.TOTAL_CNT
+      FROM (
+        SELECT TT3.RNUM AS NO,
+               TT3.LOG_NO,
+               TT3.USER_NO,
+               TT3.SESSION_ID,
+               TT3.QUESTION,
+               TT3.ANSWER,
+               DECODE(TO_CHAR(TT3.REG_DT,'YYYY-MM-DD'),
+                      TO_CHAR(SYSDATE,'YYYY-MM-DD'),
+                      TO_CHAR(TT3.REG_DT,'HH24:MI:SS'),
+                      TO_CHAR(TT3.REG_DT,'YYYY-MM-DD')) AS REG_DT
+          FROM (
+            SELECT ROWNUM AS RNUM, TT2.*
+              FROM (
+                SELECT T1.*
+                  FROM CHAT_LOG T1
+                  <include refid="search"/>
+                 ORDER BY T1.REG_DT DESC
+              ) TT2
+              <![CDATA[
+             WHERE ROWNUM <= ( NVL(#{pageSize},10) * (NVL(#{pageNo},1) - 1) + NVL(#{pageSize},10) )]]>
+          ) TT3
+          <![CDATA[
+         WHERE RNUM >= ( NVL(#{pageSize},10) * (NVL(#{pageNo},1) - 1) + 1 )
+         ]]>
+      ) A
+ CROSS JOIN (
+    SELECT COUNT(*) AS TOTAL_CNT
+      FROM CHAT_LOG
+      <include refid="search"/>
+ ) B
+  </select>
+
+  <!-- IDENTITY: LOG_NO는 DB가 생성 → 컬럼/값에서 제외 -->
+  <insert id="insertChat" parameterType="com.pcwk.ehr.domain.ChatDTO">
+    INSERT INTO CHAT_LOG (
+      USER_NO, SESSION_ID, QUESTION, ANSWER, REG_DT
+    ) VALUES (
+      #{userNo}, #{sessionId}, #{question}, #{answer}, SYSDATE
+    )
+  </insert>
+
+  <update id="updateChat" parameterType="com.pcwk.ehr.domain.ChatDTO">
+    UPDATE CHAT_LOG
+       SET
+         <trim suffixOverrides=",">
+           <if test="userNo != null">USER_NO = #{userNo},</if>
+           <if test="sessionId != null and sessionId != ''">SESSION_ID = #{sessionId},</if>
+           <if test="question != null">QUESTION = #{question},</if>
+           <if test="answer != null">ANSWER = #{answer},</if>
+         </trim>
+     WHERE LOG_NO = #{logNo}
+  </update>
+
+  <delete id="deleteChat" parameterType="java.lang.Long">
+    DELETE FROM CHAT_LOG WHERE LOG_NO = #{logNo}
+  </delete>
+
+  <delete id="deleteAll">
+    DELETE FROM CHAT_LOG
+  </delete>
+
+</mapper>
