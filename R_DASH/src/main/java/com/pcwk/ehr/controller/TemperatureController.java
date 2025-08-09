@@ -26,12 +26,19 @@ public class TemperatureController {
     @PostMapping("/save-patients.do")
     public String insertPatient() throws SQLException {
     	temperatureService.insertPatient();
-        return "등록 완료";
+        return "Patient 등록 완료!";
     }
     
-    @GetMapping("/patients.do")
+    @GetMapping("/select-patients.do")
     public List<PatientsDTO> getPatients() throws SQLException {
         return temperatureService.getAllPatients();
+    }
+    
+    @PostMapping("/save-nowcast.do")
+    public String insertNowcast() throws SQLException {
+    	temperatureService.insertNowcast();
+    	return "NowCast 등록 완료!";
+    	
     }
     
 }
