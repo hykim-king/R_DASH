@@ -8,55 +8,98 @@
 <c:set var="sysDate">
     <fmt:formatDate value="${now}" pattern="yyyy-MM-dd HH:mm:ss" />
 </c:set>
+<c:set var="fontPath" value="${CP}/resources/fonts/summernote.ttf" />
+
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>board_reg</title>
+<title>공지사항 등록하기</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
-
+<link rel="stylesheet" href="/ehr/resources/summernote/summernote-lite.min.css">
 <link rel="icon" href="${CP}/resources/image/Jaemini_face.ico" type="image/x-icon"/>
 </head>
 <body>
-<div class="container px-5 my-5 px-5">
-    <h2>게시글 등록하기</h2>
+<div>
+<div>
+    <span>🏠 홈</span><span>></span><span>공지사항</span><span>></span><span>등록</span>
+</div>
+<div>
+    <img style="width:200px; height:150px; object-fit: contain;" src="/ehr/resources/image/board_Jeamin.png">
+</div>
+    <h2>공지사항 등록하기</h2>
     <!-- form area -->
     <form action="#" method="post" enctype="multipart/form-data">
-    <div class="mb-3">
+    <div>
         <label for="name" >제목</label>
-        <input type="text" name="name" id="name" autocomplete="name" maxlength="50" required placeholder="제목을 입력해주세요." >
+        <input type="text" name="title" id="title" autocomplete="title" maxlength="50" required placeholder="제목을 입력해주세요." >
     </div>
-    <div class="mb-3">
+    <div>
         <label for="modId">등록자</label>
         <input type="text" name="modId" id="modId" autocomplete="modId" maxlength="50" required placeholder="등록자" >
     </div>
-    <div class="mb-3">
+    <div>
         <label>공지</label><input type="checkbox" name="notice" value="30">
     </div>
-    <div class="mb-3">
+    <div>
         <label for="contents" >내용</label>
-        <textarea class="form-control" id="ckeditor" name="contents"  placeholder="내용" class="contents"></textarea>
+        <textarea class="form-control" id="summernote" name="contents"  maxlength="50" class="contents"></textarea>
     </div>
     </form>
     <!-- //form area -->
     <!-- button area -->
     <div>
-        <input type="button" class="btn btn-sm btn-success" id="doSave" value="등록">
-        <input type="button" class="btn btn-sm btn-success" id="moveToList" value="목록">
+        <input type="button" id="doSave" value="등록">
+        <input type="button" id="moveToList" value="목록">
     </div>
     <!-- //button area -->
+<script src="${CP}/resources/summernote/summernote-lite.min.js"></script>
+<script src="${CP}/resources/summernote/lang/summernote-ko-KR.js"></script>
 <script>
-    $(document).ready(function() {
-        CKEDITOR.replace("ckeditor", {
-            width: "100%",
-            height: "400px",
-            filebrowserUploadUrl: "/bbs/ckeditor/ckEditorUpload",
-            image_previewText: " "
-        });
-    });
+	$('#summernote').summernote({
+		height: 300,                 // 에디터 높이
+        minHeight: null,             // 최소 높이
+        maxHeight: null,             // 최대 높이
+		lang: "ko-KR",
+        placeholder: '최대 500자까지 쓸 수 있습니다',
+		  toolbar: [
+		    // [groupName, [list of button]]
+		    ['style', ['bold', 'italic', 'underline', 'clear']],
+		    ['fontname', ['fontname']],
+		    ['fontsize', ['fontsize']],
+		    ['color', ['color']],
+		    ['table', ['table']],
+		    ['para', ['ul', 'ol', 'paragraph']],
+		    ['height', ['height']],
+		    ['insert',['picture']]
+		  ],
+		  fontname: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New','맑은 고딕','궁서','굴림체','굴림','돋움체','바탕체'],
+	
+		    // 이미지 업로드 처리
+		    callbacks: {
+		        onImageUpload: function(files) {
+		            let formData = new FormData();
+		            formData.append("file", files[0]);
+		
+		            $.ajax({
+		                url: '${CP}/board/imageUpload.do',
+		                type: 'POST',
+		                data: formData,
+		                processData: false,
+		                contentType: false,
+		                success: function(url) {
+		                    // 서버에서 반환한 URL 삽입
+		                    $('#summernote').summernote('insertImage', url);
+		                },
+		                error: function() {
+		                    alert('이미지 업로드 실패');
+		                }
+		            });
+		        }
+		    }
+		});
+		
 </script>
-<script src="/ehr/resources/js/summernote/summernote-lite.js"></script>
-<script src="/ehr/resources/lang/summernote/lang/summernote-ko-KR.js"></script>
 </div>
 
 </body>
