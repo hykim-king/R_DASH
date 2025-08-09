@@ -1,12 +1,12 @@
 package com.pcwk.ehr.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.validation.Valid;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,15 +29,15 @@ public class ChatController {
 
     private final Logger log = LogManager.getLogger(getClass());
     private final ChatService chatService;
-    private final Optional<BotService> botService; // ✅ 선택 주입
-    
+    private final BotService botService; // 단일 빈 명시 주입
 
-    public ChatController(ChatService chatService, Optional<BotService> botService) {
+    public ChatController(ChatService chatService,
+                          @Qualifier("gptBotService") BotService botService) {
         this.chatService = chatService;
-        this.botService  = botService; // 빈이 없으면 Optional.empty()
+        this.botService  = botService;
     }
 
-    /** 질문 저장 및 답변 반환 (옵션 A: PK 미수령, 에코 응답) */
+    /** 질문 저장 및 답변 반환 */
     @PostMapping("/send")
     public ResponseEntity<ChatDTO> sendChat(
             @RequestBody @Valid ChatDTO chat,
@@ -46,6 +46,7 @@ public class ChatController {
     ) {
         log.debug("┌──────── sendChat ────────┐");
         log.debug("chat={}", chat);
+        log.debug("sessionId={}", sessionId);
         log.debug("└──────────────────────────┘");
 
         // 1) 세션/사용자 보정
@@ -57,21 +58,22 @@ public class ChatController {
             return ResponseEntity.badRequest().build();
         }
 
-        // 3) 봇 호출로 answer 생성 (BotService 없으면 임시 응답)
-        String answer;
+        // 3) 봇 호출로 answer 생성
+        final String answer;
         try {
-            answer = botService
-                    .map(bs -> bs.reply(chat.getQuestion(), chat.getSessionId(), chat.getUserNo()))
-                    .orElse("답변 준비 중입니다."); // ✅ 빈 없을 때 fallback
+            answer = botService.reply(chat.getQuestion(), chat.getSessionId(), chat.getUserNo());
         } catch (Exception e) {
             log.error("BotService.reply error", e);
-            return ResponseEntity.status(502).build(); // Bad Gateway: 외부/봇 오류
+            // 외부(봇) 오류는 502로 매핑
+            return ResponseEntity.status(502).build();
         }
         chat.setAnswer(answer);
 
-        // 4) 저장 (PK는 받지 않음)
+        // 4) 저장 (PK 미수령)
         int inserted = chatService.insertChat(chat);
-        if (inserted != 1) return ResponseEntity.status(500).build();
+        if (inserted != 1) {
+            return ResponseEntity.status(500).build();
+        }
 
         // 5) 에코 응답
         return ResponseEntity.ok(chat);
@@ -82,7 +84,8 @@ public class ChatController {
     public ResponseEntity<ChatDTO> getChat(@PathVariable Long logNo) {
         log.debug("getChat logNo={}", logNo);
         ChatDTO result = chatService.selectChat(logNo);
-        return (result != null) ? ResponseEntity.ok(result) : ResponseEntity.notFound().build();
+        return (result != null) ? ResponseEntity.ok(result)
+                                : ResponseEntity.notFound().build();
     }
 
     /** 채팅 목록 조회 (검색 포함) */
