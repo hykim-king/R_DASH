@@ -13,6 +13,7 @@ public class BoardDTO extends DTO{
 	private String modDt     ;
 	private String modId     ;
 	
+	
 	public BoardDTO() {}
 
 	public BoardDTO(int boardNo, String title, String contents, String image, int views, String regDt, String regId,
@@ -100,6 +101,7 @@ public class BoardDTO extends DTO{
 	public void setModId(String modId) {
 		this.modId = modId;
 	}
+
 
 	@Override
 	public String toString() {

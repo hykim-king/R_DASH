@@ -1,7 +1,12 @@
 package com.pcwk.ehr.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -13,9 +18,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.google.gson.Gson;
 import com.pcwk.ehr.cmn.MessageDTO;
@@ -24,6 +31,7 @@ import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.BoardDTO;
 import com.pcwk.ehr.domain.UserDTO;
 import com.pcwk.ehr.service.BoardService;
+import com.pcwk.ehr.service.MarkdownService;
 
 @Controller
 @RequestMapping("/board")
@@ -32,7 +40,12 @@ public class BoardController {
 	
 	@Autowired
 	BoardService service;
+	
+	@Autowired
+    private MarkdownService markdownService;
 
+	private final String uploadDir = "/ehr/resources/upload";
+	
 	public BoardController() {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *BoardController()*       │");
@@ -45,7 +58,36 @@ public class BoardController {
 //	상세 조회	/board/doSelectOne.do	GET 0
 //	목록 조회	/board/doRetrieve.do	GET 0
 //	등록 화면	/board/doSaveView.do	POST
-//	수정 화면	/board/doUpdateView.do	POST	
+//	수정 화면	/board/doUpdateView.do	POST
+    /**
+     * 마크다운을 HTML로 변환하는 API
+     * @param markdownText 마크다운 원본
+     * @return HTML 문자열
+     */
+    @PostMapping("/convert")
+    public String convertMarkdown(@RequestBody String markdownText) {
+        return markdownService.convertToMarkdownHtml(markdownText);
+    }
+	
+	@PostMapping("/imageUpload.do")
+	@ResponseBody
+	public String imageUpload(MultipartFile file) throws IOException {
+	    // 1. 파일 저장 로직
+		// 폴더 없으면 생성
+	    Path uploadPath = Paths.get(uploadDir);
+	    if (Files.notExists(uploadPath)) {
+	        Files.createDirectories(uploadPath);
+	    }
+		
+	    String savedFileName = UUID.randomUUID().toString() + PcwkString.getExt(file.getOriginalFilename());
+	    Path savePath = Paths.get(uploadDir, savedFileName);
+	    file.transferTo(savePath.toFile());
+
+	    // 2. 저장된 이미지 URL 반환
+	    String imageUrl = "/resources/upload/" + savedFileName; 
+	    return imageUrl;
+	}
+	
 	@GetMapping("/doUpdateView.do")
 	public String doUpdateView(@RequestParam("boardNo") int boardNo,Model model,HttpSession session) throws SQLException{
 		log.debug("┌────────────────────────┐");
@@ -61,14 +103,15 @@ public class BoardController {
 		BoardDTO param = new BoardDTO();
 		param.setBoardNo(boardNo);
 		
-		BoardDTO dto = service.doSelectOne(param);
-		model.addAttribute("dto", dto);
+		BoardDTO outVO = service.doSelectOne(param);
+		model.addAttribute("vo", outVO);
+		log.debug("outVO: {}"+outVO);
 		
 		return viewStirng;
 	}
 	
 	
-	@GetMapping("/doSaveView.do")
+	@GetMapping(value="/doSaveView.do", produces = "text/plain;charset=UTF-8")
 	public String doSaveView(Model model,HttpSession session) {
 		log.debug("┌──────────────────────────────┐");
 		log.debug("│ *doSaveView()*               │");
@@ -85,7 +128,7 @@ public class BoardController {
 		return viewStirng;
 	}
 	
-	@GetMapping("/doRetrieve.do")
+	@GetMapping(value="/doRetrieve.do", produces = "text/plain;charset=UTF-8")
 	public String doRetrieve(SearchDTO param, Model model) {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *doRetrieve()*            │");
@@ -122,7 +165,7 @@ public class BoardController {
 		return viewName;
 	}
 	
-	@GetMapping(value="/doSelectOne.do")
+	@GetMapping(value="/doSelectOne.do", produces = "text/plain;charset=UTF-8")
 	public String doSelectOne(BoardDTO param, Model model, HttpServletRequest req) {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *doSelectOne()*           │");
@@ -131,9 +174,12 @@ public class BoardController {
 		String viewName = "board/board_view";
 		
 		BoardDTO outVO = service.doSelectOne(param);
+		String html = markdownService.convertToMarkdownHtml(outVO.getContents());
 		log.debug("2. outVO:{}", outVO);
 		
 		model.addAttribute("vo", outVO);
+		model.addAttribute("contentsTextAreaHtml",html);
+		log.debug("3 html: {}",html);
 		
 		return viewName;
 	}
