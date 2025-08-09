@@ -12,19 +12,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.pcwk.ehr.domain.PatientsDTO;
 import com.pcwk.ehr.mapper.TemperatureMapper;
 import com.pcwk.ehr.service.TemperatureServiceImpl;
 
 @ExtendWith(SpringExtension.class)
+@WebAppConfiguration
 @ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/root-context.xml"
 		,"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml"
 })
@@ -37,6 +36,9 @@ class TemperatuerDaoTest {
 	
 	@Autowired
 	private TemperatureServiceImpl serviceImpl;
+	
+	@Autowired
+	ApplicationContext context;
 	
 	PatientsDTO patientsDTO;
 
@@ -66,7 +68,13 @@ class TemperatuerDaoTest {
 	@Test
 	void doSelectOne() throws SQLException {
 		// 1.삭제 후 등록
-		doSave();
+		mapper.deleteAll();
+		log.debug("Count:{}",mapper.getCount());
+		assertEquals(0, mapper.getCount());
+		// 2.한건 등록
+		int flag = mapper.insertPatient(patientsDTO);
+		assertEquals(1, mapper.getCount());
+		log.debug("flag:{}",flag);
 		
 		// 2.한건 조회
 		PatientsDTO outVO = mapper.selectSidoPatients("서울");
