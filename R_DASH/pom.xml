@@ -112,6 +112,11 @@
 		<commons-fileupload-version>1.5</commons-fileupload-version>
 	</properties>
 	<dependencies>
+	    <dependency>
+		  <groupId>org.apache.logging.log4j</groupId>
+		  <artifactId>log4j-api</artifactId>
+		  <version>${log4j-core-version}</version>
+		</dependency>
 		<!-- Apache POI core -->
 	    <dependency>
 	        <groupId>org.apache.poi</groupId>
