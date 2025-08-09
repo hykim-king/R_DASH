@@ -35,9 +35,27 @@ public class UserServiceImpl implements UserService {
 		return mapper.findPw(email);
 	}
 
+	//로그인
 	@Override
 	public int login(UserDTO param) {
-		int flag = 0;
+		//flag = 10 -> email 불일치
+		//flag = 20 -> 비밀번호 불일치
+		//flag = 30 -> email/비밀번호 일치
+		int flag = 30;
+		
+		// 존재하는 이메일인지 확인
+		if(mapper.checkEmail(param.getEmail())==0) {
+			flag = 10;
+			
+			return flag;
+		}
+		// 이메일과 비밀번호가 일치하는지 확인
+		if(mapper.checkPw(param)==0) {
+			flag = 20;
+			
+			return flag;
+		}
+		// email/비밀번호 일치 로그인
 		return flag;
 	}
 
