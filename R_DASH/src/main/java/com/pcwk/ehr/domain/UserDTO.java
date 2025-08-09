@@ -10,7 +10,7 @@ public class UserDTO extends DTO {
 	private String image; // 이미지
 	private String email; // 이메일
 	private String tel; // 전화번호
-	private int zipCode; // 우편번호
+	private Integer zipCode; // 우편번호
 	private String address; // 주소
 	private String detailAddress; // 상세 주소
 	private int role; // 권한 구분
@@ -22,7 +22,7 @@ public class UserDTO extends DTO {
 	}
 
 	public UserDTO(int userNo, String password, String name, String nickname, String image, String email, String tel,
-			int zipCode, String address, String detailAddress, int role, String regDt) {
+			Integer zipCode, String address, String detailAddress, int role, String regDt) {
 		super();
 		this.userNo = userNo;
 		this.password = password;
@@ -94,11 +94,11 @@ public class UserDTO extends DTO {
 		this.tel = tel;
 	}
 
-	public int getZipCode() {
+	public Integer getZipCode() {
 		return zipCode;
 	}
 
-	public void setZipCode(int zipCode) {
+	public void setZipCode(Integer zipCode) {
 		this.zipCode = zipCode;
 	}
 
@@ -140,5 +140,7 @@ public class UserDTO extends DTO {
 				+ ", image=" + image + ", email=" + email + ", tel=" + tel + ", zipCode=" + zipCode + ", address="
 				+ address + ", detailAddress=" + detailAddress + ", role=" + role + ", regDt=" + regDt + "]";
 	}
+
+
 
 }
