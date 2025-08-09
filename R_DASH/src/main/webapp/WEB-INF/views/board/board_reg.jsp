@@ -14,7 +14,7 @@
 <meta charset="UTF-8">
 <title>board_reg</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
- <link href="/ehr/resources/ckeditor/contents.css" rel="stylesheet" >
+
 <link rel="icon" href="${CP}/resources/image/Jaemini_face.ico" type="image/x-icon"/>
 </head>
 <body>
@@ -55,7 +55,8 @@
         });
     });
 </script>
-<script src="/ehr/resources/ckeditor/ckeditor.js"></script>
+<script src="/ehr/resources/js/summernote/summernote-lite.js"></script>
+<script src="/ehr/resources/lang/summernote/lang/summernote-ko-KR.js"></script>
 </div>
 
 </body>
