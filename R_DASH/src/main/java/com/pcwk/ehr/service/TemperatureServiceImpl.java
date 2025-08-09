@@ -1,10 +1,22 @@
 package com.pcwk.ehr.service;
 
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.net.URI;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -31,15 +43,118 @@ public class TemperatureServiceImpl implements TemperatureService {
 	@Autowired
 	private TemperatureMapper temperatureMapper;
 	
-    private static final String BASE_URL = "http://apis.data.go.kr/1741000/HeatWaveCasualtiesRegion/getHeatWaveCasualtiesRegionList";
+    private static final String PATIENTES_URL = "http://apis.data.go.kr/1741000/HeatWaveCasualtiesRegion/getHeatWaveCasualtiesRegionList";
+    private static final String NOWCAST_URL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst";
     private static final String SERVICE_KEY = "VJxg5p3Iyzp7FA0pzgtVA7AYRfaM2YSuLU4h8TMQAvQIJMGkIN7qEpL%2FQoDBEqo1MnsWnxGR%2BlN%2F9SsKlSmbZg%3D%3D";
+    private static final String NOWCAST_EXCEL_PATH = "resources/excel/Nowcast.xlsx";
     
-   
     public TemperatureServiceImpl(RestTemplate restTemplate, TemperatureMapper temperatureMapper ) {
         this.restTemplate = restTemplate;
         this.temperatureMapper  = temperatureMapper ;
     }
+    
+    /*
+     * 시도, 시군구, nx, ny를 엑셀에서 읽어오는 메서드
+     */
+    public static List<Map<String, String>> readLocation() throws IOException {
+    	List<Map<String, String>> result = new ArrayList<>();
+        Set<String> uniqueKeys = new HashSet<>();
+        
+        String excelFilePath = NOWCAST_EXCEL_PATH;
+        
+        try (FileInputStream fis = new FileInputStream(excelFilePath);
+                Workbook workbook = new XSSFWorkbook(fis)) {
 
+               Sheet sheet = workbook.getSheetAt(0); // 첫 번째 시트
+               Iterator<Row> rowIterator = sheet.iterator();
+
+               // 첫 번째 행(헤더) 스킵
+               if (rowIterator.hasNext()) {
+                   rowIterator.next();
+               }
+
+               while (rowIterator.hasNext()) {
+                   Row row = rowIterator.next();
+
+                   String sido = getCellValue(row.getCell(2)); // 1단계
+                   String sigungu = getCellValue(row.getCell(3)); // 2단계
+                   String nx = getCellValue(row.getCell(5)); // 격자 X
+                   String ny = getCellValue(row.getCell(6)); // 격자 Y
+
+                   // 시군구명이 비어있으면 스킵
+                   if (sigungu == null || sigungu.isEmpty()) {                	   
+                	   continue;
+                   }
+
+                   // 시도 + 시군구 중복 제거
+                   String key = sido + "_" + sigungu;
+                   if (!uniqueKeys.contains(key)) {
+                       uniqueKeys.add(key);
+
+                       Map<String, String> map = new HashMap<>();
+                       map.put("sido", sido);
+                       map.put("sigungu", sigungu);
+                       map.put("nx", nx);
+                       map.put("ny", ny);
+
+                       result.add(map);
+                   }
+               }
+           }
+           return result;
+    }
+    
+    /*
+     * 엑셀에서 셀 값을 가져오는 메서드
+     */
+    private static String getCellValue(Cell cell) {
+        if (cell == null) return "";
+        // 숫자 값 처리
+        if (cell.getCellType() == CellType.NUMERIC) {
+        	// Date포맷 True로 반환하면 날짜로 간주해서 문자열로 변환
+            if (DateUtil.isCellDateFormatted(cell)) {
+                return cell.getDateCellValue().toString();
+            } else {
+            	// 정수로 변환, (소수점은 문자열)
+                return String.valueOf((int) Math.round(cell.getNumericCellValue()));
+            }
+        } else {
+            return cell.toString().trim();
+        }
+    }
+    
+    /*
+     * Base_Date와 Base_Time을 구하는 메서드
+     */
+    public String[] getBaseDateTime() {
+        LocalDateTime now = LocalDateTime.now();
+        int currentHour = now.getHour();
+        int currentMinute = now.getMinute();
+
+        String baseDate;
+        String baseTime;
+
+        if (currentMinute < 40) {
+            if (currentHour == 0) {
+                // 자정 이전 → 전날 23:30
+                baseDate = now.minusDays(1).format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+                baseTime = "2330";
+            } else {
+                baseDate = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+                baseTime = now.minusHours(1).format(DateTimeFormatter.ofPattern("HH")) + "30";
+            }
+        } else {
+            baseDate = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+            baseTime = now.format(DateTimeFormatter.ofPattern("HH")) + "30";
+        }
+        
+
+        return new String[]{baseDate, baseTime};
+    }
+        
+    /*
+     * API에서 받은 Response를 DTO로 변환
+     */
     private PatientsDTO patientsConvertToDTO(PatientsApiResponse.Row row) {
     	String region = row.getRegi();
         int year = Integer.parseInt(row.getBas_yy());
@@ -51,6 +166,9 @@ public class TemperatureServiceImpl implements TemperatureService {
         return patientsDTO;
     }
 
+    /*
+     * 정수로 변환할 수 없는 경우(예: null, 빈 문자열, 숫자가 아닌 문자 포함, int 범위 초과 등) 예외를 잡아서 0을 반환
+     */
     private int parseIntSafe(String val) {
         try {
             return Integer.parseInt(val);
@@ -59,11 +177,42 @@ public class TemperatureServiceImpl implements TemperatureService {
         }
     }
     
+    /*
+     * 초단기실황 API 입력
+     */
+    @Override
+    public void insertNowcast() throws SQLException{
+    	try {
+    		List<Map<String, String>> location = readLocation();
+    		
+    		String[] dateTime = getBaseDateTime();
+    		String baseDate = dateTime[0];
+    		String baseTime = dateTime[1];
+    		// 1. API 호출
+    		URI uri = new URI(NOWCAST_URL +
+    				"?serviceKey=" + SERVICE_KEY +
+    				"&numOfRows=500" +
+    				"&pageNo=1" +
+    				"&dataType=json" +
+    				"&base_date" + baseDate +
+    				"&base_time" + baseTime +
+    				"&nx" +
+    				"&ny");
+    				
+    	}
+    	catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+    
+    /*
+     * 온열질환자 API 데이터 입력
+     */
     @Override
 	public void insertPatient() throws SQLException {
 		try {
 	        // 1. API 호출
-	        URI uri = new URI(BASE_URL +
+	        URI uri = new URI(PATIENTES_URL +
 	                "?serviceKey=" + SERVICE_KEY +
 	                "&type=json" +
 	                "&bas_yy=" +
@@ -130,12 +279,6 @@ public class TemperatureServiceImpl implements TemperatureService {
 		temperatureMapper.insertNowcast(dto);
 		
 	}
-
-	@Override
-	public void savePatient(PatientsDTO dto) throws SQLException {
-		temperatureMapper.insertPatient(dto);
-	}
-
 
 }
 
