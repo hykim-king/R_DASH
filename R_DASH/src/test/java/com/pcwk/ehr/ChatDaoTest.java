@@ -113,7 +113,7 @@ class ChatDaoTest {
 		assertEquals("나도 잘 모르겠어@@@@", updated.getAnswer());
 	}
 
-	@Disabled
+	//@Disabled
 	@Test
 	void delete() {
 		mapper.deleteAll();
@@ -169,7 +169,7 @@ class ChatDaoTest {
 		assertEquals(expected.getAnswer(), actual.getAnswer(), "answer 불일치");
 	}
 
-	@Disabled
+	//@Disabled
 	@Test
 	void beans() {
 		assertNotNull(context);
