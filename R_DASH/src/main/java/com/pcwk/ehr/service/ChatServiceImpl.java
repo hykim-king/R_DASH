@@ -26,7 +26,7 @@ public class ChatServiceImpl implements ChatService {
 	@Override
 	@Transactional // 쓰기 작업만 트랜잭션
 	public int insertChat(ChatDTO chat) {
-		log.debug("inserChat 호출:{}", chat);
+		log.debug("insertChat 호출:{}", chat);
 		return chatMapper.insertChat(chat);
 	}
 
