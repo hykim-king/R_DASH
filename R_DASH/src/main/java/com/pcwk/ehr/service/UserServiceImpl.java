@@ -4,7 +4,9 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.pcwk.ehr.cmn.FileUtil;
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.UserDTO;
 import com.pcwk.ehr.mapper.UserMapper;
@@ -26,8 +28,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public int deleteUser(int userNo) {
-		return mapper.deleteUser(userNo);
+	public int deleteUser(UserDTO param) {	
+		int flag = mapper.checkPw(param);
+		if(flag == 1) {
+			mapper.deleteUser(param.getUserNo());
+		}		
+		return flag;
 	}
 
 	@Override
@@ -60,12 +66,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public int updateUser(UserDTO param) {
-		return mapper.updateUser(param);
-	}
-
-	@Override
-	public int updateImage(UserDTO param) {
+	public int updateUserInfo(UserDTO param) {
 		return mapper.updateUser(param);
 	}
 
@@ -82,6 +83,32 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public int checkEmail(String email) {
 		return mapper.checkEmail(email);
+	}
+
+	@Override
+	public int updateUserImage(UserDTO param, MultipartFile file) {
+		int flag = 0;
+		
+		
+		if (file != null && !file.isEmpty()) {
+			// 기존 이미지 파일 삭제
+			UserDTO user = mapper.selectUser(param.getUserNo());
+			if (user.getImage() != null && user.getImage() != "defaultProfile.jpg") {
+
+                String existingFilePath = "C:/Users/user/R_DASH/R_DASH/src/main/webapp/resources/image/profile/" + user.getImage();
+                FileUtil.deleteFile(existingFilePath);
+
+            }
+			// 이미지 저장
+			String uploadDir = "C:/Users/user/R_DASH/R_DASH/src/main/webapp/resources/image/profile";
+			String savedFilename = FileUtil.saveFileWithUUID(file, uploadDir);
+			
+			param.setImage(savedFilename);
+			
+			flag = mapper.updateUser(param);
+			
+		}
+		return flag;
 	}
 
 }
