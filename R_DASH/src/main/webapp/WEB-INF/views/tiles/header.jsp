@@ -228,10 +228,16 @@
 	                  <i class="ni ni-single-02"></i>
 	                  <span>마이페이지</span>
 	                </a>
-	                <a href="#!" class="dropdown-item">
+	                <a href="/ehr/user/changePw" class="dropdown-item">
 	                  <i class="ni ni-settings-gear-65"></i>
 	                  <span>비밀번호 변경</span>
 	                </a>
+	                <c:if test="${sessionScope.loginUser.role==1 }">
+		                <a href="/ehr/user/userList" class="dropdown-item">
+		                  <i class="ni ni-calendar-grid-58"></i>
+		                  <span>회원 관리</span>
+		                </a>
+	                </c:if>
 	                <a href="#!" class="dropdown-item">
 	                  <i class="ni ni-calendar-grid-58"></i>
 	                  <span>Activity</span>
