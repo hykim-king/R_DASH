@@ -38,6 +38,8 @@ document.addEventListener('DOMContentLoaded',function(){
 	 //이메일 체크 버튼
      const checkEmailButton = document.querySelector("#checkEmailButton");
 	 
+     const duplicateInput = document.querySelector("#duplicate");
+	 
 	 regForm.addEventListener("submit",function(event){
 		 event.preventDefault(); // 실제 폼 제출 막음
 		 
@@ -80,7 +82,7 @@ document.addEventListener('DOMContentLoaded',function(){
 			 return;
 		 }
 		 
-		 if(checkEmailButton.value !== '가능한 이메일입니다.'){
+		 if(duplicateInput.innerText !== '가능한 이메일입니다.'){
 			 alert('메일 중복을 확인하세요.');
 			 
 			 return;
