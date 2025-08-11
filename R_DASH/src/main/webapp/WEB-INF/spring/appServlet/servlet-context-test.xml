@@ -38,8 +38,11 @@
 <!--         <beans:property name="order" value="1" />  ViewResolver: 읽는 순서 2
  -->    </beans:bean>
 
-    <context:component-scan base-package="com.pcwk.ehr" />
+        <context:component-scan base-package="com.pcwk.ehr">
+            <context:exclude-filter type="assignable"
+            expression="com.pcwk.ehr.service.GptBotService"/>
+        </context:component-scan>
 
-
-
+  <beans:bean id="gptBotService" class="com.pcwk.ehr.service.FakeBotService"/>
+  
 </beans:beans>
