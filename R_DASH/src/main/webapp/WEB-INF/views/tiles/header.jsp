@@ -184,7 +184,7 @@
 	               <a class="nav-link pr-0" href="/ehr/user/login" role="button" data-toggle="dropdown" aria-haspopup="false">
 	                 <div class="media align-items-center">
 	                    <span class="avatar avatar-sm rounded-circle">
-	               	      <img alt="Image placeholder" src="/ehr/resources/image/defaultProfile.jpg">    
+	               	      <img alt="Image placeholder" src="/ehr/resources/image/profile/defaultProfile.jpg">    
 	                    </span>
 	                    <div class="media-body  ml-2  d-none d-lg-block">
 	                      <span class="mb-0 text-sm  font-weight-bold">비회원</span>
@@ -213,7 +213,7 @@
 	              <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 	                <div class="media align-items-center">
 	                  <span class="avatar avatar-sm rounded-circle">
-	               	    <img alt="Image placeholder" src="/ehr/resources/image/${sessionScope.loginUser.image}">    
+	               	    <img alt="Image placeholder" src="/ehr/resources/image/profile/${sessionScope.loginUser.image}">    
 	                  </span>
 	                  <div class="media-body  ml-2  d-none d-lg-block">
 	                    <span class="mb-0 text-sm  font-weight-bold">${sessionScope.loginUser.name}</span>
