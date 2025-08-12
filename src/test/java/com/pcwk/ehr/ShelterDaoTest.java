@@ -78,6 +78,7 @@ class ShelterDaoTest {
 		log.debug("단건 조회: {}", dto);
 
 	}
+<<<<<<< HEAD
 
 //	지역 기준 목록 ( 나중 구현 )
 	@Disabled
@@ -130,6 +131,18 @@ class ShelterDaoTest {
 	}
 
 	@Disabled
+=======
+	
+
+	
+	
+	
+	
+	
+	
+	
+//	@Disabled
+>>>>>>> 6fe288ce8ab270d0ad2660851a0ddfd165438fe3
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");
