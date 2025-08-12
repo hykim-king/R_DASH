@@ -6,8 +6,8 @@
 	xmlns:task="http://www.springframework.org/schema/task"
 	xsi:schemaLocation="http://www.springframework.org/schema/mvc https://www.springframework.org/schema/mvc/spring-mvc.xsd
 		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
-		http://www.springframework.org/schema/beans https://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
     
     <!-- cron scheduler -->
     <task:scheduler id="cronScheduler" pool-size="3"/>
@@ -38,8 +38,11 @@
 <!--         <beans:property name="order" value="1" />  ViewResolver: 읽는 순서 2
  -->    </beans:bean>
 
-    <context:component-scan base-package="com.pcwk.ehr" />
+        <context:component-scan base-package="com.pcwk.ehr">
+            <context:exclude-filter type="assignable"
+            expression="com.pcwk.ehr.service.GptBotService"/>
+        </context:component-scan>
 
-
-
+  <beans:bean id="gptBotService" class="com.pcwk.ehr.service.FakeBotService"/>
+  
 </beans:beans>
