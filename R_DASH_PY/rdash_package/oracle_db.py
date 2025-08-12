@@ -39,7 +39,7 @@ def main():
     connection = conn.connect()
 
     if connection:
-        print("✅ DB 연결 성공!")
+        print(" DB 연결 성공!")
         cursor = connection.cursor()
         cursor.execute("SELECT sysdate FROM dual")
         result = cursor.fetchone()
@@ -47,7 +47,7 @@ def main():
         cursor.close()
         connection.close()
     else:
-        print("❌ DB 연결 실패")
+        print(" DB 연결 실패")
 
 if __name__ == '__main__':
     main()
