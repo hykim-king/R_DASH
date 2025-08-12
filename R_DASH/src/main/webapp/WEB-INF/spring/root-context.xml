@@ -178,7 +178,7 @@
         <property name="driverClassName"
             value="oracle.jdbc.driver.OracleDriver" />
         <property name="jdbcUrl"
-            value="jdbc:oracle:thin:@218.144.130.138:1522:XE" />
+            value="jdbc:oracle:thin:@192.168.100.30:1522:XE" />
         <property name="username" value="jm" />
         <property name="password" value="8864"></property>
         <!-- Optional settings -->
@@ -190,6 +190,8 @@
         <!-- maximumPoolSize : 풀에 유지할 최대 연결 수 minimumIdle : 유휴상태로 유지할수 있는 최대 연결 
             수 connectionTimeout: 연결 시도 시 타임아웃 설정(밀리 초) idleTimeout : 유휴 연결이 풀에서 제거되기 
             전 대기 시간(밀리 초) maxLifetime : 연결이 풀에서 제거되기 전 최대 생존 시간 입니다.(밀리 초) -->
+            
+     <bean id="aesUtil" class="com.pcwk.ehr.cmn.AESUtil"/>
 
     </bean>
 
