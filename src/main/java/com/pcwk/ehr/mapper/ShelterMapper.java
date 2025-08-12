@@ -17,14 +17,12 @@ public interface ShelterMapper extends WorkDiv<ShelterDTO>{
 	ShelterDTO findById(@Param("shelterNo") int shelterNo);
 
 //    특정 지역의 소방서 목록
-	List<ShelterDTO> listByArea(@Param("area") String area);
+	List<ShelterDTO> listByArea(@Param("ronaDaddr") String ronaDaddr);
 
-////    지역명 자동완성(q 검색 키워드)
-//	List<String> suggestKeyword(@Param("q") String q);
+//    지역명 자동완성(q 검색 키워드)
+	List<String> suggestKeyword(@Param("q") String q);
 
-//    소방서명 자동완성
-	List<String> suggestStation(@Param("q") String q);
-	
+
 	/**
 	 * 지도 BBox + 키워드 검색
 	 * 
