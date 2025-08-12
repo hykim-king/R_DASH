@@ -73,7 +73,7 @@ class ShelterDaoTest {
 		double maxLat = 38.0;
 		double minLon = 126.0;
 		double maxLon = 127.0;
-		String q = "";
+		String q = "한파쉼터";
 		
 		List<ShelterDTO> list = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, q);
 		log.debug("┌────────────────────────────┐");
@@ -82,7 +82,7 @@ class ShelterDaoTest {
 		
 		assertNotNull(list);
 		log.debug("BBox 검색 건수 : {}", list.size());
-//		list.forEach(list);
+		list.forEach(list);
 	}
 >>>>>>> 62fc1d5 (대피소 / 소방서 Mapper 작업 중)
 	
