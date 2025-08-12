@@ -2,7 +2,7 @@ package com.pcwk.ehr.domain;
 
 import com.pcwk.ehr.cmn.DTO;
 
-public class Dust extends DTO {
+public class DustDTO extends DTO {
 	private Integer dustNo ;	//고유 번호
 	private String 	tm     ;	//관측 시간
 	private String 	stnNm  ;	//지점명
@@ -15,10 +15,10 @@ public class Dust extends DTO {
 	private int 	cnt    ;	//PM10 자료갯수
 	
 	
-	public Dust() {}
+	public DustDTO() {}
 
 
-	public Dust(Integer dustNo, String tm, String stnNm, double lat, double lon, String org, int pm10, int avg, int max,
+	public DustDTO(Integer dustNo, String tm, String stnNm, double lat, double lon, String org, int pm10, int avg, int max,
 			int cnt) {
 		super();
 		this.dustNo = dustNo;
