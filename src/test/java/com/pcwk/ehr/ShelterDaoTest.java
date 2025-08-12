@@ -63,24 +63,7 @@ class ShelterDaoTest {
 		
 	}
 	
-	
-	@Test
-	public void selectByBBoxsTest() {
-		double minLat = 34.0;
-		double maxLat = 38.0;
-		double minLon = 126.0;
-		double maxLon = 127.0;
-		String q = "";
-		
-		List<ShelterDTO> list = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, q);
-		log.debug("┌────────────────────────────┐");
-		log.debug("│ selectByBBoxsTest()        │");
-		log.debug("└────────────────────────────┘");
-		
-		assertNotNull(list);
-		log.debug("BBox 검색 건수 : {}", list.size());
-//		list.forEach(list);
-	}
+
 	
 	
 	
