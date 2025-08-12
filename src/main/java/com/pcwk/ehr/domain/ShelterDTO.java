@@ -2,7 +2,7 @@ package com.pcwk.ehr.domain;
 
 import com.pcwk.ehr.cmn.DTO;
 
-public class Shelter extends DTO {
+public class ShelterDTO extends DTO {
 	private Integer shelterNo    ;	//대피소 번호
 	private String  reareNm      ;	//시설명
 	private String  ronaDaddr    ;	//도로명 주소
@@ -11,9 +11,9 @@ public class Shelter extends DTO {
 	private int  shltCd          ; 	//대피소 구분 코드
 	private String  shltNm       ;	//대피소 구분명
 	
-	public Shelter() {}
+	public ShelterDTO() {}
 
-	public Shelter(Integer shelterNo, String reareNm, String ronaDaddr, double lat, double lon, int shltCd,
+	public ShelterDTO(Integer shelterNo, String reareNm, String ronaDaddr, double lat, double lon, int shltCd,
 			String shltNm) {
 		super();
 		this.shelterNo = shelterNo;
