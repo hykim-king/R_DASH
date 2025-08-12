@@ -55,6 +55,7 @@ class ChatControllerTest {
 	void setUp() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 		this.gson = new Gson();
+		chatService.deleteAll();
 	}
 
 	@AfterEach
