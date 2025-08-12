@@ -32,14 +32,20 @@ def top_n(df, column_name='content', save_path=None):
     plt.title("Top 20 단어")
     plt.tight_layout()
 
-    if save_path:
-        # 디렉터리가 없으면 생성
-        os.makedirs(os.path.dirname(save_path), exist_ok=True)
-        plt.savefig(save_path)
-        print(f"그래프가 '{save_path}' 에 저장되었습니다.")
-        plt.show()
-    else:
-        plt.show()
+    save_path = "topn_result.png"
+    plt.savefig(save_path)
+    print(f"그래프가 '{save_path}' 에 저장되었습니다.")
+
+    # if save_path:
+    #     # 디렉터리가 없으면 생성
+    #     os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    #     plt.savefig(save_path)
+    #     print(f"그래프가 '{save_path}' 에 저장되었습니다.")
+    #     #plt.show()
+    # else:
+    #     #plt.show()
+    # pass
+    plt.close()
     return words,freqs
 
 def main():

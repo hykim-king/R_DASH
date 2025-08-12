@@ -7,8 +7,8 @@ from oracledb import connect
 import topic_topN
 from wordcloud import WordCloud
 import asyncio
-#from topic_dao import TopicDao
-#from to_db import save_topic_to_db
+from topic_dao import TopicDao
+from to_db import save_topic_to_db
 import topicWordCloud
 
 def main():
@@ -38,6 +38,7 @@ def main():
     smmr = smmr_topic(lda_results)
     summary_chain, name_chain = smmr.summarize_lda_topics()
 
+
     reg_id = "AI"
 
     for topic_num, terms in lda_results["topic_terms"].items():
@@ -51,13 +52,13 @@ def main():
 
         count = lda_results["topic_counts"].get(topic_num, 0)  # 토픽별 문서 수 가져오기
 
-        #save_topic_to_db(name, summary, reg_id, count)
+        save_topic_to_db(name, summary, reg_id, count)
 
-    topicWordCloud.make_wordcloud(df)
-
-    words,freqs = topic_topN.top_n(df)
+    words, freqs = topic_topN.top_n(df)
     print(words)
     print(freqs)
+
+    topicWordCloud.make_wordcloud(df)
 
 if __name__ == '__main__':
     main()
