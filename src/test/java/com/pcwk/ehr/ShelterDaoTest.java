@@ -63,10 +63,7 @@ class ShelterDaoTest {
 		
 	}
 	
-<<<<<<< HEAD
 
-=======
-	
 	@Test
 	public void selectByBBoxsTest() {
 		double minLat = 34.0;
@@ -84,7 +81,7 @@ class ShelterDaoTest {
 		log.debug("BBox 검색 건수 : {}", list.size());
 		list.forEach(list);
 	}
->>>>>>> 62fc1d5 (대피소 / 소방서 Mapper 작업 중)
+
 	
 	
 	
