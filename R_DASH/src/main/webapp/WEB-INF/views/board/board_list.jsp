@@ -12,6 +12,10 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
+<meta name="author" content="Creative Tim">
+<link href="/ehr/resources/template/dashboard/css/dashboard.css" rel="stylesheet" />
 <title>공지사항 게시판</title>
 <link rel="icon" href="${CP}/resources/image/Jaemini_face.ico" type="image/x-icon"/>
 <style type="text/css">
@@ -50,34 +54,81 @@ span {
         </div>
     </div>
 </form>
-<!-- table 영역 -->
-<table border="1">
-    <thead>
-        <th>번호</th>
-        <th>제목</th>
-        <th>조회수</th>
-        <th>작성일</th>
-    </thead>
-    <tbody>
-          <c:choose>
-            <c:when test="${list.size() > 0 }"> <!-- if -->
-                <c:forEach var="vo" items="${list }"> <!-- 향상된 for -->
-                  <tr>
-                    <td ><c:out value="${vo.no}"/></td>
-                    <td ><c:out value="${vo.title }"/></td>
-                    <td ><c:out value="${vo.viewCnt }"/></td>
-                    <td ><c:out value="${vo.modDt }"/></td>
-                    <td style="display: none;"><c:out value="${vo.boardNo }"/></td>
-                  </tr> 
-                </c:forEach>
-            </c:when>
-            <c:otherwise>    <!-- else -->
-                <tr>
-                   <td colspan="99"  class="table-cell text-center">조회된 데이터가 없습니다.</td> 
-                </tr>
-            </c:otherwise>
-          </c:choose>
-</table>
+<!-- header2 -->
+<div class="header bg-primary pb-6">
+	<div class="container-fluid">
+		<div class="header-body">
+			<div class="row align-items-center py-4">
+				<div class="col-lg-6 col-7">
+				    <h6 class="h2 text-white d-inline-block mb-0">Tables</h6>
+					<nav aria-label="breadcrumb" class="d-none d-md-inline-block ml-md-4">
+					<ol class="breadcrumb breadcrumb-links breadcrumb-dark">
+					<li class="breadcrumb-item"><a href="#"><i class="fas fa-home">
+					</i></a></li>
+					<li class="breadcrumb-item"><a href="#">Tables</a></li>
+					<li class="breadcrumb-item active" aria-current="page">Tables</li></ol></nav>
+				</div>
+				    <div class="col-lg-6 col-5 text-right"> 
+					<a href="#" class="btn btn-sm btn-neutral">등록</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- //header2 -->
+<div class="container-fluid mt--6">
+	<div class="row">
+	<div class="col">
+	    <div class="card">
+	        <div class="card-header border-0">
+	            <h3 class="mb-0">공지사항</h3>
+	        </div>
+	<!-- table 영역 -->
+	<div class="table-responsive">
+		<table class="table align-items-center table-flush">
+		    <thead class="thead-light">
+		       <tr>
+			        <th scope="col" class="sort">번호</th>
+			        <th scope="col" class="sort">제목</th>
+			        <th scope="col" class="sort">조회수</th>
+			        <th scope="col" class="sort">작성일</th>
+		        </tr>
+		    </thead>
+		    <tbody class="list">
+		          <c:choose>
+		            <c:when test="${list.size() > 0 }"> <!-- if -->
+		                <c:forEach var="vo" items="${list }"> <!-- 향상된 for -->
+		                  <tr>
+		                    <td ><c:out value="${vo.no}"/></td>
+		
+		                    <td ><div class="media-body">
+		                    <span class="name mb-0 text-sm">
+		                       <c:out value="${vo.title }"/>
+		                    </span></div></td>
+	
+		                    <td ><c:out value="${vo.viewCnt }"/></td>
+		                    <td ><c:out value="${vo.modDt }"/></td>
+		                    <td style="display: none;"><c:out value="${vo.boardNo }"/></td>
+		                  </tr> 
+		                </c:forEach>
+		            </c:when>
+		            <c:otherwise>    <!-- else -->
+		                <tr>
+		                   <td colspan="99"  class="table-cell text-center">조회된 데이터가 없습니다.</td> 
+		                </tr>
+		            </c:otherwise>
+		          </c:choose>
+			</table>
+		</div>
+		<!-- 카드 푸터 -->
+		
+		<!-- //카드 푸터 -->
+	    </div>
+	</div>
+	</div>
+</div>
 <!--// table 영역 -->
 
 
