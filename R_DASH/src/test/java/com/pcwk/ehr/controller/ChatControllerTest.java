@@ -55,6 +55,7 @@ class ChatControllerTest {
 	void setUp() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 		this.gson = new Gson();
+		chatService.deleteAll();
 	}
 
 	@AfterEach
@@ -66,7 +67,7 @@ class ChatControllerTest {
 	@Test
 	void sendChat_success() throws Exception {
 		ChatDTO in = new ChatDTO();
-		in.setQuestion("안녕, 너는 누구야?");
+		in.setQuestion("재난이구나, 너가 산사태야?");
 
 		String body = gson.toJson(in);
 
@@ -79,7 +80,7 @@ class ChatControllerTest {
 		ChatDTO out = gson.fromJson(mr.getResponse().getContentAsString(), ChatDTO.class);
 		assertNotNull(out);
 		assertEquals("test-session-001", out.getSessionId());
-		assertEquals("안녕, 너는 누구야?", out.getQuestion());
+		assertEquals("재난이구나, 너가 산사태야?", out.getQuestion());
 		assertNotNull(out.getAnswer()); // FakeBotService → "테스트 응답"
 	}
 
