@@ -8,7 +8,7 @@ public class ShelterDTO extends DTO {
 	private String  ronaDaddr    ;	//도로명 주소
 	private double  lat          ;	//위도
 	private double  lon          ;	//경도
-	private int  shltCd          ; 	//대피소 구분 코드
+	private int  	shltCd       ; 	//대피소 구분 코드
 	private String  shltNm       ;	//대피소 구분명
 	
 	public ShelterDTO() {}
