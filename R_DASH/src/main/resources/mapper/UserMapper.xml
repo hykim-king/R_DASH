@@ -55,7 +55,7 @@
                 tt3.image,
                 tt3.role,
                 DECODE(TO_CHAR(tt3.reg_dt,'YYYY-MM-DD'),TO_CHAR(SYSDATE,'YYYY-MM-DD'),
-                        TO_CHAR(tt3.reg_dt,'HH24:MI:SS'),TO_CHAR(tt3.reg_dt,'YYYY-MM-DD')) AS regDt
+                        TO_CHAR(tt3.reg_dt,'HH24:MI'),TO_CHAR(tt3.reg_dt,'YYYY-MM-DD')) AS regDt
          FROM (                                                            
              SELECT ROWNUM as RNUM,                                        
                     tt2.*                                                  

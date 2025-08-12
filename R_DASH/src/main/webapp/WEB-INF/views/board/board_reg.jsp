@@ -14,10 +14,50 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
+<meta name="author" content="Creative Tim">
 <title>공지사항 등록하기</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
 <link rel="stylesheet" href="/ehr/resources/summernote/summernote-lite.min.css">
 <link rel="icon" href="${CP}/resources/image/Jaemini_face.ico" type="image/x-icon"/>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded');
+    
+    function isEmpty(value) {
+        return value == null || value.trim() === '';
+    }
+    
+    const titleInput = document.querySelector("#title");
+    console.log(titleInput);
+    
+    const summernoteInput = document.querySelector("#summernote");
+    console.log(summernoteInput);
+    
+    const noticeCheck = document.querySelector("#notice");
+    console.log(noticeCheck);
+    
+    const doSaveBtn = document.querySelector("#doSave");
+    console.log(doSaveBtn);
+    
+    const moveToListBtn = document.querySelector("#moveToList");
+    console.log(moveToListBtn);
+    
+    moveToListBtn.addEventListener('click', function() {
+        
+        window.location.href = '/ehr/board/doRetrieve.do';
+        
+        // 사용자 확인
+        if (!confirm('목록으로 이동합니다.')) {
+            return;
+        }
+    });
+    
+});
+</script>
+
+
 </head>
 <body>
 <div>
@@ -27,25 +67,31 @@
 <div>
     <img style="width:200px; height:150px; object-fit: contain;" src="/ehr/resources/image/board_Jeamin.png">
 </div>
-    <h2>공지사항 등록하기</h2>
-    <!-- form area -->
-    <form action="#" method="post" enctype="multipart/form-data">
-    <div>
-        <label for="name" >제목</label>
-        <input type="text" name="title" id="title" autocomplete="title" maxlength="50" required placeholder="제목을 입력해주세요." >
+<div class="col">
+    <div class="card">
+        <div class="card-header border-0">
+            <h3 class="mb-0">공지사항</h3>
+        </div>
+	    <!-- form area -->
+	    <form action="#" method="post" enctype="multipart/form-data">
+	    <div>
+	        <label for="title" >제목</label>
+	        <input type="text" name="title" id="title" autocomplete="title" maxlength="50" required placeholder="제목을 입력해주세요." >
+	    </div>
+	    <div>
+	        <label for="modId">등록자</label>
+	        <input type="text" name="modId" id="modId" autocomplete="modId" maxlength="50" required placeholder="등록자" >
+	    </div>
+	    <div>
+	        <label for="notice">공지</label><input type="checkbox" name="notice" id="notice" value="30">
+	    </div>
+	    <div>
+	        <label for="summernote" >내용</label>
+	        <textarea class="form-control" id="summernote" name="contents"  maxlength="50" class="contents"></textarea>
+	    </div>
+	    </form>
     </div>
-    <div>
-        <label for="modId">등록자</label>
-        <input type="text" name="modId" id="modId" autocomplete="modId" maxlength="50" required placeholder="등록자" >
-    </div>
-    <div>
-        <label>공지</label><input type="checkbox" name="notice" value="30">
-    </div>
-    <div>
-        <label for="contents" >내용</label>
-        <textarea class="form-control" id="summernote" name="contents"  maxlength="50" class="contents"></textarea>
-    </div>
-    </form>
+</div>
     <!-- //form area -->
     <!-- button area -->
     <div>
