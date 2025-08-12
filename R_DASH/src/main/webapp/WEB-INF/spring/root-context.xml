@@ -11,6 +11,9 @@
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
 	
+	<bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+	  <constructor-arg ref="transactionManager"/>
+	</bean>
 	
 	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
         <property name="messageConverters">
@@ -178,7 +181,7 @@
         <property name="driverClassName"
             value="oracle.jdbc.driver.OracleDriver" />
         <property name="jdbcUrl"
-            value="jdbc:oracle:thin:@218.144.130.138:1522:XE" />
+            value="jdbc:oracle:thin:@192.168.100.30:1522:XE" />
         <property name="username" value="jm" />
         <property name="password" value="8864"></property>
         <!-- Optional settings -->
