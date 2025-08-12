@@ -1,6 +1,6 @@
 from rdash_package.oracle_db import OracleConnection
 from topic_vo import TopicVO
-import cx_Oracle
+import oracledb
 
 class TopicDao:
     def __init__(self,db:OracleConnection):
@@ -49,7 +49,7 @@ class TopicDao:
             flag = cursor.rowcount
             print(f'3. 반영 건수:{flag}')
 
-        except cx_Oracle.DatabaseError as e:
+        except oracledb.DatabaseError as e:
             # 데이터 베이스 관련 예외 처리
             # 오류 발생 시 롤백
             conn.rollback()

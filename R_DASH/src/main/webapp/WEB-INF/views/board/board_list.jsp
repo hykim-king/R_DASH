@@ -38,7 +38,7 @@ span {
     vertical-align: middle;
 }
 
-<!-- 두 번째 열(제목)만 왼쪽 정렬 -->
+<!-- 두 번째 열만 왼쪽 정렬 -->
 .table.align-items-center.table-flush th:nth-child(2),
 .table.align-items-center.table-flush td:nth-child(2) {
     text-align: left;
@@ -74,7 +74,6 @@ span {
 		<div class="row">
 		<div class="col">
   		    <div class="card"> 
-  		  
 		        <div class="card-header border-0 d-flex align-items-center">
 		            <h3 class="mb-0">공지사항</h3>
 		            <!-- 검색란 -->
