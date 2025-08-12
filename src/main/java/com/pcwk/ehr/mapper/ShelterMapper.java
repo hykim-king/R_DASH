@@ -32,15 +32,7 @@ public interface ShelterMapper extends WorkDiv<ShelterDTO>{
 	 * @param maxLat 최대 위도
 	 * @param minLon 최소 경도
 	 * @param maxLon 최대 경도
-<<<<<<< HEAD
-<<<<<<< HEAD
 	 * @param q      검색 키워드(지역명/대피소명)
-=======
-	 * @param q      검색 키워드(지역명/소방서명)
->>>>>>> 62fc1d5 (대피소 / 소방서 Mapper 작업 중)
-=======
-	 * @param q      검색 키워드(지역명/대피소명)
->>>>>>> 94f3a18 (shelter 작업중)
 	 */
 	List<ShelterDTO> selectByBBox(@Param("minLat") double minLat, @Param("maxLat") double maxLat,
 			@Param("minLon") double minLon, @Param("maxLon") double maxLon, @Param("q") String q);

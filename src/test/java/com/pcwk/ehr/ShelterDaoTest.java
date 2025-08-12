@@ -64,6 +64,7 @@ class ShelterDaoTest {
 	}
 	
 
+
 	@Test
 	public void selectByBBoxsTest() {
 		double minLat = 34.0;
@@ -82,11 +83,7 @@ class ShelterDaoTest {
 		list.forEach(list);
 	}
 
-	
-	
-	
-	
-	
+
 	
 	
 //	@Disabled
