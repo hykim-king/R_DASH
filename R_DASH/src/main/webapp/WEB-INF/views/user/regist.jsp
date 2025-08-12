@@ -38,6 +38,8 @@ document.addEventListener('DOMContentLoaded',function(){
 	 //이메일 체크 버튼
      const checkEmailButton = document.querySelector("#checkEmailButton");
 	 
+     const duplicateInput = document.querySelector("#duplicate");
+	 
 	 regForm.addEventListener("submit",function(event){
 		 event.preventDefault(); // 실제 폼 제출 막음
 		 
@@ -80,7 +82,7 @@ document.addEventListener('DOMContentLoaded',function(){
 			 return;
 		 }
 		 
-		 if(checkEmailButton.value !== '가능한 이메일입니다.'){
+		 if(duplicateInput.innerText !== '가능한 이메일입니다.'){
 			 alert('메일 중복을 확인하세요.');
 			 
 			 return;
@@ -192,8 +194,8 @@ function searchAddress(){
         <div class="header-body text-center mb-7">
           <div class="row justify-content-center">
             <div class="col-xl-5 col-lg-6 col-md-8 px-5">
-              <h1 class="text-white">Create an account</h1>
-              <p class="text-lead text-white">Use these awesome forms to login or create new account in your project for free.</p>
+              <h1 class="text-white">회원가입</h1>
+              <p class="text-lead text-white">아래 양식을 작성하여 새 계정을 만들어보세요!</p>
             </div>
           </div>
         </div>
@@ -211,7 +213,7 @@ function searchAddress(){
         <div class="col-lg-6 col-md-8">
           <div class="card bg-secondary border border-soft">
             <div class="card-header bg-transparent pb-5">
-              <div class="text-muted text-center mt-2 mb-4"><small>Sign up with</small></div>
+              <div class="text-muted text-center mt-2 mb-4"><small>소셜 회원가입</small></div>
               <div class="text-center">
                 <a href="#" class="btn btn-neutral btn-icon mr-4">
                   <span class="btn-inner--icon"><img src="/ehr/resources/template/dashboard/assets/img/icons/common/github.svg"></span>
@@ -225,7 +227,7 @@ function searchAddress(){
             </div>
             <div class="card-body px-lg-5 py-lg-5">
               <div class="text-center text-muted mb-4">
-                <small>Or sign up with credentials</small>
+                <small>계정을 생성하세요!</small>
               </div>
               <form method="post" id="regForm">
                 <div class="form-group">
@@ -233,7 +235,7 @@ function searchAddress(){
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-hat-3"></i></span>
                     </div>
-                    <input class="form-control" name="name" id="name" placeholder="Name" type="text">
+                    <input class="form-control" name="name" id="name" placeholder="이름" type="text">
                   </div>
                 </div>
                 <div class="form-group">
@@ -241,7 +243,7 @@ function searchAddress(){
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
-                    <input class="form-control" name="email" id="email" placeholder="Email" type="email">
+                    <input class="form-control" name="email" id="email" placeholder="이메일" type="email">
                     <input type="button" onclick="checkEmail()" id="checkEmailButton" class="btn btn-default btn-sm" value="메일중복 확인" style="margin-left: 10px;">
                   </div>
                 </div>
@@ -253,7 +255,7 @@ function searchAddress(){
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input class="form-control" name="password" id="password" placeholder="Password" type="password">
+                    <input class="form-control" name="password" id="password" placeholder="비밀번호" type="password">
                   </div>
                 </div>
                 <div class="form-group">

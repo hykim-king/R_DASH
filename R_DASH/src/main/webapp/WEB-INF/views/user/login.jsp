@@ -99,8 +99,8 @@
         <div class="header-body text-center mb-7">
           <div class="row justify-content-center">
             <div class="col-xl-5 col-lg-6 col-md-8 px-5">
-              <h1 class="text-white">Welcome!</h1>
-              <p class="text-lead text-white">Use these awesome forms to login or create new account in your project for free.</p>
+              <h1 class="text-white">환영합니다!</h1>
+              <p class="text-lead text-white">재민이 사이트를 찾아주셔서 감사합니다! <br>즐거운 하루 되세요!</p>
             </div>
           </div>
         </div>
@@ -117,7 +117,7 @@
         <div class="col-lg-5 col-md-7">
           <div class="card bg-secondary border border-soft mb-0">
             <div class="card-header bg-transparent pb-5">
-              <div class="text-center mt-2 mb-3"><small>Sign in with</small></div>
+              <div class="text-center mt-2 mb-3"><small>소셜 로그인</small></div>
               <div class="btn-wrapper text-center">
                 <a href="#" class="btn btn-neutral btn-icon">
                   <span class="btn-inner--icon"><img src="/ehr/resources/template/dashboard/assets/img/icons/common/github.svg"></span>
@@ -131,7 +131,7 @@
             </div>
             <div class="card-body px-lg-5 py-lg-5">
               <div class="text-center mb-4">
-                <small>Or sign in with credentials</small>
+                 <small>가입한 계정으로 로그인하세요!</small> 
               </div>
               <form method="post" id="loginForm">
                 <div class="form-group mb-3">
@@ -139,7 +139,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Email" id="email" name="email">
+                    <input class="form-control" placeholder="이메일" id="email" name="email">
                   </div>
                 </div>
                 <div class="form-group">
@@ -147,11 +147,11 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Password" id="password" type="password" name="password">
+                    <input class="form-control" placeholder="비밀번호" id="password" type="password" name="password">
                   </div>
                 </div>
                 <div class="text-center">
-                  <button type="submit" id="loginButton" class="btn btn-default my-4">login</button>
+                  <button type="submit" id="loginButton" class="btn btn-default my-4">로그인</button>
                 </div>
               </form>
             </div>
