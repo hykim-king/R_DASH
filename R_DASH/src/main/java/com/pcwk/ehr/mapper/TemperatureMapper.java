@@ -2,6 +2,7 @@ package com.pcwk.ehr.mapper;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -13,8 +14,6 @@ public interface TemperatureMapper {
 	
 	int upsertNowcast(List<NowcastDTO> list);
 	
-	int insertNowcast(NowcastDTO dto) throws SQLException;
-	
 	int insertPatient(PatientsDTO dto) throws SQLException;
 	
     List<PatientsDTO> selectAllPatients() throws SQLException;
@@ -24,4 +23,6 @@ public interface TemperatureMapper {
     void deleteAll() throws SQLException;
 
 	int getCount() throws SQLException;
+	
+	List<PatientsDTO> selectPatientsSummary(Map<String, Object> map) throws SQLException;
 }
