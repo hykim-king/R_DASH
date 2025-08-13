@@ -36,7 +36,8 @@
 		    reg_dt
 		FROM
 		    news
-		WHERE (TRUNC(reg_dt) = TRUNC(SYSDATE))AND keyword=#{keyword}
+		WHERE (TRUNC(reg_dt) = TRUNC(SYSDATE))
+		AND keyword=#{keyword}
 		ORDER BY reg_dt DESC
     </select>
     <select id="doSelectOne" parameterType="NewsDTO" resultType="NewsDTO">

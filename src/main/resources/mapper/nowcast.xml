@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pcwk.ehr.mapper.NowcastMapper">
+
+  <!-- 1) 전체 조회 (테스트/디버그용) -->
+  <select id="selectAll" resultType="com.pcwk.ehr.domain.NowcastDTO">
+    SELECT NOWCAST_NO, BASE_DATE, BASE_TIME, SIDO_NM, SIGNGU_NM,
+           NX, NY, CATEGORY, OBSR_VALUE
+    FROM NOWCAST
+  </select>
+
+  <!-- 2) 최신 시각 + 시/도 카드 집계 -->
+  <select id="selectSidoNm" parameterType="string"
+          resultType="com.pcwk.ehr.domain.NowcastDTO">
+    WITH LATEST AS (
+      SELECT MAX(TO_DATE(BASE_DATE||' '||BASE_TIME, 'RR/MM/DD HH24MI')) TS
+      FROM NOWCAST
+    ),
+    R AS (
+      SELECT BASE_DATE, BASE_TIME, SIDO_NM, CATEGORY,
+             TO_NUMBER(OBSR_VALUE) AS VAL
+      FROM NOWCAST N
+      WHERE
+        <if test="sidoNm != null and sidoNm != ''">
+          N.SIDO_NM = #{sidoNm, jdbcType=VARCHAR}
+        </if>
+        AND TO_DATE(N.BASE_DATE||' '||N.BASE_TIME, 'RR/MM/DD HH24MI')
+            = (SELECT TS FROM LATEST)
+    )
+    SELECT
+      MAX(BASE_DATE) AS baseDate,
+      MAX(BASE_TIME) AS baseTime,
+      MAX(SIDO_NM)   AS sidoNm,
+      ROUND(AVG(CASE WHEN CATEGORY = 'T1H' THEN VAL END), 1)              AS temp,
+      ROUND(SUM(CASE WHEN CATEGORY = 'RN1' THEN NVL(VAL,0) END), 1)       AS precipitation,
+      ROUND(AVG(CASE WHEN CATEGORY = 'WSD' THEN VAL END), 1)              AS windSpeed,
+      ROUND(AVG(CASE WHEN CATEGORY = 'REH' THEN VAL END))                 AS humidity
+    FROM R
+  </select>
+
+</mapper>

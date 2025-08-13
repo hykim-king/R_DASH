@@ -1,4 +1,4 @@
-from news import summarize_lda_topics
+from topic import summarize_lda_topics
 from news_crawler import crawler
 import extract
 import lda_analysis
@@ -8,7 +8,7 @@ import topic_topN
 from wordcloud import WordCloud
 import asyncio
 from topic_dao import TopicDao
-from to_db import save_topic_to_db
+from topic_insert import save_topic_to_db
 import topicWordCloud
 
 def main():
