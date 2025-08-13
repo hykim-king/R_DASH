@@ -37,11 +37,5 @@ public interface NowcastMapper extends WorkDiv<NowcastDTO> {
         @Param("signguNm") String sigunguNm
     );
 
-public interface NowcastMapper extends WorkDiv<NowcastDTO> {
-//	전체 초단기 목록
-	List<NowcastDTO> selectAll();
-
-//  단건 조회
-	NowcastDTO selectSidoNm(@Param("sidoNm") String sidoNm);
 
 }
