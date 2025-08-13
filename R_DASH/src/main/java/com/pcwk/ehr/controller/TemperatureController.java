@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -56,6 +57,17 @@ public class TemperatureController {
     public String mergeNowcast() throws SQLException {
     	temperatureService.insertNowcast();
     	return "NowCast 등록 완료!";
+    }
+    
+    @GetMapping("/patientsPage")
+    public String patientsPage(Model model) throws SQLException {
+        List<String> yearList = temperatureService.getYearList();
+        List<String> sidoList = temperatureService.getSidoList();
+
+        model.addAttribute("yearList", yearList);
+        model.addAttribute("sidoList", sidoList);
+
+        return "stats/Test1";
     }
 
     @GetMapping("/main.do")
