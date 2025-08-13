@@ -52,7 +52,7 @@ class ShelterDaoTest {
 //	전체 목록 조회
 	@Disabled
 	@Test
-	public void selectAllFfsTest() {
+	public void selectAllFsTest() {
 		List<ShelterDTO> list = mapper.selectAll();
 		log.debug("┌────────────────────┐");
 		log.debug("│ selectAllTest()    │");
@@ -78,12 +78,12 @@ class ShelterDaoTest {
 		log.debug("단건 조회: {}", dto);
 
 	}
-<<<<<<< HEAD
+
 
 //	지역 기준 목록 ( 나중 구현 )
 	@Disabled
 	@Test
-	public void listByAreafsTest() {
+	public void listByAreasTest() {
 		String ronaDaddr = "서울";
 		List<ShelterDTO> list = mapper.listByArea(ronaDaddr);
 		log.debug("┌────────────────────┐");
@@ -130,34 +130,9 @@ class ShelterDaoTest {
 		list.forEach(log::debug);
 	}
 
-	@Disabled
-=======
-	
-
-
-	@Test
-	public void selectByBBoxsTest() {
-		double minLat = 34.0;
-		double maxLat = 38.0;
-		double minLon = 126.0;
-		double maxLon = 127.0;
-		String q = "한파쉼터";
-		
-		List<ShelterDTO> list = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, q);
-		log.debug("┌────────────────────────────┐");
-		log.debug("│ selectByBBoxsTest()        │");
-		log.debug("└────────────────────────────┘");
-		
-		assertNotNull(list);
-		log.debug("BBox 검색 건수 : {}", list.size());
-		list.forEach(list);
-	}
-
 
 	
-	
-//	@Disabled
->>>>>>> 6fe288ce8ab270d0ad2660851a0ddfd165438fe3
+
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");
