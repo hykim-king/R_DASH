@@ -148,6 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
 			 <div class="pl-lg-4 w-75">
 			    <div class="row">
 				<form action="#" method="post" enctype="multipart/form-data">
+				    <input type="hidden" name="image" id="image">
 			        <div class="form-group d-flex">
 			            <label for="title"></label>
 			            <input type="text" class="form-control" id="title" name="title" autocomplete="title" maxlength="50" required placeholder="제목을 입력해주세요." >
@@ -178,60 +179,61 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="${CP}/resources/summernote/summernote-lite.min.js"></script>
 <script src="${CP}/resources/summernote/lang/summernote-ko-KR.js"></script>
 <script>
-	$('#summernote').summernote({
-		height: 300,                 // 에디터 높이
-        minHeight: null,             // 최소 높이
-        maxHeight: null,             // 최대 높이
-		focus : true, //에디터 로딩 후 포커스 맞출지 여부
-        lang: "ko-KR",
-        placeholder: '최대 500자까지 쓸 수 있습니다',
-		  toolbar: [
-		    // [groupName, [list of button]]
-		    ['style', ['bold', 'italic', 'underline', 'clear']],
-		    ['fontname', ['fontname']],
-		    ['fontsize', ['fontsize']],
-		    ['color', ['color']],
-		    ['table', ['table']],
-		    ['para', ['ul', 'ol', 'paragraph']],
-		    ['height', ['height']],
-		    ['insert',['picture']]
-		  ],
-		  fontname: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New','맑은 고딕','궁서','굴림체','굴림','돋움체','바탕체'],
-	
-		    // 이미지 첨부하는 부분
-		    callbacks: { 
-		        onImageUpload: function(files) {
-		        	boardImageFile(file[0],this);   
-		        },
-		        onPaste: funtion(e){
-		        	var clipBoardData = e.originEvent.clipBoardData;
-		        	if(clipBoardData && clipBoardData.items && clipBoardData.items.length){
-		        		var item = clipBoardData.items[0];
-		        		if(item.kind == 'file' && item.type.indexOf('image/') !== -1){
-		        			e.preventDefault();
-		        		}
-		        	}
-		        }
-		    }
-		   }
-		});
-	//이미지 파일 업로드
-	function uploadSummernoteImage(file,editor){
-		data = new FormData();
-		data.append("file",file);
-		$.ajax({
-			data : data,
-			type : "POST",
-			url : "/ehr/uploads/boardImageFile",
-			contentType : false,
-			processData : false,
-			success : funtion(data){
-				//항상 업로드된 파일의 url이 있어야 한다.
-				$(editor).summernote('insertImage',data.url);
-			}
-		});
-	}
-		
+$('#summernote').summernote({
+    height: 300,                 // 에디터 높이
+    minHeight: null,             // 최소 높이
+    maxHeight: null,             // 최대 높이
+    focus: true,                 // 에디터 로딩 후 포커스 여부
+    lang: "ko-KR",
+    placeholder: '최대 500자까지 쓸 수 있습니다',
+    toolbar: [
+        ['style', ['bold', 'italic', 'underline', 'clear']],
+        ['fontname', ['fontname']],
+        ['fontsize', ['fontsize']],
+        ['color', ['color']],
+        ['table', ['table']],
+        ['para', ['ul', 'ol', 'paragraph']],
+        ['height', ['height']],
+        ['insert', ['picture']]
+    ],
+    fontNames: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New', '맑은 고딕', '궁서', '굴림체', '굴림', '돋움체', '바탕체'],
+
+    // 이미지 첨부 콜백
+    callbacks: { 
+        onImageUpload: function(files) {
+        	uploadSummernoteImage(files[0], this);   
+        },
+        onPaste: function(e) {
+            var clipBoardData = e.originalEvent.clipboardData;
+            if (clipBoardData && clipBoardData.items && clipBoardData.items.length) {
+                var item = clipBoardData.items[0];
+                if (item.kind === 'file' && item.type.indexOf('image/') !== -1) {
+                    e.preventDefault();
+                }
+            }
+        }
+    }
+});
+//이미지 파일 업로드
+function uploadSummernoteImage(file, editor) {
+    let data = new FormData();
+    data.append("file", file);
+
+    $.ajax({
+        data: data,
+        type: "POST",
+        url: "${CP}/board/boardImageFile",
+        contentType: false,
+        processData: false,
+        success: function(data) {
+            // 항상 업로드된 파일의 URL이 있어야 한다.
+            $(editor).summernote('insertImage', data.url);
+        },
+        error: function(err) {
+            console.error("이미지 업로드 실패:", err);
+        }
+    });
+}
 </script>
 <script>
   // 예시로 3초 후에 로딩 숨기기 (실제 로딩 완료 이벤트에 맞게 조절하세요)
