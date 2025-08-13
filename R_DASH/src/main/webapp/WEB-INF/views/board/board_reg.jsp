@@ -14,9 +14,12 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
-<meta name="author" content="Creative Tim">
+<meta name="author" content="Moonsu">
+<link href="/ehr/resources/template/dashboard/css/dashboard.css" rel="stylesheet" />
+<link href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo.css" rel="stylesheet" />
+<link href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo-svg.css" rel="stylesheet" />
+<link href="/ehr/resources/template/dashboard/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+
 <title>공지사항 등록하기</title>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
 <link rel="stylesheet" href="/ehr/resources/summernote/summernote-lite.min.css">
@@ -56,48 +59,77 @@ document.addEventListener('DOMContentLoaded', function() {
     
 });
 </script>
-
-
 </head>
 <body>
-<div>
-<div>
-    <span>🏠 홈</span><span>></span><span>공지사항</span><span>></span><span>등록</span>
+<div class="main-content">
+<div class="header bg-warning pb-6 header bg-gradient-warning py-7 py-lg-8 pt-lg-9">
+	<span class="mask bg-gradient-default opacity-8"></span>
+	<div class="container-fluid d-flex align-items-center">
+		<div class="row">
+			<div class="col-lg-7 col-md-10">
+				<div>
+				    <span>🏠   홈</span><span> > </span><span>공지사항</span><span> > </span><span>등록</span>
+				</div>
+				<h1 class="display-2 text-white">공지사항 등록 안내문</h1>
+				<p class="text-white mt-0 mb-5">시민분들께 전달할 재난 최신 정보와 안전 수칙을 쉽고 명확하게 작성해 주세요.     
+                                                                                                            작성 후에는 내용 확인 및 수정도 언제든지 가능하니 편하게 관리해 주세요.<br>  
+                                                                                                            알림 버튼을 누르면 공지가 사이트를 방문하는 모든 회원에게 전달됩니다.</p>
+			<!-- 	<input type="button" id="moveTolist" class="btn btn-neutral" value="목록으로 "> -->
+			</div>
+		</div>
+	</div>
+</div>   
+
+<!-- Page Contents -->
+<div class="container-fluid mt--6" style="min-height: 700px; max-width:1700px; margin:0 auto;">
+	<div class="row">
+	<div class="col-xl-8 offset-xl-2 order-xl-1" >
+		<div class="card">
+			<div class="card-header">
+				<div class="row align-items-center border-0 d-flex align-items-center">
+				   <div class="col-8 d-flex align-items-center">
+				       <h3 class="mb-0">공지 등록</h3>
+				        <label class="custom-toggle ml-3">
+                            <input type="checkbox" checked>
+                            <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="알림"></span>
+                        </label>
+				   </div>
+				   <div class="col-4 text-right">
+				     <input type="button" id="doSave" class="btn btn-sm btn-primary" value="등록">
+				     <input type="button" id="doSave" class="btn btn-sm btn-primary" value="목록으로">
+				   </div>
+			   </div>
+			</div>
+			<div class="card-body d-flex justify-content-center align-items-center" style="min-height: 300px;"">
+			 <div class="pl-lg-4 w-75">
+			    <div class="row">
+				<form action="#" method="post" enctype="multipart/form-data">
+			        <div class="form-group d-flex">
+			            <label for="title"></label>
+			            <input type="text" class="form-control" name="title" id="title" autocomplete="title" maxlength="50" required placeholder="제목을 입력해주세요." >
+			        </div>		        
+			        <div class="form-group d-flex">
+			            <label for="summernote"></label>
+			            <textarea class="form-control" id="summernote" name="contents" class="contents" style="white-space: pre-wrap; overflow-wrap: break-word; resize: vertical;"></textarea>
+			        </div>
+			     </form>
+			     </div>
+			  </div>
+			</div>
+		</div>
+	   </div>
+	</div>
 </div>
+<!-- //Page Contents -->
+
+
+
 <div>
     <img style="width:200px; height:150px; object-fit: contain;" src="/ehr/resources/image/board_Jeamin.png">
 </div>
-<div class="col">
-    <div class="card">
-        <div class="card-header border-0">
-            <h3 class="mb-0">공지사항</h3>
-        </div>
-	    <!-- form area -->
-	    <form action="#" method="post" enctype="multipart/form-data">
-	    <div>
-	        <label for="title" >제목</label>
-	        <input type="text" name="title" id="title" autocomplete="title" maxlength="50" required placeholder="제목을 입력해주세요." >
-	    </div>
-	    <div>
-	        <label for="modId">등록자</label>
-	        <input type="text" name="modId" id="modId" autocomplete="modId" maxlength="50" required placeholder="등록자" >
-	    </div>
-	    <div>
-	        <label for="notice">공지</label><input type="checkbox" name="notice" id="notice" value="30">
-	    </div>
-	    <div>
-	        <label for="summernote" >내용</label>
-	        <textarea class="form-control" id="summernote" name="contents"  maxlength="50" class="contents"></textarea>
-	    </div>
-	    </form>
-    </div>
+
+    
 </div>
-    <!-- //form area -->
-    <!-- button area -->
-    <div>
-        <input type="button" id="doSave" value="등록">
-        <input type="button" id="moveToList" value="목록">
-    </div>
     <!-- //button area -->
 <script src="${CP}/resources/summernote/summernote-lite.min.js"></script>
 <script src="${CP}/resources/summernote/lang/summernote-ko-KR.js"></script>
@@ -146,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 		
 </script>
-</div>
+
 
 </body>
 </html>

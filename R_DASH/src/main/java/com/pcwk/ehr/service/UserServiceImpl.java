@@ -77,7 +77,21 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public int updateRole(UserDTO param) {
-		return mapper.updateRole(param);
+		UserDTO user = mapper.selectUser(param.getUserNo());
+		int flag = 0;
+		
+		//관리자를 일반회원으로
+		if(user.getRole()==1) {
+			user.setRole(2);
+			mapper.updateRole(user);
+			flag = 1;
+		//일반회원을 관리자로
+		}else {
+			user.setRole(1);
+			mapper.updateRole(user);
+			flag = 2;
+		}
+		return flag;
 	}
 
 	@Override

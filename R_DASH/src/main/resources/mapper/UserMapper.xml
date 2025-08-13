@@ -63,7 +63,7 @@
                      SELECT t1.*                                           
                       FROM USER_JM t1
                       <include refid="search"/>
-                     ORDER BY t1.reg_dt DESC                            
+                     ORDER BY t1.role , t1.reg_dt DESC                            
              )tt2
     <![CDATA[                                                          
          WHERE ROWNUM <= ( #{pageSize} * (#{pageNo} - 1 ) + #{pageSize} )                                             
