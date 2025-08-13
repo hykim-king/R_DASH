@@ -43,7 +43,6 @@ public class TemperatureController {
     public String mergeNowcast() throws SQLException {
     	temperatureService.insertNowcast();
     	return "NowCast 등록 완료!";
-    	
     }
 
     @GetMapping("/main.do")
