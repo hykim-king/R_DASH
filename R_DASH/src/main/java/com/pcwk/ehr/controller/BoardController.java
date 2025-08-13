@@ -1,16 +1,15 @@
 package com.pcwk.ehr.controller;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +24,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.pcwk.ehr.cmn.MessageDTO;
 import com.pcwk.ehr.cmn.PcwkString;
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.BoardDTO;
-import com.pcwk.ehr.domain.UserDTO;
 import com.pcwk.ehr.service.BoardService;
 import com.pcwk.ehr.service.MarkdownService;
 
@@ -43,8 +42,6 @@ public class BoardController {
 	
 	@Autowired
     private MarkdownService markdownService;
-
-	private final String uploadDir = "/ehr/resources/upload";
 	
 	public BoardController() {
 		log.debug("┌───────────────────────────┐");
@@ -69,23 +66,33 @@ public class BoardController {
         return markdownService.convertToMarkdownHtml(markdownText);
     }
 	
-	@PostMapping("/imageUpload.do")
+	@PostMapping(value="/boardImageFile", produces = "application/json")
 	@ResponseBody
-	public String imageUpload(MultipartFile file) throws IOException {
-	    // 1. 파일 저장 로직
-		// 폴더 없으면 생성
-	    Path uploadPath = Paths.get(uploadDir);
-	    if (Files.notExists(uploadPath)) {
-	        Files.createDirectories(uploadPath);
-	    }
+	public JsonObject boardImageFile(@RequestParam("file") MultipartFile file) throws IOException {
 		
-	    String savedFileName = UUID.randomUUID().toString() + PcwkString.getExt(file.getOriginalFilename());
-	    Path savePath = Paths.get(uploadDir, savedFileName);
-	    file.transferTo(savePath.toFile());
-
-	    // 2. 저장된 이미지 URL 반환
-	    String imageUrl = "/resources/upload/" + savedFileName; 
-	    return imageUrl;
+		JsonObject jsonObject = new JsonObject();
+		
+		String fileRoot = "C:\\Users\\user\\R_DASH\\R_DASH\\src\\main\\webapp\\resources\\uploads\\";
+		String originalFileName = file.getOriginalFilename();	//오리지날 파일명
+		String extension = PcwkString.getExt(originalFileName); //파일 확장자
+		
+		String savedFileName = PcwkString.getUUID()+extension;
+		
+		File targetFile = new File(fileRoot+savedFileName);
+		
+		try {
+			InputStream fileStream = file.getInputStream();
+			FileUtils.copyInputStreamToFile(fileStream, targetFile);	//파일 저장
+			jsonObject.addProperty("url", "/summernoteImage/"+savedFileName);
+			jsonObject.addProperty("responseCode", "success");
+			
+		}catch(IOException e) {
+			FileUtils.deleteQuietly(targetFile);	//저장된 파일 삭제
+			jsonObject.addProperty("responseCode", "error");
+			e.printStackTrace();
+		}
+	    
+        return jsonObject;
 	}
 	
 	@GetMapping("/doUpdateView.do")

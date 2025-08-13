@@ -2,8 +2,7 @@ package com.pcwk.ehr.service;
 
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
+import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.NewsDTO;
 import com.pcwk.ehr.domain.TopicDTO;
 
@@ -23,6 +22,8 @@ public interface NewsService {
 	int doUpdate(NewsDTO param);
 	
 	int doSave(NewsDTO param);
+	
+	List<NewsDTO> doRetrieve(SearchDTO param);
 	
 	/**
 	 * Topic Table

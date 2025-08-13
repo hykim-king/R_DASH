@@ -9,6 +9,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.NewsDTO;
 import com.pcwk.ehr.domain.TopicDTO;
 import com.pcwk.ehr.domain.UserDTO;
@@ -45,6 +46,11 @@ public class NewsServiceImpl implements NewsService {
 	public int doSave(NewsDTO param) {
 		return newsMapper.doSave(param);
 	}
+	
+	@Override
+	public List<NewsDTO> doRetrieve(SearchDTO param){
+		return newsMapper.doRetrieve(param);
+	}
 
 	@Override
 	public List<TopicDTO> getTodayTopicsList(TopicDTO param) {
@@ -65,7 +71,7 @@ public class NewsServiceImpl implements NewsService {
 		}else if(user.getRole() != 1) {
 			throw new RuntimeException("관리자 권한 필요");
 		}
-		param.setRegId(user.getNickname());
+		param.setRegId(user.getEmail());
 		return topicMapper.doSave(param);
 	}
 
@@ -78,7 +84,7 @@ public class NewsServiceImpl implements NewsService {
 		}else if(user.getRole() != 1) {
 			throw new RuntimeException("관리자 권한 필요");
 		}
-		param.setModId(user.getNickname());
+		param.setModId(user.getEmail());
 		return topicMapper.doUpdate(param);
 	}
 
