@@ -34,28 +34,6 @@
 	    INSERT (BASE_DATE, BASE_TIME, SIDO_NM, SIGNGU_NM, NX, NY, CATEGORY, OBSR_VALUE)
 	    VALUES (s.BASE_DATE, s.BASE_TIME, s.SIDO_NM, s.SIGNGU_NM, s.NX, s.NY, s.CATEGORY, s.OBSR_VALUE)
 	</update>
-  
-    <insert id="insertNowcast" parameterType="NowcastDTO">
-        INSERT INTO NOWCAST (
-			BASE_DATE,
-			BASE_TIME,
-			SIDO_NM,
-			SIGNGU_NM,
-			NX,
-			NY,
-			CATEGORY,
-			OBSR_VALUE
-        ) VALUES (
-            #{baseDate}, 
-            #{baseTime}, 
-            #{sidoNm},
-            #{sigunguNm},
-            #{nx}, 
-            #{ny}, 
-            #{category},
-            #{obsrValue}
-        )
-    </insert>
     
     <insert id="insertPatient" parameterType="PatientsDTO">
         INSERT INTO PATIENTS (
@@ -84,17 +62,42 @@
         FROM PATIENTS
     </select>
     
-    <select id="selectSidoPatients" parameterType="String" resultType="PatientsDTO">
-        SELECT 
-            PATIENTS_NO, 
-            YEAR, 
-            SIDO_NM, 
-            PATIENTS_TOT, 
-            OUT_SUBTOT, 
-            IN_SUBTOT
-        FROM PATIENTS
-        WHERE SIDO_NM = #{sidoNm}
-    </select>
+    <select id="selectPatientsSummary" parameterType="map" resultType="PatientsDTO">
+	    SELECT 
+	        <choose>
+	            <when test="groupType == 'region'">
+	                SIDO_NM AS groupKey
+	            </when>
+	            <when test="groupType == 'year'">
+	                YEAR AS groupKey
+	            </when>
+	        </choose>,
+	        SUM(PATIENTS_TOT) AS PATIENTS_TOT,
+	        SUM(OUT_SUBTOT)   AS OUT_SUBTOT,
+	        SUM(IN_SUBTOT)    AS IN_SUBTOT
+	    FROM PATIENTS
+	    <where>
+	        <!-- 특정 년도의 지역별 합계 -->
+	        <if test="groupType == 'region' and year != null and year != ''">
+	            YEAR = #{year}
+	        </if>
+	
+	        <!-- 특정 지역의 년도별 합계 -->
+	        <if test="groupType == 'year' and sidoNm != null and sidoNm != ''">
+	            SIDO_NM = #{sidoNm}
+	        </if>
+	    </where>
+	    <choose>
+	        <when test="groupType == 'region'">
+	            GROUP BY SIDO_NM
+	            ORDER BY SIDO_NM
+	        </when>
+	        <when test="groupType == 'year'">
+	            GROUP BY YEAR
+	            ORDER BY YEAR
+	        </when>
+	    </choose>
+	</select>
    
     <select id="getCount" resultType="java.lang.Integer">
         SELECT COUNT(*) AS totalCnt FROM PATIENTS
