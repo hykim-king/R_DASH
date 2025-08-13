@@ -34,7 +34,7 @@ public class GptBotService implements BotService {
 	private static final String API_URL = "https://api.openai.com/v1/chat/completions";
 
 	// 모델/샘플링
-	private static final String MODEL = "gpt-5-nano";
+	private static final String MODEL = "gpt-4o";
 	private static final double TEMP = 0.7;
 	private static final int MAX_TOKENS = 800;
 

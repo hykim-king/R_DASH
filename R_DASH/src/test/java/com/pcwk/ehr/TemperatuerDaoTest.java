@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.sql.SQLException;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -60,13 +61,20 @@ class TemperatuerDaoTest {
 	
 	@Disabled
 	@Test
-	void doSelectAll() throws SQLException {
+	void selectSidoPatients() throws SQLException {
 		
 	}
 	
 	@Disabled
 	@Test
-	void doSelectOne() throws SQLException {
+	void doSelectAllPatients() throws SQLException {
+		List<PatientsDTO> outVO = mapper.selectAllPatients();
+		log.debug("outVO:{}",outVO);
+	}
+	
+	@Disabled
+	@Test
+	void doSelectOnePatient() throws SQLException {
 		// 1.삭제 후 등록
 		mapper.deleteAll();
 		log.debug("Count:{}",mapper.getCount());
@@ -84,7 +92,7 @@ class TemperatuerDaoTest {
 	
 	@Disabled
 	@Test
-	void doSave() throws SQLException {
+	void doSavePatient() throws SQLException {
 		// 1.전체삭제
 		mapper.deleteAll();
 		log.debug("Count:{}",mapper.getCount());
