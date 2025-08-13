@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 from wordcloud import WordCloud
 import pandas as pd
+import seaborn
 
 
 def make_wordcloud(df,mask_path=None):
@@ -20,8 +21,8 @@ def make_wordcloud(df,mask_path=None):
     # 6워드클라우드 생성 및 시각화
     wordcloud = WordCloud(
         font_path='C:/Windows/Fonts/malgun.ttf',  # 한글 폰트 지정 (Windows 기준)
-        background_color='white',
-        colormap='autumn',
+        background_color='black',
+        colormap=seaborn.color_palette("Spectral", as_cmap=True),
         # mask=mask_arr,
         prefer_horizontal=True,
         max_words=300,
@@ -37,7 +38,8 @@ def make_wordcloud(df,mask_path=None):
     plt.figure(figsize=(10, 10))
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis('off')
-    plt.show()
+    #plt.show()
+    plt.close()
 
 
 def main():
