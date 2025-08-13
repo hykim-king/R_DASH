@@ -46,8 +46,8 @@
             #{year}, 
             #{sidoNm}, 
             #{patientsTot}, 
-            #{outSubtot}, 
-            #{inSubtot}
+            #{outSubTot}, 
+            #{inSubTot}
         )
     </insert>
 
@@ -84,18 +84,18 @@
 	                YEAR AS groupKey
 	            </when>
 	        </choose>,
-	        SUM(PATIENTS_TOT) AS PATIENTS_TOT,
-	        SUM(OUT_SUBTOT)   AS OUT_SUBTOT,
-	        SUM(IN_SUBTOT)    AS IN_SUBTOT
+	        SUM(PATIENTS_TOT) AS patientsTot,
+		    SUM(OUT_SUBTOT) AS outSubTot,
+		    SUM(IN_SUBTOT) AS inSubTot
 	    FROM PATIENTS
 	    <where>
 	        <!-- 특정 년도의 지역별 합계 -->
-	        <if test="groupType == 'region' and year != null and year != ''">
+	        <if test="year != null">
 	            YEAR = #{year}
 	        </if>
 	
 	        <!-- 특정 지역의 년도별 합계 -->
-	        <if test="groupType == 'year' and sidoNm != null and sidoNm != ''">
+	        <if test="sidoNm != null and sidoNm != ''">
 	            SIDO_NM = #{sidoNm}
 	        </if>
 	    </where>
