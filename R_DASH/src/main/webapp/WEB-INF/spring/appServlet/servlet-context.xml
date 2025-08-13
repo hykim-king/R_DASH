@@ -85,9 +85,11 @@ class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 </beans:bean>
 
 
-<context:component-scan
-base-package="com.pcwk.ehr" />
+<context:component-scan base-package="com.pcwk.ehr" />
 
+
+<!-- Summernote 이미지 접근 매핑 -->
+<resources mapping="/summernoteImage/**" location="/resources/uploads/" />
 
 
 
