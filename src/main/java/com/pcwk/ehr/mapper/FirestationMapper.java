@@ -5,12 +5,13 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import com.pcwk.ehr.cmn.WorkDiv;
 import com.pcwk.ehr.domain.FirestationDTO;
 
 //소방서 조회 전용 Mapper - 전체 목록 - 단건 조회 - BBox(지도 범위) 조회 - 지역명 / 소방서명 자동완성 - 특정 지역
 
 @Mapper
-public interface FirestationMapper {
+public interface FirestationMapper  extends WorkDiv<FirestationDTO>{
 
 //	전체 소방서 목록
 	List<FirestationDTO> selectAll();

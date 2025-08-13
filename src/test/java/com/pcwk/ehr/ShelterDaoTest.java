@@ -52,7 +52,10 @@ class ShelterDaoTest {
 //	전체 목록 조회
 	@Disabled
 	@Test
+	public void selectAllFsTest() {
+
 	public void selectAllFfsTest() {
+
 		List<ShelterDTO> list = mapper.selectAll();
 		log.debug("┌────────────────────┐");
 		log.debug("│ selectAllTest()    │");
@@ -78,7 +81,42 @@ class ShelterDaoTest {
 		log.debug("단건 조회: {}", dto);
 
 	}
-<<<<<<< HEAD
+
+
+
+//	지역 기준 목록 ( 나중 구현 )
+	@Disabled
+	@Test
+	public void listByAreasTest() {
+		String ronaDaddr = "서울";
+		List<ShelterDTO> list = mapper.listByArea(ronaDaddr);
+		log.debug("┌────────────────────┐");
+		log.debug("│ listByAreaTest()   │");
+		log.debug("└────────────────────┘");
+
+		assertNotNull(list);
+		log.debug("지역 기준 목록 건수: {}", list.size());
+		list.forEach(log::debug);
+	}
+
+//	필수 기능 아님 ( 추후 구현 )
+//	@Disabled
+	@Test
+	public void suggestKeywordsTest() {
+		String q = "서울";
+		List<String> list = mapper.suggestKeyword(q);
+		log.debug("┌────────────────────────────────┐");
+		log.debug("│ suggestKeywordTest()           │");
+		log.debug("└────────────────────────────────┘");
+
+		assertNotNull(list);
+		log.debug("지역 자동완성 결과: {}", list);
+	}
+
+	// BBox + 키워드 조회
+	// BBox 검색 건수 ( 지정된 지역 & 위경도 범위 내에 있는 데이터만 조회 )
+//	@Disabled
+
 
 //	지역 기준 목록 ( 나중 구현 )
 	@Disabled
@@ -130,34 +168,8 @@ class ShelterDaoTest {
 		list.forEach(log::debug);
 	}
 
-	@Disabled
-=======
-	
 
 
-	@Test
-	public void selectByBBoxsTest() {
-		double minLat = 34.0;
-		double maxLat = 38.0;
-		double minLon = 126.0;
-		double maxLon = 127.0;
-		String q = "한파쉼터";
-		
-		List<ShelterDTO> list = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, q);
-		log.debug("┌────────────────────────────┐");
-		log.debug("│ selectByBBoxsTest()        │");
-		log.debug("└────────────────────────────┘");
-		
-		assertNotNull(list);
-		log.debug("BBox 검색 건수 : {}", list.size());
-		list.forEach(list);
-	}
-
-
-	
-	
-//	@Disabled
->>>>>>> 6fe288ce8ab270d0ad2660851a0ddfd165438fe3
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");
