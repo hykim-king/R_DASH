@@ -179,12 +179,16 @@ public class PcwkString {
 		int endPageNo   = ((currentPageNo - 1)/bottomCount+1) * bottomCount;//10,20,30,40,...
 		
 		long nowBlockNo = ((currentPageNo - 1)/bottomCount)+1;//1
-        long maxBlockNo = ((maxNum-1)/bottomCount)+1;//3				
+        long maxBlockNo = ((maxNum-1)/rowPerPage)+1;//3				
 		
         if(currentPageNo > maxPageNo) {
         	return "";
         }
-        
+        System.out.println("maxPageNo : "+maxPageNo);
+        System.out.println("startPageNo : "+startPageNo);
+        System.out.println("endPageNo : "+endPageNo);
+        System.out.println("nowBlockNo : "+nowBlockNo);
+        System.out.println("maxBlockNo : "+maxBlockNo);
 		//«	<	1	2	3	4	5	>	»
 		//a b           c           d   e
 		//« : 1 page로 이동
@@ -219,9 +223,9 @@ public class PcwkString {
         
         //1	2	3	4	5...10 : page번호 
         int inx = 0;
-        for(inx = startPageNo;inx <=endPageNo; inx++) {
+        for(inx = startPageNo;inx<=maxPageNo && inx <=endPageNo; inx++) {
         	if(inx == currentPageNo) {//링크 없음
-        		html.append("<li class=\"page-item active\"><a class=\"page-link\" href=\"#\">");
+        		html.append("<li class=\"page-item active\"><a class=\"page-link\">");
         		html.append(inx);
         		html.append("</a></li>\n");
         	}else {
@@ -230,7 +234,7 @@ public class PcwkString {
         		html.append("</a></li>\n");        		 
         	}
         }
-        
+        System.out.println("inx : "+inx);
         inx -= 1;
 
         //> 오른쪽으로 bottomCount++
