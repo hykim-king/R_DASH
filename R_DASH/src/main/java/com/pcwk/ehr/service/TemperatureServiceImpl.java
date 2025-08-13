@@ -66,7 +66,7 @@ public class TemperatureServiceImpl implements TemperatureService {
     private static final String NOWCAST_URL = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst";
     private static final String SERVICE_KEY = "VJxg5p3Iyzp7FA0pzgtVA7AYRfaM2YSuLU4h8TMQAvQIJMGkIN7qEpL%2FQoDBEqo1MnsWnxGR%2BlN%2F9SsKlSmbZg%3D%3D";
     private static Map<String, List<Map<String, String>>> locationCache = new ConcurrentHashMap<>();
-    private final int FETCH_BUFFER_SIZE = 1000;
+    private final int FETCH_BUFFER_SIZE = 2500;
     private final int BATCH_SIZE = 500; // 환경에 따라 200~1000 권장
     private final int MAX_RETRY = 3;    // 청크 실패 시 재시도 횟수
     private List<NowcastDTO> buffer = new ArrayList<>();
@@ -102,7 +102,6 @@ public class TemperatureServiceImpl implements TemperatureService {
                 .build(true)
                 .toUri();
 
-        
         log.info(uri.toString());
 
         return uri;
