@@ -32,6 +32,12 @@ public class UserController {
 	@Autowired
 	UserMapper mapper;
 	
+	@GetMapping("error")
+	public String error() {
+		throw new RuntimeException("테스트 예외");
+		
+	}
+	
 	
 	
 	@GetMapping("userList")
