@@ -22,6 +22,8 @@
 
 <title>공지사항 게시판</title>
 <link rel="icon" href="${CP}/resources/image/Jaemini_face.ico" type="image/x-icon"/>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 <style type="text/css">
 span {
     margin-right: 20px;
@@ -46,8 +48,8 @@ span {
 </style>
 </head>
 <body>
-
-<div class="main=content">
+<jsp:include page="/WEB-INF/views/loading/loading.jsp"></jsp:include>
+<div class=main-content>
 	
 	<!-- header2 -->
 	<div class="header bg-warning pb-6 header bg-gradient-warning py-7 py-lg-8 pt-lg-9">
@@ -170,6 +172,16 @@ span {
 </div>
 <!--// table 영역 -->
 </div>
-
+<script>
+  // 예시로 3초 후에 로딩 숨기기 (실제 로딩 완료 이벤트에 맞게 조절하세요)
+  $(document).ready(function() {
+    setTimeout(function() {
+      $('.loading, .overlay').css('opacity', 0);
+      setTimeout(function() {
+        $('.loading, .overlay').hide();
+      }, 400); // transition 시간과 맞춤
+    }, 2000);
+  });
+</script>
 </body>
 </html>
