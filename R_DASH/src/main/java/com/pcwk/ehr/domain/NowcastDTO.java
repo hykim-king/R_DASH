@@ -6,7 +6,7 @@ public class NowcastDTO {
 	private String baseDate;
 	private String baseTime;
 	private String sidoNm;
-	private String sigunguNm;
+	private String signguNm;
 	private int nx;
 	private int ny;
 	private String category;
@@ -74,15 +74,15 @@ public class NowcastDTO {
 	/**
 	 * @return the sigunguNm
 	 */
-	public String getSigunguNm() {
-		return sigunguNm;
+	public String getSignguNm() {
+		return signguNm;
 	}
 
 	/**
 	 * @param sigunguNm the sigunguNm to set
 	 */
-	public void setSigunguNm(String sigunguNm) {
-		this.sigunguNm = sigunguNm;
+	public void setSignguNm(String signguNm) {
+		this.signguNm = signguNm;
 	}
 
 	/**
@@ -159,7 +159,7 @@ public class NowcastDTO {
 		this.baseDate = baseDate;
 		this.baseTime = baseTime;
 		this.sidoNm = sidoNm;
-		this.sigunguNm = sigunguNm;
+		this.signguNm = sigunguNm;
 		this.nx = nx;
 		this.ny = ny;
 		this.category = category;
@@ -169,7 +169,7 @@ public class NowcastDTO {
 	@Override
 	public String toString() {
 		return "NowcastDTO [nowcastNo=" + nowcastNo + ", baseDate=" + baseDate + ", baseTime=" + baseTime + ", sidoNm="
-				+ sidoNm + ", sigunguNm=" + sigunguNm + ", nx=" + nx + ", ny=" + ny + ", category=" + category
+				+ sidoNm + ", signguNm=" + signguNm + ", nx=" + nx + ", ny=" + ny + ", category=" + category
 				+ ", obsrValue=" + obsrValue + "]";
 	}
 	
