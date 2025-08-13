@@ -1,5 +1,37 @@
+<%@page import="com.pcwk.ehr.cmn.PcwkString"%>
+<%@page import="com.pcwk.ehr.cmn.SearchDTO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%
+    int bottomCount = 5;
+    int pageSize    = 0;//페이지 사이즈
+    int pageNo      = 0;//페이지 번호
+    int maxNum      = 0;//총글수
+    
+    String url      = "";//호출URL
+    String scriptName="";//자바스크립트 이름
+    
+    
+    //request: 요청 처리를 할수 있는 jsp 내장 객체
+    String totalCntString = request.getAttribute("totalCnt").toString();
+    //out.print("totalCntString:"+totalCntString);
+    maxNum = Integer.parseInt(totalCntString);  
+    
+    SearchDTO  paramVO = (SearchDTO)request.getAttribute("search");   
+    pageSize = paramVO.getPageSize();
+    pageNo   = paramVO.getPageNo();
+    
+    String cp = request.getContextPath();
+       //out.print("cp:"+cp);
+       
+       url = cp+"/user/userList";
+       //out.print("url:"+url);
+       
+       scriptName = "pagerDoRetrieve";
+       
+       String pageHtml=PcwkString.bootstrapRenderingPager(maxNum, pageNo, pageSize, bottomCount, url, scriptName);
+       
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -9,6 +41,91 @@
   <meta name="author" content="Creative Tim">
   <title>회원 조회</title>
 </head>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+	if('${sessionScope.loginUser.role}'!=='1'){
+        alert('관리자만 접근 가능합니다.');
+        
+        window.location.href='/ehr/home';
+    }
+	
+	if('${search.searchDiv}'===''){
+		searchWord.disabled = true;
+	}
+});
+//searchDiv 설정
+function selectDiv(div){
+	const selectDivButton = document.querySelector('#selectDivButton');
+	const searchWord = document.querySelector('#searchWord');
+	
+	if(div===10){
+		selectDivButton.innerText = '이메일';
+		selectDivButton.value=div;
+		searchWord.disabled = false;
+	}else if(div === 20){
+		selectDivButton.innerText = '이름';
+		selectDivButton.value=div;
+		searchWord.disabled = false;
+	}else{
+		selectDivButton.innerText = '전체';
+		selectDivButton.value='';
+		searchWord.disabled = true;
+	}
+	
+}
+//회원 검색
+function search(){
+	const selectDivButton = document.querySelector('#selectDivButton');
+	const searchWord = document.querySelector('#searchWord');
+	const pageNo = document.querySelector('#pageNo')
+	window.location.href = '/ehr/user/userList?searchDiv=' + selectDivButton.value + '&searchWord=' + searchWord.value + '&pageNo=' + pageNo.value;
+}
+// 권한 변경
+function changeRole(userNo){
+	if(confirm('권한을 변경하시겠습니까?')){
+		
+		$.ajax({
+            method:"POST",    //GET/POST
+            url:"/ehr/user/changeRole", //서버측 URL
+            dataType:"json",//서버에서 받을 데이터 타입
+            data:{          //파라메터
+              "userNo" : userNo,
+            },
+            success:function(result){//요청 성공
+                if(2 === result.success){
+                    alert(result.message);
+                    
+                    //페이지 새로고침
+                    window.location.reload();
+                }else{
+                    alert(result.message);
+                    
+                    //페이지 새로고침
+                    window.location.reload();
+                } 
+                    
+            },
+            error:function(result){//요청 실패
+                console.log("error:"+result)
+                alert(result);
+            }
+            
+            
+        });
+	}
+}
+
+//페이징 
+function pagerDoRetrieve(url, pageNo){   
+    //button
+    const searchButton = document.querySelector('#searchButton');
+    
+    document.querySelector('#pageNo').value= pageNo;
+    
+    searchButton.click();     
+    
+}
+</script>
 <body>
   <!-- Sidenav -->
   <nav class="sidenav navbar navbar-vertical  fixed-left  navbar-expand-xs navbar-light bg-white" id="sidenav-main">
@@ -402,15 +519,27 @@
             <!-- Card header -->
             <div class="card-header border-0 d-flex align-items-center">
               <h3 class="mb-0">회원 정보</h3>
-              <div class="ml-auto"> <!-- 오른쪽 끝으로 밀기 -->
-              	<select name="searchDiv">
-              		<option>전체</option>
-              		<option value="10">email</option>
-              		<option value="20">이름</option>
-              	</select>
-              	<input type="text" name="searchWord">
-			    <button type="button" class="btn btn-sm btn-default">검색</button>
-			    <button type="button" class="btn btn-sm btn-default">관리자</button>
+              <!-- 
+              <button type="button" class="btn btn-default" style="margin-left:20px;" onclick="location.href='/ehr/user/userList?searchDiv=30'">관리자</button>
+               -->
+              <div class="ml-auto d-flex align-items-center"> <!-- 오른쪽 끝으로 밀기 -->
+                <div class="dropdown">
+				  <button class="btn btn-secondary dropdown-toggle" type="button" value="" id="selectDivButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				    <c:choose>
+				        <c:when test="${search.searchDiv == '10' }">이메일</c:when>
+				        <c:when test="${search.searchDiv == '20' }">이름</c:when>
+				        <c:otherwise>전체</c:otherwise>
+				    </c:choose>
+				  </button>
+				  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+				    <a class="dropdown-item" onclick="javascript:selectDiv('')">전체</a>
+				    <a class="dropdown-item" onclick="javascript:selectDiv(10)">이메일</a>
+				    <a class="dropdown-item" onclick="javascript:selectDiv(20)">이름</a>
+				  </div>
+				</div>
+	            <input type="text" class="form-control" id="searchWord" name="searchWord">
+	            <input type="hidden"id="pageNo" name="pageNo">  
+			    <button type="button" id="searchButton" onclick="javascript:search()" class="btn btn-default text-nowrap" style="margin-left:10px">검색</button>
 			  </div>
             </div>
             <!-- Light table -->
@@ -464,7 +593,7 @@
 			                      </span>
 			                    </td>
 			                    <td>
-			                      <button class="btn btn-success">권한 변경</button>
+			                      <button class="btn btn-success" onclick="changeRole(${vo.userNo})">권한 변경</button>
 			                    </td>
 			                  </tr>
                     	</c:forEach>
@@ -481,6 +610,12 @@
             </div>
             <!-- Card footer -->
             <div class="card-footer py-4">
+                    <!-- paging -->
+            <%
+                out.print(pageHtml);
+            %>
+            <!--// paging end -->
+            <!-- 
               <nav aria-label="...">
                 <ul class="pagination justify-content-end mb-0">
                   <li class="page-item disabled">
@@ -504,6 +639,7 @@
                   </li>
                 </ul>
               </nav>
+              -->
             </div>
           </div>
         </div>

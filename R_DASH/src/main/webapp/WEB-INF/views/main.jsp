@@ -592,7 +592,7 @@ img.card-img-top {
 				</div>
 				<div class="chat-footer">
 					<textarea id="chatInput" class="chat-input"
-						placeholder="메시지를 입력하세요. (Enter 전송, Shift+Enter 줄바꿈)"></textarea>
+						placeholder="궁금한거 있으면 물어봐요! (Enter 전송, Shift+Enter 줄바꿈)"></textarea>
 					<button id="chatSend" class="chat-send-btn">전송</button>
 				</div>
 			</div>
@@ -653,43 +653,39 @@ document.addEventListener("DOMContentLoaded", () => {
   let SESSION_ID = localStorage.getItem('X-Session-Id') || null;
 
   async function sendMessage() {
-    const text = chatInput.value.trim();
-    if (!text) return;
-    appendBubble(text, 'user');
-    chatInput.value = '';
+	  const text = chatInput.value.trim();
+	  if (!text) return;
+	  appendBubble(text, 'user');
+	  chatInput.value = '';
 
-    // 실제 서버 연동
-    try {
-      const res = await fetch(`${CP}/api/chat/send`, {
-        method: 'POST',
-        headers: {
-          'Content-Type':'application/json',
-          ...(SESSION_ID ? {'X-Session-Id': SESSION_ID} : {})
-        },
-        body: JSON.stringify({ question: text })
-      });
+	  try {
+	    console.log('POST', `${CP}/api/chat/send`, {question: text}); // 디버그
+	    const res = await fetch(`${CP}/api/chat/send`, {
+	      method: 'POST',
+	      headers: {
+	        'Content-Type':'application/json',
+	        ...(SESSION_ID ? {'X-Session-Id': SESSION_ID} : {})
+	      },
+	      body: JSON.stringify({ question: text })
+	    });
 
-      // 새 세션 아이디를 내려주면 갱신
-      const sid = res.headers.get('X-Session-Id');
-      if (sid) {
-        SESSION_ID = sid;
-        localStorage.setItem('X-Session-Id', sid);
-      }
+	    const sid = res.headers.get('X-Session-Id');
+	    if (sid) { SESSION_ID = sid; localStorage.setItem('X-Session-Id', sid); }
 
-      if (!res.ok) {
-        appendBubble('서버 응답이 원활하지 않습니다. 잠시 후 다시 시도해 주세요.', 'bot');
-        return;
-      }
+	    const raw = await res.text(); // ← 응답을 문자열로 먼저
+	    let data = null; try { data = JSON.parse(raw); } catch {}
+	    if (!res.ok) {
+	      appendBubble(`AI 호출 실패(${res.status}) ${raw || ''}`, 'bot'); // 서버 메시지까지 보여주기
+	      console.error('chat/send error', res.status, raw);
+	      return;
+	    }
 
-      const data = await res.json(); // {answer: "..."} 또는 ChatDTO
-      const answer = data.answer || '응답을 불러오지 못했어요.';
-      appendBubble(answer, 'bot');
-
-    } catch (e) {
-      // 네트워크 에러 시 간단 안내 + 임시 답변
-      appendBubble('네트워크 오류가 발생했어요. 연결 상태를 확인해 주세요.', 'bot');
-    }
-  }
+	    appendBubble((data && data.answer) || '응답을 불러오지 못했어요.', 'bot');
+	  } catch (e) {
+	    appendBubble('네트워크 오류가 발생했어요. 연결 상태를 확인해 주세요.', 'bot');
+	    console.error(e);
+	  }
+	}
 
   chatSend.addEventListener('click', sendMessage);
   chatInput.addEventListener('keydown', (e) => {
