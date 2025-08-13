@@ -32,22 +32,25 @@ public class UserController {
 	@Autowired
 	UserMapper mapper;
 	
+	
+	
 	@GetMapping("userList")
 	public String userList(HttpServletRequest request,Model model) {
 		String viewName = "user/userList";
 		SearchDTO search = new SearchDTO();
 		//pageNo 설정
-		if(request.getParameter("pageNo")==null) {
+		if(request.getParameter("pageNo")==null||request.getParameter("pageNo").isEmpty()) {
 			search.setPageNo(1);
 		}else {
 			search.setPageNo(Integer.parseInt(request.getParameter("pageNo")));
 		}
 		//pageSize 20으로 고정
 		if(request.getParameter("pageSize")==null) {
-			search.setPageSize(20);
+			search.setPageSize(10);
 		}
 		//searchDiv 설정 (10:이메일로 검색, 20:이름으로 검색, 30:관리자만 검색)
 		if(request.getParameter("searchDiv")!=null) {
+			log.debug("searchDiv:{}",request.getParameter("searchDiv"));
 			search.setSearchDiv(request.getParameter("searchDiv"));
 		}
 		//searchWord 검색어 설정
@@ -92,6 +95,27 @@ public class UserController {
 		String viewName = "user/changePw";
 
 		return viewName;
+	}
+	
+	
+	@PostMapping(value="/changeRole", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String, Object> changeRole(UserDTO param, HttpSession session){
+		Map<String, Object> result = new HashMap<>();
+		int flag = service.updateRole(param);
+		
+		if(flag == 1) {
+			result.put("success", "1");
+			result.put("message", "일반 사용자 권한으로 변경되었습니다.");
+		}else if(flag == 2) {
+			result.put("success", "2");
+			result.put("message", "관리자 권한으로 변경되었습니다.");
+		}else {
+			result.put("success", "0");
+			result.put("message", "변경에 실패했습니다.");
+		}
+		
+		return result;
 	}
 	
 	@PostMapping(value="/changePw", produces = "application/json;charset=UTF-8")

@@ -2,6 +2,39 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pcwk.ehr.mapper.TemperatureMapper">
     
+	<update id="upsertNowcast" parameterType="java.util.List">
+	  MERGE INTO JM.NOWCAST t
+	  USING (
+	    <foreach collection="list" item="item" separator=" UNION ALL ">
+	      SELECT
+	        TO_DATE(#{item.baseDate}, 'YYYYMMDD') AS BASE_DATE,
+	        #{item.baseTime} AS BASE_TIME,
+	        #{item.sidoNm} AS SIDO_NM,
+	        #{item.sigunguNm} AS SIGNGU_NM,
+	        #{item.nx} AS NX,
+	        #{item.ny} AS NY,
+	        #{item.category} AS CATEGORY,
+	        #{item.obsrValue} AS OBSR_VALUE
+	      FROM dual
+	    </foreach>
+	  ) s
+	  ON (
+	    t.SIDO_NM   = s.SIDO_NM
+	    AND t.SIGNGU_NM = s.SIGNGU_NM
+	    AND t.NX = s.NX
+	    AND t.NY = s.NY
+	    AND t.CATEGORY = s.CATEGORY
+	  )
+	  WHEN MATCHED THEN
+	    UPDATE SET
+	      t.OBSR_VALUE = s.OBSR_VALUE,
+	      t.BASE_DATE  = s.BASE_DATE,
+	      t.BASE_TIME  = s.BASE_TIME
+	  WHEN NOT MATCHED THEN
+	    INSERT (BASE_DATE, BASE_TIME, SIDO_NM, SIGNGU_NM, NX, NY, CATEGORY, OBSR_VALUE)
+	    VALUES (s.BASE_DATE, s.BASE_TIME, s.SIDO_NM, s.SIGNGU_NM, s.NX, s.NY, s.CATEGORY, s.OBSR_VALUE)
+	</update>
+  
     <insert id="insertNowcast" parameterType="NowcastDTO">
         INSERT INTO NOWCAST (
 			BASE_DATE,
