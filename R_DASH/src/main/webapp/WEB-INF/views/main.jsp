@@ -592,7 +592,7 @@ img.card-img-top {
 				</div>
 				<div class="chat-footer">
 					<textarea id="chatInput" class="chat-input"
-						placeholder="궁금한거 있으면 물어봐요! (Enter 전송, Shift+Enter 줄바꿈)"></textarea>
+						placeholder="궁금한거 있으면 물어봐요!"></textarea>
 					<button id="chatSend" class="chat-send-btn">전송</button>
 				</div>
 			</div>
