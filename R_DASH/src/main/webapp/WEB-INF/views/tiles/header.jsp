@@ -5,7 +5,7 @@
     <div class="scrollbar-inner">
       <!-- Brand -->
       <div class="sidenav-header  d-flex  align-items-center">
-        <a class="navbar-brand" href="/ehr/resources/template/index.html">
+        <a class="navbar-brand" href="/ehr/home">
           <img src="/ehr/resources/template/dashboard/assets/img/r_dash_logo.png" height="40" class="navbar-brand-img" alt="...">
         </a>
         <div class=" ml-auto ">
@@ -136,45 +136,15 @@
                 </ul>
               </div>
             </li>
-            <!-- 
-            <hr class="my-3"/>
-            <h6 class="navbar-heading pl-4 text-muted">
-              <span class="docs-normal">Documentation</span>
-            </h6>
-            <li class="nav-item">
-              <a class="nav-link" href="https://demos.creative-tim.com/impact-design-system-pro/docs/getting-started/quick-start/">
-                <i class="ni ni-spaceship"></i>
-                <span class="nav-link-text">Getting started</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="https://demos.creative-tim.com/impact-design-system-pro/docs/dashboard/alerts/">
-                <i class="ni ni-ui-04"></i>
-                <span class="nav-link-text">Components</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="https://demos.creative-tim.com/impact-design-system-pro/docs/plugins/charts/">
-                <i class="ni ni-chart-pie-35"></i>
-                <span class="nav-link-text">Plugins</span>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link active active-pro" href="https://www.creative-tim.com/product/impact-design-system-pro" target="_blank">
-                <i class="ni ni-send text-primary"></i>
-                <span class="nav-link-text">Upgrade to PRO</span>
-              </a>
-            </li>
-             -->
           </ul>
         </div>
       </div>
     </div>
   </nav>
-  <!-- Main content -->
-  <div class="main-content fixed-top" id="panel">
+    <!-- Main content -->
+  <div class="main-content" id="panel">
     <!-- Topnav -->
-    <nav class="navbar navbar-horizontal navbar-expand-lg navbar-dark bg-warning fixed-top">
+    <nav class="navbar navbar-horizontal navbar-expand-lg navbar-dark bg-warning">
       <div class="container-fluid">
         <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
 		  <c:choose>
@@ -256,8 +226,6 @@
 	          </ul>    
             </c:otherwise>
 		  </c:choose>
-          
         </div>
       </div>
     </nav>
-   </div>
