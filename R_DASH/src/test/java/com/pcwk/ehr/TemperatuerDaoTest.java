@@ -4,7 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -61,8 +63,38 @@ class TemperatuerDaoTest {
 	
 	@Disabled
 	@Test
-	void selectSidoPatients() throws SQLException {
-		
+    void selectSidoPatients() throws SQLException {
+        Map<String, Object> param = new HashMap<>();
+        param.put("groupType", "year");
+        param.put("year", ""); // 전체년도
+        param.put("sidoNm", "서울"); // 특정 지역
+
+        List<PatientsDTO> result = mapper.selectPatientsSummary(param);
+
+        assertNotNull(result);
+
+        // groupKey 출력 (년도별)
+        result.forEach(dto -> {
+            System.out.println(dto.getGroupKey() + " | " + dto.getPatientsTot());
+        });
+    }
+	
+	@Disabled
+	@Test
+	void selectYearPatients() throws SQLException {
+		Map<String, Object> param = new HashMap<>();
+        param.put("groupType", "region");
+        param.put("year", "2024"); // 특정년도 필터
+        param.put("sidoNm", "");   // 전체 지역
+
+        List<PatientsDTO> result = mapper.selectPatientsSummary(param);
+
+        assertNotNull(result);
+
+        // 예시 출력
+        result.forEach(dto -> {
+            System.out.println(dto.getGroupKey() + " | " + dto.getPatientsTot());
+        });
 	}
 	
 	@Disabled
