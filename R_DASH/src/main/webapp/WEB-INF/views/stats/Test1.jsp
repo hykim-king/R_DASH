@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,16 +20,17 @@
 <!-- 년도 선택 -->
 <select id="yearSelect">
     <option value="">전체년도</option>
-    <option value="2024">2024</option>
-    <option value="2023">2023</option>
+    <c:forEach var="year" items="${yearList}">
+        <option value="${year}">${year}</option>
+    </c:forEach>
 </select>
 
 <!-- 지역 선택 -->
 <select id="sidoSelect">
     <option value="">전체지역</option>
-    <option value="서울">서울</option>
-    <option value="인천">인천</option>
-    
+    <c:forEach var="sido" items="${sidoList}">
+        <option value="${sido}">${sido}</option>
+    </c:forEach>
 </select>
 
 <canvas id="patientsChart" width="400" height="200"></canvas>
