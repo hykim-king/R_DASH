@@ -154,6 +154,111 @@ public class PcwkString {
 		
 		return html.toString();
 	}	
+	/**
+	 * 
+	 * @param maxNum : 총 글수
+	 * @param currentPageNo: 현재 페이지번호
+	 * @param rowPerPage : 페이지 사이즈 (10,20,...100)
+	 * @param bottomCount: 10/5
+	 * @param url : 서버 호출 URL   
+	 * @param scriptName : 자바스크립트 함수명
+	 * @return "html 텍스트"
+	 */
+	public static String bootstrapRenderingPager(int maxNum, int currentPageNo, int rowPerPage, int bottomCount, String url, String scriptName) {
+		StringBuilder  html=new StringBuilder(2500);
+		
+ 
+		
+		//maxNum : 총 글수 -> 21
+		//currentPageNo = 1
+		//rowPerPage : 10
+		//bottomCount: 10
+		
+		int maxPageNo = (maxNum -1) / rowPerPage +1; //3
+		int startPageNo = ((currentPageNo - 1)/bottomCount) * bottomCount +1;//1,11,21,31,...
+		int endPageNo   = ((currentPageNo - 1)/bottomCount+1) * bottomCount;//10,20,30,40,...
+		
+		long nowBlockNo = ((currentPageNo - 1)/bottomCount)+1;//1
+        long maxBlockNo = ((maxNum-1)/bottomCount)+1;//3				
+		
+        if(currentPageNo > maxPageNo) {
+        	return "";
+        }
+        
+		//«	<	1	2	3	4	5	>	»
+		//a b           c           d   e
+		//« : 1 page로 이동
+		//< : 왼쪽으로 bottomCount--
+		//1	2	3	4	5...10 : page번호
+		//> : 오른쪽으로 bottomCount++
+		//» : 마지막 페이지
+        
+        
+        html.append("<nav aria-label=\"Page navigation example\"> \n");
+        html.append("<ul class=\"pagination justify-content-end\">\n");
+        
+        //« : 1 page로 이동
+        if(nowBlockNo > 1 && nowBlockNo <=maxBlockNo ) {
+        	html.append("<li class=\"page-item \">\n");
+        	html.append("<a href=\"javascript:"+scriptName+"('"+url+"',1);\" class=\"page-link\" tabindex=\"-1\">\n");
+        	html.append("<i class=\"fa fa-angle-left\"></i>\n");
+        	html.append("<span class=\"sr-only\">Previous</span>\n");
+        	html.append("</a>\n");
+        	html.append("</li>\n");
+        }
+
+        //< : 왼쪽으로 bottomCount--
+        if(startPageNo > bottomCount) {
+        	html.append("<li class=\"page-item\">\n");
+        	html.append("<a href=\"javascript:"+scriptName+"('"+url+"',"+(startPageNo - bottomCount)+");\" class=\"page-link\" tabindex=\"-1\">\n");
+        	html.append("<i class=\"fa fa-angle-left\"></i>\n");
+        	html.append("<span class=\"sr-only\">Previous</span>\n");
+        	html.append("</a>\n");
+        	html.append("</li>\n");
+        }
+        
+        //1	2	3	4	5...10 : page번호 
+        int inx = 0;
+        for(inx = startPageNo;inx <=endPageNo; inx++) {
+        	if(inx == currentPageNo) {//링크 없음
+        		html.append("<li class=\"page-item active\"><a class=\"page-link\" href=\"#\">");
+        		html.append(inx);
+        		html.append("</a></li>\n");
+        	}else {
+        		html.append(" <li class=\"page-item\"><a class=\"page-link\" href=\"javascript:"+scriptName+"('"+url+"',"+(inx)+");\" >");
+        		html.append(inx);
+        		html.append("</a></li>\n");        		 
+        	}
+        }
+        
+        inx -= 1;
+
+        //> 오른쪽으로 bottomCount++
+        if(maxPageNo > inx) {
+        	html.append("<li class=\"page-item\">\n");
+        	html.append("<a class=\"page-link\" href=\"javascript:"+scriptName+"('"+url+"',"+( (nowBlockNo * bottomCount)+1 )+");\" >");
+        	html.append("<i class=\"fa fa-angle-right\"></i>");
+        	html.append("<span class=\"sr-only\">Next</span>\n");
+        	html.append("</a></li>\n");
+        }
+        
+        //» : 마지막 페이지
+        if(maxPageNo > inx) {
+        	html.append("<li class=\"page-item\">\n");
+        	html.append("<a class=\"page-link\" href=\"javascript:"+scriptName+"('"+url+"',"+( maxPageNo )+");\" >");
+        	html.append("<i class=\"fa fa-angle-right\"></i>");
+        	html.append("<span class=\"sr-only\">Next</span>\n");
+        	html.append("</a></li>\n");           	
+        	
+        }
+        
+
+        html.append("</ul>");
+        html.append("</nav>");
+		
+		
+		return html.toString();
+	}	
 
 	/**
 	 * null,"" 입력되면 default value로 변경
