@@ -118,30 +118,30 @@ public class TemperatureServiceImpl implements TemperatureService {
 					Row row = rowIterator.next();
 
 					String sido = getCellValue(row.getCell(2)); // 1단계
-					String sigungu = getCellValue(row.getCell(3)); // 2단계
+					String signgu = getCellValue(row.getCell(3)); // 2단계
 					String nx = getCellValue(row.getCell(5)); // 격자 X
 					String ny = getCellValue(row.getCell(6)); // 격자 Y
 
 					// 시군구명이 비어있으면 스킵
-					if (sigungu == null || sigungu.isEmpty() || nx.isEmpty() || ny.isEmpty()) {
+					if (signgu == null || signgu.isEmpty() || nx.isEmpty() || ny.isEmpty()) {
 						continue;
 					}
 
 					// 현재 읽은 엑셀 행이 (시도, 시군구, nx, ny)까지 완전히 동일한 중복이라면 스킵
-					String fullRowKey = sido + "_" + sigungu + "_" + nx + "_" + ny;
+					String fullRowKey = sido + "_" + signgu + "_" + nx + "_" + ny;
 					if (xyKeys.contains(fullRowKey)) {
 						continue;
 					}
 					xyKeys.add(fullRowKey);
 
 					// 시도 + 시군구 중복 제거
-					String key = sido + "_" + sigungu;
+					String key = sido + "_" + signgu;
 					if (!sidoKeys.contains(key)) {
 						sidoKeys.add(key);
 
 						Map<String, String> map = new HashMap<>();
 						map.put("sido", sido);
-						map.put("sigungu", sigungu);
+						map.put("signgu", signgu);
 						map.put("nx", nx);
 						map.put("ny", ny);
 
@@ -155,7 +155,7 @@ public class TemperatureServiceImpl implements TemperatureService {
 
 					Map<String, String> locationInfo = new HashMap<>();
 					locationInfo.put("sido", sido);
-					locationInfo.put("sigungu", sigungu);
+					locationInfo.put("signgu", signgu);
 
 					locationCache.get(xyKey).add(locationInfo);
 				}
@@ -215,7 +215,7 @@ public class TemperatureServiceImpl implements TemperatureService {
 	/*
 	 * API에서 받은 Response를 DTO로 변환
 	 */
-	private NowcastDTO nowCastConvertToDTO(NowcastApiResponse.Item item, String sidoNm, String sigunguNm) {
+	private NowcastDTO nowCastConvertToDTO(NowcastApiResponse.Item item, String sidoNm, String signguNm) {
 		String baseDate = item.getBaseDate();
 		String baseTime = item.getBaseTime();
 		String category = item.getCategory();
@@ -228,7 +228,7 @@ public class TemperatureServiceImpl implements TemperatureService {
 			e.printStackTrace();
 		}
 
-		NowcastDTO nowcastDTO = new NowcastDTO(null, baseDate, baseTime, sidoNm, sigunguNm, nx, ny, category,
+		NowcastDTO nowcastDTO = new NowcastDTO(null, baseDate, baseTime, sidoNm, signguNm, nx, ny, category,
 				obsrValue);
 		return nowcastDTO;
 	}
@@ -278,7 +278,7 @@ public class TemperatureServiceImpl implements TemperatureService {
 			String nx = loc.get("nx");
 			String ny = loc.get("ny");
 			String sido = loc.get("sido");
-			String sigungu = loc.get("sigungu");
+			String signgu = loc.get("signgu");
 
 			URI uri;
 			try {
@@ -307,7 +307,7 @@ public class TemperatureServiceImpl implements TemperatureService {
 				continue;
 
 			for (NowcastApiResponse.Item item : items) {
-				NowcastDTO dto = nowCastConvertToDTO(item, sido, sigungu);
+				NowcastDTO dto = nowCastConvertToDTO(item, sido, signgu);
 				buffer.add(dto);
 
 				if (buffer.size() >= FETCH_BUFFER_SIZE) {
@@ -450,7 +450,16 @@ public class TemperatureServiceImpl implements TemperatureService {
 			System.out.println("데이터 저장 중 오류 발생: " + e.getMessage());
 		}
 	}
-
+	
+	@Override
+	public List<String> getSidoList() throws SQLException {
+	    return temperatureMapper.pSido();
+	}
+	@Override
+	public List<String> getYearList() throws SQLException {
+	    return temperatureMapper.pYear();
+	}
+	
 	@Override
 	public List<PatientsDTO> getAllPatients() throws SQLException {
 		return temperatureMapper.selectAllPatients();
