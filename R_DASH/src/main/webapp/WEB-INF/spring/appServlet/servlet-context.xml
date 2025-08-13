@@ -89,3 +89,6 @@ class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 base-package="com.pcwk.ehr" />
 
 
+
+
+</beans:beans>
