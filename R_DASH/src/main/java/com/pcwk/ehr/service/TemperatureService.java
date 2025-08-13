@@ -3,6 +3,7 @@ package com.pcwk.ehr.service;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import com.pcwk.ehr.domain.NowcastDTO;
 import com.pcwk.ehr.domain.PatientsDTO;
@@ -18,5 +19,11 @@ public interface TemperatureService {
     void insertNowcast() throws SQLException;
     
     void fetchAndMergeNowcast() throws URISyntaxException;
+
+	List<PatientsDTO> selectPatientsSummary(Map<String, Object> map) throws SQLException;
+
+	List<String> getSidoList() throws SQLException;
+
+	List<String> getYearList() throws SQLException;
 
 }
