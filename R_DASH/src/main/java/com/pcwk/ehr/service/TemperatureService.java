@@ -22,4 +22,8 @@ public interface TemperatureService {
 
 	List<PatientsDTO> selectPatientsSummary(Map<String, Object> map) throws SQLException;
 
+	List<String> getSidoList() throws SQLException;
+
+	List<String> getYearList() throws SQLException;
+
 }

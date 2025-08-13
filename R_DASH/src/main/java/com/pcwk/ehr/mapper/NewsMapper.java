@@ -14,4 +14,5 @@ public interface NewsMapper extends WorkDiv<NewsDTO> {
 	public int getCount();
 	//키 워드로 조회
 	List<NewsDTO> searchByKeyword(NewsDTO param);
+	
 }

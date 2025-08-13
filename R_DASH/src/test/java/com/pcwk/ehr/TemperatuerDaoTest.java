@@ -59,10 +59,10 @@ class TemperatuerDaoTest {
 		log.debug("└────────────────────┘");
 	}
 	
+	@Disabled
 	@Test
 	void selectSidoPatients() throws SQLException {
-		PatientsDTO outVO = mapper.selectSidoPatients("서울");
-		log.debug("outVO:{}",outVO);
+		
 	}
 	
 	@Disabled

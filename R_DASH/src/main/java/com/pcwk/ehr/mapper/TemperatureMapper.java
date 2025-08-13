@@ -25,4 +25,8 @@ public interface TemperatureMapper {
 	int getCount() throws SQLException;
 	
 	List<PatientsDTO> selectPatientsSummary(Map<String, Object> map) throws SQLException;
+	
+	//드롭다운 만들기 위해 값가져오기
+	List<String> pSido() throws SQLException;
+	List<String> pYear() throws SQLException;
 }
