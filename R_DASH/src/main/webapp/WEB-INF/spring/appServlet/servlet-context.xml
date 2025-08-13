@@ -59,7 +59,12 @@
 			</beans:list>
 		</beans:property>
 	</beans:bean>
-
+    <!-- 예외처리: 최종테스트에 열고 사용 하세요 -->
+    <beans:bean id="exceptionResolver" 
+       class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver"> 
+        <beans:property name="defaultErrorView" value="user/error"/>
+        <beans:property name="exceptionAttribute" value="ex"/>
+    </beans:bean> 
     
     
 	<!-- Tiles ViewResolver -->
