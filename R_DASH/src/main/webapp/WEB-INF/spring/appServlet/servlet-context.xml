@@ -31,21 +31,13 @@
 
 	</websocket:message-broker>
     
-    
-	<!-- cron scheduler -->
-	<!-- 
-	<task:scheduler id="cronScheduler" pool-size="3" />
-     -->
-	<!-- Cron 스케줄링 -->
-	<!--  <task:scheduled-tasks scheduler="cronScheduler">
-		<task:scheduled ref="userServiceImpl"
-			method="upgradeLevels" cron="0 */3 * * 10 *" />
-
-
-		<task:scheduled ref="pcwkCron" method="runTask"
-			cron="0 */1 * * 10 *" />
+    <!--
+	<task:scheduler id="cronScheduler" pool-size="3"/>
+	<task:scheduled-tasks scheduler="cronScheduler">
+	  <task:scheduled ref="temperatureServiceImpl" method="insertNowcast" cron="0 45 * * * ?" />
 	</task:scheduled-tasks>
     -->
+    
 	<!-- DispatcherServlet Context: defines this servlet's request-processing 
 		infrastructure -->
 
