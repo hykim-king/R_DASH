@@ -4,12 +4,13 @@ public class PatientsDTO {
 
 	private Integer patientsNo;
 	private String sidoNm;
-	private int year;
-	private int patientsTot;
-	private int outSubtot;
-	private int inSubtot;
+	private Integer year;
+	private Integer patientsTot;
+	private Integer outSubTot;
+	private Integer inSubTot;
 	
-
+	private String groupKey;
+	
 	/**
 	 * 
 	 */
@@ -18,7 +19,7 @@ public class PatientsDTO {
 	/**
 	 * @return the patientsNo
 	 */
-	public int getPatientsNo() {
+	public Integer getPatientsNo() {
 		return patientsNo;
 	}
 	/**
@@ -42,7 +43,7 @@ public class PatientsDTO {
 	/**
 	 * @return the year
 	 */
-	public int getYear() {
+	public Integer getYear() {
 		return year;
 	}
 	/**
@@ -54,7 +55,7 @@ public class PatientsDTO {
 	/**
 	 * @return the patientsTot
 	 */
-	public int getPatientsTot() {
+	public Integer getPatientsTot() {
 		return patientsTot;
 	}
 	/**
@@ -66,26 +67,39 @@ public class PatientsDTO {
 	/**
 	 * @return the outSubtot
 	 */
-	public int getOutSubtot() {
-		return outSubtot;
+	public Integer getOutSubTot() {
+		return outSubTot;
 	}
 	/**
 	 * @param outSubtot the outSubtot to set
 	 */
-	public void setOutSubtot(int outSubtot) {
-		this.outSubtot = outSubtot;
+	public void setOutSubTot(Integer outSubtot) {
+		this.outSubTot = outSubtot;
 	}
 	/**
 	 * @return the inSubtot
 	 */
-	public int getInSubtot() {
-		return inSubtot;
+	public Integer getInSubTot() {
+		return inSubTot;
 	}
 	/**
 	 * @param inSubtot the inSubtot to set
 	 */
-	public void setInSubtot(int inSubtot) {
-		this.inSubtot = inSubtot;
+	public void setInSubTot(Integer inSubtot) {
+		this.inSubTot = inSubtot;
+	}
+	
+	/**
+	 * @return the groupKey
+	 */
+	public String getGroupKey() {
+		return groupKey;
+	}
+	/**
+	 * @param groupKey the groupKey to set
+	 */
+	public void setGroupKey(String groupKey) {
+		this.groupKey = groupKey;
 	}
 	/**
 	 * @param patientsNo
@@ -95,19 +109,19 @@ public class PatientsDTO {
 	 * @param outSubtot
 	 * @param inSubtot
 	 */
-	public PatientsDTO(Integer patientsNo, String sidoNm, int year, int patientsTot, int outSubtot, int inSubtot) {
+	public PatientsDTO(Integer patientsNo, String sidoNm, Integer year, Integer patientsTot, Integer outSubTot, Integer inSubTot) {
 		super();
 		this.patientsNo = patientsNo;
 		this.sidoNm = sidoNm;
 		this.year = year;
 		this.patientsTot = patientsTot;
-		this.outSubtot = outSubtot;
-		this.inSubtot = inSubtot;
+		this.outSubTot = outSubTot;
+		this.inSubTot = inSubTot;
 	}
 	@Override
 	public String toString() {
 		return "PatientsDTO [patientsNo=" + patientsNo + ", sidoNm=" + sidoNm + ", year=" + year + ", patientsTot="
-				+ patientsTot + ", outSubtot=" + outSubtot + ", inSubtot=" + inSubtot + "]";
+				+ patientsTot + ", outSubTot=" + outSubTot + ", inSubTot=" + inSubTot + "]";
 	}
 	
 	

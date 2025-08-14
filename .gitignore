@@ -201,3 +201,7 @@ R_DASH/target/
 R_DASH/target/
 /target/
 R_DASH_PY.7z
+
+# Windows reserved names
+NUL
+nul
