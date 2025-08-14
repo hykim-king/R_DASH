@@ -67,25 +67,25 @@ public class PatientsDTO {
 	/**
 	 * @return the outSubtot
 	 */
-	public Integer getOutSubtot() {
+	public Integer getOutSubTot() {
 		return outSubTot;
 	}
 	/**
 	 * @param outSubtot the outSubtot to set
 	 */
-	public void setOutSubtot(int outSubtot) {
+	public void setOutSubTot(Integer outSubtot) {
 		this.outSubTot = outSubtot;
 	}
 	/**
 	 * @return the inSubtot
 	 */
-	public Integer getInSubtot() {
+	public Integer getInSubTot() {
 		return inSubTot;
 	}
 	/**
 	 * @param inSubtot the inSubtot to set
 	 */
-	public void setInSubtot(int inSubtot) {
+	public void setInSubTot(Integer inSubtot) {
 		this.inSubTot = inSubtot;
 	}
 	

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.pcwk.ehr.domain.NowcastDTO;
 import com.pcwk.ehr.domain.PatientsDTO;
 import com.pcwk.ehr.service.TemperatureService;
 
@@ -24,6 +25,22 @@ public class TemperatureController {
     @Autowired
     private TemperatureService temperatureService;
     
+    @GetMapping("/weather.do")
+    @ResponseBody
+    public List<NowcastDTO> getTopWeather(
+            @RequestParam String category) {
+
+        switch (category) {
+            case "T1H":
+                return temperatureService.getTopTemperature();
+            case "REH":
+                return temperatureService.getTopHumidity();
+            case "RN1":
+                return temperatureService.getTopRainfall();
+            default:
+                return null;
+        }
+    }
     @GetMapping("/summary.do")
     @ResponseBody
     public List<PatientsDTO> getPatientsSummary(
