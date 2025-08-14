@@ -94,7 +94,7 @@ class NewsDaoTest {
 		}
 		
 	}
-	@Disabled
+	//@Disabled
 	@Test
 	void searchByKeyword() {
 		//1. 전체 삭제
@@ -117,7 +117,7 @@ class NewsDaoTest {
 		assertEquals(33, outVO.size());
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void merge() {
 		//1. 전체를 삭제
@@ -151,7 +151,7 @@ class NewsDaoTest {
 
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void doSave() {
 		//1. 전체를 삭제
@@ -169,7 +169,7 @@ class NewsDaoTest {
 
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");
