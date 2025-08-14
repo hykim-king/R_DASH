@@ -12,9 +12,9 @@ import com.pcwk.ehr.domain.PatientsDTO;
 @Mapper
 public interface TemperatureMapper {
 	
-	List<NowcastDTO> selectTopTemperature();
-    List<NowcastDTO> selectTopHumidity();
-    List<NowcastDTO> selectTopRainfall();
+	List<NowcastDTO> selectTopT1H();
+    List<NowcastDTO> selectTopREH();
+    List<NowcastDTO> selectTopRN1();
 	
 	int upsertNowcast(List<NowcastDTO> list);
 	
