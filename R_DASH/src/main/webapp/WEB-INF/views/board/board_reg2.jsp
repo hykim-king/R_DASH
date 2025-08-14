@@ -24,7 +24,83 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
 <link rel="stylesheet" href="/ehr/resources/summernote/summernote-lite.min.css">
 <link rel="icon" href="${CP}/resources/image/Jaemini_face.ico" type="image/x-icon"/>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOMContentLoaded');
+    
+    function isEmpty(value) {
+        return value == null || value.trim() === '';
+    }
+    
+    const titleInput = document.querySelector("#title");
+    console.log(titleInput);
+    
+    const summernoteInput = document.querySelector("#summernote");
+    console.log(summernoteInput);
+    
+    const noticeCheck = document.querySelector("#notice");
+    console.log(noticeCheck);
+    
+    const doSaveBtn = document.querySelector("#doSave");
+    console.log(doSaveBtn);
+    
+    const moveToListBtn = document.querySelector("#moveToList");
+    console.log(moveToListBtn);
+    
+    moveToListBtn.addEventListener('click', function() {
+        
+        window.location.href = '/ehr/board/doRetrieve.do';
+        
+        // 사용자 확인
+        if (!confirm('목록으로 이동합니다.')) {
+            return;
+        }
+    });
+    //등록 버튼이 존재
+    doSaveBtn.addEventListener('click',function(event){
+    	console.log('doSaveBtn click');
+    	// 필수값 체크
+        if (isEmpty(titleInput.value)) {
+            alert('제목을 입력 하세요');
+            titleInput.focus();
+            return;
+        }
+        if (isEmpty(summernoteInput.value)) {
+            alert('내용을 입력 하세요');
+            summernoteInput.focus();
+        }
+        
+        // FormData 객체 생성
+        var formData = new FormData();
+        formData.append("title",titleInput.value);
+        formData.append("summernote",summernoteInput.value);
+        
+        $.ajax({
+            type: "POST",
+            url: "/ehr/board/doSave.do",
+            data: formData,
+            processData: false,  // 필수! 데이터를 query string으로 변환하지 않음
+            contentType: false,  // 필수! multipart/form-data 헤더를 자동 설정
+            dataType: "json",    // 서버가 JSON 응답일 경우
+            success: function(response) {
+                console.log("success: ", response);
 
+                alert(response.message);
+
+                if (response.messageId == 1) {
+                    window.location.href = '/ehr/board/doRetrieve.do';
+                }
+            },
+            error: function(xhr, status, error) {
+                console.log("error: ", error);
+                alert("등록 중 오류가 발생했습니다.");
+            }
+        });
+     
+    });
+    
+});
+</script>
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/loading/loading.jsp"></jsp:include>
@@ -138,76 +214,6 @@ $('#summernote').summernote({
         }
     }
 });
-function isEmpty(value) {
-    return value == null || value.trim() === '';
-}
-
-const titleInput = document.querySelector("#title");
-console.log(titleInput);
-
-const summernoteInput = document.querySelector("#summernote");
-console.log(summernoteInput);
-
-const noticeCheck = document.querySelector("#notice");
-console.log(noticeCheck);
-
-const doSaveBtn = document.querySelector("#doSave");
-console.log(doSaveBtn);
-
-const moveToListBtn = document.querySelector("#moveToList");
-console.log(moveToListBtn);
-
-moveToListBtn.addEventListener('click', function() {
-    
-    window.location.href = '/ehr/board/doRetrieve.do';
-    
-    // 사용자 확인
-    if (!confirm('목록으로 이동합니다.')) {
-        return;
-    }
-});
-//등록 버튼이 존재
-doSaveBtn.addEventListener('click',function(event){
-    console.log('doSaveBtn click');
-    // 필수값 체크
-    if (isEmpty(titleInput.value)) {
-        alert('제목을 입력 하세요');
-        titleInput.focus();
-        return;
-    }
-    if (isEmpty(summernoteInput.value)) {
-        alert('내용을 입력 하세요');
-        summernoteInput.focus();
-    }
-    
-    // FormData 객체 생성
-    var formData = new FormData();
-    formData.append("title",titleInput.value);
-    formData.append("summernote",summernoteInput.value);
-    
-    $.ajax({
-        type: "POST",
-        url: "/ehr/board/doSave.do",
-        data: formData,
-        processData: false,  // 필수! 데이터를 query string으로 변환하지 않음
-        contentType: false,  // 필수! multipart/form-data 헤더를 자동 설정
-        dataType: "json",    // 서버가 JSON 응답일 경우
-        success: function(response) {
-            console.log("success: ", response);
-
-            alert(response.message);
-
-            if (response.messageId == 1) {
-                window.location.href = '/ehr/board/doRetrieve.do';
-            }
-        },
-        error: function(xhr, status, error) {
-            console.log("error: ", error);
-            alert("등록 중 오류가 발생했습니다.");
-        }
-    });
- 
-});
 //이미지 파일 업로드
 function uploadSummernoteImage(file, editor) {
     let data = new FormData();
@@ -219,10 +225,7 @@ function uploadSummernoteImage(file, editor) {
         url: "${CP}/board/boardImageFile",
         contentType: false,
         processData: false,
-        dataType: "json", //json 응답을 받도록 설정
         success: function(data) {
-        	console.log("서버 응답:", data); // 전체 객체 확인
-            console.log("data.url 값:", data.url); // url 속성만 확인
             // 항상 업로드된 파일의 URL이 있어야 한다.
             $(editor).summernote('insertImage', data.url);
         },
