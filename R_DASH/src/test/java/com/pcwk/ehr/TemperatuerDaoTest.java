@@ -49,7 +49,6 @@ class TemperatuerDaoTest {
 	PatientsDTO patientsDTO4;
 	PatientsDTO patientsDTO5;
 
-	
 	@BeforeEach
 	void setUp() throws Exception {
 		log.debug("┌────────────────────┐");
@@ -60,6 +59,7 @@ class TemperatuerDaoTest {
 		patientsDTO3 = new PatientsDTO(0, "인천", 2024, 330, 320, 10);
 		patientsDTO4 = new PatientsDTO(0, "서울", 2023, 330, 250, 30);
 		patientsDTO5 = new PatientsDTO(0, "서울", 2022, 260, 240, 20);
+
 	}
 
 	@AfterEach
@@ -76,6 +76,7 @@ class TemperatuerDaoTest {
 		mapper.deleteAll();
 		log.debug("Count:{}",mapper.getCount());
 		assertEquals(0, mapper.getCount());
+
 		// 2.5건 등록
 		mapper.insertPatient(patientsDTO1);
 		mapper.insertPatient(patientsDTO2);
@@ -83,8 +84,9 @@ class TemperatuerDaoTest {
 		mapper.insertPatient(patientsDTO4);
 		mapper.insertPatient(patientsDTO5);
 		assertEquals(5, mapper.getCount());
-				
-        Map<String, Object> param = new HashMap<>();
+		
+		// 3.지역 검색
+    Map<String, Object> param = new HashMap<>();
         param.put("groupType", "year");
         param.put("year", ""); // 전체년도
         param.put("sidoNm", "서울"); // 특정 지역
@@ -106,6 +108,7 @@ class TemperatuerDaoTest {
 		mapper.deleteAll();
 		log.debug("Count:{}",mapper.getCount());
 		assertEquals(0, mapper.getCount());
+
 		// 2.5건 등록
 		mapper.insertPatient(patientsDTO1);
 		mapper.insertPatient(patientsDTO2);
@@ -113,7 +116,9 @@ class TemperatuerDaoTest {
 		mapper.insertPatient(patientsDTO4);
 		mapper.insertPatient(patientsDTO5);
 		assertEquals(5, mapper.getCount());
-				
+
+		
+		//3. 년도 검색
 		Map<String, Object> param = new HashMap<>();
         param.put("groupType", "region");
         param.put("year", "2024"); // 특정년도 필터
@@ -136,6 +141,7 @@ class TemperatuerDaoTest {
 		mapper.deleteAll();
 		log.debug("Count:{}",mapper.getCount());
 		assertEquals(0, mapper.getCount());
+
 		// 2.5건 등록
 		mapper.insertPatient(patientsDTO1);
 		mapper.insertPatient(patientsDTO2);
@@ -143,7 +149,10 @@ class TemperatuerDaoTest {
 		mapper.insertPatient(patientsDTO4);
 		mapper.insertPatient(patientsDTO5);
 		assertEquals(5, mapper.getCount());
-				
+			
+		assertEquals(5, mapper.getCount());
+		log.debug("mapper.getCount():{}",mapper.getCount());
+		
 		List<PatientsDTO> outVO = mapper.selectAllPatients();
 		log.debug("outVO:{}",outVO);
 	}

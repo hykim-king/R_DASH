@@ -10,10 +10,15 @@
 		<put-attribute name="footer" value="/WEB-INF/views/tiles/footer.jsp"></put-attribute>
 	</definition>
 
-	<definition name="user/*" extends="base-definition">
+	<definition name="*/*" extends="base-definition">
 		<put-attribute name="body"
-			value="/WEB-INF/views/user/{1}.jsp"></put-attribute>
+			value="/WEB-INF/views/{1}/{2}.jsp"></put-attribute>
 	</definition>
+	
+	<definition name="exception/error" extends="base-definition">
+        <put-attribute name="body"
+            value="/WEB-INF/views/exception/error.jsp"></put-attribute>
+    </definition>
 	<!-- 
     <definition name="*/*" extends="base-definition">
         <put-attribute name="body"

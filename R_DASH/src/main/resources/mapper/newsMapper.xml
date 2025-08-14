@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pcwk.ehr.mapper.NewsMapper">
+    <select id="doRetrieve" parameterType="SearchDTO" resultType="NewsDTO">
+        SELECT RNUM AS NO,t2.*
+		FROM(
+		        SELECT ROWNUM AS RNUM, t1.*
+		        FROM (
+		               SELECT 
+		                    news_no,
+		                    keyword,
+		                    title,
+		                    company,
+		                    url,
+		                    pub_dt,
+		                    reg_dt
+		                FROM
+		                    news
+		                WHERE (TRUNC(reg_dt) = TRUNC(SYSDATE))		                
+		        ) t1
+		 <![CDATA[    WHERE ROWNUM <= #{pageSize}*#{pageNo} + #{pageSize}
+		)t2
+		WHERE RNUM >= #{pageSize}*#{pageNo} +#{pageNo} ]]>
+    </select>
 
     <insert id="saveAll">
        INSERT INTO NEWS (
