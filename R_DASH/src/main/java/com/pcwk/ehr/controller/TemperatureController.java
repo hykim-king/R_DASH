@@ -32,11 +32,11 @@ public class TemperatureController {
 
         switch (category) {
             case "T1H":
-                return temperatureService.getTopTemperature();
+                return temperatureService.getTopT1H();
             case "REH":
-                return temperatureService.getTopHumidity();
+                return temperatureService.getTopREH();
             case "RN1":
-                return temperatureService.getTopRainfall();
+                return temperatureService.getTopRN1();
             default:
                 return null;
         }
