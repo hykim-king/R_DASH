@@ -106,7 +106,7 @@ public class BoardController {
     public Map<String, Object> boardImageFile(@RequestParam("file") MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
 
-        String fileRoot = "C:/summernote_image/"; // 반드시 폴더 존재 확인
+        String fileRoot = "/upload/"; // 반드시 폴더 존재 확인
         File dir = new File(fileRoot);
         if (!dir.exists()) dir.mkdirs(); // 폴더 없으면 생성
 
