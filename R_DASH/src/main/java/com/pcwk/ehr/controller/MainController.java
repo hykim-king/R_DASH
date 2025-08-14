@@ -30,7 +30,7 @@ public class MainController {
 		log.debug("└─────────────────────┘");
 
 		model.addAttribute("msg", "저희 재난 알림 사이트를 방문해주셔서 감사합니다.");
-		return "main"; // /WEB-INF/views/main.jsp
+		return "main/main"; // /WEB-INF/views/main.jsp
 	}
 
 	/**

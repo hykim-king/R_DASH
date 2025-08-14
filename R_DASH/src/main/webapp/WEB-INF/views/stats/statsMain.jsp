@@ -8,7 +8,12 @@
     <title>통계 페이지</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+    <style>
+        .canvasContainer {
+            width: 500px; 
+            height: 300px;
+        }
+    </style>
 </head>
 <body>
 
@@ -34,94 +39,27 @@
     </c:forEach>
 </select>
 
-
-<div style="width: 500px; height: 300px;">
+<!-- 환자 전체 합계 -->
+<div class = "canvasContainer">
     <canvas id="patientsChart"></canvas>
 </div>
-    
 
-<script>
-let chartInstance = null;
+<!-- 환자 실내외 소계 -->
+<div class = "canvasContainer">
+    <canvas id="inOutdoorChart"></canvas>
+</div>
 
-$(document).ready(function() {
+<select id="dataTypeSelect">
+    <option value="TEMP">기온</option>
+    <option value="HUM">습도</option>
+    <option value="RAIN">강수량</option>
+</select>
 
-    // 드롭다운 토글 함수
-    function toggleDropdowns() {
-	    let type = $("#groupType").val();
-	
-	    if (type === "region") {
-	        // 지역별 → 년도 드롭다운만 보이게
-	        $("#yearSelect").show();
-	        $("#sidoSelect").hide().val(''); // 숨길 때 값 초기화
-	    } else if (type === "year") {
-	        // 년도별 → 지역 드롭다운만 보이게
-	        $("#sidoSelect").show();
-	        $("#yearSelect").hide().val(''); // 숨길 때 값 초기화
-	    }
-	}
+<canvas id="top5Chart" width="400" height="200"></canvas>
 
-    // 차트 로드
-    function loadChart() {
-        let groupType = $("#groupType").val();
-        let year = $("#yearSelect").val();
-        let sidoNm = $("#sidoSelect").val();
+<script src="${pageContext.request.contextPath}/resources/js/patients.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/nowcast.js"></script>
 
-        $.ajax({
-            url: '/ehr/temperature/summary.do',
-            type: 'GET',
-            data: { groupType, year, sidoNm },
-            success: function(data) {
-                let labels = data
-                    .filter(item => item.groupKey !== "전국") // 전국 제외
-                    .map(item => item.groupKey);
-
-                let values = data
-                    .filter(item => item.groupKey !== "전국")
-                    .map(item => item.patientsTot);
-
-                let ctx = document.getElementById('patientsChart').getContext('2d');
-
-                if (window.chartInstance) {
-                    window.chartInstance.destroy();
-                }
-
-                window.chartInstance = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: '환자 수',
-                            data: values,
-                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        scales: {
-                            y: { beginAtZero: true, title: { display: true, text: '환자 수' } },
-                            x: { title: { display: true, text: groupType === 'region' ? '지역' : '년도' } }
-                        }
-                    }
-                });
-            }
-        });
-    }
-
-    // 이벤트 바인딩
-    $("#groupType").on("change", function() {
-        toggleDropdowns();
-        loadChart();
-    });
-
-    $("#yearSelect, #sidoSelect").on("change", loadChart);
-
-    // 초기 실행
-    toggleDropdowns();
-    loadChart();
-});
-</script>
 </body>
 </html>
 

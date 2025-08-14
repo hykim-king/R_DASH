@@ -240,7 +240,7 @@ public class TemperatureServiceImpl implements TemperatureService {
 		String region = row.getRegi();
 		int year = Integer.parseInt(row.getBas_yy());
 		int total = parseIntSafe(row.getTot());
-		int outdoor = parseIntSafe(row.getOtdoor_subtot());
+		int outdoor = parseIntSafe(row.getOutdoor_subtot());
 		int indoor = parseIntSafe(row.getIndoor_subtot());
 
 		PatientsDTO patientsDTO = new PatientsDTO(null, region, year, total, outdoor, indoor);
@@ -469,5 +469,19 @@ public class TemperatureServiceImpl implements TemperatureService {
 	public List<PatientsDTO> selectPatientsSummary(Map<String, Object> map) throws SQLException {
 		return temperatureMapper.selectPatientsSummary(map);
 	}
+	
+	@Override
+    public List<NowcastDTO> getTopTemperature() {
+        return temperatureMapper.selectTopTemperature();
+    }
 
+    @Override
+    public List<NowcastDTO> getTopHumidity() {
+        return temperatureMapper.selectTopHumidity();
+    }
+
+    @Override
+    public List<NowcastDTO> getTopRainfall() {
+        return temperatureMapper.selectTopRainfall();
+    }
 }

@@ -55,62 +55,6 @@ html, body {
 	position: relative;
 }
 
-/* 상단 네비게이션 바 */
-.top-bar {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	padding: 10px 30px;
-	background: rgba(0, 0, 0, 0.4);
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	z-index: 1000;
-	backdrop-filter: blur(5px);
-}
-
-/* 언어/로그인 버튼 */
-.right-menu {
-	position: absolute;
-	right: 30px;
-	display: flex;
-	gap: 10px;
-	align-items: center;
-}
-
-.lang-btn, .login-btn {
-	padding: 6px 12px;
-	border: none;
-	border-radius: 5px;
-	font-size: 0.9rem;
-}
-
-.lang-btn {
-	background-color: #6c757d;
-	color: white;
-}
-
-.login-btn {
-	background-color: #dc3545;
-	color: white;
-}
-
-/* 상단 메뉴 */
-.center-menu {
-	display: flex;
-	justify-content: center;
-	gap: 40px;
-	z-index: 1;
-}
-
-.center-menu a {
-	color: white;
-	text-decoration: none;
-	font-size: 1rem;
-	font-weight: 500;
-}
-
 /* 드롭다운(공통) */
 .dropdown-wrapper {
 	display: none;
@@ -431,57 +375,6 @@ img.card-img-top {
 
 	<!-- 메인 화면 -->
 	<div class="main-section main-background">
-		<div class="top-bar">
-			<div class="center-menu">
-				<div class="nav-item">
-					<a href="#">통계 페이지</a>
-				</div>
-				<div class="nav-item">
-					<a href="#">재난 페이지</a>
-				</div>
-				<div class="nav-item">
-					<a href="#">뉴스 페이지</a>
-				</div>
-				<div class="nav-item">
-					<a href="#">토픽 페이지</a>
-				</div>
-				<div class="nav-item">
-					<a href="#">지도 페이지</a>
-				</div>
-				<div class="nav-item">
-					<a href="#">마이 페이지</a>
-				</div>
-			</div>
-			<div class="right-menu">
-				<button class="lang-btn">🌐 한국어 ▾</button>
-				<a href="${CP}/user/login" class="login-btn">로그인</a>
-			</div>
-		</div>
-
-		<div class="mega-dropdown">
-			<div class="dropdown-column">
-				<a href="#">온여지료환자 통계</a> <a href="#">초단기 실화 통계</a> <a href="#">공공시설
-					복구현황</a> <a href="#">화장 재난 통계</a> <a href="#">소화기 통계</a>
-			</div>
-			<div class="dropdown-column">
-				<a href="#">지진</a> <a href="#">황사</a> <a href="#">싱크홀</a>
-			</div>
-			<div class="dropdown-column">
-				<a href="#">오늘의 뉴스</a> <a href="#">재난 뉴스</a> <a href="#">그것이
-					알고싶다!</a>
-			</div>
-			<div class="dropdown-column">
-				<a href="#">안녕</a> <a href="#">클레오파트라</a> <a href="#">세상에서 제일가는
-					포테이토치프</a>
-			</div>
-			<div class="dropdown-column">
-				<a href="#">지진은 어디인가?</a> <a href="#">황사 바람 온다.</a> <a href="#">싱크홀
-					땅 긴진~</a>
-			</div>
-			<div class="dropdown-column">
-				<a href="#">게시판</a>
-			</div>
-		</div>
 
 		<div class="search-container backInUp">
 			<h1>저희 재난 알림 사이트를 방문해주셔서 감사합니다.</h1>
