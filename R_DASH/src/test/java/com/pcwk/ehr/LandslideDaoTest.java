@@ -10,7 +10,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,8 +26,6 @@ import com.pcwk.ehr.mapper.LandslideMapper;
 @ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/root-context.xml",
 		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml" })
 public class LandslideDaoTest {
-
-	
 	Logger log = LogManager.getLogger(getClass());
 
 	@Autowired
@@ -53,23 +50,28 @@ public class LandslideDaoTest {
 	}
 	
 	
-	  // selectByBBox 쿼리 결과 검증 – 지도 화면(BBox) 내 산사태 목록 조회
-//	@Disabled
+//	 selectByBBox 쿼리 결과 검증 – 지도 화면(BBox) 내 산사태 목록 조회
+//	 @Disabled
 	 @Test
 	    void selectByBBox_latest() {
+		 //지도에서 현재 보이는 범위(대한민국 전체 범위 예시)
 	        double minLat = 33.0, maxLat = 39.0;
 	        double minLon = 124.0, maxLon = 132.0;
 	        String q = null; // 또는 "경보", "주의보" 등
-
+	        
+//	        Mapper 호출  : BBox범위 내 산사태 목록 조회
 	        List<LandslideDTO> rows = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, q);
 	        log.debug("┌────────────────────────────────┐");
 			log.debug("│ selectByBBox_latest()          │");
 			log.debug("└────────────────────────────────┘");
 			
 			
-			
+//			결과 리스트가 null이 아닌지 확인
 	        assertNotNull(rows, "rows must not be null");
+//	                 결과 건수 로그 출력
 	        log.info("rows.size={}", rows.size());
+	        
+	        //데이터가 있다면 첫 번째 레코드 상세 출력
 	        if (!rows.isEmpty()) {
 	            LandslideDTO first = rows.get(0);
 	            log.info("first: no={}, inst={}, dt={}, stts={}, lat={}, lon={}",
@@ -80,8 +82,8 @@ public class LandslideDaoTest {
 	    }
 	 
 	 
-	    // findById 쿼리 결과 검증 – PK로 단건 상세 조회
-	 @Disabled
+// 		findById 쿼리 결과 검증 – ** PK로 단건 상세 조회 ** 
+//		@Disabled
 	    @Test
 	    void findById_ok() {
 	        Long testId = 1L; // 실제 DB에 존재하는 PK로 변경
@@ -95,7 +97,7 @@ public class LandslideDaoTest {
 	        log.info("dto: {}", dto);
 	    }
 
-	 // countByRegionInBBox 쿼리 결과 검증 – BBox 내 지역별 발생 건수 집계
+//	  	countByRegionInBBox 쿼리 결과 검증 – ** BBox 내 지역별 발생 건수 집계 **
 //	    @Disabled
 	    @Test
 	    void countByRegionInBBox_ok() {
@@ -121,7 +123,7 @@ public class LandslideDaoTest {
 	    }
 	
 	
-	@Disabled
+//	@Disabled
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");
