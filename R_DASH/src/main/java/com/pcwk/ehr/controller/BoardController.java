@@ -6,10 +6,8 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
-
 import java.util.Map;
 import java.util.UUID;
-
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -70,7 +68,7 @@ public class BoardController {
     public String convertMarkdown(@RequestBody String markdownText) {
         return markdownService.convertToMarkdownHtml(markdownText);
     }
-
+	
     @PostMapping(value="/boardImageFile", produces="application/json")
     @ResponseBody
     public Map<String, Object> boardImageFile(@RequestParam("file") MultipartFile file) {
@@ -99,7 +97,6 @@ public class BoardController {
 
         return result;
     }
-
 	
 	@GetMapping("/doUpdateView.do")
 	public String doUpdateView(@RequestParam("boardNo") int boardNo,Model model,HttpSession session) throws SQLException{
