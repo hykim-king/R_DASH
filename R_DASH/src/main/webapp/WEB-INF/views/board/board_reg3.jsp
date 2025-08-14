@@ -223,14 +223,14 @@ function uploadSummernoteImage(file, editor) {
         processData: false,
         dataType: "json",
         success: function(data) {
-            console.log("서버 응답:", data); // 전체 객체 확인
+        	console.log("서버 응답:", data); // 전체 객체 확인
             console.log("data.url 값:", data.url); // url 속성만 확인
             // 항상 업로드된 파일의 URL이 있어야 한다.
             if (data.url) {
-            $(editor).summernote('insertImage', data.url);
-            } else {
-                console.error("서버 응답에 url 속성이 없습니다.", data);
-            }
+	        $(editor).summernote('insertImage', data.url);
+		    } else {
+		        console.error("서버 응답에 url 속성이 없습니다.", data);
+		    }
             if (typeof data === "string") {
                 try {
                     data = JSON.parse(data);

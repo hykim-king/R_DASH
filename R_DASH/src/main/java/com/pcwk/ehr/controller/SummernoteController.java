@@ -20,7 +20,7 @@ public class SummernoteController {
 		// TODO Auto-generated constructor stub
 	}
 	
-	@PostMapping("/summernoteImage")
+	@PostMapping("/uploadSummernoteImageFile")
     @ResponseBody
     public Map<String, Object> uploadSummernoteImage(@RequestParam("file") MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
