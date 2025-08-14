@@ -2,7 +2,7 @@ package com.pcwk.ehr.domain;
 
 import com.pcwk.ehr.cmn.DTO;
 
-public class Landslide extends DTO {
+public class LandslideDTO extends DTO {
 	private int lndApntCd    ;	//산사태 현황 구분번호  1= 경보 / 2 = 주의보
 	private String  lndApntNm    ;	//산사태 현황
 	private String  lndApntStts  ;	//예보발령상태
@@ -12,11 +12,11 @@ public class Landslide extends DTO {
 	private double  lon          ;	//경도
 	private Integer landslideNo  ;  //산사태 구분 번호
 	
-	public Landslide() {
+	public LandslideDTO() {
 	}
 
 
-	public Landslide(int lndApntCd, String lndApntNm, String lndApntStts, String lndApntDt, String lndInstNm,
+	public LandslideDTO(int lndApntCd, String lndApntNm, String lndApntStts, String lndApntDt, String lndInstNm,
 			double lat, double lon, Integer landslideNo) {
 		super();
 		this.lndApntCd = lndApntCd;

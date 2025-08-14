@@ -52,7 +52,7 @@ class ShelterDaoTest {
 //	전체 목록 조회
 	@Disabled
 	@Test
-	public void selectAllFsTest() {
+
 
 	public void selectAllFfsTest() {
 
@@ -102,7 +102,7 @@ class ShelterDaoTest {
 //	필수 기능 아님 ( 추후 구현 )
 //	@Disabled
 	@Test
-	public void suggestKeywordsTest() {
+	public void suggestKeywordTest() {
 		String q = "서울";
 		List<String> list = mapper.suggestKeyword(q);
 		log.debug("┌────────────────────────────────┐");

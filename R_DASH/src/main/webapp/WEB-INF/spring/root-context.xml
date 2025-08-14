@@ -64,20 +64,6 @@
     <bean id="passwordEncoder" 
     class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></bean>
         
-    <!-- 예외처리: 최종테스트에 열고 사용 하세요 -->
-<!--     <bean id="exceptionResolver" 
-       class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">
-        <property name="exceptionMappings">
-            <props>
-                <prop key="java.lang.ArithmeticException">
-                    cmn/arithmeticError
-                </prop>            
-            </props>
-
-        </property>  
-
-        <property name="defaultErrorView" value="cmn/error"></property>
-    </bean> -->
         
     <!-- fileupload -->
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
