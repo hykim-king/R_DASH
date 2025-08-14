@@ -71,35 +71,6 @@ public class BoardController {
         return markdownService.convertToMarkdownHtml(markdownText);
     }
 
-    @PostMapping(value="/boardImageFile", produces="application/json")
-    @ResponseBody
-    public Map<String, Object> boardImageFile(@RequestParam("file") MultipartFile file) {
-        Map<String, Object> result = new HashMap<>();
-
-        String fileRoot = "/upload/"; // 반드시 폴더 존재 확인
-        File dir = new File(fileRoot);
-        if (!dir.exists()) dir.mkdirs(); // 폴더 없으면 생성
-
-        try {
-            String originalFileName = file.getOriginalFilename();
-            String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-            String savedFileName = UUID.randomUUID().toString() + extension;
-
-            File targetFile = new File(fileRoot + savedFileName);
-            file.transferTo(targetFile); // Spring MultipartFile 기본 제공
-
-            result.put("url", "/summernoteImage/" + savedFileName);
-            result.put("responseCode", "success");
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            result.put("responseCode", "error");
-            result.put("message", e.getMessage());
-        }
-
-        return result;
-    }
-
 	
 	@GetMapping("/doUpdateView.do")
 	public String doUpdateView(@RequestParam("boardNo") int boardNo,Model model,HttpSession session) throws SQLException{
