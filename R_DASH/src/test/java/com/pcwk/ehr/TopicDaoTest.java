@@ -74,7 +74,7 @@ class TopicDaoTest {
 		assertEquals(25, outVO.size());
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void UpdateAndSelectOne() {
 		mapper.deleteAll();
@@ -109,7 +109,7 @@ class TopicDaoTest {
 	/**
 	 * 단 건 등록 -> 단 건 조회 -> 단 건 삭제 테스트
 	 */
-	@Disabled
+	//@Disabled
 	@Test
 	void SaveAndDelete() {
 		mapper.deleteAll();
@@ -124,7 +124,7 @@ class TopicDaoTest {
 
 	}
 
-	@Disabled
+	//@Disabled
 	@Test
 	void beans() {
 		assertNotNull(mapper);

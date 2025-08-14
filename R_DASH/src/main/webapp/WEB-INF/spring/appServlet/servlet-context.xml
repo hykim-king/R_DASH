@@ -89,7 +89,7 @@ class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 
 
 <!-- Summernote 이미지 접근 매핑 -->
-<resources mapping="/summernoteImage/**" location="/resources/uploads/" />
+<resources mapping="/summernoteImage/**" location="/resources/uploads/summernoteImage/" />
 
 
 
