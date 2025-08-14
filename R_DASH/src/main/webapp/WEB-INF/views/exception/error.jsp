@@ -18,8 +18,12 @@
           <div class="card bg-secondary border border-soft mb-0">
             <div class="card-header bg-transparent pb-5">
               <img src="/ehr/resources/image/error.png" alt="에러 아이콘" class="error-image" style="width:100%; height:95%; align:center;">
-			    <h1>에러 코드 : ${status }</h1>
-			    <p>내용 : ${message }</p>
+               <div class="text-center">
+			    <h1>${message }</h1>
+			    </div>
+			    <div class="text-center">
+			    <h2>에러 코드 : ${status }</h2>
+			    </div>
                 <div class="text-center">
                   <button type="button" onclick="location.href='/ehr/home'" id="loginButton" class="btn btn-default my-4">메인으로 이동</button>
                 </div>

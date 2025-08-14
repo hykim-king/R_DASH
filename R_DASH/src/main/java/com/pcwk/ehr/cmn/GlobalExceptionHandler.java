@@ -74,6 +74,6 @@ public class GlobalExceptionHandler {
 	public String handle500(Throwable ex, Model model, HttpServletResponse resp) {
 		String ref = UUID.randomUUID().toString().substring(0, 8); // 로그 추적용 ID
 		log.error("[ERR:{}] Unhandled exception", ref, ex);
-		return render(HttpStatus.INTERNAL_SERVER_ERROR.value(), "처리 중 오류가 발생했습니다. (코드: " + ref + ")", model, resp);
+		return render(HttpStatus.INTERNAL_SERVER_ERROR.value(), "처리 중 오류가 발생했습니다.", model, resp);
 	}
 }
