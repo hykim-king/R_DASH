@@ -43,15 +43,22 @@ class TemperatuerDaoTest {
 	@Autowired
 	ApplicationContext context;
 	
-	PatientsDTO patientsDTO;
-
+	PatientsDTO patientsDTO1;
+	PatientsDTO patientsDTO2;
+	PatientsDTO patientsDTO3;
+	PatientsDTO patientsDTO4;
+	PatientsDTO patientsDTO5;
 	
 	@BeforeEach
 	void setUp() throws Exception {
 		log.debug("┌────────────────────┐");
 		log.debug("│ setUp()            │");
 		log.debug("└────────────────────┘");
-		patientsDTO = new PatientsDTO(0, "서울", 2025, 330, 300, 30);
+		patientsDTO1 = new PatientsDTO(0, "서울", 2025, 330, 300, 30);
+		patientsDTO2 = new PatientsDTO(0, "서울", 2024, 450, 330, 120);
+		patientsDTO3 = new PatientsDTO(0, "인천", 2024, 260, 220, 40);
+		patientsDTO4 = new PatientsDTO(0, "서울", 2022, 230, 200, 30);
+		patientsDTO5 = new PatientsDTO(0, "서울", 2021, 140, 110, 30);
 	}
 
 	@AfterEach
@@ -61,9 +68,22 @@ class TemperatuerDaoTest {
 		log.debug("└────────────────────┘");
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
     void selectSidoPatients() throws SQLException {
+		// 1.삭제 후 등록
+		mapper.deleteAll();
+		log.debug("Count:{}",mapper.getCount());
+		assertEquals(0, mapper.getCount());
+				
+		// 2.5건 등록
+		mapper.insertPatient(patientsDTO1);
+		mapper.insertPatient(patientsDTO2);
+		mapper.insertPatient(patientsDTO3);
+		mapper.insertPatient(patientsDTO4);
+		mapper.insertPatient(patientsDTO5);
+		
+		// 3.지역 검색
         Map<String, Object> param = new HashMap<>();
         param.put("groupType", "year");
         param.put("year", ""); // 전체년도
@@ -82,6 +102,19 @@ class TemperatuerDaoTest {
 	@Disabled
 	@Test
 	void selectYearPatients() throws SQLException {
+		// 1.삭제 후 등록
+		mapper.deleteAll();
+		log.debug("Count:{}",mapper.getCount());
+		assertEquals(0, mapper.getCount());
+				
+		// 2.5건 등록
+		mapper.insertPatient(patientsDTO1);
+		mapper.insertPatient(patientsDTO2);
+		mapper.insertPatient(patientsDTO3);
+		mapper.insertPatient(patientsDTO4);
+		mapper.insertPatient(patientsDTO5);
+		
+		//3. 년도 검색
 		Map<String, Object> param = new HashMap<>();
         param.put("groupType", "region");
         param.put("year", "2024"); // 특정년도 필터
@@ -100,6 +133,21 @@ class TemperatuerDaoTest {
 	@Disabled
 	@Test
 	void doSelectAllPatients() throws SQLException {
+		// 1.삭제 후 등록
+		mapper.deleteAll();
+		log.debug("Count:{}",mapper.getCount());
+		assertEquals(0, mapper.getCount());
+				
+		// 2.5건 등록
+		mapper.insertPatient(patientsDTO1);
+		mapper.insertPatient(patientsDTO2);
+		mapper.insertPatient(patientsDTO3);
+		mapper.insertPatient(patientsDTO4);
+		mapper.insertPatient(patientsDTO5);
+		
+		assertEquals(5, mapper.getCount());
+		log.debug("mapper.getCount():{}",mapper.getCount());
+		
 		List<PatientsDTO> outVO = mapper.selectAllPatients();
 		log.debug("outVO:{}",outVO);
 	}
@@ -112,7 +160,7 @@ class TemperatuerDaoTest {
 		log.debug("Count:{}",mapper.getCount());
 		assertEquals(0, mapper.getCount());
 		// 2.한건 등록
-		int flag = mapper.insertPatient(patientsDTO);
+		int flag = mapper.insertPatient(patientsDTO1);
 		assertEquals(1, mapper.getCount());
 		log.debug("flag:{}",flag);
 		
@@ -130,7 +178,7 @@ class TemperatuerDaoTest {
 		log.debug("Count:{}",mapper.getCount());
 		assertEquals(0, mapper.getCount());
 		// 2.한건 등록
-		int flag = mapper.insertPatient(patientsDTO);
+		int flag = mapper.insertPatient(patientsDTO1);
 		assertEquals(1, mapper.getCount());
 		log.debug("flag:{}",flag);
 	}
