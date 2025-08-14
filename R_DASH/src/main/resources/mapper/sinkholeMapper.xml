@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pcwk.ehr.mapper.SinkholeMapper">
+
+<!-- 컬럼 묶음 -->
+<sql id="SinkholeColumns">
+    SINKHOLE_NO,
+    SIDO_NM,
+    SIGNGU_NM,
+    LAT,
+    LON,
+    OCCUR_DT,
+    DPRS_CNT,
+    INJPSN_CNT,
+    VEHCLE_CNT,   <!-- 여기 -->
+    STATE_NM,
+    COMPLT_DT
+</sql>
+
+<!-- resultMap -->
+<resultMap id="SinkholeMap" type="com.pcwk.ehr.domain.SinkholeDTO">
+    <id     property="sinkholeNo" column="SINKHOLE_NO"/>
+    <result property="sidoNm"     column="SIDO_NM"/>
+    <result property="signguNm"   column="SIGNGU_NM"/>
+    <result property="lat"        column="LAT"/>
+    <result property="lon"        column="LON"/>
+    <result property="occurDt"    column="OCCUR_DT"/>
+    <result property="dprsCnt"    column="DPRS_CNT"/>
+    <result property="injpsnCnt"  column="INJPSN_CNT"/>
+    <result property="vehcleCnt"  column="VEHCLE_CNT"/> <!-- 여기 -->
+    <result property="stateNm"    column="STATE_NM"/>
+    <result property="compltDt"   column="COMPLT_DT"/>
+</resultMap>
+
+    <!-- 지도: BBox + 키워드 + 날짜구간 -->
+    <select id="selectByBBox" resultMap="SinkholeMap">
+        SELECT
+            <include refid="SinkholeColumns"/>
+        FROM SINKHOLE
+        WHERE
+            LAT BETWEEN #{minLat} AND #{maxLat}
+            AND LON BETWEEN #{minLon} AND #{maxLon}
+
+        <if test="q != null and q != ''">
+            AND (
+                UPPER(SIDO_NM)   LIKE '%' || UPPER(#{q}) || '%'
+                OR UPPER(SIGNGU_NM) LIKE '%' || UPPER(#{q}) || '%'
+            )
+        </if>
+
+        <!-- 발생일자(from~to). to는 당일 포함 -->
+        <if test="from != null and from != ''">
+            AND OCCUR_DT &gt;= TO_DATE(#{from}, 'YYYY-MM-DD')
+        </if>
+        <if test="to != null and to != ''">
+            AND OCCUR_DT &lt;  TO_DATE(#{to}, 'YYYY-MM-DD') + 1
+        </if>
+
+        ORDER BY OCCUR_DT DESC, SINKHOLE_NO DESC
+        FETCH FIRST 500 ROWS ONLY
+    </select>
+
+    <!-- 단건 상세 -->
+    <select id="findById" parameterType="int" resultMap="SinkholeMap">
+        SELECT
+            <include refid="SinkholeColumns"/>
+        FROM SINKHOLE
+        WHERE SINKHOLE_NO = #{sinkholeNo}
+    </select>
+
+    <!-- 상태별 집계 -->
+    <select id="countByState" resultType="map">
+        SELECT NVL(STATE_NM, '미상') AS STATE_NM,
+               COUNT(*) AS CNT
+        FROM SINKHOLE
+        GROUP BY NVL(STATE_NM, '미상')
+        ORDER BY STATE_NM
+    </select>
+
+</mapper>
