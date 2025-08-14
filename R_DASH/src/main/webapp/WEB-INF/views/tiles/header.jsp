@@ -208,14 +208,6 @@
 		                  <span>회원 관리</span>
 		                </a>
 	                </c:if>
-	                <a href="#!" class="dropdown-item">
-	                  <i class="ni ni-calendar-grid-58"></i>
-	                  <span>Activity</span>
-	                </a>
-	                <a href="#!" class="dropdown-item">
-	                  <i class="ni ni-support-16"></i>
-	                  <span>Support</span>
-	                </a>
 	                <div class="dropdown-divider"></div>
 	                <a href="/ehr/user/logout" class="dropdown-item">
 	                  <i class="ni ni-user-run"></i>
