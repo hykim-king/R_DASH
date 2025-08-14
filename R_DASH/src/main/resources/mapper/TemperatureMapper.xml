@@ -2,6 +2,30 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pcwk.ehr.mapper.TemperatureMapper">
     
+    <select id="selectTopT1H" resultType="NowcastDTO">
+	    SELECT SIDO_NM, SIGNGU_NM, CATEGORY, OBSR_VALUE
+		FROM NOWCAST
+		WHERE CATEGORY = 'T1H'
+		ORDER BY OBSR_VALUE DESC
+		FETCH FIRST 5 ROWS ONLY
+	</select>
+	
+	<select id="selectTopREH" resultType="NowcastDTO">
+	    SELECT SIDO_NM, SIGNGU_NM, CATEGORY, OBSR_VALUE
+        FROM NOWCAST
+        WHERE CATEGORY = 'REH'
+        ORDER BY OBSR_VALUE DESC
+        FETCH FIRST 5 ROWS ONLY
+	</select>
+	
+	<select id="selectTopRN1" resultType="NowcastDTO">
+	    SELECT SIDO_NM, SIGNGU_NM, CATEGORY, OBSR_VALUE
+        FROM NOWCAST
+        WHERE CATEGORY = 'RN1'
+        ORDER BY OBSR_VALUE DESC
+        FETCH FIRST 5 ROWS ONLY
+	</select>
+
 	<update id="upsertNowcast" parameterType="java.util.List">
 	  MERGE INTO JM.NOWCAST t
 	  USING (
