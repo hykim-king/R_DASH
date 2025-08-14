@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pcwk.ehr.mapper.DustMapper">
+  <!-- ✅ TM이 DATE 타입일 때 -->
+<!-- TM이 VARCHAR2일 때 -->
+<sql id="whereDay"><![CDATA[
+  SUBSTR(TM, 1, 10) = #{day}
+]]></sql>
+  <select id="selectStationAvgAt10" resultType="com.pcwk.ehr.domain.DustDTO">
+    WITH base AS (
+      SELECT
+        STN_NM, LAT, LON, AVG, TM,
+        ROW_NUMBER() OVER (PARTITION BY STN_NM ORDER BY TM DESC) AS rn
+      FROM DUST
+      WHERE <include refid="whereDay"/>
+      <if test="minLat != null and minLon != null and maxLat != null and maxLon != null">
+        AND LAT BETWEEN #{minLat} AND #{maxLat}
+        AND LON BETWEEN #{minLon} AND #{maxLon}
+      </if>
+    )
+    SELECT
+      STN_NM   AS stnNm,
+      MAX(LAT) AS lat,
+      MAX(LON) AS lon,
+      MAX(AVG) AS avg
+    FROM base
+    WHERE rn = 1
+    GROUP BY STN_NM
+    ORDER BY STN_NM
+  </select>
+
+
+
+  <select id="selectLegendBucketsAt10" resultType="com.pcwk.ehr.domain.DustDTO">
+    SELECT
+      CASE
+        WHEN AVG > 30 THEN '경고'
+        WHEN AVG > 20 THEN '주의'
+        ELSE '관심'
+      END AS org,
+      COUNT(*) AS cnt
+    FROM DUST
+    WHERE <include refid="whereDay"/> AND AVG IS NOT NULL
+    GROUP BY
+      CASE
+        WHEN AVG > 30 THEN '경고'
+        WHEN AVG > 20 THEN '주의'
+        ELSE '관심'
+      END
+    ORDER BY 1
+  </select>
+
+  <select id="selectLatestByOrgAt10" resultType="com.pcwk.ehr.domain.DustDTO">
+    WITH ranked AS (
+      SELECT
+        STN_NM, ORG, LAT, LON, PM10, AVG, MAX, CNT, TM,
+        ROW_NUMBER() OVER (PARTITION BY STN_NM ORDER BY TM DESC) AS rn
+      FROM DUST
+      WHERE <include refid="whereDay"/>
+        <if test="org != null and org != ''">
+          AND ORG = #{org}
+        </if>
+        <if test="minLat != null and minLon != null and maxLat != null and maxLon != null">
+          AND LAT BETWEEN #{minLat} AND #{maxLat}
+          AND LON BETWEEN #{minLon} AND #{maxLon}
+        </if>
+    )
+    SELECT
+      STN_NM AS stnNm,
+      ORG,
+      LAT,
+      LON,
+      PM10,
+      AVG,
+      MAX,
+      CNT,
+      TM AS tm 
+    FROM ranked
+    WHERE rn = 1
+    ORDER BY STN_NM
+  </select>
+</mapper>

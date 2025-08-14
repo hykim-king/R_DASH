@@ -19,20 +19,22 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.google.gson.Gson;
 import com.pcwk.ehr.cmn.MessageDTO;
-import com.pcwk.ehr.domain.BoardDTO;
+import com.pcwk.ehr.cmn.PcwkString;
+import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.NewsDTO;
 import com.pcwk.ehr.domain.TopicDTO;
+import com.pcwk.ehr.domain.UserDTO;
 import com.pcwk.ehr.service.NewsService;
 
 @Controller
 @RequestMapping("/news")
-public class newsController {
+public class NewsController {
 	Logger log = LogManager.getLogger(getClass());
 	
 	@Autowired
 	NewsService service;
 	
-	public newsController() {
+	public NewsController() {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *newsController()*        │");
 		log.debug("└───────────────────────────┘");
@@ -43,7 +45,36 @@ public class newsController {
 	//3. 토픽 삭제 Post0
 	//4. 토픽 조회 Get0
 	//5. 토픽 단건 조회 Get0
-	//6. 뉴스 조회 Get0
+	//6. 뉴스 키워드 조회 Get0
+	//7. 뉴스 전체 조회 Get0
+	
+	@GetMapping(value="/doRetrieve.do", produces = "text/plain;charset=UTF-8")
+	public String doRetrieve(SearchDTO param, Model model) {
+		log.debug("┌───────────────────────────┐");
+		log.debug("│ *doRetrieve()*            │");
+		log.debug("└───────────────────────────┘");
+		log.debug("1. param:{}", param);
+		
+		String viewString = "news/news_page";
+		
+		//페이징 
+		int pageNo = PcwkString.nvlZero(param.getPageNo(), 1); //0이면 1 반환
+		int pageSize = PcwkString.nvlZero(param.getPageSize(), 10); //0이면 10 반환
+		
+		log.debug("pageNo:{}",pageNo);
+		log.debug("pageSize:{}",pageSize);
+		
+		param.setPageNo(pageNo);
+		param.setPageSize(pageSize);
+		
+		List<NewsDTO> list = service.doRetrieve(param);
+		
+		model.addAttribute("list",list);
+		model.addAttribute("search", param);
+		
+		return viewString;
+	}
+		
 	
 	@GetMapping("/doUpdateView.do")
 	public String doUpdateView(@RequestParam("topicNo") int topicNo,Model model,HttpSession session) throws SQLException{
@@ -187,13 +218,21 @@ public class newsController {
 	
 	@PostMapping(value = "doSave.do", produces = "text/plain;charset=UTF-8")
 	@ResponseBody
-	public String doSave(TopicDTO param) {
+	public String doSave(TopicDTO param,HttpSession session) {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *doSave()*                │");
 		log.debug("└───────────────────────────┘");
 		String jsonString = "";
 		
 		log.debug("param:{}", param);
+				
+		UserDTO user = (UserDTO) session.getAttribute("user");
+		
+//		if(user != null && user.getRole()==1) {
+//			param.setRegId(user.getEmail());
+//			param.setModId(user.getEmail());
+//		}
+		
 		
 		int flag = service.doSave(param);
 		
