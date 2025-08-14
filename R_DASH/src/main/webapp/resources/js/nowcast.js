@@ -1,55 +1,47 @@
-function loadTopWeather(category) {
+// T1H
+function loadT1HTable() {
     $.ajax({
         url: '/ehr/temperature/weather.do',
         type: 'GET',
+        data: { category: 'T1H' },
         success: function(data) {
-            // 선택한 category만 필터
-            let filtered = data.filter(d => d.category === category);
-
-            let labels = filtered.map(d => d.sidoNm);
-            let values = filtered.map(d => d.obsrValue);
-
-            console.log(filtered); // 데이터 확인용
-            console.log(labels, values);
-
-            let ctx = document.getElementById('weatherChart').getContext('2d');
-
-            // 기존 차트 제거
-            if(window.weatherChart) {
-                window.weatherChart.destroy();
-            }
-
-            // 막대 그래프 예시
-            window.weatherChart = new Chart(ctx, {
-                type: 'bar', // 필요하면 'horizontalBar' 또는 'radar' 등 변경 가능
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: category,
-                        data: values,
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    indexAxis: 'y', // 수평막대로
-                    scales: {
-                        x: { beginAtZero: true, title: { display: true, text: category } },
-                        y: { title: { display: true, text: '지역' } }
-                    }
-                }
+            let tbody = $('#t1hTable');
+            tbody.empty();
+            data.forEach((d, idx) => {
+                tbody.append(`<tr>
+                  <td>${idx + 1}</td>
+                  <td>${d.sidoNm} ${d.signguNm}</td>
+                  <td>${d.obsrValue}</td>
+                </tr>`);
             });
         }
     });
 }
 
-// 드롭다운 이벤트
-$('#dataTypeSelect').on('change', function() {
-    loadTopWeather(this.value);
+// REH + RN1
+function loadREHRN1Table() {
+    $.when(
+        $.ajax({ url: '/ehr/temperature/weather.do', data: { category: 'REH' } }),
+        $.ajax({ url: '/ehr/temperature/weather.do', data: { category: 'RN1' } })
+    ).done(function(rehData, rn1Data) {
+        let tbody = $('#rehRn1Table');
+        tbody.empty();
+        let rehValues = rehData[0];
+        let rn1Values = rn1Data[0];
+
+        for(let i=0; i<rehValues.length; i++){
+            tbody.append(`<tr>
+                <td>${i + 1}</td>
+                <td>${rehValues[i].sidoNm} ${rehValues[i].signguNm}</td>
+                <td>${rehValues[i].obsrValue}</td>
+                <td>${rn1Values[i].obsrValue}</td>
+            </tr>`);
+        }
+    });
+}
+
+// 페이지 로딩 시
+$(document).ready(function() {
+    loadT1HTable();
+    loadREHRN1Table();
 });
-
-// 페이지 로딩 시 초기 값
-loadTopWeather($('#dataTypeSelect').val());
-
