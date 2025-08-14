@@ -12,6 +12,10 @@ import com.pcwk.ehr.domain.PatientsDTO;
 @Mapper
 public interface TemperatureMapper {
 	
+	List<NowcastDTO> selectTopTemperature();
+    List<NowcastDTO> selectTopHumidity();
+    List<NowcastDTO> selectTopRainfall();
+	
 	int upsertNowcast(List<NowcastDTO> list);
 	
 	int insertPatient(PatientsDTO dto) throws SQLException;
