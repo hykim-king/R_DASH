@@ -64,6 +64,7 @@ class FirestationDaoTest {
 	}
 	
 	
+
 //	단건 조회
 //	@Disabled
 	@Test
@@ -79,8 +80,8 @@ class FirestationDaoTest {
 		log.debug("단건 조회: {}", dto);
 	}
 
-	
-//	지도 BBox + 키워드 기반 소방서 목록 조회
+
+//	지도 BBox + 키워드 기반 소방서 목록 회회
 //	@Disabled
 	@Test
 	public void selectByBBoxfsTest() {
@@ -103,9 +104,11 @@ class FirestationDaoTest {
 	
 	
 	
+
 	
 //	검색 시 자동 완성
 //	** 필수 기능 아님 ( 나중 구현 )**
+//	필수 기능 아님 ( 추후 구현 )
 //	@Disabled
 	@Test
 	public void suggestKeywordfsTest() {
@@ -120,8 +123,10 @@ class FirestationDaoTest {
 		log.debug("지역 자동완성 결과: {}", list);
 	}
 
+
 //	검색 시 자동 완성
 //	** 필수 기능 아님 ( 나중 구현 )**
+//	필수 기능 아님 ( 나중 구현 )
 //	@Disabled
 	@Test
 	public void suggestStationfsTest() {
@@ -138,8 +143,10 @@ class FirestationDaoTest {
 	
 	
 	
+
 //	지역명 기준 소방서 검색
 //	** 필수 기능 아님 ( 나중 구현 )**
+//	필수 기능 아님 ( 나중 구현 )
 //	@Disabled
 	@Test
 	public void listByAreafsTest() {
