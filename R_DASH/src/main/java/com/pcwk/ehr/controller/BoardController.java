@@ -6,8 +6,10 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+
 import java.util.Map;
 import java.util.UUID;
+
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -69,6 +71,36 @@ public class BoardController {
         return markdownService.convertToMarkdownHtml(markdownText);
     }
 	
+
+	@PostMapping(value="/boardImageFile", produces = "application/json")
+	@ResponseBody
+	public JsonObject boardImageFile(@RequestParam("file") MultipartFile file) throws IOException {
+		
+		JsonObject jsonObject = new JsonObject();
+		
+		String fileRoot = "C:\\Users\\user\\R_DASH\\R_DASH\\src\\main\\webapp\\resources\\uploads\\";
+		String originalFileName = file.getOriginalFilename();	//오리지날 파일명
+		String extension = PcwkString.getExt(originalFileName); //파일 확장자
+		
+		String savedFileName = PcwkString.getUUID()+extension;
+		
+		File targetFile = new File(fileRoot+savedFileName);
+		
+		try {
+			InputStream fileStream = file.getInputStream();
+			FileUtils.copyInputStreamToFile(fileStream, targetFile);	//파일 저장
+			jsonObject.addProperty("url", "/summernoteImage/"+savedFileName);
+			jsonObject.addProperty("responseCode", "success");
+			
+		}catch(IOException e) {
+			FileUtils.deleteQuietly(targetFile);	//저장된 파일 삭제
+			jsonObject.addProperty("responseCode", "error");
+			e.printStackTrace();
+		}
+	    
+        return jsonObject;
+	}
+
     @PostMapping(value="/boardImageFile", produces="application/json")
     @ResponseBody
     public Map<String, Object> boardImageFile(@RequestParam("file") MultipartFile file) {
@@ -97,6 +129,7 @@ public class BoardController {
 
         return result;
     }
+
 	
 	@GetMapping("/doUpdateView.do")
 	public String doUpdateView(@RequestParam("boardNo") int boardNo,Model model,HttpSession session) throws SQLException{

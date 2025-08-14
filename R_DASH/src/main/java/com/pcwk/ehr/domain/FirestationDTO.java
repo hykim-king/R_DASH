@@ -2,7 +2,7 @@ package com.pcwk.ehr.domain;
 
 import com.pcwk.ehr.cmn.DTO;
 
-public class FireStation extends DTO {
+public class FirestationDTO extends DTO {
 	private Integer stationNo    ;
 	private String  stationNm    ;
 	private String  area         ;
@@ -13,9 +13,9 @@ public class FireStation extends DTO {
 	private String  fireTp       ;
 	
 	
-	public FireStation() {}
+	public FirestationDTO() {}
 
-	public FireStation(Integer stationNo, String stationNm, String area, String fireNead, String tel, double lat,
+	public FirestationDTO(Integer stationNo, String stationNm, String area, String fireNead, String tel, double lat,
 			double lon, String fireTp) {
 		super();
 		this.stationNo = stationNo;
