@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pcwk.ehr.mapper.LandslideMapper">
+
+    <!-- DTO 매핑 -->
+    <!-- com.pcwk.ehr.domain.LandslideDTO 의 필드명 예시:
+         landslideNo, lndApntCd, lndApntNm, lndApntStts, lndApntDt, lndInstNm, lat, lon -->
+    <resultMap id="LandslideMap" type="com.pcwk.ehr.domain.LandslideDTO">
+        <id     property="landslideNo" column="LANDSLIDE_NO"/>
+        <result property="lndApntCd"   column="LND_APNT_CD"/>
+        <result property="lndApntNm"   column="LND_APNT_NM"/>
+        <result property="lndApntStts" column="LND_APNT_STTS"/>
+        <result property="lndApntDt"   column="LND_APNT_DT"/>
+        <result property="lndInstNm"   column="LND_INST_NM"/>
+        <result property="lat"         column="LAT"/>
+        <result property="lon"         column="LON"/>
+    </resultMap>
+
+    <!-- 공통 컬럼 묶음 -->
+    <sql id="LandslideColumns">
+        LANDSLIDE_NO,
+        LND_APNT_CD,
+        LND_APNT_NM,
+        LND_APNT_STTS,
+        LND_APNT_DT,
+        LND_INST_NM,
+        LAT,
+        LON
+    </sql>
+
+    <!-- BBox + 키워드(선택) -->
+    <select id="selectByBBox" resultMap="LandslideMap">
+        SELECT
+            <include refid="LandslideColumns"/>
+        FROM LANDSLIDE
+        WHERE
+            LAT BETWEEN #{minLat} AND #{maxLat}
+            AND LON BETWEEN #{minLon} AND #{maxLon}
+        <if test="q != null and q != ''">
+            AND (
+                UPPER(LND_INST_NM) LIKE '%' || UPPER(#{q}) || '%'
+                OR UPPER(LND_APNT_NM) LIKE '%' || UPPER(#{q}) || '%'
+                OR UPPER(LND_APNT_STTS) LIKE '%' || UPPER(#{q}) || '%'
+            )
+        </if>
+        ORDER BY LND_APNT_DT DESC, LANDSLIDE_NO DESC
+        FETCH FIRST 500 ROWS ONLY
+    </select>
+    
+    
+    
+        <!-- 단건 상세 -->
+    <select id="findById" resultMap="LandslideMap">
+        SELECT
+            <include refid="LandslideColumns"/>
+        FROM LANDSLIDE
+        WHERE LANDSLIDE_NO = #{landslideNo}
+    </select>
+    
+
+    <!-- 버블맵용: 지역별 COUNT (BBox 제한) -->
+    <select id="countByRegionInBBox" resultType="map">
+        SELECT
+            LND_INST_NM    AS region,
+            COUNT(*)       AS cnt,
+            MAX(LND_APNT_DT) AS latestDt
+        FROM LANDSLIDE
+        WHERE
+            LAT BETWEEN #{minLat} AND #{maxLat}
+            AND LON BETWEEN #{minLon} AND #{maxLon}
+        <if test="q != null and q != ''">
+            AND (
+                UPPER(LND_INST_NM) LIKE '%' || UPPER(#{q}) || '%'
+                OR UPPER(LND_APNT_NM) LIKE '%' || UPPER(#{q}) || '%'
+                OR UPPER(LND_APNT_STTS) LIKE '%' || UPPER(#{q}) || '%'
+            )
+        </if>
+        GROUP BY LND_INST_NM
+        ORDER BY cnt DESC
+        FETCH FIRST 300 ROWS ONLY
+    </select>
+
+</mapper>

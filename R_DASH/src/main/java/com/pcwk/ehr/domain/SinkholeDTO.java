@@ -2,7 +2,7 @@ package com.pcwk.ehr.domain;
 
 import com.pcwk.ehr.cmn.DTO;
 
-public class Sinkhole extends DTO{
+public class SinkholeDTO extends DTO{
 	private Integer sinkholeNo    ;	//고유 번호
 	private String  sidoNm        ;	//시도명
 	private String  signguNm      ;	//시군구명
@@ -15,10 +15,10 @@ public class Sinkhole extends DTO{
 	private String  stateNm       ;	//복구완료일자
 	private String  compltDt      ;	//지하침하정보(싱크롤)
 	
-	public Sinkhole() {
+	public SinkholeDTO() {
 	}
 
-	public Sinkhole(Integer sinkholeNo, String sidoNm, String signguNm, double lat, double lon, String occurDt,
+	public SinkholeDTO(Integer sinkholeNo, String sidoNm, String signguNm, double lat, double lon, String occurDt,
 			int dprsCnt, int injpsnCnt, int vehcleCnt, String stateNm, String compltDt) {
 		super();
 		this.sinkholeNo = sinkholeNo;
