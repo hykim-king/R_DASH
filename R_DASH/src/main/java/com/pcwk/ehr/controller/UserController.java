@@ -12,11 +12,13 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.UserDTO;
@@ -33,12 +35,10 @@ public class UserController {
 	UserMapper mapper;
 	
 	@GetMapping("error")
-	public String error() {
-		throw new RuntimeException("테스트 예외");
+	public String testException() {
 		
+		throw new NullPointerException();
 	}
-	
-	
 	
 	@GetMapping("userList")
 	public String userList(HttpServletRequest request,Model model) {

@@ -15,7 +15,7 @@
 			value="/WEB-INF/views/{1}/{2}.jsp"></put-attribute>
 	</definition>
 	
-	<definition name="user/error" extends="base-definition">
+	<definition name="exception/error" extends="base-definition">
         <put-attribute name="body"
             value="/WEB-INF/views/exception/error.jsp"></put-attribute>
     </definition>
