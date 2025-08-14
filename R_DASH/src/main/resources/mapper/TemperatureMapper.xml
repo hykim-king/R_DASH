@@ -120,7 +120,7 @@
 	
 	        <!-- 특정 지역의 년도별 합계 -->
 	        <if test="sidoNm != null and sidoNm != ''">
-	            SIDO_NM = #{sidoNm}
+	             AND SIDO_NM = #{sidoNm}
 	        </if>
 	    </where>
 	    <choose>
