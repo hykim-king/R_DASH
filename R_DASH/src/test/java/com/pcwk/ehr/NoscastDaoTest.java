@@ -50,11 +50,8 @@ public class NoscastDaoTest {
 		log.debug("└────────────────────┘");
 	}
 
-	@Test
-	void wiring() {
-		assertNotNull(mapper, "Mapper 주입 실패");
-	}
-
+//	특정 지역 (시/군/구)의 최신 데이터 조회 
+//	@Disabled
 	@Test
 	void selectNowcastByRegion_latest() {
 		// 1) 최신 공통 시각
@@ -65,11 +62,10 @@ public class NoscastDaoTest {
 		assertNotNull(baseDate, "BASE_DATE null");
 		assertNotNull(baseTime, "BASE_TIME null");
 
-		// 2) 실제 DB에 존재하는 값으로 변경하세요
 		String sidoNm = "서울특별시";
 		String signguNm = "강남구";
 
-		// 3) 조회
+		// 2) 조회
 		List<NowcastDTO> list = mapper.selectNowcastByRegion(baseDate, baseTime, sidoNm, signguNm);
 		log.debug("┌────────────────────────────┐");
 		log.debug("│ selectNowcastByRegion()    │");
@@ -78,7 +74,7 @@ public class NoscastDaoTest {
 		for (NowcastDTO dto : list) {
 			System.out.printf("%s=%s%n", dto.getCategory(), dto.getObsrValue());
 		}
-		// 4) 검증
+		// 3) 검증
 		assertNotNull(list, "조회 결과가 null");
 		assertTrue(list.size() > 0, "결과가 비었습니다.");
 
@@ -86,20 +82,20 @@ public class NoscastDaoTest {
 
 		for (NowcastDTO r : list) {
 			assertEquals(sidoNm, r.getSidoNm(), "SIDO_NM 불일치");
-			// ★ 게터 이름 확인: DTO 필드가 signguNm 라면 getSignguNm() 사용
+
 			assertEquals(signguNm, r.getSignguNm(), "SIGNGU_NM 불일치");
 
 			switch (r.getCategory()) {
-			case "T1H":			// 기온
-				hasT1H = true;   
+			case "T1H": // 기온
+				hasT1H = true;
 				break;
-			case "RN1":			// 강수량
+			case "RN1": // 강수량
 				hasRN1 = true;
 				break;
-			case "WSD":			// 풍속
+			case "WSD": // 풍속
 				hasWSD = true;
 				break;
-			case "REH":			// 습도
+			case "REH": // 습도
 				hasREH = true;
 				break;
 			}

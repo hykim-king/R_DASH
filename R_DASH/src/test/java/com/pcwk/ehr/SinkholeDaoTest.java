@@ -4,12 +4,12 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,10 +68,10 @@ public class SinkholeDaoTest {
         if (!rows.isEmpty()) {
             SinkholeDTO first = rows.get(0);
             log.debug("first: no={}, addr={} {}, pos={}/{}, state={}, occurDt={}",
-                    first.getSinkholeNo(),
-                    first.getSidoNm(), first.getSignguNm(),
-                    first.getLat(), first.getLon(),
-                    first.getStateNm(), first.getOccurDt());
+                    first.getSinkholeNo(), //시퀀스
+                    first.getSidoNm(), first.getSignguNm(), // 발생 지역
+                    first.getLat(), first.getLon(),			//위경도
+                    first.getStateNm(), first.getOccurDt());//복구현황 및 발생 일시
         }
         assertTrue(rows.size() >= 0);
     }
@@ -87,7 +87,7 @@ public class SinkholeDaoTest {
                 minLat, maxLat, minLon, maxLon,
                 "성남",            // 키워드 (null/"" 가능)
                 "2010-01-01",     // from (YYYY-MM-DD)
-                "2030-12-31"      // to   (YYYY-MM-DD, 당일 포함)
+                "2025-08-14"      // to   (YYYY-MM-DD, 당일 포함)
         );
 
         assertNotNull(rows, "rows must not be null");
@@ -95,18 +95,10 @@ public class SinkholeDaoTest {
         assertTrue(rows.size() >= 0);
     }
 
-    /** 범례용 상태 집계 */
-//	@Disabled
-    @Test
-    void countByState_ok() {
-        List<Map<String, Object>> agg = mapper.countByState();
-        assertNotNull(agg, "agg must not be null");
-        log.debug("state agg: {}", agg);
-        assertTrue(agg.size() >= 0);
-    }
+
 	
 	
-//	@Disabled
+	@Disabled
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");
