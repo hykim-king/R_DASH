@@ -70,36 +70,6 @@ public class BoardController {
     public String convertMarkdown(@RequestBody String markdownText) {
         return markdownService.convertToMarkdownHtml(markdownText);
     }
-	
-
-	@PostMapping(value="/boardImageFile", produces = "application/json")
-	@ResponseBody
-	public JsonObject boardImageFile(@RequestParam("file") MultipartFile file) throws IOException {
-		
-		JsonObject jsonObject = new JsonObject();
-		
-		String fileRoot = "C:\\Users\\user\\R_DASH\\R_DASH\\src\\main\\webapp\\resources\\uploads\\";
-		String originalFileName = file.getOriginalFilename();	//오리지날 파일명
-		String extension = PcwkString.getExt(originalFileName); //파일 확장자
-		
-		String savedFileName = PcwkString.getUUID()+extension;
-		
-		File targetFile = new File(fileRoot+savedFileName);
-		
-		try {
-			InputStream fileStream = file.getInputStream();
-			FileUtils.copyInputStreamToFile(fileStream, targetFile);	//파일 저장
-			jsonObject.addProperty("url", "/summernoteImage/"+savedFileName);
-			jsonObject.addProperty("responseCode", "success");
-			
-		}catch(IOException e) {
-			FileUtils.deleteQuietly(targetFile);	//저장된 파일 삭제
-			jsonObject.addProperty("responseCode", "error");
-			e.printStackTrace();
-		}
-	    
-        return jsonObject;
-	}
 
     @PostMapping(value="/boardImageFile", produces="application/json")
     @ResponseBody
