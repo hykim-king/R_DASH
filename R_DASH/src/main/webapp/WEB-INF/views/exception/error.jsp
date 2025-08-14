@@ -17,9 +17,9 @@
         <div class="col-lg-5 col-md-7">
           <div class="card bg-secondary border border-soft mb-0">
             <div class="card-header bg-transparent pb-5">
-              <img src="/ehr/resources/image/error.png" alt="에러 아이콘" class="error-image" style="width:394px; height:400px; align:center;">
-			    <h1>문제가 발생했습니다 ${ex }</h1>
-			    <p>이용에 불편을 드려 죄송합니다.<br>잠시 후 다시 시도해 주세요.</p>
+              <img src="/ehr/resources/image/error.png" alt="에러 아이콘" class="error-image" style="width:100%; height:95%; align:center;">
+			    <h1>에러 코드 : ${status }</h1>
+			    <p>내용 : ${message }</p>
                 <div class="text-center">
                   <button type="button" onclick="location.href='/ehr/home'" id="loginButton" class="btn btn-default my-4">메인으로 이동</button>
                 </div>
