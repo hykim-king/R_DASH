@@ -74,7 +74,7 @@ class BoardDaoTest {
 		assertEquals(1, view);
 
 	}
-	@Disabled
+	//@Disabled
 	@Test
 	void doRetrieve() {
 		log.debug("┌────────────────────┐");
@@ -100,7 +100,7 @@ class BoardDaoTest {
 	
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void doUpdate() {
 		log.debug("┌────────────────────┐");
@@ -130,7 +130,7 @@ class BoardDaoTest {
 		isSameBoard(inVO, outVO);
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void saveAndDelete() {
 		log.debug("┌────────────────────┐");
@@ -151,7 +151,7 @@ class BoardDaoTest {
 		assertEquals(0,mapper.getCount());
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");
