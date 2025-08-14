@@ -9,7 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,10 +49,8 @@ class ShelterDaoTest {
 	}
 
 //	전체 목록 조회
-	@Disabled
+//	@Disabled
 	@Test
-
-
 	public void selectAllFfsTest() {
 
 		List<ShelterDTO> list = mapper.selectAll();
@@ -61,14 +58,14 @@ class ShelterDaoTest {
 		log.debug("│ selectAllTest()    │");
 		log.debug("└────────────────────┘");
 
-		assertNotNull(list);
+		assertNotNull(list); // null 여부 확인
 		assertTrue(list.size() >= 0);
 		list.forEach(log::debug);
 		log.debug("전체 목록 건수: {}", list.size());
 	}
 
 //	단건 조회
-	@Disabled
+//	@Disabled
 	@Test
 	public void findByIdsTest() {
 		int testId = 1;
@@ -77,15 +74,13 @@ class ShelterDaoTest {
 		log.debug("│ findByIdTest()         │");
 		log.debug("└────────────────────────┘");
 
-		assertNotNull(dto);
+		assertNotNull(dto); // null 여부 확인
 		log.debug("단건 조회: {}", dto);
 
 	}
 
-
-
-//	지역 기준 목록 ( 나중 구현 )
-	@Disabled
+//	지역명으로 대피소 목록 조회
+//	@Disabled
 	@Test
 	public void listByAreasTest() {
 		String ronaDaddr = "서울";
@@ -94,11 +89,12 @@ class ShelterDaoTest {
 		log.debug("│ listByAreaTest()   │");
 		log.debug("└────────────────────┘");
 
-		assertNotNull(list);
+		assertNotNull(list);// null 여부 확인
 		log.debug("지역 기준 목록 건수: {}", list.size());
 		list.forEach(log::debug);
 	}
 
+//	지역 자동완성(키워드 기반
 //	필수 기능 아님 ( 추후 구현 )
 //	@Disabled
 	@Test
@@ -113,13 +109,9 @@ class ShelterDaoTest {
 		log.debug("지역 자동완성 결과: {}", list);
 	}
 
-	// BBox + 키워드 조회
-	// BBox 검색 건수 ( 지정된 지역 & 위경도 범위 내에 있는 데이터만 조회 )
-//	@Disabled
-
-
+//	지역명으로 대피소 목록 조회
 //	지역 기준 목록 ( 나중 구현 )
-	@Disabled
+//	@Disabled
 	@Test
 	public void listByAreafsTest() {
 		String ronaDaddr = "서울";
@@ -131,20 +123,6 @@ class ShelterDaoTest {
 		assertNotNull(list);
 		log.debug("지역 기준 목록 건수: {}", list.size());
 		list.forEach(log::debug);
-	}
-
-//	필수 기능 아님 ( 추후 구현 )
-//	@Disabled
-	@Test
-	public void suggestKeywordsTest() {
-		String q = "서울";
-		List<String> list = mapper.suggestKeyword(q);
-		log.debug("┌────────────────────────────────┐");
-		log.debug("│ suggestKeywordTest()           │");
-		log.debug("└────────────────────────────────┘");
-
-		assertNotNull(list);
-		log.debug("지역 자동완성 결과: {}", list);
 	}
 
 	// BBox + 키워드 조회
@@ -168,9 +146,8 @@ class ShelterDaoTest {
 		list.forEach(log::debug);
 	}
 
-
-
 	@Test
+//	@Disabled
 	void beans() {
 		log.debug("┌────────────────────┐");
 		log.debug("│ beans()            │");

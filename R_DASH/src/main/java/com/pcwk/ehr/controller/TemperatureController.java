@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.pcwk.ehr.domain.NowcastDTO;
 import com.pcwk.ehr.domain.PatientsDTO;
 import com.pcwk.ehr.service.TemperatureService;
 
@@ -24,7 +25,23 @@ public class TemperatureController {
     @Autowired
     private TemperatureService temperatureService;
     
-    @GetMapping("/summary")
+    @GetMapping("/weather.do")
+    @ResponseBody
+    public List<NowcastDTO> getTopWeather(
+            @RequestParam String category) {
+
+        switch (category) {
+            case "T1H":
+                return temperatureService.getTopTemperature();
+            case "REH":
+                return temperatureService.getTopHumidity();
+            case "RN1":
+                return temperatureService.getTopRainfall();
+            default:
+                return null;
+        }
+    }
+    @GetMapping("/summary.do")
     @ResponseBody
     public List<PatientsDTO> getPatientsSummary(
             @RequestParam(required = false) String groupType,
@@ -33,8 +50,13 @@ public class TemperatureController {
 
         Map<String, Object> param = new HashMap<>();
         param.put("groupType", groupType);
-        param.put("year", year);
         param.put("sidoNm", sidoNm);
+        if (year != null && !year.isEmpty()) {
+            param.put("year", Integer.parseInt(year));
+        } else {
+            param.put("year", null); // 연도가 선택되지 않으면 null을 전달
+        }
+        
 
         return temperatureService.selectPatientsSummary(param);
     }
@@ -59,7 +81,7 @@ public class TemperatureController {
     	return "NowCast 등록 완료!";
     }
     
-    @GetMapping("/patientsPage")
+    @GetMapping("/statsPage")
     public String patientsPage(Model model) throws SQLException {
         List<String> yearList = temperatureService.getYearList();
         List<String> sidoList = temperatureService.getSidoList();
@@ -67,7 +89,7 @@ public class TemperatureController {
         model.addAttribute("yearList", yearList);
         model.addAttribute("sidoList", sidoList);
 
-        return "stats/Test1";
+        return "stats/statsMain";
     }
 
     @GetMapping("/main.do")
