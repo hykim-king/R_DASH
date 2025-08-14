@@ -114,8 +114,8 @@
 	    FROM PATIENTS
 	    <where>
 	        <!-- 특정 년도의 지역별 합계 -->
-	        <if test="year != null">
-	             AND YEAR = #{year}
+	        <if test="year != null and year != ''">
+	            YEAR = #{year}
 	        </if>
 	
 	        <!-- 특정 지역의 년도별 합계 -->

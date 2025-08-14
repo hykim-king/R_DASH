@@ -48,7 +48,7 @@
 		           #{regId},
 		           SYSDATE,
 		           #{regId},
-		           #{topicRatio} )
+		           #{topicRatio, jdbcType=DECIMAL})
     </insert>
     <update id="doUpdate" parameterType="TopicDTO">
         UPDATE topic

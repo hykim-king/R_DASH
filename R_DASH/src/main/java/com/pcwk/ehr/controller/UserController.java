@@ -32,8 +32,6 @@ public class UserController {
 	@Autowired
 	UserMapper mapper;
 	
-	
-	
 	@GetMapping("userList")
 	public String userList(HttpServletRequest request,Model model) {
 		String viewName = "user/userList";

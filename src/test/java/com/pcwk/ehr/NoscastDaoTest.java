@@ -1,23 +1,18 @@
 package com.pcwk.ehr;
 
 
-import com.pcwk.ehr.domain.NowcastDTO;
-import com.pcwk.ehr.mapper.NowcastMapper;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.*;
-
+// ★ JUnit5 assertions
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +21,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-
-import java.util.List;
-import java.util.Map;
-
-
-import static org.junit.jupiter.api.Assertions.*; // ★ JUnit5 assertions
+import com.pcwk.ehr.domain.NowcastDTO;
+import com.pcwk.ehr.mapper.NowcastMapper;
 
 @WebAppConfiguration
 @ExtendWith(SpringExtension.class)
