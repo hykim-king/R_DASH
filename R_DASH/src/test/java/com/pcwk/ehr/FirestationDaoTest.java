@@ -9,7 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,18 +17,18 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import com.pcwk.ehr.domain.ShelterDTO;
-import com.pcwk.ehr.mapper.ShelterMapper;
+import com.pcwk.ehr.domain.FirestationDTO;
+import com.pcwk.ehr.mapper.FirestationMapper;
 
 @WebAppConfiguration
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/root-context.xml",
 		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml" })
-class ShelterDaoTest {
+class FirestationDaoTest {
 	Logger log = LogManager.getLogger(getClass());
 
 	@Autowired
-	ShelterMapper mapper;
+	FirestationMapper mapper;
 
 	@Autowired
 	ApplicationContext context;
@@ -49,127 +48,113 @@ class ShelterDaoTest {
 		log.debug("└────────────────────┘");
 	}
 
-//	전체 목록 조회
-	@Disabled
 	@Test
-
-
 	public void selectAllFfsTest() {
-
-		List<ShelterDTO> list = mapper.selectAll();
+		List<FirestationDTO> list = mapper.selectAll();
 		log.debug("┌────────────────────┐");
 		log.debug("│ selectAllTest()    │");
 		log.debug("└────────────────────┘");
-
+		
 		assertNotNull(list);
 		assertTrue(list.size() >= 0);
-		list.forEach(log::debug);
 		log.debug("전체 목록 건수: {}", list.size());
+		list.forEach(log::debug);
 	}
-
-//	단건 조회
-	@Disabled
+	
+	
+	
+//	@Disabled
 	@Test
-	public void findByIdsTest() {
-		int testId = 1;
-		ShelterDTO dto = mapper.findById(testId);
+	public void findByIdfsTest() {
+		int testId = 1; 
+		FirestationDTO dto = mapper.findById(testId);
 		log.debug("┌────────────────────────┐");
 		log.debug("│ findByIdTest()         │");
 		log.debug("└────────────────────────┘");
-
+		
+		
 		assertNotNull(dto);
 		log.debug("단건 조회: {}", dto);
-
 	}
 
-
-
-//	지역 기준 목록 ( 나중 구현 )
-	@Disabled
-	@Test
-	public void listByAreasTest() {
-		String ronaDaddr = "서울";
-		List<ShelterDTO> list = mapper.listByArea(ronaDaddr);
-		log.debug("┌────────────────────┐");
-		log.debug("│ listByAreaTest()   │");
-		log.debug("└────────────────────┘");
-
-		assertNotNull(list);
-		log.debug("지역 기준 목록 건수: {}", list.size());
-		list.forEach(log::debug);
-	}
-
-//	필수 기능 아님 ( 추후 구현 )
+	
+	
 //	@Disabled
 	@Test
-	public void suggestKeywordTest() {
-		String q = "서울";
-		List<String> list = mapper.suggestKeyword(q);
-		log.debug("┌────────────────────────────────┐");
-		log.debug("│ suggestKeywordTest()           │");
-		log.debug("└────────────────────────────────┘");
-
-		assertNotNull(list);
-		log.debug("지역 자동완성 결과: {}", list);
-	}
-
-	// BBox + 키워드 조회
-	// BBox 검색 건수 ( 지정된 지역 & 위경도 범위 내에 있는 데이터만 조회 )
-//	@Disabled
-
-
-//	지역 기준 목록 ( 나중 구현 )
-	@Disabled
-	@Test
-	public void listByAreafsTest() {
-		String ronaDaddr = "서울";
-		List<ShelterDTO> list = mapper.listByArea(ronaDaddr);
-		log.debug("┌────────────────────┐");
-		log.debug("│ listByAreaTest()   │");
-		log.debug("└────────────────────┘");
-
-		assertNotNull(list);
-		log.debug("지역 기준 목록 건수: {}", list.size());
-		list.forEach(log::debug);
-	}
-
-//	필수 기능 아님 ( 추후 구현 )
-//	@Disabled
-	@Test
-	public void suggestKeywordsTest() {
-		String q = "서울";
-		List<String> list = mapper.suggestKeyword(q);
-		log.debug("┌────────────────────────────────┐");
-		log.debug("│ suggestKeywordTest()           │");
-		log.debug("└────────────────────────────────┘");
-
-		assertNotNull(list);
-		log.debug("지역 자동완성 결과: {}", list);
-	}
-
-	// BBox + 키워드 조회
-	// BBox 검색 건수 ( 지정된 지역 & 위경도 범위 내에 있는 데이터만 조회 )
-//	@Disabled
-	@Test
-	public void selectByBBoxsTest() {
+	public void selectByBBoxfsTest() {
 		double minLat = 37.0;
 		double maxLat = 38.0;
 		double minLon = 126.0;
 		double maxLon = 127.0;
 		String q = "서울"; // 키워드 없으면 null 가능
 
-		List<ShelterDTO> list = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, q);
+		List<FirestationDTO> list = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, q);
 		log.debug("┌────────────────────────────┐");
 		log.debug("│ selectByBBoxTest()         │");
 		log.debug("└────────────────────────────┘");
-
+		
+		
 		assertNotNull(list);
 		log.debug("BBox 검색 건수: {}", list.size());
 		list.forEach(log::debug);
 	}
+	
+	
+	
+//	필수 기능 아님 ( 추후 구현 )
+//	@Disabled
+	@Test
+	public void suggestKeywordfsTest() {
+		String q = "서울";
+		List<String> list = mapper.suggestKeyword(q);
+		log.debug("┌────────────────────┐");
+		log.debug("│ suggestKeywordTest()         │");
+		log.debug("└────────────────────┘");
+		
+		
+		assertNotNull(list);
+		log.debug("지역 자동완성 결과: {}", list);
+	}
+
+	
+//	필수 기능 아님 ( 나중 구현 )
+//	@Disabled
+	@Test
+	public void suggestStationfsTest() {
+		String q = "중부";
+		List<String> list = mapper.suggestStation(q);
+		log.debug("┌──────────────────────────────┐");
+		log.debug("│ suggestStationTest()         │");
+		log.debug("└──────────────────────────────┘");
+		
+		
+		assertNotNull(list);
+		log.debug("소방서명 자동완성 결과: {}", list);
+	}
+	
+	
+	
+	
+//	필수 기능 아님 ( 나중 구현 )
+//	@Disabled
+	@Test
+	public void listByAreafsTest() {
+		String area = "서울";
+		List<FirestationDTO> list = mapper.listByArea(area);
+		log.debug("┌────────────────────┐");
+		log.debug("│ listByAreaTest()   │");
+		log.debug("└────────────────────┘");
+		
+		
+		assertNotNull(list);
+		log.debug("지역 기준 목록 건수: {}", list.size());
+		list.forEach(log::debug);
+	}
+	
+	
 
 
-
+//	@Disabled
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");
