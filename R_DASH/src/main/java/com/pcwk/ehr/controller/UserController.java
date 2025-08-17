@@ -210,13 +210,13 @@ public class UserController {
 
 	@GetMapping("logout")
 	public String logout(HttpSession session) {
-
+		log.debug("loginUser:{}",session.getAttribute("loginUser"));
 		if (null != session.getAttribute("loginUser")) {
 			// 서션 삭제
 			session.invalidate();
 		}
 
-		return "redirect:login";
+		return "redirect:/home";
 	}
 
 	@GetMapping("regist")
