@@ -121,7 +121,7 @@ def naver_news_api(qeury):
     # 요청 파라미터
     params = {
         "query": qeury,
-        "display": 1,  # 결과 5개만
+        "display": 10,  # 결과 5개만
         "start": 1,
         "sort": "date"  # 정확도순 , data : 날짜순 내림차순
     }
