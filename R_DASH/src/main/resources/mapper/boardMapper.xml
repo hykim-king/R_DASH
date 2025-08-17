@@ -26,7 +26,6 @@
         SELECT TT1.rnum AS no,
                TT1.board_no,
                TT1.title,
-               TT1.image,
                TT1.view_cnt,
                DECODE(TO_CHAR(SYSDATE, 'YYYY.MM.DD'), 
                      TO_CHAR(TT1.mod_dt, 'YYYY.MM.DD'),
@@ -66,7 +65,6 @@
             SELECT LEVEL board_no,
                     '제목'||LEVEL title,
                 '내용'||LEVEL contents,
-                '397839829850900'||LEVEL||'.png' image,
                 Level AS viewCnt,
                 sysdate - LEVEL reg_dt,
                 DECODE(MOD(LEVEL,2),1,'james','admin') reg_id,
@@ -81,7 +79,6 @@
             board_no,
             title,
             contents,
-            image,
             view_cnt,
             TO_CHAR(mod_dt,'YY.MM.DD HH24:MI') as modDt,
             mod_id
@@ -106,7 +103,6 @@
 		SET
 		    title = #{title, jdbcType=VARCHAR},
 		    contents = #{contents, jdbcType=VARCHAR},
-		    image = #{image, jdbcType=VARCHAR},
 		    mod_dt = SYSDATE,
 		    mod_id = #{modId, jdbcType=VARCHAR}
 		WHERE
@@ -120,7 +116,6 @@
 	  INSERT INTO board (
 	    title,
 	    contents,
-	    image,
 	    view_cnt,
 	    reg_dt,
 	    reg_id,
@@ -129,7 +124,6 @@
 	  ) VALUES (
 	    #{title, jdbcType=VARCHAR},
 	    #{contents, jdbcType=VARCHAR},
-	    #{image, jdbcType=VARCHAR},
 	    0,
 	    SYSDATE,
 	    #{regId, jdbcType=VARCHAR},
