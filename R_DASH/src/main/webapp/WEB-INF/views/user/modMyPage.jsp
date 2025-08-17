@@ -134,43 +134,18 @@
           });
 		  
 	  });
-	  document.querySelector('#deleteButton').addEventListener('click',function(){
-          const inputPw = prompt("비밀번호를 입력하세요:");
-          if (inputPw === null) { // 사용자가 취소 클릭
-              return;
-          }
-          
-          $.ajax({
-              method:"POST",    //GET/POST
-              url:"/ehr/user/deleteUser", //서버측 URL
-              dataType:"json",//서버에서 받을 데이터 타입
-              data:{
-            	"password":inputPw  
-              },
-              success:function(result){//요청 실패
-                  if(false === result.success){
-                      alert(result.message);
-
-                      return;
-                  }else{
-                      alert(result.message);
-                      
-                      window.location.href='/ehr/user/login';
-                  } 
-                      
-              },
-              error:function(result){//요청 실패
-                  console.log("error:"+result)
-                  alert(result);
-              }
-              
-              
-          });
-      });
+	  
+	// 비밀번호 탈퇴 시 엔터키 
+	  document.getElementById("passwordInput").addEventListener("keydown", function(e) {
+	      if (e.key === "Enter") {
+	          e.preventDefault(); // 폼 자동 제출 방지
+	          submitPassword();
+	      }
+	  });
 	  
   });
    
-  
+  //다음 주소 api
   function searchAddress(){
 	    new daum.Postcode({
 	        oncomplete: function(data) {
@@ -181,6 +156,51 @@
 	        }
 	    }).open();
 	}
+  // 회원 탈퇴 버튼 클릭
+function openPasswordPrompt() {
+	document.body.appendChild(document.getElementById("passwordModal"));
+    document.getElementById("passwordModal").style.display = "block";
+    document.getElementById("passwordInput").focus();
+}
+  
+function closePasswordPrompt() {
+    document.getElementById("passwordModal").style.display = "none";
+    document.getElementById("passwordInput").value = '';
+}
+
+function submitPassword() {
+    const pwd = document.getElementById("passwordInput").value;
+    document.getElementById("passwordInput").value = '';
+    closePasswordPrompt();
+    
+    $.ajax({
+        method:"POST",    //GET/POST
+        url:"/ehr/user/deleteUser", //서버측 URL
+        dataType:"json",//서버에서 받을 데이터 타입
+        data:{
+      	"password":pwd  
+        },
+        success:function(result){//요청 실패
+            if(false === result.success){
+                alert(result.message);
+
+                return;
+            }else{
+                alert(result.message);
+                
+                window.location.href='/ehr/user/login';
+            } 
+                
+        },
+        error:function(result){//요청 실패
+            console.log("error:"+result)
+            alert(result);
+        }
+        
+        
+    });
+    
+}
   </script>
 </head>
 <body>
@@ -201,6 +221,14 @@
     </div>
     <!-- Page content -->
     <div class="container-fluid mt--6">
+      <div id="passwordModal" class="card" style="display:none; width:350px; position:fixed; top:40%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; border:1px solid #ccc;">
+		    <p>비밀번호를 입력하세요:</p>
+		    <input class="form-control" type="password" id="passwordInput">
+		    <div class="text-center" style="margin-top:15px;">
+			    <button class="btn btn-lg btn-default" onclick="javascript:submitPassword()">확인</button>
+			    <button class="btn btn-lg btn-default" onclick="javascript:closePasswordPrompt()">취소</button>
+		    </div>
+		</div>
       <div class="row">
         <div class="col-xl-4 order-xl-2">
           <div class="card card-profile">
@@ -261,7 +289,7 @@
                 </div>
                 <div class="col-4 text-right">
                   <button class="btn btn-lg btn-default" id="updateButton">수정</button>
-                  <button class="btn btn-lg btn-default" id="deleteButton">탈퇴</button>
+                  <button class="btn btn-lg btn-default" id="deleteButton" onclick="javascript:openPasswordPrompt()">탈퇴</button>
                   
                 </div>
               </div>

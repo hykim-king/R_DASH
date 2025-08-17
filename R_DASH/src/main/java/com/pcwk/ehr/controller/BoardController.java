@@ -100,6 +100,7 @@ public class BoardController {
                     os.write(imageBytes);
                 }
 
+
                 publicUrl = "/ehr/summernote/" + saveName; // ResourceHandler 매핑 기준 URL
             } else {
                 publicUrl = imageUrl;
