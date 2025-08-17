@@ -4,82 +4,74 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pcwk.ehr.mapper.DustMapper">
-  <!-- ✅ TM이 DATE 타입일 때 -->
-<!-- TM이 VARCHAR2일 때 -->
-<sql id="whereDay"><![CDATA[
-  SUBSTR(TM, 1, 10) = #{day}
-]]></sql>
-  <select id="selectStationAvgAt10" resultType="com.pcwk.ehr.domain.DustDTO">
+
+  <!-- DTO 매핑 : DustDTO의 필드명에 맞춰 수정 -->
+  <resultMap id="DustMap" type="com.pcwk.ehr.domain.DustDTO">
+    <id     property="dustNo"  column="DUST_NO"/>
+    <result property="stnNm"   column="STN_NM"/>
+    <result property="lat"     column="LAT"/>
+    <result property="lon"     column="LON"/>
+    <result property="avg"     column="AVG"/>
+    <result property="tmDate"  column="TM_DATE"/>
+    <result property="airType" column="AIR_TYPE"/>
+  </resultMap>
+
+  <!-- 공통 컬럼 묶음 -->
+  <sql id="dustColumns">
+    STN_NM, LAT, LON, AVG, TM_DATE, AIR_TYPE
+  </sql>
+
+  <!-- 핵심 서브쿼리: airType(+옵션 day, BBox)에서 측정소별 최신 1건 -->
+  <sql id="latestPerStationBase">
     WITH base AS (
       SELECT
-        STN_NM, LAT, LON, AVG, TM,
-        ROW_NUMBER() OVER (PARTITION BY STN_NM ORDER BY TM DESC) AS rn
-      FROM DUST
-      WHERE <include refid="whereDay"/>
-      <if test="minLat != null and minLon != null and maxLat != null and maxLon != null">
-        AND LAT BETWEEN #{minLat} AND #{maxLat}
-        AND LON BETWEEN #{minLon} AND #{maxLon}
+        d.STN_NM,
+        d.LAT,
+        d.LON,
+        d.AVG,
+        d.TM_DATE,
+        d.AIR_TYPE,
+        ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) AS rn
+      FROM DUST d
+      WHERE d.AIR_TYPE = #{airType}
+      <!-- 날짜가 TIMESTAMP/DATE 어느쪽이든 안전하게 TRUNC 비교 -->
+      <if test="day != null and day != ''">
+        AND TRUNC(d.TM_DATE) = TO_DATE(#{day}, 'YYYY-MM-DD')
+      </if>
+      <if test="minLat != null and maxLat != null and minLon != null and maxLon != null">
+        AND d.LAT BETWEEN #{minLat} AND #{maxLat}
+        AND d.LON BETWEEN #{minLon} AND #{maxLon}
       </if>
     )
     SELECT
-      STN_NM   AS stnNm,
-      MAX(LAT) AS lat,
-      MAX(LON) AS lon,
-      MAX(AVG) AS avg
-    FROM base
-    WHERE rn = 1
-    GROUP BY STN_NM
-    ORDER BY STN_NM
+      b.STN_NM,
+      b.LAT,
+      b.LON,
+      b.AVG,
+      b.TM_DATE,
+      b.AIR_TYPE
+    FROM base b
+    WHERE b.rn = 1
+  </sql>
+
+  <!-- 1) BBox 버전 -->
+  <select id="selectLatestByTypeBBox" resultMap="DustMap">
+    SELECT <include refid="dustColumns"/>
+    FROM ( <include refid="latestPerStationBase"/> )
+    ORDER BY TM_DATE DESC, STN_NM
+    <if test="limit != null">
+      FETCH FIRST #{limit} ROWS ONLY
+    </if>
   </select>
 
-
-
-  <select id="selectLegendBucketsAt10" resultType="com.pcwk.ehr.domain.DustDTO">
-    SELECT
-      CASE
-        WHEN AVG > 30 THEN '경고'
-        WHEN AVG > 20 THEN '주의'
-        ELSE '관심'
-      END AS org,
-      COUNT(*) AS cnt
-    FROM DUST
-    WHERE <include refid="whereDay"/> AND AVG IS NOT NULL
-    GROUP BY
-      CASE
-        WHEN AVG > 30 THEN '경고'
-        WHEN AVG > 20 THEN '주의'
-        ELSE '관심'
-      END
-    ORDER BY 1
+  <!-- 2) 전국 버전 (BBox 파라미터 없이 호출하면 자동으로 전국) -->
+  <select id="selectLatestByTypeAll" resultMap="DustMap">
+    SELECT <include refid="dustColumns"/>
+    FROM ( <include refid="latestPerStationBase"/> )
+    ORDER BY TM_DATE DESC, STN_NM
+    <if test="limit != null">
+      FETCH FIRST #{limit} ROWS ONLY
+    </if>
   </select>
 
-  <select id="selectLatestByOrgAt10" resultType="com.pcwk.ehr.domain.DustDTO">
-    WITH ranked AS (
-      SELECT
-        STN_NM, ORG, LAT, LON, PM10, AVG, MAX, CNT, TM,
-        ROW_NUMBER() OVER (PARTITION BY STN_NM ORDER BY TM DESC) AS rn
-      FROM DUST
-      WHERE <include refid="whereDay"/>
-        <if test="org != null and org != ''">
-          AND ORG = #{org}
-        </if>
-        <if test="minLat != null and minLon != null and maxLat != null and maxLon != null">
-          AND LAT BETWEEN #{minLat} AND #{maxLat}
-          AND LON BETWEEN #{minLon} AND #{maxLon}
-        </if>
-    )
-    SELECT
-      STN_NM AS stnNm,
-      ORG,
-      LAT,
-      LON,
-      PM10,
-      AVG,
-      MAX,
-      CNT,
-      TM AS tm 
-    FROM ranked
-    WHERE rn = 1
-    ORDER BY STN_NM
-  </select>
 </mapper>
