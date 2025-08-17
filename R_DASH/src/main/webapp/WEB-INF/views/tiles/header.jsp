@@ -147,77 +147,77 @@
     <nav class="navbar navbar-horizontal navbar-expand-lg navbar-dark bg-warning">
       <div class="container-fluid">
         <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
-		  <c:choose>
-		  	<c:when test="${empty sessionScope.loginUser}">   
-		  	<ul class="navbar-nav align-items-center">
-	            <li class="nav-item dropdown"> 
-	               <a class="nav-link pr-0" href="/ehr/user/login" role="button" data-toggle="dropdown" aria-haspopup="false">
-	                 <div class="media align-items-center">
-	                    <span class="avatar avatar-sm rounded-circle">
-	               	      <img alt="Image placeholder" src="/ehr/resources/image/profile/defaultProfile.jpg">    
-	                    </span>
-	                    <div class="media-body  ml-2  d-none d-lg-block">
-	                      <span class="mb-0 text-sm  font-weight-bold">비회원</span>
-	                    </div>
-	                  </div>
-	                </a>
-	                <div class="dropdown-menu  dropdown-menu-right ">
-	                <div class="dropdown-header noti-title">
-	                  <h6 class="text-overflow m-0">환영합니다!</h6>
-	                </div>
-	                <a href="/ehr/user/login" class="dropdown-item">
-	                  <i class="ni ni-single-02"></i>
-	                  <span>로그인</span>
-	                </a>
-	                <a href="/ehr/user/regist" class="dropdown-item">
-	                  <i class="ni ni-settings-gear-65"></i>
-	                  <span>회원가입</span>
-	                </a>
-	              </div>
-	            </li>
-	        </ul>
+          <c:choose>
+            <c:when test="${empty sessionScope.loginUser}">   
+            <ul class="navbar-nav align-items-center">
+                <li class="nav-item dropdown"> 
+                   <a class="nav-link pr-0" href="/ehr/user/login" role="button" data-toggle="dropdown" aria-haspopup="false">
+                     <div class="media align-items-center">
+                        <span class="avatar avatar-sm rounded-circle">
+                          <img alt="Image placeholder" src="/ehr/resources/image/profile/defaultProfile.jpg">    
+                        </span>
+                        <div class="media-body  ml-2  d-none d-lg-block">
+                          <span class="mb-0 text-sm  font-weight-bold">비회원</span>
+                        </div>
+                      </div>
+                    </a>
+                    <div class="dropdown-menu  dropdown-menu-right ">
+                    <div class="dropdown-header noti-title">
+                      <h6 class="text-overflow m-0">환영합니다!</h6>
+                    </div>
+                    <a href="/ehr/user/login" class="dropdown-item">
+                      <i class="ni ni-single-02"></i>
+                      <span>로그인</span>
+                    </a>
+                    <a href="/ehr/user/regist" class="dropdown-item">
+                      <i class="ni ni-settings-gear-65"></i>
+                      <span>회원가입</span>
+                    </a>
+                  </div>
+                </li>
+            </ul>
             </c:when>
             <c:otherwise>
               <ul class="navbar-nav align-items-center">
-	            <li class="nav-item dropdown">
-	              <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-	                <div class="media align-items-center">
-	                  <span class="avatar avatar-sm rounded-circle">
-	               	    <img alt="Image placeholder" src="/ehr/resources/image/profile/${sessionScope.loginUser.image}">    
-	                  </span>
-	                  <div class="media-body  ml-2  d-none d-lg-block">
-	                    <span class="mb-0 text-sm  font-weight-bold">${sessionScope.loginUser.name}</span>
-	                  </div>
-	                </div>
-	              </a>
-	              <div class="dropdown-menu  dropdown-menu-right ">
-	                <div class="dropdown-header noti-title">
-	                  <h6 class="text-overflow m-0">환영합니다!</h6>
-	                </div>
-	                <a href="/ehr/user/myPage" class="dropdown-item">
-	                  <i class="ni ni-single-02"></i>
-	                  <span>마이페이지</span>
-	                </a>
-	                <a href="/ehr/user/changePw" class="dropdown-item">
-	                  <i class="ni ni-settings-gear-65"></i>
-	                  <span>비밀번호 변경</span>
-	                </a>
-	                <c:if test="${sessionScope.loginUser.role==1 }">
-		                <a href="/ehr/user/userList" class="dropdown-item">
-		                  <i class="ni ni-calendar-grid-58"></i>
-		                  <span>회원 관리</span>
-		                </a>
-	                </c:if>
-	                <div class="dropdown-divider"></div>
-	                <a href="/ehr/user/logout" class="dropdown-item">
-	                  <i class="ni ni-user-run"></i>
-	                  <span>로그아웃</span>
-	                </a>
-	              </div>
-	            </li>
-	          </ul>    
+                <li class="nav-item dropdown">
+                  <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <div class="media align-items-center">
+                      <span class="avatar avatar-sm rounded-circle">
+                        <img alt="Image placeholder" src="/ehr/resources/image/profile/${sessionScope.loginUser.image}">    
+                      </span>
+                      <div class="media-body  ml-2  d-none d-lg-block">
+                        <span class="mb-0 text-sm  font-weight-bold">${sessionScope.loginUser.name}</span>
+                      </div>
+                    </div>
+                  </a>
+                  <div class="dropdown-menu  dropdown-menu-right ">
+                    <div class="dropdown-header noti-title">
+                      <h6 class="text-overflow m-0">환영합니다!</h6>
+                    </div>
+                    <a href="/ehr/user/myPage" class="dropdown-item">
+                      <i class="ni ni-single-02"></i>
+                      <span>마이페이지</span>
+                    </a>
+                    <a href="/ehr/user/changePw" class="dropdown-item">
+                      <i class="ni ni-settings-gear-65"></i>
+                      <span>비밀번호 변경</span>
+                    </a>
+                    <c:if test="${sessionScope.loginUser.role==1 }">
+                        <a href="/ehr/user/userList" class="dropdown-item">
+                          <i class="ni ni-calendar-grid-58"></i>
+                          <span>회원 관리</span>
+                        </a>
+                    </c:if>
+                    <div class="dropdown-divider"></div>
+                    <a href="/ehr/user/logout" class="dropdown-item">
+                      <i class="ni ni-user-run"></i>
+                      <span>로그아웃</span>
+                    </a>
+                  </div>
+                </li>
+              </ul>    
             </c:otherwise>
-		  </c:choose>
+          </c:choose>
         </div>
       </div>
     </nav>

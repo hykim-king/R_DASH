@@ -10,6 +10,8 @@ public class TopicDTO {
 	private String modDt	    ;//수정일
 	private Double topicRatio	;//토픽별 기사 수 집계(%)
 	
+	private int no;           // 추가: 화면용 순번
+	
 	public TopicDTO() {
 		super();
 	}
@@ -26,6 +28,13 @@ public class TopicDTO {
 		this.modDt = modDt;
 		this.topicRatio = topicRatio;
 	}
+
+    public int getNo() {
+        return no;
+    }
+    public void setNo(int no) {
+        this.no = no;
+    }
 
 	public Integer getTopicNo() {
 		return topicNo;

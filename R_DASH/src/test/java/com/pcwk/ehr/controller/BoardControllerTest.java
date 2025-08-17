@@ -66,7 +66,7 @@ class BoardControllerTest {
 		// MockMvcBuilders.webAppContextSetup : (@WebAppConfiguration)를 기반으로 전체 웹 애플리케이션 환경을 구성
 		//.build() : MockMvc 객체를 최종적으로 생성
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-		dto = new BoardDTO(0, "제목1", "내용1", "이미지1.png",0, "사용안함", "ADMIN", "사용안함", "ADMIN");
+		dto = new BoardDTO(0, "제목1", "내용1",0, "사용안함", "ADMIN", "사용안함", "ADMIN");
 		search = new SearchDTO();
 	}
 
@@ -221,7 +221,6 @@ class BoardControllerTest {
 					.param("boardNo",String.valueOf(outVO.getBoardNo()))
 					.param("title",outVO.getTitle()+upString)
 					.param("contents", dto.getContents()+upString)
-					.param("image", upString+dto.getImage())
 					.param("modId", dto.getModId()+upString);
 		log.debug("requestBuilder:{}", requestBuilder);
 		//2.2 호출
@@ -257,7 +256,6 @@ class BoardControllerTest {
 				MockMvcRequestBuilders.post("/board/doSave.do")
 				.param("title", dto.getTitle())
 				.param("contents", dto.getContents())
-				.param("image", dto.getImage())
 				.param("regId", dto.getRegId())
 				.param("modId", dto.getRegId());
 		//2. 호출
@@ -300,7 +298,6 @@ class BoardControllerTest {
 		assertEquals(outVO.getBoardNo(),dto01.getBoardNo());
 		assertEquals(outVO.getTitle(),dto01.getTitle());
 		assertEquals(outVO.getContents(),dto01.getContents());
-		assertEquals(outVO.getImage(),dto01.getImage());
 		assertEquals(outVO.getViewCnt(),dto01.getViewCnt());
 		assertEquals(outVO.getModId(),dto01.getModId());
 
