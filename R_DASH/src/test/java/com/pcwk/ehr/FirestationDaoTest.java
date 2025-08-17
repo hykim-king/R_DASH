@@ -1,7 +1,6 @@
 package com.pcwk.ehr;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 
@@ -22,161 +21,107 @@ import com.pcwk.ehr.mapper.FirestationMapper;
 
 @WebAppConfiguration
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/root-context.xml",
-		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml" })
+@ContextConfiguration(locations = { 
+    "file:src/main/webapp/WEB-INF/spring/root-context.xml",
+    "file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml" 
+})
 class FirestationDaoTest {
-	Logger log = LogManager.getLogger(getClass());
+    Logger log = LogManager.getLogger(getClass());
 
-	@Autowired
-	FirestationMapper mapper;
+    @Autowired
+    FirestationMapper mapper;
 
-	@Autowired
-	ApplicationContext context;
+    @Autowired
+    ApplicationContext context;
 
-	@BeforeEach
-	public void setUp() throws Exception {
-		log.debug("┌────────────────────┐");
-		log.debug("│ setUp()            │");
-		log.debug("└────────────────────┘");
+    @BeforeEach
+    public void setUp() throws Exception {
+        log.debug("┌────────────────────┐");
+        log.debug("│ setUp()            │");
+        log.debug("└────────────────────┘");
+    }
 
-	}
+    @AfterEach
+    public void tearDown() throws Exception {
+        log.debug("┌────────────────────┐");
+        log.debug("│ tearDown()         │");
+        log.debug("└────────────────────┘");
+    }
 
-	@AfterEach
-	public void tearDown() throws Exception {
-		log.debug("┌────────────────────┐");
-		log.debug("│ tearDown()         │");
-		log.debug("└────────────────────┘");
-	}
+    // ------------------- 테스트 -------------------
 
-//	전체 목록 조회
-//	@Disabled
-	@Test
-	public void selectAllFfsTest() {
-		List<FirestationDTO> list = mapper.selectAll();
-		log.debug("┌────────────────────┐");
-		log.debug("│ selectAllTest()    │");
-		log.debug("└────────────────────┘");
-		
-		assertNotNull(list);
-		assertTrue(list.size() >= 0);
-		log.debug("전체 목록 건수: {}", list.size());
-		list.forEach(log::debug);
-	}
-	
-	
+    /** BBox + 키워드 */
+    @Test
+    public void selectByBBoxTest() {
+        double minLat = 37.0;
+        double maxLat = 38.0;
+        double minLon = 126.0;
+        double maxLon = 127.0;
+        String q = "서울"; // 키워드 없으면 null 가능
 
-//	단건 조회
-//	@Disabled
-	@Test
-	public void findByIdfsTest() {
-		int testId = 1; 
-		FirestationDTO dto = mapper.findById(testId);
-		log.debug("┌────────────────────────┐");
-		log.debug("│ findByIdTest()         │");
-		log.debug("└────────────────────────┘");
-		
-		
-		assertNotNull(dto);
-		log.debug("단건 조회: {}", dto);
-	}
+        List<FirestationDTO> list = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, q, 20);
+        assertNotNull(list);
+        log.debug("BBox 검색 건수: {}", list.size());
+        list.forEach(log::debug);
 
+        // 위경도 범위 체크
+        list.forEach(dto -> {
+            assertTrue(dto.getLat() >= minLat && dto.getLat() <= maxLat);
+            assertTrue(dto.getLon() >= minLon && dto.getLon() <= maxLon);
+        });
+    }
 
-//	지도 BBox + 키워드 기반 소방서 목록 회회
-//	@Disabled
-	@Test
-	public void selectByBBoxfsTest() {
-		double minLat = 37.0;
-		double maxLat = 38.0;
-		double minLon = 126.0;
-		double maxLon = 127.0;
-		String q = "서울"; // 키워드 없으면 null 가능
+    /** 검색 (지역, 키워드, 페이징) */
+    @Test
+    public void searchTest() {
+        List<FirestationDTO> list = mapper.search("소방", "서울특별시",
+                37.0, 38.0, 126.0, 127.0,
+                "name", 10, 0);
+        assertNotNull(list);
+        log.debug("검색 결과 건수: {}", list.size());
+        list.forEach(log::debug);
+    }
 
-		List<FirestationDTO> list = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, q);
-		log.debug("┌────────────────────────────┐");
-		log.debug("│ selectByBBoxTest()         │");
-		log.debug("└────────────────────────────┘");
-		
-		
-		assertNotNull(list);
-		log.debug("BBox 검색 건수: {}", list.size());
-		list.forEach(log::debug);
-	}
-	
-	
-	
+    /** 검색 총 건수 */
+    @Test
+    public void countSearchTest() {
+        int total = mapper.countSearch("소방", "서울특별시",
+                37.0, 38.0, 126.0, 127.0);
+        log.debug("검색 총 건수: {}", total);
+        assertTrue(total >= 0);
+    }
 
-	
-//	검색 시 자동 완성
-//	** 필수 기능 아님 ( 나중 구현 )**
-//	필수 기능 아님 ( 추후 구현 )
-//	@Disabled
-	@Test
-	public void suggestKeywordfsTest() {
-		String q = "서울";
-		List<String> list = mapper.suggestKeyword(q);
-		log.debug("┌────────────────────┐");
-		log.debug("│ suggestKeywordTest()         │");
-		log.debug("└────────────────────┘");
-		
-		
-		assertNotNull(list);
-		log.debug("지역 자동완성 결과: {}", list);
-	}
+    /** 단건 상세 */
+    @Test
+    public void selectOneTest() {
+        // 테스트용으로 PK=1 조회 (데이터 없으면 null일 수 있음)
+        FirestationDTO dto = mapper.selectOne(1);
+        log.debug("단건 조회 결과: {}", dto);
+        assertNotNull(dto);
+    }
 
+    /** 자동완성 - 지역 */
+    @Test
+    public void autocompleteAreaTest() {
+        List<String> list = mapper.autocompleteArea("서", 5);
+        assertNotNull(list);
+        log.debug("지역 자동완성 결과: {}", list);
+    }
 
-//	검색 시 자동 완성
-//	** 필수 기능 아님 ( 나중 구현 )**
-//	필수 기능 아님 ( 나중 구현 )
-//	@Disabled
-	@Test
-	public void suggestStationfsTest() {
-		String q = "중부";
-		List<String> list = mapper.suggestStation(q);
-		log.debug("┌──────────────────────────────┐");
-		log.debug("│ suggestStationTest()         │");
-		log.debug("└──────────────────────────────┘");
-		
-		
-		assertNotNull(list);
-		log.debug("소방서명 자동완성 결과: {}", list);
-	}
-	
-	
-	
+    /** 자동완성 - 소방서명 */
+    @Test
+    public void autocompleteStationTest() {
+        List<String> list = mapper.autocompleteStation("중부", "서울특별시", 5);
+        assertNotNull(list);
+        log.debug("소방서명 자동완성 결과: {}", list);
+    }
 
-//	지역명 기준 소방서 검색
-//	** 필수 기능 아님 ( 나중 구현 )**
-//	필수 기능 아님 ( 나중 구현 )
-//	@Disabled
-	@Test
-	public void listByAreafsTest() {
-		String area = "서울";
-		List<FirestationDTO> list = mapper.listByArea(area);
-		log.debug("┌────────────────────┐");
-		log.debug("│ listByAreaTest()   │");
-		log.debug("└────────────────────┘");
-		
-		
-		assertNotNull(list);
-		log.debug("지역 기준 목록 건수: {}", list.size());
-		list.forEach(log::debug);
-	}
-	
-	
-
-
-//	@Disabled
-	@Test
-	void beans() {
-		log.debug("┌────────────────────┐");
-		log.debug("│ beans()            │");
-		log.debug("└────────────────────┘");
-
-		assertNotNull(mapper);
-		assertNotNull(context);
-
-		log.debug("mapper: {}" + mapper);
-		log.debug("context: {}" + context);
-	}
-
+    /** 스프링 빈 체크 */
+    @Test
+    void beans() {
+        assertNotNull(mapper);
+        assertNotNull(context);
+        log.debug("mapper: {}", mapper);
+        log.debug("context: {}", context);
+    }
 }
