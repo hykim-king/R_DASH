@@ -76,8 +76,8 @@ public class BoardController {
         String uuid = UUID.randomUUID().toString();
         String saveName = uuid + "_" + originalFilename;
 
-        File target = new File(IMAGE_UPLOAD_PATH, saveName);
-        file.transferTo(target);
+//        File target = new File(IMAGE_UPLOAD_PATH, saveName);
+//        file.transferTo(target);
 
         Map<String, Object> result = new HashMap<>();
         result.put("url", "/images/" + saveName); // 톰캣에서 접근 가능한 URL
