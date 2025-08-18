@@ -125,6 +125,7 @@ document.addEventListener('DOMContentLoaded', function(){
     var topicDetails = [];
     	<c:forEach var="t" items="${topicDetails}">
     	topicDetails.push({
+    		topicNo: '<c:out value="${t.topicNo}" />',
     	    title: '<c:out value="${t.title}" escapeXml="false"/>',
     	    contents: '<c:out value="${t.contents}" escapeXml="false"/>'
     	});
@@ -150,6 +151,46 @@ document.addEventListener('DOMContentLoaded', function(){
         //(0+1)%4 => 1%4 => 1번째로 이동(0,1,2,3)
         currentIndex = (currentIndex + 1)%topicDetails.length; 
         showTopic(currentIndex);
+    });
+    
+    //등록 모달
+    const moveToTopicRegBtn = document.querySelector("#moveToTopicReg");
+    moveToTopicRegBtn.addEventListener("click",function(e){
+    	let url = "doSaveView.do";
+    	const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
+        console.log('screenWidth: '+screenWidth);
+        console.log('screenHeight: '+screenHeight);
+
+       const left = (screenWidth - 600)/2;
+       const top = (screenHeight - 400)/2;
+
+       let options = `width=600,height=600, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+       window.open(url,"_blank",options);
+    });
+    //수정 모달
+    const moveToTopicModBtn = document.querySelector("#moveToTopicMod");
+    moveToTopicModBtn.addEventListener("click",function(e){
+    	if(topicDetails.length === 0) {
+            alert("수정할 토픽이 없습니다.");
+            return;
+        }
+    	let topicNo = topicDetails[currentIndex].topicNo; // 현재 상세보기 토픽 번호
+        if(!topicNo){
+            alert("토픽 번호를 확인할 수 없습니다.");
+            return;
+        }
+        let url = "doUpdateView.do?topicNo=" + topicNo;
+        const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
+        console.log('screenWidth: '+screenWidth);
+        console.log('screenHeight: '+screenHeight);
+
+       const left = (screenWidth - 600)/2;
+       const top = (screenHeight - 400)/2;
+
+       let options = `width=600,height=700, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+       window.open(url,"_blank",options);
     });
 
 });
@@ -181,8 +222,8 @@ document.addEventListener('DOMContentLoaded', function(){
 				</div>
 			    <!--  버튼 -->
 				<div class="col-lg-6 col-5 text-right">
-				    <input type="button" id="doSave" class="btn btn-white" value="등록">
-				    <input type="button" id="doUpdate" class="btn btn-white" value="수정">
+				    <input type="button" id="moveToTopicReg" class="btn btn-white" value="등록">
+				    <input type="button" id="moveToTopicMod" class="btn btn-white" value="수정">
 				</div>
 				 <!-- //버튼 -->
 		      </div>
@@ -259,9 +300,6 @@ document.addEventListener('DOMContentLoaded', function(){
 		                 <p id="detailContents"></p>
 	                   </div>
 	               </div><!-- //카드 body -->
-	  <!--            <button class="arrow right">
-                    <i class="ni ni-bold-right"></i>
-                </button> -->
 	           </div><!-- //카드 -->
            </div>
            <!--//오른쪽 : 토픽 상세  -->

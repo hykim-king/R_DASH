@@ -49,7 +49,6 @@ public class NewsController {
 	//6. 뉴스 키워드 조회 Get0
 	//7. 뉴스 전체 조회 Get0
 	
-		
 	
 	@GetMapping("/doUpdateView.do")
 	public String doUpdateView(@RequestParam("topicNo") int topicNo,Model model,HttpSession session) throws SQLException{
@@ -58,17 +57,12 @@ public class NewsController {
 		log.debug("└────────────────────────┘");
 		
 		String viewStirng = "news/topic_mod";
-		log.debug("viewStirng: ",viewStirng);
 		
-		//UserDTO loginUser = (UserDTO) session.getAttribute("user");
-		//model.addAttribute("user", loginUser);
-		
-		TopicDTO param = new TopicDTO();
-		param.setTopicNo(topicNo);
-		
-		TopicDTO outVO = service.doSelectOne(param);
-		model.addAttribute("vo", outVO);
-		log.debug("outVO: {}"+outVO);
+		TopicDTO vo = new TopicDTO();
+	    vo.setTopicNo(topicNo);
+
+	    TopicDTO outVO = service.doSelectOne(vo);
+	    model.addAttribute("vo", outVO);
 		
 		return viewStirng;
 	}
@@ -81,7 +75,6 @@ public class NewsController {
 		
 		String viewStirng = "news/topic_reg";
 		log.debug("viewStirng: ",viewStirng);
-		
 		
 		
 		//UserDTO loginUser = (UserDTO) session.getAttribute("user");
