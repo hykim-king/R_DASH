@@ -89,8 +89,27 @@ public class NewsController {
 		
 		return viewStirng;
 	}
+	//AJAX 호출용
+	@GetMapping(value="/topicDetail.do",produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public TopicDTO getTopicDetail(@RequestParam("topicNo") int topicNo) {
+	    TopicDTO topic = new TopicDTO();
+	    topic.setTopicNo(topicNo);
+	    TopicDTO topicVO = service.doSelectOne(topic);
+	    return topicVO;
+	}
 	
+	@GetMapping(value="/newsKeywordSearch.do", produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public List<NewsDTO> newsKeywordSearch(@RequestParam("keyword") String keyword) {
+	    log.debug("┌─────────────────────────────────────────────┐");
+	    log.debug("│ *newsKeywordSearch()* keyword=" + keyword +"│");
+	    log.debug("└─────────────────────────────────────────────┘");
 
+	    NewsDTO news = new NewsDTO();
+	    news.setKeyword(keyword);
+	    return service.searchByKeyword(news);
+	}
 	
 	@GetMapping(value="/newsPage.do", produces = "text/plain;charset=UTF-8")
 	public String newsPage(SearchDTO search,NewsDTO news,TopicDTO topic,Model model) {
@@ -118,7 +137,7 @@ public class NewsController {
 	    List<TopicDTO> todayTopics = service.getTodayTopicsList(topic);
 	    model.addAttribute("todayTopics", todayTopics);
 
-	    // 4. 토픽 단건 조회 (topicNo가 있을 때만)
+	    // 4. 토픽 단건 조회 (topicNo가 있을 때만) -> 페이지 초기 로딩용
 	    if (todayTopics != null && !todayTopics.isEmpty()) {
 	        List<TopicDTO> topicDetails = new ArrayList<>();
 	        

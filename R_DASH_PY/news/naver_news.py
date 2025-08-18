@@ -1,7 +1,7 @@
 import requests
 import re
-from bs4 import BeautifulSoup
-import pandas as pd
+#from bs4 import BeautifulSoup
+#import pandas as pd
 from dotenv import load_dotenv
 import os
 from news_insert import save_news_to_db

@@ -80,7 +80,8 @@ public class BoardController {
     public MessageDTO saveImageByUrl(@RequestBody Map<String, String> param) {
         String imageUrl = param.get("imageUrl");
         String publicUrl = "";
-
+        
+       
         try {
             if (imageUrl.startsWith("data:image")) {
                 // data:image/png;base64,iVBORw0... 이런 식으로 들어옴
