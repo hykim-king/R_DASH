@@ -66,7 +66,7 @@ class BoardControllerTest {
 		// MockMvcBuilders.webAppContextSetup : (@WebAppConfiguration)를 기반으로 전체 웹 애플리케이션 환경을 구성
 		//.build() : MockMvc 객체를 최종적으로 생성
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-		dto = new BoardDTO(0, "제목1", "내용1",0, "사용안함", "ADMIN", "사용안함", "ADMIN");
+		dto = new BoardDTO(0, "제목1", "내용1",0, "사용안함", "ADMIN", "사용안함", "ADMIN",null);
 		search = new SearchDTO();
 	}
 

@@ -104,7 +104,8 @@
 		    title = #{title, jdbcType=VARCHAR},
 		    contents = #{contents, jdbcType=VARCHAR},
 		    mod_dt = SYSDATE,
-		    mod_id = #{modId, jdbcType=VARCHAR}
+		    mod_id = #{modId, jdbcType=VARCHAR},
+		    is_notice = #{isNotice, jdbcType=VARCHAR}
 		WHERE
 		        board_no = #{boardNo}
     </update>
@@ -120,7 +121,8 @@
 	    reg_dt,
 	    reg_id,
 	    mod_dt,
-	    mod_id
+	    mod_id,
+	    is_notice
 	  ) VALUES (
 	    #{title, jdbcType=VARCHAR},
 	    #{contents, jdbcType=VARCHAR},
@@ -128,7 +130,8 @@
 	    SYSDATE,
 	    #{regId, jdbcType=VARCHAR},
 	    SYSDATE,
-	    #{modId, jdbcType=VARCHAR}
+	    #{modId, jdbcType=VARCHAR},
+	    #{isNotice, jdbcType=VARCHAR}
 	  )
 	</insert>
 
