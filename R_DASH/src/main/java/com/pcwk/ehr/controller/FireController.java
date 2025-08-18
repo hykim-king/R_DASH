@@ -11,31 +11,30 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.pcwk.ehr.mapper.FireMapper;
-import com.pcwk.ehr.service.FireService;
+import com.pcwk.ehr.service.FireSafeService;
+import com.pcwk.ehr.service.FirestationService;
 
 @Controller
 @RequestMapping("/fire")
 public class FireController {
 	
 	@Autowired
-    private FireMapper fireMapper;
-
-	@Autowired
-	private FireService fireService;
+	private FirestationService fireStationService;
 	
+	@Autowired
+	private FireSafeService fireSafeService;
 	
 	@GetMapping("/fire-safe.do")
 	@ResponseBody
     public List<Map<String, Object>> getFireSafe() {
-        return fireService.getSelectFireSafe();
+        return fireSafeService.getSelectFireSafe();
     }
 	
 	
 	@GetMapping("/fire-stations.do")
 	@ResponseBody
 	public List<Map<String, Object>> getFireStation() throws SQLException {
-	    return fireService.getfirestationCounts();
+	    return fireStationService.getfirestationCounts();
 	}
 	
 	@GetMapping("/statsPage")

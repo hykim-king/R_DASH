@@ -1,15 +1,17 @@
-$(document).ready(function() {
-    //소방서
-    $.ajax({
-        url: '/ehr/fire/fire-stations-count.do',
+var jq36 = jQuery.noConflict(true); // 3.6.0 jQuery 별칭
+
+jq36(document).ready(function() {
+    // 소방서 데이터
+    jq36.ajax({
+        url: '/ehr/fire/fire-stations.do',
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-            console.log(data);
-            var tbody = $('#firestationTable tbody');
+            var tbody = jq36('#firestationTable tbody');
             tbody.empty();
+
             data.forEach(function(row, index) {
-                var tr = $('<tr></tr>');
+                var tr = jq36('<tr></tr>');
                 var region = row.REGION || row.region; 
                 var count = row.FIRE_STATION_CNT || row.fire_station_cnt;
 
@@ -18,26 +20,33 @@ $(document).ready(function() {
                 tr.append('<td>' + count + '</td>');
                 tbody.append(tr);
             });
+
+            // DataTables 초기화
+            jq36('#firestationTable').DataTable({
+                pageLength: 10,
+                searching: true,
+                ordering: true
+            });
         },
         error: function(xhr, status, error) {
             console.error('AJAX 오류:', error);
         }
     });
 
-    //복구현황
-    $.ajax({
+    // 복구현황
+    jq36.ajax({
         url: '/ehr/fire/fire-safe.do',
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-            // 연도, 피해금액, 복구금액 배열 생성
-            var labels = data.map(row => row.MSTN_YR);
-            var damage = data.map(row => row.CFMTN_AMT);
-            var recovery = data.map(row => row.CFMTN_RCRY);
+            console.log('복구 데이터:', data);
+            const labels = data.map(row => row.YEAR);                 // 연도
+            const damage = data.map(row => row.TOTALDAMAGE);         // 피해금액
+            const recovery = data.map(row => row.TOTALRECOVERY);     // 복구금액
 
-            // Chart.js 그래프 생성
-            var ctx = document.getElementById('fireSafeChart').getContext('2d');
-            var fireChart = new Chart(ctx, {
+            const ctx = document.getElementById('fireSafeChart').getContext('2d');
+
+            new Chart(ctx, {
                 data: {
                     labels: labels,
                     datasets: [
@@ -57,37 +66,32 @@ $(document).ready(function() {
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
                             tension: 0.4,
                             fill: false,
-                            yAxisID: 'y'
+                            yAxisID: 'y1'
                         }
                     ]
                 },
                 options: {
                     responsive: true,
-                    interaction: {
-                        mode: 'index',
-                        intersect: false,
-                    },
+                    interaction: { mode: 'index', intersect: false },
                     plugins: {
-                        title: {
-                            display: true,
-                            text: '년도별 화재 피해금액 및 복구금액'
-                        },
-                        tooltip: {
-                            enabled: true,
-                            mode: 'index'
-                        }
+                        title: { display: true, text: '년도별 화재 피해금액 및 복구금액' },
+                        tooltip: { mode: 'index' }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: '금액 (단위: 원)'
-                            }
+                            title: { display: true, text: '피해금액 (원)' }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            title: { display: true, text: '복구금액 (원)' },
+                            grid: { drawOnChartArea: false }
                         }
                     }
                 }
             });
+
         },
         error: function(xhr, status, error) {
             console.error('AJAX 오류:', error);

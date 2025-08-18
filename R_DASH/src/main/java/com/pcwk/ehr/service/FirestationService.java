@@ -1,6 +1,7 @@
 package com.pcwk.ehr.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.pcwk.ehr.domain.FirestationDTO;
 
@@ -27,4 +28,7 @@ public interface FirestationService {
     // 자동완성
     List<String> autocompleteArea(String prefix, Integer limit);
     List<String> autocompleteStation(String prefix, String area, Integer limit);
+    
+    List<Map<String, Object>> getfirestationCounts();
+
 }
