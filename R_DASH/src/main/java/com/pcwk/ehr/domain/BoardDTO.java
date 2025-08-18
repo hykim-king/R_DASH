@@ -11,6 +11,7 @@ public class BoardDTO extends DTO{
 	private String regId     ;
 	private String modDt     ;
 	private String modId     ;
+	private String isNotice;
 	
 	
 	public BoardDTO() {}
@@ -18,7 +19,7 @@ public class BoardDTO extends DTO{
 	
 
 	public BoardDTO(int boardNo, String title, String contents, int viewCnt, String regDt, String regId, String modDt,
-			String modId) {
+			String modId,String isNotice) {
 		super();
 		this.boardNo = boardNo;
 		this.title = title;
@@ -28,6 +29,7 @@ public class BoardDTO extends DTO{
 		this.regId = regId;
 		this.modDt = modDt;
 		this.modId = modId;
+		this.isNotice = isNotice;
 	}
 
 
@@ -92,9 +94,16 @@ public class BoardDTO extends DTO{
 	public String getModId() {
 		return modId;
 	}
-
+	
 	public void setModId(String modId) {
 		this.modId = modId;
+	}
+	public String getIsNotice() {
+		return isNotice;
+	}
+	
+	public void IsNotice(String isNotice) {
+		this.isNotice = isNotice;
 	}
 
 
@@ -102,7 +111,7 @@ public class BoardDTO extends DTO{
 	@Override
 	public String toString() {
 		return "BoardDTO [boardNo=" + boardNo + ", title=" + title + ", contents=" + contents + ", viewCnt=" + viewCnt
-				+ ", regDt=" + regDt + ", regId=" + regId + ", modDt=" + modDt + ", modId=" + modId + ", toString()="
+				+ ", regDt=" + regDt + ", regId=" + regId + ", modDt=" + modDt + ", modId=" + modId +", isNotice=" + isNotice + ", toString()="
 				+ super.toString() + "]";
 	}
 
