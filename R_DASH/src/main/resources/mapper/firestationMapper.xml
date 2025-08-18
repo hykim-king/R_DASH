@@ -100,5 +100,28 @@
         WHERE UPPER(AREA) LIKE '%' || UPPER(#{area}) || '%'
         ORDER BY AREA, STATION_NM
     </select>
+    
+     <!-- 시/군/구 기준 소방서 개수 조회 -->
+    <select id="firestationCount" resultType="map">
+        SELECT 
+            CASE 
+                WHEN REGEXP_LIKE(AREA, '군') 
+                    THEN REGEXP_SUBSTR(AREA, '^[^ ]+ [^ ]+ 군')
+                WHEN REGEXP_LIKE(AREA, '구') 
+                    THEN REGEXP_SUBSTR(AREA, '^[^ ]+ [^ ]+ 구')
+                ELSE REGEXP_SUBSTR(AREA, '^[^ ]+ [^ ]+')
+            END AS REGION,
+            COUNT(*) AS FIRE_STATION_CNT
+        FROM FIRE_STATION
+        GROUP BY 
+            CASE 
+                WHEN REGEXP_LIKE(AREA, '군') 
+                    THEN REGEXP_SUBSTR(AREA, '^[^ ]+ [^ ]+ 군')
+                WHEN REGEXP_LIKE(AREA, '구') 
+                    THEN REGEXP_SUBSTR(AREA, '^[^ ]+ [^ ]+ 구')
+                ELSE REGEXP_SUBSTR(AREA, '^[^ ]+ [^ ]+')
+            END
+        ORDER BY FIRE_STATION_CNT DESC
+    </select>
 
 </mapper>
