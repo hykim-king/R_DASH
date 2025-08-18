@@ -10,7 +10,7 @@
         <id     property="stationNo" column="STATION_NO"/>
         <result property="stationNm" column="STATION_NM"/>
         <result property="area"      column="AREA"/>
-        <result property="fireHead"  column="FIRE_HEAD"/>
+        <result property="fireNead"  column="FIRE_HEAD"/>
         <result property="tel"       column="TEL"/>
         <result property="lat"       column="LAT"/>
         <result property="lon"       column="LON"/>
@@ -134,11 +134,9 @@
             <if test="prefix != null and prefix != ''">
                 STATION_NM LIKE #{prefix} || '%'
             </if>
-
             <if test="area != null and area != ''">
                 AND AREA = #{area}
             </if>
-
         </where>
         ORDER BY STATION_NM
         FETCH FIRST
