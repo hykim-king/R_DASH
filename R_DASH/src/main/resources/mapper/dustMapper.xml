@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pcwk.ehr.mapper.DustMapper">
+
 
   <!-- DTO 매핑 : DustDTO의 필드명에 맞춰 수정 -->
   <resultMap id="DustMap" type="com.pcwk.ehr.domain.DustDTO">
@@ -59,6 +59,72 @@
     SELECT <include refid="dustColumns"/>
     FROM ( <include refid="latestPerStationBase"/> )
     ORDER BY TM_DATE DESC, STN_NM
+
+  <resultMap id="DustMap" type="com.pcwk.ehr.domain.DustDTO">
+    <id     property="dustNo" column="DUST_NO"/>
+    <result property="tm"     column="TM"/>
+    <result property="stnNm"  column="STN_NM"/>
+    <result property="lat"    column="LAT"/>
+    <result property="lon"    column="LON"/>
+    <result property="org"    column="ORG"/>
+    <result property="pm10"   column="PM10"/>
+    <result property="avg"    column="AVG"/>
+  </resultMap>
+
+  <sql id="dustColumns">
+    DUST_NO, TM, STN_NM, LAT, LON, ORG, PM10, AVG
+  </sql>
+
+  <!-- 공통 CTE 템플릿 (WHERE 없이 골격만) -->
+  <sql id="cte_base">
+    WITH base AS (
+      SELECT
+        d.DUST_NO,
+        d.TM,
+        d.STN_NM,
+        d.LAT,
+        d.LON,
+        d.ORG,
+        d.PM10,
+        d.AVG,
+        ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM DESC) AS rn
+      FROM DUST d
+      /* WHERE 절은 호출 쿼리에서 구성 */
+    )
+    SELECT DUST_NO, TM, STN_NM, LAT, LON, ORG, PM10, AVG
+    FROM base
+    WHERE rn = 1
+  </sql>
+
+  <!-- 1) BBox 버전: BBox와 day를 WHERE에 적용 -->
+  <select id="selectLatestByTypeBBox" resultMap="DustMap">
+    SELECT <include refid="dustColumns"/> FROM (
+      WITH base AS (
+        SELECT
+          d.DUST_NO,
+          d.TM,
+          d.STN_NM,
+          d.LAT,
+          d.LON,
+          d.ORG,
+          d.PM10,
+          d.AVG,
+          ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM DESC) AS rn
+        FROM DUST d
+        WHERE 1=1
+          <if test="day != null and day != ''">
+            AND TRUNC(d.TM) = TO_DATE(#{day}, 'YYYY-MM-DD')
+          </if>
+          <!-- BBox는 이 쿼리에서만 참조하므로 All 호출에서 파라미터 미존재 오류가 안 납니다 -->
+          AND d.LAT BETWEEN #{minLat} AND #{maxLat}
+          AND d.LON BETWEEN #{minLon} AND #{maxLon}
+      )
+      SELECT DUST_NO, TM, STN_NM, LAT, LON, ORG, PM10, AVG
+      FROM base
+      WHERE rn = 1
+    )
+    ORDER BY TM DESC, STN_NM
+
     <if test="limit != null">
       FETCH FIRST #{limit} ROWS ONLY
     </if>
@@ -69,9 +135,40 @@
     SELECT <include refid="dustColumns"/>
     FROM ( <include refid="latestPerStationBase"/> )
     ORDER BY TM_DATE DESC, STN_NM
+
+  <!-- 2) 전국 버전: BBox 전혀 참조하지 않음 -->
+  <select id="selectLatestByTypeAll" resultMap="DustMap">
+    SELECT <include refid="dustColumns"/> FROM (
+      WITH base AS (
+        SELECT
+          d.DUST_NO,
+          d.TM,
+          d.STN_NM,
+          d.LAT,
+          d.LON,
+          d.ORG,
+          d.PM10,
+          d.AVG,
+          ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM DESC) AS rn
+        FROM DUST d
+        <where>
+          <if test="day != null and day != ''">
+            TRUNC(d.TM) = TO_DATE(#{day}, 'YYYY-MM-DD')
+          </if>
+        </where>
+      )
+      SELECT DUST_NO, TM, STN_NM, LAT, LON, ORG, PM10, AVG
+      FROM base
+      WHERE rn = 1
+    )
+    ORDER BY TM DESC, STN_NM
+
     <if test="limit != null">
       FETCH FIRST #{limit} ROWS ONLY
     </if>
   </select>
 
+
 </mapper>
+
+

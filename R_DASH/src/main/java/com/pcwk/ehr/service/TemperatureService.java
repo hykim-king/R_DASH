@@ -26,4 +26,8 @@ public interface TemperatureService {
 
 	List<String> getYearList() throws SQLException;
 
+	List<NowcastDTO> getTopT1H();
+	List<NowcastDTO> getTopRN1();
+    List<NowcastDTO> getTopREH();
+
 }

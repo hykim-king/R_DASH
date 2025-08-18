@@ -18,8 +18,11 @@ import org.springframework.web.context.WebApplicationContext;
 
 @WebAppConfiguration
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/root-context.xml",
-		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml" })
+@ContextConfiguration(locations = {
+    "file:src/main/webapp/WEB-INF/spring/root-context.xml",
+    "file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml"
+})
+
 public class ShelterControllerTest {
 	Logger log = LogManager.getLogger(getClass());
 

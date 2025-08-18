@@ -48,7 +48,7 @@ class BoardServiceTest {
 		log.debug("│ setUp()            │");
 		log.debug("└────────────────────┘");
 		
-		dto = new BoardDTO(0, "제목1", "내용1", "이미지1.png",0, "사용안함", "ADMIN", "사용안함", "ADMIN");
+		dto = new BoardDTO(0, "제목1", "내용1", 0, "사용안함", "ADMIN", "사용안함", "ADMIN");
 
 	}
 
