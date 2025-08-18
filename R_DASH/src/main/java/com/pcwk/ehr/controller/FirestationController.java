@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,6 +24,20 @@ public class FirestationController {
     @Autowired
     private FirestationService service;
 
+    
+    // 검색 총 건수
+    @GetMapping("/countSearch")
+    public ResponseEntity<Integer> countSearch(
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String area,
+            @RequestParam double minLat,
+            @RequestParam double maxLat,
+            @RequestParam double minLon,
+            @RequestParam double maxLon) {
+
+        int total = service.countSearch(keyword, area, minLat, maxLat, minLon, maxLon);
+        return ResponseEntity.ok(total);
+    }
     /** 지도 BBox 조회 */
     @GetMapping(value="/bbox", produces="application/json; charset=UTF-8")
     @ResponseBody
@@ -44,7 +59,7 @@ public class FirestationController {
             @RequestParam(required=false) Double maxLat,
             @RequestParam(required=false) Double minLon,
             @RequestParam(required=false) Double maxLon,
-            @RequestParam(required=false, defaultValue="name") String orderBy,
+            @RequestParam(required=false, defaultValue="stationNm") String orderBy,
             @RequestParam(required=false, defaultValue="20") Integer limit,
             @RequestParam(required=false, defaultValue="0") Integer offset) {
 
@@ -79,8 +94,8 @@ public class FirestationController {
     @GetMapping(value="/auto/station", produces="application/json; charset=UTF-8")
     @ResponseBody
     public List<String> autoStation(@RequestParam String prefix,
-                                    @RequestParam(required=false) String area,
+
                                     @RequestParam(required=false, defaultValue="10") Integer limit) {
-        return service.autocompleteStation(prefix, area, limit);
+        return service.autocompleteStation(prefix, limit);
     }
 }

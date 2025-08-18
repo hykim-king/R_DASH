@@ -84,7 +84,7 @@ class FirestationServiceTest {
     @Test
     void countSearchTest() {
         int total = service.countSearch(
-                "소방", "서울특별시", 
+                "소방", "", 
                 37.0, 38.0, 126.0, 127.0
         );
         log.debug("총 건수: {}", total);
@@ -110,7 +110,7 @@ class FirestationServiceTest {
     /** 자동완성 - 소방서명 */
     @Test
     void autocompleteStationTest() {
-        List<String> names = service.autocompleteStation("중부", "서울특별시", 5);
+        List<String> names = service.autocompleteStation("중부", 5);
         assertNotNull(names);
         log.debug("소방서명 자동완성: {}", names);
     }

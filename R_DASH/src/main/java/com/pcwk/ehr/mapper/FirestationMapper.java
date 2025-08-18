@@ -54,6 +54,5 @@ public interface FirestationMapper extends WorkDiv<FirestationDTO> {
 
     /** 자동완성 - 소방서명(prefix% 매칭, 선택: 지역 필터) */
     List<String> autocompleteStation(@Param("prefix") String prefix,
-                                     @Param("area") String area,
                                      @Param("limit") Integer limit);
 }

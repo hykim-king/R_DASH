@@ -47,7 +47,7 @@ public class FirestationServiceImpl implements FirestationService {
     }
 
     @Override
-    public List<String> autocompleteStation(String prefix, String area, Integer limit) {
-        return mapper.autocompleteStation(prefix, area, limit);
+    public List<String> autocompleteStation(String prefix,  Integer limit) {
+        return mapper.autocompleteStation(prefix,  limit);
     }
 }
