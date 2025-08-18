@@ -26,9 +26,9 @@ class TopicDao:
             topic_ratio
         ) VALUES ( :title,
                    :contents,
-                   :reg_dt,
+                   SYSDATE,
                    :reg_id,
-                   :mod_dt,
+                   SYSDATE,
                    :mod_id,
                    :topic_ratio )
         '''
@@ -39,9 +39,7 @@ class TopicDao:
             cursor.execute(sql, {
                 'title': topic.title,
                 'contents': topic.contents,
-                'reg_dt': topic.reg_dt,
                 'reg_id': topic.reg_id,
-                'mod_dt': topic.mod_dt,
                 'mod_id': topic.mod_id,
                 'topic_ratio': topic.topic_ratio
             })
