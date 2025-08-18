@@ -2,17 +2,21 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pcwk.ehr.mapper.TopicMapper">
     <select id="getTodayTopicsList" parameterType="TopicDTO" resultType="TopicDTO">
-            SELECT
-		        topic_no,
-		        title,
-		        TO_CHAR(reg_dt, 'YYYY-MM-DD') AS reg_dt,
-		        topic_ratio
-		    FROM
-		        topic
-		    WHERE
-		        TRUNC(reg_dt) = TRUNC(SYSDATE)
-		    ORDER BY
-		        topic_no DESC
+        SELECT t1.*
+		FROM(         SELECT
+	                   	ROWNUM as no,
+		                topic_no,
+		                title,
+		                TO_CHAR(reg_dt, 'YYYY-MM-DD') AS reg_dt,
+		                topic_ratio
+		            FROM
+		                topic
+		            WHERE
+		                TRUNC(reg_dt) = TRUNC(SYSDATE)
+		            
+		            ORDER BY
+		                topic_no DESC
+		                 ) t1
     </select>
     
     <select id="doSelectOne" parameterType="int" resultType="TopicDTO">
@@ -28,6 +32,7 @@
 		FROM
 		    topic
 		WHERE topic_no = #{topicNo, jdbcType=INTEGER}
+		AND TRUNC(reg_dt) = TRUNC(SYSDATE)
     </select>
     
     <insert id="doSave" useGeneratedKeys="true" 
