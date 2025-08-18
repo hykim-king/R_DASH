@@ -12,18 +12,29 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
-<meta name="author" content="Creative Tim">
 <link href="/ehr/resources/template/dashboard/css/dashboard.css" rel="stylesheet" />
 <link href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo.css" rel="stylesheet" />
 <link href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo-svg.css" rel="stylesheet" />
 <link href="/ehr/resources/template/dashboard/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 
 <title>공지사항 게시판</title>
-<link rel="icon" href="${CP}/resources/image/Jaemini_face.ico" type="image/x-icon"/>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    console.log('DOMContentLoaded');
+    
+    //조회버튼
+    const moveToRegBtn =document.querySelector("#moveToReg");
+    console.log(moveToRegBtn);
+    
+    moveToRegBtn.addEventListener("click",function(event){
+        console.log('moveToSaveButton click');
+    	if(confirm('등록 화면으로 이동 하시겠습니까?') === false)return;
+    
+    	window.location.href = '/ehr/board/doSaveView.do';
+ });
+});
+</script>
 <style type="text/css">
 span {
     margin-right: 20px;
@@ -127,8 +138,9 @@ span {
 			                    <td ><c:out value="${vo.no}"/></td>
 			                    <td >
 				                    <div class="media-body">
+				                    
 					                    <span class="name mb-0 text-sm">
-					                       <c:out value="${vo.title }"/>
+					                    <a href="/ehr/board/doSelectOne.do?boardNo=${vo.boardNo}"><c:out value="${vo.title }"/></a>
 					                    </span>
 				                    </div>
 			                    </td>

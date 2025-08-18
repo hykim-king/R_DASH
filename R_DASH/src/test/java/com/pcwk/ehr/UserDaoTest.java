@@ -17,11 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.UserDTO;
 import com.pcwk.ehr.mapper.UserMapper;
-
+@WebAppConfiguration
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/root-context.xml",
 		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml" })
@@ -89,7 +90,7 @@ class UserDaoTest {
 		
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void updateRole() {
 		// 매번 동일한 결과가 도출 되도록 작성
@@ -120,7 +121,7 @@ class UserDaoTest {
 		assertEquals(1, outVO.getRole());
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void Retrieve() {
 		// 매번 동일한 결과가 도출 되도록 작성
@@ -194,7 +195,7 @@ class UserDaoTest {
 	}
 	
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void updateUser() {
 		// 매번 동일한 결과가 도출 되도록 작성
@@ -237,7 +238,7 @@ class UserDaoTest {
 		
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void deleteUser() {
 		// 매번 동일한 결과가 도출 되도록 작성
@@ -272,7 +273,7 @@ class UserDaoTest {
 			
 	}
 
-	@Disabled
+	//@Disabled
 	@Test
 	void addAndGet() {
 		// 매번 동일한 결과가 도출 되도록 작성
@@ -326,7 +327,7 @@ class UserDaoTest {
 		}
 	}
 
-	@Disabled
+	//@Disabled
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");

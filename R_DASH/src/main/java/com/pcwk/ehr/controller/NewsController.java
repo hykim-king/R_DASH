@@ -1,6 +1,7 @@
 package com.pcwk.ehr.controller;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,32 +49,6 @@ public class NewsController {
 	//6. 뉴스 키워드 조회 Get0
 	//7. 뉴스 전체 조회 Get0
 	
-	@GetMapping(value="/doRetrieve.do", produces = "text/plain;charset=UTF-8")
-	public String doRetrieve(SearchDTO param, Model model) {
-		log.debug("┌───────────────────────────┐");
-		log.debug("│ *doRetrieve()*            │");
-		log.debug("└───────────────────────────┘");
-		log.debug("1. param:{}", param);
-		
-		String viewString = "news/news_page";
-		
-		//페이징 
-		int pageNo = PcwkString.nvlZero(param.getPageNo(), 1); //0이면 1 반환
-		int pageSize = PcwkString.nvlZero(param.getPageSize(), 10); //0이면 10 반환
-		
-		log.debug("pageNo:{}",pageNo);
-		log.debug("pageSize:{}",pageSize);
-		
-		param.setPageNo(pageNo);
-		param.setPageSize(pageSize);
-		
-		List<NewsDTO> list = service.doRetrieve(param);
-		
-		model.addAttribute("list",list);
-		model.addAttribute("search", param);
-		
-		return viewString;
-	}
 		
 	
 	@GetMapping("/doUpdateView.do")
@@ -115,57 +90,52 @@ public class NewsController {
 		return viewStirng;
 	}
 	
-	@GetMapping(value="getNews.do",produces = "text/plain;charset=UTF-8")
-	public String searchByKeyword(NewsDTO param,Model model) {
-		log.debug("┌───────────────────────────┐");
-		log.debug("│ *getTodayTopicsList()*    │");
-		log.debug("└───────────────────────────┘");
-		log.debug("1. param:{}", param);
-		
-		String viewName = "news/news_page";
-		
-		String keyword = param.getKeyword();
-		log.debug("keyword:{}",keyword);
-		
-		param.setKeyword(keyword);
-		
-		List<NewsDTO> list = service.searchByKeyword(param);
-		
-		model.addAttribute("list",list);
-		
-		return viewName;
-	}
+
 	
-	@GetMapping(value="/todayTopic.do", produces = "text/plain;charset=UTF-8")
-	public String getTodayTopicsList(TopicDTO param,Model model) {
+	@GetMapping(value="/newsPage.do", produces = "text/plain;charset=UTF-8")
+	public String newsPage(SearchDTO search,NewsDTO news,TopicDTO topic,Model model) {
 		log.debug("┌───────────────────────────┐");
-		log.debug("│ *getTodayTopicsList()*    │");
+		log.debug("│ *newsPage()*              │");
 		log.debug("└───────────────────────────┘");
-		log.debug("1. param:{}", param);
 		
 		String viewName = "news/news_page";
-		
-		List<TopicDTO> list = service.getTodayTopicsList(param);
-		
-		model.addAttribute("list",list);
-		
+		// 1. 전체 뉴스
+	    int pageNo = PcwkString.nvlZero(search.getPageNo(), 1);
+	    int pageSize = PcwkString.nvlZero(search.getPageSize(), 10);
+	    search.setPageNo(pageNo);
+	    search.setPageSize(pageSize);
+	    List<NewsDTO> newsList = service.doRetrieve(search);
+	    model.addAttribute("newsList", newsList);
+	    model.addAttribute("search", search);
+
+
+	    // 2. 키워드 뉴스 (keyword 파라미터가 있을 때만)
+	    if (news.getKeyword() != null && !news.getKeyword().isEmpty()) {
+	        List<NewsDTO> keywordNews = service.searchByKeyword(news);
+	        model.addAttribute("keywordNews", keywordNews);
+	    }
+	    // 3. 오늘의 토픽
+	    List<TopicDTO> todayTopics = service.getTodayTopicsList(topic);
+	    model.addAttribute("todayTopics", todayTopics);
+
+	    // 4. 토픽 단건 조회 (topicNo가 있을 때만)
+	    if (todayTopics != null && !todayTopics.isEmpty()) {
+	        List<TopicDTO> topicDetails = new ArrayList<>();
+	        
+	        for (TopicDTO t : todayTopics) {
+	            int topicNo = t.getTopicNo();
+	            TopicDTO topicDetail = new TopicDTO();
+	            topicDetail.setTopicNo(topicNo);
+	            topicDetail = service.doSelectOne(topicDetail);
+	            
+	            if (topicDetail != null) {
+	                topicDetails.add(topicDetail);
+	            }
+	        }
+	        model.addAttribute("topicDetails",topicDetails);
+	    }
+	    
 		return viewName;
-	}
-	
-	@GetMapping(value="/topicSelectOne.do", produces = "text/plain;charset=UTF-8")
-	public String topicSelectOne(TopicDTO param,Model model,HttpServletRequest req) {
-		log.debug("┌───────────────────────────┐");
-		log.debug("│ *topicSelectOne()*        │");
-		log.debug("└───────────────────────────┘");
-		log.debug("1. param:{}", param);
-		String viewName = "news/news_page";
-		
-		TopicDTO outVO = service.doSelectOne(param);
-		log.debug("2. outVO:{}", outVO);
-		
-		model.addAttribute("vo", outVO);
-		return viewName;
-		
 	}
 	
 	@PostMapping(value = "/doDelete.do", produces = "text/plain;charset=UTF-8")
