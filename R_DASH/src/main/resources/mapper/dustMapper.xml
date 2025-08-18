@@ -1,85 +1,107 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pcwk.ehr.mapper.DustMapper">
-  <!-- ✅ TM이 DATE 타입일 때 -->
-<!-- TM이 VARCHAR2일 때 -->
-<sql id="whereDay"><![CDATA[
-  SUBSTR(TM, 1, 10) = #{day}
-]]></sql>
-  <select id="selectStationAvgAt10" resultType="com.pcwk.ehr.domain.DustDTO">
+
+  <resultMap id="DustMap" type="com.pcwk.ehr.domain.DustDTO">
+    <id     property="dustNo" column="DUST_NO"/>
+    <result property="tm"     column="TM"/>
+    <result property="stnNm"  column="STN_NM"/>
+    <result property="lat"    column="LAT"/>
+    <result property="lon"    column="LON"/>
+    <result property="org"    column="ORG"/>
+    <result property="pm10"   column="PM10"/>
+    <result property="avg"    column="AVG"/>
+  </resultMap>
+
+  <sql id="dustColumns">
+    DUST_NO, TM, STN_NM, LAT, LON, ORG, PM10, AVG
+  </sql>
+
+  <!-- 공통 CTE 템플릿 (WHERE 없이 골격만) -->
+  <sql id="cte_base">
     WITH base AS (
       SELECT
-        STN_NM, LAT, LON, AVG, TM,
-        ROW_NUMBER() OVER (PARTITION BY STN_NM ORDER BY TM DESC) AS rn
-      FROM DUST
-      WHERE <include refid="whereDay"/>
-      <if test="minLat != null and minLon != null and maxLat != null and maxLon != null">
-        AND LAT BETWEEN #{minLat} AND #{maxLat}
-        AND LON BETWEEN #{minLon} AND #{maxLon}
-      </if>
+        d.DUST_NO,
+        d.TM,
+        d.STN_NM,
+        d.LAT,
+        d.LON,
+        d.ORG,
+        d.PM10,
+        d.AVG,
+        ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM DESC) AS rn
+      FROM DUST d
+      /* WHERE 절은 호출 쿼리에서 구성 */
     )
-    SELECT
-      STN_NM   AS stnNm,
-      MAX(LAT) AS lat,
-      MAX(LON) AS lon,
-      MAX(AVG) AS avg
+    SELECT DUST_NO, TM, STN_NM, LAT, LON, ORG, PM10, AVG
     FROM base
     WHERE rn = 1
-    GROUP BY STN_NM
-    ORDER BY STN_NM
-  </select>
+  </sql>
 
-
-
-  <select id="selectLegendBucketsAt10" resultType="com.pcwk.ehr.domain.DustDTO">
-    SELECT
-      CASE
-        WHEN AVG > 30 THEN '경고'
-        WHEN AVG > 20 THEN '주의'
-        ELSE '관심'
-      END AS org,
-      COUNT(*) AS cnt
-    FROM DUST
-    WHERE <include refid="whereDay"/> AND AVG IS NOT NULL
-    GROUP BY
-      CASE
-        WHEN AVG > 30 THEN '경고'
-        WHEN AVG > 20 THEN '주의'
-        ELSE '관심'
-      END
-    ORDER BY 1
-  </select>
-
-  <select id="selectLatestByOrgAt10" resultType="com.pcwk.ehr.domain.DustDTO">
-    WITH ranked AS (
-      SELECT
-        STN_NM, ORG, LAT, LON, PM10, AVG, MAX, CNT, TM,
-        ROW_NUMBER() OVER (PARTITION BY STN_NM ORDER BY TM DESC) AS rn
-      FROM DUST
-      WHERE <include refid="whereDay"/>
-        <if test="org != null and org != ''">
-          AND ORG = #{org}
-        </if>
-        <if test="minLat != null and minLon != null and maxLat != null and maxLon != null">
-          AND LAT BETWEEN #{minLat} AND #{maxLat}
-          AND LON BETWEEN #{minLon} AND #{maxLon}
-        </if>
+  <!-- 1) BBox 버전: BBox와 day를 WHERE에 적용 -->
+  <select id="selectLatestByTypeBBox" resultMap="DustMap">
+    SELECT <include refid="dustColumns"/> FROM (
+      WITH base AS (
+        SELECT
+          d.DUST_NO,
+          d.TM,
+          d.STN_NM,
+          d.LAT,
+          d.LON,
+          d.ORG,
+          d.PM10,
+          d.AVG,
+          ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM DESC) AS rn
+        FROM DUST d
+        WHERE 1=1
+          <if test="day != null and day != ''">
+            AND TRUNC(d.TM) = TO_DATE(#{day}, 'YYYY-MM-DD')
+          </if>
+          <!-- BBox는 이 쿼리에서만 참조하므로 All 호출에서 파라미터 미존재 오류가 안 납니다 -->
+          AND d.LAT BETWEEN #{minLat} AND #{maxLat}
+          AND d.LON BETWEEN #{minLon} AND #{maxLon}
+      )
+      SELECT DUST_NO, TM, STN_NM, LAT, LON, ORG, PM10, AVG
+      FROM base
+      WHERE rn = 1
     )
-    SELECT
-      STN_NM AS stnNm,
-      ORG,
-      LAT,
-      LON,
-      PM10,
-      AVG,
-      MAX,
-      CNT,
-      TM AS tm 
-    FROM ranked
-    WHERE rn = 1
-    ORDER BY STN_NM
+    ORDER BY TM DESC, STN_NM
+    <if test="limit != null">
+      FETCH FIRST #{limit} ROWS ONLY
+    </if>
   </select>
+
+  <!-- 2) 전국 버전: BBox 전혀 참조하지 않음 -->
+  <select id="selectLatestByTypeAll" resultMap="DustMap">
+    SELECT <include refid="dustColumns"/> FROM (
+      WITH base AS (
+        SELECT
+          d.DUST_NO,
+          d.TM,
+          d.STN_NM,
+          d.LAT,
+          d.LON,
+          d.ORG,
+          d.PM10,
+          d.AVG,
+          ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM DESC) AS rn
+        FROM DUST d
+        <where>
+          <if test="day != null and day != ''">
+            TRUNC(d.TM) = TO_DATE(#{day}, 'YYYY-MM-DD')
+          </if>
+        </where>
+      )
+      SELECT DUST_NO, TM, STN_NM, LAT, LON, ORG, PM10, AVG
+      FROM base
+      WHERE rn = 1
+    )
+    ORDER BY TM DESC, STN_NM
+    <if test="limit != null">
+      FETCH FIRST #{limit} ROWS ONLY
+    </if>
+  </select>
+
 </mapper>
