@@ -9,11 +9,7 @@
   <resultMap id="ShelterMap" type="com.pcwk.ehr.domain.ShelterDTO">
     <id     property="shelterNo" column="SHELTER_NO"/>
     <result property="reareNm"   column="REARE_NM"/>
-
     <result property="adress"    column="ADRESS"/>
-
-    <result property="ronaDaddr"    column="RONA_DADDR"/>
-
     <result property="lat"       column="LAT"/>
     <result property="lon"       column="LON"/>
     <result property="shltCd"    column="SHLT_CD"/>
@@ -22,11 +18,7 @@
 
   <!-- 공통 컬럼 -->
   <sql id="ShelterColumns">
-
     SHELTER_NO, REARE_NM, ADRESS, LAT, LON, SHLT_CD, SHLT_NM
-
-    SHELTER_NO, REARE_NM, RONA_DADDR, LAT, LON, SHLT_CD, SHLT_NM
-
   </sql>
 
   <!-- BBox + 키워드 -->
@@ -39,11 +31,7 @@
       <if test="q != null and q != ''">
         AND (
               UPPER(REARE_NM) LIKE '%' || UPPER(#{q}) || '%'
-
            OR UPPER(ADRESS)   LIKE '%' || UPPER(#{q}) || '%'
-
-           OR UPPER(RONA_DADDR)   LIKE '%' || UPPER(#{q}) || '%'
-
            OR UPPER(SHLT_NM)  LIKE '%' || UPPER(#{q}) || '%'
         )
       </if>
@@ -76,15 +64,9 @@
   <select id="suggestAdress" parameterType="string" resultType="string">
     SELECT ADRESS
     FROM SHELTER
-
     WHERE ADRESS IS NOT NULL
       AND UPPER(ADRESS) LIKE '%' || UPPER(#{q}) || '%'
     GROUP BY ADRESS
-
-    WHERE RONA_DADDR IS NOT NULL
-      AND UPPER(RONA_DADDR) LIKE '%' || UPPER(#{q}) || '%'
-    GROUP BY RONA_DADDR
-
     ORDER BY MIN(SHELTER_NO)
     FETCH FIRST 10 ROWS ONLY
   </select>
