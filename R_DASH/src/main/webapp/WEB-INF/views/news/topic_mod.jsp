@@ -11,7 +11,7 @@
 <link href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo.css" rel="stylesheet" />
 <link href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo-svg.css" rel="stylesheet" />
 <link href="/ehr/resources/template/dashboard/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
-<title>주제 등록</title>
+<title>주제 수정</title>
 </head>
 <body>
 <section class="section-header bg-warning text-white pb-9 pb-lg-13 mb-4 mb-lg-6">
@@ -19,7 +19,7 @@
 		<div class="row justify-content-center">
 			<div class="col-12 col-md-8 text-center">
 				<h1 class="display-2 mb-3" _msttexthash="54081573" _msthash="30">
-				오늘의 토픽을 등록하세요 !</h1>
+				오늘의 토픽을 수정하세요 !</h1>
 				<p class="lead" _msttexthash="1256972990" _msthash="31">
 				 GPT AI가 매일 뉴스를 분석하여 <strong>핵심 토픽 4건</strong>을 자동으로 제공합니다.<br>
 기본적으로는 AI의 분석 결과를 그대로 활용하지만,<br>
@@ -37,22 +37,30 @@
 				<div class="card border-light shadow-soft p-2 p-md-4 p-lg-5">
 				<div class="card-body">
 				    <form action="#" method="post">
+				     <input type="hidden" name="topicNo" id="topicNo" value="<c:out value='${vo.topicNo}'/>" >
 				    <div class="row">
 				         <div class="col-12 mt-4">
 					        <div class="form-group">
 					            <label id="title" class="form-label text-dark">주제</label>
-					            <input type="text" class="form-control" id="title" name="title" autocomplete="title" maxlength="50" required placeholder="제목을 입력하세요." >
+					            <input type="text" class="form-control" id="title" name="title" 
+					            autocomplete="title" maxlength="50" value="<c:out value='${vo.title}'/>" >
 					        </div>
 					        <div class="form-group">
+                                <label id="regId" class="form-label text-dark">등록자</label>
+                                <input type="text" class="form-control" id="regId" name="regId" 
+                                autocomplete="title"  value="<c:out value='${vo.regId}'/>" disabled="disabled">
+                            </div>
+					        <div class="form-group">
 					            <label id="contents" class="form-label text-dark">주제 상세</label>
-					            <textarea style="height:200px;" class="form-control" id="contents" name="contents" maxlength="50" maxlength="300" required placeholder="내용을 입력하세요." ></textarea>
+					            <textarea style="height:200px;" class="form-control" id="contents" name="contents" maxlength="300" required placeholder="내용을 입력하세요." >${vo.contents }</textarea>
 					        </div>
 				        </div>
 				        </div>
 				    </form>
 				</div>
 				<div class="text-center">
-					<input type="button" id="doSave" class="btn btn-warning mt-4 animate-up-2" value="등록">
+					<input type="button" id="doUpdate" class="btn btn-warning mt-4 animate-up-2" value="수정">
+				    <input type="button" id="doDelete" class="btn btn-warning mt-4 animate-up-2" value="삭제">
 				</div>
 				</div>
 			</div>
