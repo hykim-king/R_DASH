@@ -1,11 +1,13 @@
 package com.pcwk.ehr.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.pcwk.ehr.domain.FirestationDTO;
+import com.pcwk.ehr.mapper.FireSafeMapper;
 import com.pcwk.ehr.mapper.FirestationMapper;
 
 @Service
@@ -13,6 +15,9 @@ public class FirestationServiceImpl implements FirestationService {
 
     @Autowired
     private FirestationMapper mapper;
+    
+    @Autowired
+	private FireSafeMapper fireSafeMapper;
 
     @Override
     public List<FirestationDTO> selectByBBox(double minLat, double maxLat,
@@ -50,4 +55,10 @@ public class FirestationServiceImpl implements FirestationService {
     public List<String> autocompleteStation(String prefix, String area, Integer limit) {
         return mapper.autocompleteStation(prefix, area, limit);
     }
+    
+    @Override
+	public List<Map<String, Object>> getfirestationCounts() {
+	    return mapper.firestationCount();
+	}
+	
 }

@@ -6,8 +6,12 @@
 <head>
     <meta charset="UTF-8">
     <title>통계 페이지</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- DataTables JS -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+	<!-- DataTables CSS -->
+	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
+	<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         .canvasContainer {
             width: 500px; 
@@ -86,7 +90,7 @@
 	<c:when test="${type == 'fire'}">
         <h2>시/군/구별 소방서 개수</h2>
 		
-		<table id="firestationTable" border="1">
+		<table id="firestationTable" class="display" border="1">
 		    <thead>
 		        <tr>
 		            <th>순위</th>
