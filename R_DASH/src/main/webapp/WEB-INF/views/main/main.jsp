@@ -472,8 +472,9 @@ img.card-img-top {
 				<div
 					class="chat-header d-flex justify-content-between align-items-center">
 					<strong>재민이 채팅</strong>
-					<button type="button" class="btn-close btn-close-white"
-						data-bs-dismiss="modal" aria-label="Close"></button>
+					<button id="chatClose" type="button"
+						class="btn-close btn-close-white" data-bs-dismiss="modal"
+						aria-label="Close"></button>
 				</div>
 				<div id="chatBody" class="chat-body">
 					<div class="chat-bubble bot">
@@ -517,6 +518,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const chatInput = document.getElementById('chatInput');
   const chatSend = document.getElementById('chatSend');
 
+  const chatCloseBtn = document.getElementById('chatClose');
+  if (chatCloseBtn) {
+    chatCloseBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      chatModal.hide();
+    });
+  }
+  
   if (icon) {
     icon.addEventListener('click', (e) => {
       e.preventDefault();
