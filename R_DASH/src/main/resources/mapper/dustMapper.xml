@@ -4,6 +4,62 @@
 
 <mapper namespace="com.pcwk.ehr.mapper.DustMapper">
 
+
+  <!-- DTO 매핑 : DustDTO의 필드명에 맞춰 수정 -->
+  <resultMap id="DustMap" type="com.pcwk.ehr.domain.DustDTO">
+    <id     property="dustNo"  column="DUST_NO"/>
+    <result property="stnNm"   column="STN_NM"/>
+    <result property="lat"     column="LAT"/>
+    <result property="lon"     column="LON"/>
+    <result property="avg"     column="AVG"/>
+    <result property="tmDate"  column="TM_DATE"/>
+    <result property="airType" column="AIR_TYPE"/>
+  </resultMap>
+
+  <!-- 공통 컬럼 묶음 -->
+  <sql id="dustColumns">
+    STN_NM, LAT, LON, AVG, TM_DATE, AIR_TYPE
+  </sql>
+
+  <!-- 핵심 서브쿼리: airType(+옵션 day, BBox)에서 측정소별 최신 1건 -->
+  <sql id="latestPerStationBase">
+    WITH base AS (
+      SELECT
+        d.STN_NM,
+        d.LAT,
+        d.LON,
+        d.AVG,
+        d.TM_DATE,
+        d.AIR_TYPE,
+        ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) AS rn
+      FROM DUST d
+      WHERE d.AIR_TYPE = #{airType}
+      <!-- 날짜가 TIMESTAMP/DATE 어느쪽이든 안전하게 TRUNC 비교 -->
+      <if test="day != null and day != ''">
+        AND TRUNC(d.TM_DATE) = TO_DATE(#{day}, 'YYYY-MM-DD')
+      </if>
+      <if test="minLat != null and maxLat != null and minLon != null and maxLon != null">
+        AND d.LAT BETWEEN #{minLat} AND #{maxLat}
+        AND d.LON BETWEEN #{minLon} AND #{maxLon}
+      </if>
+    )
+    SELECT
+      b.STN_NM,
+      b.LAT,
+      b.LON,
+      b.AVG,
+      b.TM_DATE,
+      b.AIR_TYPE
+    FROM base b
+    WHERE b.rn = 1
+  </sql>
+
+  <!-- 1) BBox 버전 -->
+  <select id="selectLatestByTypeBBox" resultMap="DustMap">
+    SELECT <include refid="dustColumns"/>
+    FROM ( <include refid="latestPerStationBase"/> )
+    ORDER BY TM_DATE DESC, STN_NM
+
   <resultMap id="DustMap" type="com.pcwk.ehr.domain.DustDTO">
     <id     property="dustNo" column="DUST_NO"/>
     <result property="tm"     column="TM"/>
@@ -68,10 +124,17 @@
       WHERE rn = 1
     )
     ORDER BY TM DESC, STN_NM
+
     <if test="limit != null">
       FETCH FIRST #{limit} ROWS ONLY
     </if>
   </select>
+
+  <!-- 2) 전국 버전 (BBox 파라미터 없이 호출하면 자동으로 전국) -->
+  <select id="selectLatestByTypeAll" resultMap="DustMap">
+    SELECT <include refid="dustColumns"/>
+    FROM ( <include refid="latestPerStationBase"/> )
+    ORDER BY TM_DATE DESC, STN_NM
 
   <!-- 2) 전국 버전: BBox 전혀 참조하지 않음 -->
   <select id="selectLatestByTypeAll" resultMap="DustMap">
@@ -99,9 +162,13 @@
       WHERE rn = 1
     )
     ORDER BY TM DESC, STN_NM
+
     <if test="limit != null">
       FETCH FIRST #{limit} ROWS ONLY
     </if>
   </select>
 
+
 </mapper>
+
+
