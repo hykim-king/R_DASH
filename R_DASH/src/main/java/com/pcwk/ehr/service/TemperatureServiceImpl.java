@@ -469,19 +469,21 @@ public class TemperatureServiceImpl implements TemperatureService {
 	public List<PatientsDTO> selectPatientsSummary(Map<String, Object> map) throws SQLException {
 		return temperatureMapper.selectPatientsSummary(map);
 	}
-	
+
 	@Override
-    public List<NowcastDTO> getTopTemperature() {
-        return temperatureMapper.selectTopTemperature();
-    }
+	public List<NowcastDTO> getTopT1H() {
+		return temperatureMapper.selectTopT1H();
+	}
 
-    @Override
-    public List<NowcastDTO> getTopHumidity() {
-        return temperatureMapper.selectTopHumidity();
-    }
+	@Override
+	public List<NowcastDTO> getTopRN1() {
+		return temperatureMapper.selectTopRN1();
+	}
 
-    @Override
-    public List<NowcastDTO> getTopRainfall() {
-        return temperatureMapper.selectTopRainfall();
-    }
+	@Override
+	public List<NowcastDTO> getTopREH() {
+		return temperatureMapper.selectTopREH();
+	}
+	
+	
 }

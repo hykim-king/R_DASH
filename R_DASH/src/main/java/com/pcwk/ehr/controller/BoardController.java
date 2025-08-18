@@ -1,18 +1,22 @@
 package com.pcwk.ehr.controller;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URL;
 import java.sql.SQLException;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +30,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.pcwk.ehr.cmn.MessageDTO;
 import com.pcwk.ehr.cmn.PcwkString;
 import com.pcwk.ehr.cmn.SearchDTO;
@@ -42,6 +47,8 @@ public class BoardController {
 	
 	@Autowired
 	BoardService service;
+	
+	private static final String IMAGE_UPLOAD_PATH = "C:/images/summernote/";
 	
 	@Autowired
     private MarkdownService markdownService;
@@ -68,35 +75,68 @@ public class BoardController {
     public String convertMarkdown(@RequestBody String markdownText) {
         return markdownService.convertToMarkdownHtml(markdownText);
     }
-	
-    @PostMapping(value="/boardImageFile", produces="application/json")
+    @PostMapping("/saveImageByUrl")
     @ResponseBody
-    public Map<String, Object> boardImageFile(@RequestParam("file") MultipartFile file) {
-        Map<String, Object> result = new HashMap<>();
-
-        String fileRoot = "/upload/"; // 반드시 폴더 존재 확인
-        File dir = new File(fileRoot);
-        if (!dir.exists()) dir.mkdirs(); // 폴더 없으면 생성
+    public MessageDTO saveImageByUrl(@RequestBody Map<String, String> param) {
+        String imageUrl = param.get("imageUrl");
+        String publicUrl = "";
 
         try {
-            String originalFileName = file.getOriginalFilename();
-            String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
-            String savedFileName = UUID.randomUUID().toString() + extension;
+            if (imageUrl.startsWith("data:image")) {
+                // data:image/png;base64,iVBORw0... 이런 식으로 들어옴
+                String base64Data = imageUrl.substring(imageUrl.indexOf(",") + 1);
+                String meta = imageUrl.substring(0, imageUrl.indexOf(",")); // data:image/png;base64
+                String ext = meta.substring(meta.indexOf("/") + 1, meta.indexOf(";"));
 
-            File targetFile = new File(fileRoot + savedFileName);
-            file.transferTo(targetFile); // Spring MultipartFile 기본 제공
+                if (ext.equals("jpeg")) ext = "jpg";
 
-            result.put("url", "/summernoteImage/" + savedFileName);
-            result.put("responseCode", "success");
+                String saveName = UUID.randomUUID().toString() + "." + ext;
+                File uploadDir = new File("C:/images/summernote/");
+                if (!uploadDir.exists()) uploadDir.mkdirs();
 
+                File file = new File(uploadDir, saveName);
+                byte[] imageBytes = Base64.getDecoder().decode(base64Data);
+                try (OutputStream os = new FileOutputStream(file)) {
+                    os.write(imageBytes);
+                }
+
+
+                publicUrl = "/ehr/summernote/" + saveName; // ResourceHandler 매핑 기준 URL
+            } else {
+                publicUrl = imageUrl;
+            }
+
+            return new MessageDTO(1, publicUrl); // messageId=1 성공
         } catch (Exception e) {
             e.printStackTrace();
-            result.put("responseCode", "error");
-            result.put("message", e.getMessage());
+            return new MessageDTO(0, imageUrl); // 실패 시 원본 반환
         }
-
-        return result;
     }
+
+    @PostMapping("/uploadSummernoteImageFile")
+	@ResponseBody
+	public Map<String, Object> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+	    String originalFilename = file.getOriginalFilename();
+	    String ext = PcwkString.getExt(originalFilename);
+	    if (ext == null) ext = "";
+	    if (!ext.startsWith(".")) ext = "." + ext;
+
+	    String saveName = UUID.randomUUID().toString() + ext;
+
+	    File uploadDir = new File("C:/images/summernote/");
+	    if (!uploadDir.exists()) uploadDir.mkdirs();
+
+	    File target = new File(uploadDir, saveName);
+	    file.transferTo(target);
+
+	    // 여기서 contextPath 기반이 아니라 ResourceHandler 기반 경로 리턴
+	    String publicUrl = "/ehr/summernote/" + saveName;
+
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("url", publicUrl);
+	    return result;
+	}
+	
 	
 	@GetMapping("/doUpdateView.do")
 	public String doUpdateView(@RequestParam("boardNo") int boardNo,Model model,HttpSession session) throws SQLException{
@@ -225,23 +265,7 @@ public class BoardController {
 		
 		log.debug("1. param:{}", param);
 		String jsonString = "";
-		//1. 이미지를 받으면
-		String image = param.getImage(); 
 		
-		if (image != null && !image.isEmpty()) {
-			boolean isImage = PcwkString.isImageExtension(image);
-			String imageExt = PcwkString.getExt(image);
-			
-			//2. 이미지 확장자인지 확인
-			if(isImage==false) {
-				log.debug("지원하지 않는 확장자 입니다.");
-			}	
-			//3. uuid + 확장자로 변경
-			String savedImageName = PcwkString.getUUID()+imageExt;
-			param.setImage(savedImageName);
-		}else {
-			log.debug("이미지 없음.");
-		}
 		int flag = service.doUpdate(param);
 		
 		String message = "";
@@ -254,25 +278,27 @@ public class BoardController {
 		jsonString = new Gson().toJson(messageDTO);
 		log.debug("jsonString:{}", jsonString); 
 		return jsonString;
-	}
-	
+
+}	
 	//UUID 새로 만들지 말고, Summernote 업로드 시 반환된 URL 그대로 사용
 	@PostMapping(value = "doSave.do", produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public String doSave(BoardDTO param) {
 	    log.debug("param:{}", param);
-
-	    String image = param.getImage(); 
-	    if (image != null && !image.isEmpty()) {
-	        // 이미지 URL 그대로 사용
-	        log.debug("이미지 있음: {}", image);
-	    } else {
-	        log.debug("이미지 없음.");
-	    }
-
-	    int flag = service.doSave(param); // DB 저장
-	    String message = (flag == 1) ? param.getTitle() + " 등록되었습니다." : param.getTitle() + " 등록 실패";
+	    int flag = 0;
 	    
+	    try {
+	        flag = service.doSave(param);
+	    } catch (Exception e) {
+	        log.error("DB 저장 오류", e);
+	    }
+	    String message = "";
+
+	    if (1 == flag) {
+			message = "등록 되었습니다.";
+		} else {
+			message = "등록 실패!";
+		}
 	    MessageDTO messageDTO = new MessageDTO(flag, message);
 	    return new Gson().toJson(messageDTO);
 	}

@@ -19,11 +19,9 @@
 <link href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo.css" rel="stylesheet" />
 <link href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo-svg.css" rel="stylesheet" />
 <link href="/ehr/resources/template/dashboard/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="/ehr/resources/summernote/summernote-lite.min.css">
 
 <title>공지사항 수정하기</title>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
-<link rel="stylesheet" href="/ehr/resources/summernote/summernote-lite.min.css">
-<link rel="icon" href="${CP}/resources/image/Jaemini_face.ico" type="image/x-icon"/>
 </head>
 <body>
 <div class="main-content">
@@ -69,7 +67,7 @@
             <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 300px;"">
              <div class="pl-lg-4 w-75">
                 <div class="row">
-                <form action="#" method="post" enctype="multipart/form-data">
+                <form action="doUpdate" method="post" enctype="multipart/form-data">
                    <input type="hidden" name="boardNo" id="boardNo" value="<c:out value='${vo.boardNo}'/>" >
                     <div class="form-group d-flex">
                         <label for="title"></label>
@@ -94,25 +92,25 @@
 <!-- //Page Contents -->
 </div>
 
-
-<div>
-    <img style="width:200px; height:150px; object-fit: contain;" src="/ehr/resources/image/board_Jeamin.png">
-</div>
 <%-- <p>제목 테스트: ${vo.title}</p>
 <p>등록자 테스트: ${vo.modId}</p>
 <p>내용 테스트: ${vo.contents}</p> --%>
-  
-<script src="${CP}/resources/summernote/summernote-lite.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+<script src="${CP}/resources/summernote/summernote-lite.min.js" defer></script>
 <script src="${CP}/resources/summernote/lang/summernote-ko-KR.js"></script>
 <script>
-    $('#summernote').summernote({
-        height: 300,                 // 에디터 높이
-        minHeight: null,             // 최소 높이
-        maxHeight: null,             // 최대 높이
+$(document).ready(function() {
+      console.log($('#summernote').length); 
+    var $summernote = $('#summernote');
+
+    $summernote.summernote({
+        height: 300,
+        minHeight: null,
+        maxHeight: null,
+        focus: true,
         lang: "ko-KR",
         placeholder: '최대 500자까지 쓸 수 있습니다',
-          toolbar: [
-            // [groupName, [list of button]]
+        toolbar: [
             ['style', ['bold', 'italic', 'underline', 'clear']],
             ['fontname', ['fontname']],
             ['fontsize', ['fontsize']],
@@ -120,41 +118,129 @@
             ['table', ['table']],
             ['para', ['ul', 'ol', 'paragraph']],
             ['height', ['height']],
-            ['insert',['picture']]
-          ],
-          fontname: ['Arial', 'Arial Black', 'Comic Sans MS', 'Courier New','맑은 고딕','궁서','굴림체','굴림','돋움체','바탕체'],
-    
-            // 이미지 업로드 처리
-            callbacks: {
-                onImageUpload: function(files) {
-                    let formData = new FormData();
-                    formData.append("file", files[0]);
-        
-                    $.ajax({
-                        url: '${CP}/board/imageUpload.do',
-                        type: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        success: function(url) {
-                            // 서버에서 반환한 URL 삽입
-                            $('#summernote').summernote('insertImage', url);
-                        },
-                        error: function() {
-                            alert('이미지 업로드 실패');
-                        }
-                    });
+            ['insert', ['picture']]
+        ],
+        callbacks: {
+            onInit: function() {
+                console.log('Summernote 초기화 완료!');
+                
+                // 초기화 후에 실행할 코드
+                setTimeout(function() {
+                    $('.loading, .overlay').css('opacity', 0);
+                    setTimeout(function() {
+                        $('.loading, .overlay').hide();
+                    }, 400);
+                }, 2000);
+            },
+            onImageUpload: function(files) {
+                // 여러 파일도 처리 가능
+                for (let i = 0; i < files.length; i++) {
+                    uploadImage(files[i]);
                 }
+            },
+            onImageLinkInsert: function(url) { 
+                console.log("Image link inserted:", url);
+                saveByImageUrl(url, function(savedUrl){
+                    $('#summernote').summernote('insertImage', savedUrl);
+                });
+            }
+        }
+    });
+    
+    function uploadImage(file) {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        $.ajax({
+            url: "/ehr/board/uploadSummernoteImageFile", // 서버 이미지 업로드 URL
+            type: "POST",
+            data: formData,
+            contentType: false,
+            processData: false,
+            dataType: "json",
+            success: function(data) {
+                // 서버에서 반환한 이미지 URL 삽입
+                $('#summernote').summernote('insertImage', data.url);
+            },
+            error: function(xhr, status, error) {
+                console.error("이미지 업로드 실패:", error);
             }
         });
-    // 초기값 셋팅
+    }
+    function saveByImageUrl(url,callback){
+        $.ajax({
+            url: "/ehr/board/saveImageByUrl",
+            type: "POST",
+            contentType: "application/json",
+            processData: false,
+            data: JSON.stringify({ imageUrl: url }),
+            dataType: "json",
+            success: function(response) {
+                 console.log("response:", response);
+
+                 // 서버에서 MessageDTO로 반환: messageId, message
+                 if (response.messageId == 1) {
+                     // 저장 성공
+                     if (callback) callback(response.message); // message에 publicUrl이 들어있음
+                 } else {
+                     // 실패 시 원본 URL 그대로
+                     if (callback) callback(url);
+                 }
+             },
+            error: function(xhr, status, error) {
+                console.error("url error:", error);
+                if (callback) callback(url); // 실패하면 원본 URL 반환
+            }
+        });
+    }
+    /* // 초기값 셋팅
     var initContents = `<c:out value='${fn:escapeXml(vo.contents)}'/>`;
-    $('#summernote').summernote('code', initContents);
+    $('#summernote').summernote('code', initContents); */
+    
+ // 초기화 완료 후 로그
+    $summernote.on('summernote.init', function() {
+        console.log('Summernote is ready!');
+    });
+    
+    $('#doUpdate').on('click',function(){
+    	const summernoteContent = $summernote.summernote('code'); // 안전하게 접근
+        if (!summernoteContent || summernoteContent === '<p><br></p>') {
+            alert('내용을 입력하세요');
+            return;
+        }
+        const formData = new FormData();
+        formData.append("title", $('#title').val());
+        formData.append("contents", summernoteContent);
+        formData.append("boardNo", $('#boardNo').val());
+        
+        $.ajax({
+        	type: "POST",
+        	url:"/ehr/board/doUpdate.do",
+        	data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            success: function(response) {
+            	console.log("doUpdate response:", response);
+                if (response.messageId == 1) {
+                    alert("수정 되었습니다.");
+                    window.location.href = '/ehr/board/doRetrieve.do';
+                }else {
+                    alert("수정 실패: " + response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+            	console.error("doUpdate error:", error);
+                alert("수정 중 오류가 발생했습니다.");
+            }
+        });
+    });
+    $('#moveToList').on('click', function() {
+        alert("목록으로 이동합니다.");
+        window.location.href = '/ehr/board/doRetrieve.do';
+    });
+});
        
 </script>
-
-
-
-
 </body>
 </html>

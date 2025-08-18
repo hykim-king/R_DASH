@@ -49,13 +49,34 @@
     <canvas id="inOutdoorChart"></canvas>
 </div>
 
-<select id="dataTypeSelect">
-    <option value="TEMP">기온</option>
-    <option value="HUM">습도</option>
-    <option value="RAIN">강수량</option>
-</select>
+<h3>기온(T1H) Top5</h3>
+<table border="1">
+    <thead>
+        <tr>
+            <th>순위</th>
+            <th>지역</th>
+            <th>기온(℃)</th>
+        </tr>
+    </thead>
+    <tbody id="t1hTable">
+        <!-- JS에서 채움 -->
+    </tbody>
+</table>
 
-<canvas id="top5Chart" width="400" height="200"></canvas>
+<h3>습도(REH) & 강수량(RN1) Top5</h3>
+<table border="1">
+    <thead>
+        <tr>
+            <th>순위</th>
+            <th>지역</th>
+            <th>습도(%)</th>
+            <th>강수량(mm)</th>
+        </tr>
+    </thead>
+    <tbody id="rehRn1Table">
+        <!-- JS에서 채움 -->
+    </tbody>
+</table>
 
 <script src="${pageContext.request.contextPath}/resources/js/patients.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/nowcast.js"></script>
