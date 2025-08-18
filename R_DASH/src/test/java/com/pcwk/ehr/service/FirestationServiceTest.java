@@ -110,7 +110,11 @@ class FirestationServiceTest {
     /** 자동완성 - 소방서명 */
     @Test
     void autocompleteStationTest() {
+
+        List<String> names = service.autocompleteStation("중부", "서울특별시", 5);
+
         List<String> names = service.autocompleteStation("중부", 5);
+
         assertNotNull(names);
         log.debug("소방서명 자동완성: {}", names);
     }
