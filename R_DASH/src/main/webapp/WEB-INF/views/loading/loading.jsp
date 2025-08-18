@@ -2,10 +2,7 @@
 <html>
 <head>
 <title>Image Spinner</title>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
 <style>
-  /* 전체 화면을 덮는 반투명 오버레이 */
   .overlay {
     position: fixed;
     top: 0;

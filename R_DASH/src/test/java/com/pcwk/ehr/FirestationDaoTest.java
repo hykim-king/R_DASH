@@ -112,6 +112,8 @@ class FirestationDaoTest {
     @Test
     public void autocompleteStationTest() {
         List<String> list = mapper.autocompleteStation("중부", "서울특별시", 5);
+        List<String> list = mapper.autocompleteStation("중부", 5);
+
         assertNotNull(list);
         log.debug("소방서명 자동완성 결과: {}", list);
     }

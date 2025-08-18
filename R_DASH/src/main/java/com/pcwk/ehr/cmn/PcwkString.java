@@ -184,11 +184,7 @@ public class PcwkString {
         if(currentPageNo > maxPageNo) {
         	return "";
         }
-        System.out.println("maxPageNo : "+maxPageNo);
-        System.out.println("startPageNo : "+startPageNo);
-        System.out.println("endPageNo : "+endPageNo);
-        System.out.println("nowBlockNo : "+nowBlockNo);
-        System.out.println("maxBlockNo : "+maxBlockNo);
+
 		//«	<	1	2	3	4	5	>	»
 		//a b           c           d   e
 		//« : 1 page로 이동
@@ -234,7 +230,7 @@ public class PcwkString {
         		html.append("</a></li>\n");        		 
         	}
         }
-        System.out.println("inx : "+inx);
+
         inx -= 1;
 
         //> 오른쪽으로 bottomCount++

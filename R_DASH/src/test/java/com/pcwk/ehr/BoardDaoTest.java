@@ -45,7 +45,7 @@ class BoardDaoTest {
 		log.debug("│ setUp()            │");
 		log.debug("└────────────────────┘");
 		
-		dto01 = new BoardDTO(0, "제목1", "내용1", "이미지1.png",0, "사용안함", "ADMIN", "사용안함", "ADMIN");
+		dto01 = new BoardDTO(0, "제목1", "내용1",0, "사용안함", "ADMIN", "사용안함", "ADMIN");
 		search = new SearchDTO();
 	}
 
@@ -74,7 +74,7 @@ class BoardDaoTest {
 		assertEquals(1, view);
 
 	}
-	@Disabled
+	//@Disabled
 	@Test
 	void doRetrieve() {
 		log.debug("┌────────────────────┐");
@@ -100,7 +100,7 @@ class BoardDaoTest {
 	
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void doUpdate() {
 		log.debug("┌────────────────────┐");
@@ -130,7 +130,7 @@ class BoardDaoTest {
 		isSameBoard(inVO, outVO);
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void saveAndDelete() {
 		log.debug("┌────────────────────┐");
@@ -151,7 +151,7 @@ class BoardDaoTest {
 		assertEquals(0,mapper.getCount());
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");
@@ -172,7 +172,6 @@ class BoardDaoTest {
 		assertEquals(outVO.getBoardNo(),dto01.getBoardNo());
 		assertEquals(outVO.getTitle(),dto01.getTitle());
 		assertEquals(outVO.getContents(),dto01.getContents());
-		assertEquals(outVO.getImage(),dto01.getImage());
 		assertEquals(outVO.getViewCnt(),dto01.getViewCnt());
 		assertEquals(outVO.getModId(),dto01.getModId());
 
