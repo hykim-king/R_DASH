@@ -46,7 +46,7 @@
         DELETE FROM NEWS
     </delete>
     
-    <select id="searchByKeyword" parameterType="NewsDTO" resultType="NewsDTO">
+    <select id="searchByKeyword" parameterType="String" resultType="NewsDTO">
         SELECT 
 		    news_no,
 		    keyword,
