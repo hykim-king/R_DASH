@@ -20,7 +20,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
-<script src="/ehr/resources/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 
 <script>
@@ -44,5 +44,13 @@
        noticeModal.show();
    });
 });
+   const closeBtn = queryselector(".btn-close.btn-close-white");
+   
+   closeBtn.addEventListener("click",function(event){
+	   console.log('closeBtn click');
+	   
+	   $("#noticeModal").hide();
+	   
+   });
    
 </script>
