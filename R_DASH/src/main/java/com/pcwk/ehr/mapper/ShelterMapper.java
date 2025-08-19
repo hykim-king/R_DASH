@@ -11,7 +11,7 @@ import com.pcwk.ehr.domain.ShelterDTO;
 @Mapper
 public interface ShelterMapper extends WorkDiv<ShelterDTO> {
 	/** 단건 상세 */
-	ShelterDTO selectOne(@Param("shelterNo") long shelterNo);
+	ShelterDTO selectOne(@Param("shelterNo") Integer shelterNo);
 
 	/** 단순 리스트(상위 N개) */
 	List<ShelterDTO> selectList(@Param("limit") Integer limit);

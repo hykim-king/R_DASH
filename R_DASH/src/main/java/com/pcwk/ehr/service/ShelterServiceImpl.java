@@ -29,7 +29,7 @@ public class ShelterServiceImpl implements ShelterService {
 
     /** 단건 상세 */
     @Override
-    public ShelterDTO selectOne(long shelterNo) throws Exception {
+    public ShelterDTO selectOne(Integer shelterNo) throws Exception {
         return mapper.selectOne(shelterNo);
     }
 

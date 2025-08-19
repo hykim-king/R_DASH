@@ -1,78 +1,77 @@
 package com.pcwk.ehr.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.BDDMockito.given;      // BDD 스타일
-// import static org.mockito.Mockito.when;      // Mockito 스타일을 쓰고 싶으면 이걸로 대체 가능
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.pcwk.ehr.domain.ShelterDTO;
-import com.pcwk.ehr.mapper.ShelterMapper;
 
-/**
- * Service 단위 테스트
- * - Mapper는 Mock(가짜)으로 두고, Service 로직만 검증
- */
-@ExtendWith(MockitoExtension.class) // JUnit5 + Mockito 통합
+@WebAppConfiguration
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations = {
+    "file:src/main/webapp/WEB-INF/spring/root-context.xml",
+    "file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml"
+})
 class ShelterServiceTest {
 
-    @Mock
-    ShelterMapper mapper;           // DB 호출 대신 동작을 우리가 지정
+    final Logger log = LogManager.getLogger(getClass());
 
-    @InjectMocks
-    ShelterServiceImpl service;     // 테스트 대상(Service) - mapper Mock이 주입됨
+    @Autowired
+    ApplicationContext context;
+
+    @Autowired
+    ShelterService service;  // 실제 Service Bean 주입 (Mapper/DB도 연결됨)
+
+    @BeforeEach
+    void setUp() {
+        log.debug("context={}, service={}", context, service);
+    }
 
     /** 단건 조회 */
     @Test
     void selectOne_ok() throws Exception {
-        ShelterDTO dummy = new ShelterDTO();
-        dummy.setShelterNo(1);                 // Integer 타입 맞춤
-        dummy.setReareNm("테스트대피소");
+        Integer shelterNo = 1; // 실제 DB에 1번 데이터가 있어야 성공
+        ShelterDTO result = service.selectOne(shelterNo);
 
-        given(mapper.selectOne(1)).willReturn(dummy);
-
-        ShelterDTO result = service.selectOne(1);
-
-        assertNotNull(result);
-        assertEquals(1, result.getShelterNo());
-        assertEquals("테스트대피소", result.getReareNm());
+        assertNotNull(result, "결과가 null이면 안됨");
+        log.info("selectOne({}) -> {}", shelterNo, result);
     }
 
     /** BBox 조회 */
     @Test
     void selectByBBox_ok() throws Exception {
-        ShelterDTO s1 = new ShelterDTO(); s1.setShelterNo(1);
-        ShelterDTO s2 = new ShelterDTO(); s2.setShelterNo(2);
+        double minLat = 37.4, maxLat = 37.6;
+        double minLon = 126.8, maxLon = 127.1;
 
-        given(mapper.selectByBBox(37.4, 37.6, 126.8, 127.1, null, 10))
-            .willReturn(Arrays.asList(s1, s2));
+        List<ShelterDTO> rows = service.selectByBBox(minLat, maxLat, minLon, maxLon, null, 10);
 
-        List<ShelterDTO> rows = service.selectByBBox(37.4, 37.6, 126.8, 127.1, null, 10);
-
-        assertEquals(2, rows.size());
-        assertEquals(1, rows.get(0).getShelterNo());
+        assertNotNull(rows);
+        assertFalse(rows.isEmpty(), "BBox 결과가 비어있음");
+        log.info("BBox 결과 건수={}", rows.size());
+        rows.forEach(r -> log.info("{}", r));
     }
 
     /** 자동완성 - 주소 */
     @Test
     void suggestAdress_ok() throws Exception {
-        given(mapper.suggestAdress("서울"))
-            .willReturn(Collections.singletonList("서울시 양천구 화곡로"));
-
         List<String> list = service.suggestAdress("서울");
 
-        assertFalse(list.isEmpty());
+        assertNotNull(list);
+        assertFalse(list.isEmpty(), "자동완성 결과 없음");
         assertTrue(list.get(0).contains("서울"));
+        log.info("자동완성 결과 -> {}", list);
     }
 }

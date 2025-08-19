@@ -20,6 +20,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,6 +49,9 @@ public class BoardController {
 	@Autowired
 	BoardService service;
 	
+	@Autowired
+	private SimpMessagingTemplate simpMessagingTemplate;
+	
 	private static final String IMAGE_UPLOAD_PATH = "C:/images/summernote/";
 	
 	@Autowired
@@ -66,6 +70,7 @@ public class BoardController {
 //	목록 조회	/board/doRetrieve.do	GET 0
 //	등록 화면	/board/doSaveView.do	POST
 //	수정 화면	/board/doUpdateView.do	POST
+	
     /**
      * 마크다운을 HTML로 변환하는 API
      * @param markdownText 마크다운 원본
@@ -80,7 +85,8 @@ public class BoardController {
     public MessageDTO saveImageByUrl(@RequestBody Map<String, String> param) {
         String imageUrl = param.get("imageUrl");
         String publicUrl = "";
-
+        
+       
         try {
             if (imageUrl.startsWith("data:image")) {
                 // data:image/png;base64,iVBORw0... 이런 식으로 들어옴
@@ -292,6 +298,17 @@ public class BoardController {
 	    } catch (Exception e) {
 	        log.error("DB 저장 오류", e);
 	    }
+	    
+	    // 공지 글이면 websocket 알림 
+	    if("Y".equals(param.getIsNotice())) {
+	    	Map<String,String> noticeMsg = new HashMap<>();
+	    	noticeMsg.put("boardNo", String.valueOf(param.getBoardNo()));
+	    	noticeMsg.put("title", param.getTitle());
+	    	noticeMsg.put("contents", param.getContents());
+	    	
+	    	simpMessagingTemplate.convertAndSend("/topic/notice",noticeMsg);
+	    }
+	    
 	    String message = "";
 
 	    if (1 == flag) {

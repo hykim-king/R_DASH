@@ -45,7 +45,7 @@ class BoardDaoTest {
 		log.debug("│ setUp()            │");
 		log.debug("└────────────────────┘");
 		
-		dto01 = new BoardDTO(0, "제목1", "내용1",0, "사용안함", "ADMIN", "사용안함", "ADMIN");
+		dto01 = new BoardDTO(0, "제목1", "내용1",0, "사용안함", "ADMIN", "사용안함", "ADMIN",null);
 		search = new SearchDTO();
 	}
 
