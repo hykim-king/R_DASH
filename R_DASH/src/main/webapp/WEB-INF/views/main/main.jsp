@@ -23,349 +23,205 @@
 	href="${CP}/resources/template/Animate/backInUp.css">
 
 <style>
+/* ========== Base ========== */
 html, body {
-	margin: 0;
-	padding: 0;
-	font-family: 'Noto Sans KR', sans-serif;
-	scroll-behavior: smooth;
-	width: 100%;
+  margin: 0;
+  padding: 0;
+  font-family: 'Noto Sans KR', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  width: 100%;
+  scroll-behavior: smooth;
+  color: #fff;
 }
 
-/* 메인 + 뉴스 공통 배경 */
+/* 배경 공통 */
 .main-background {
-	background-image: url('${CP}/resources/image/mainboard.png');
-	background-size: cover;
-	background-position: center;
-	background-repeat: no-repeat;
-	background-attachment: fixed;
-	color: white;
+  background-image: url('${CP}/resources/image/mainboard.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  color: #fff;
 }
 
 /* 메인 섹션 */
 .main-section {
-	height: 100vh;
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	align-items: center;
-	text-align: center;
-	padding-top: 80px;
-	position: relative;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding-top: 80px;
+  position: relative;
 }
 
-/* 드롭다운(공통) */
-.dropdown-wrapper {
-	display: none;
-	position: absolute;
-	top: 100%;
-	left: 0;
-	width: 100%;
-	padding-top: 10px;
-	display: flex;
-	justify-content: center;
-	gap: 40px;
-	z-index: 999;
-	background: transparent;
-}
-
-.dropdown-column {
-	display: flex;
-	flex-direction: column;
-}
-
-.dropdown-column a {
-	color: white;
-	text-decoration: none;
-	padding: 6px 12px;
-	white-space: nowrap;
-	font-size: 0.9rem;
-}
-
-.dropdown-column a:hover {
-	text-decoration: underline;
-	background-color: rgba(255, 255, 255, 0.1);
-}
-
-.dropdown-wrap:hover .mega-dropdown {
-	display: flex;
-}
-
-/* 개별 nav-item 하위 드롭다운 */
-.nav-item {
-	position: relative;
-}
-
-.submenu {
-	position: absolute;
-	top: 100%;
-	left: 0;
-	display: none;
-	flex-direction: column;
-	background: rgba(0, 0, 0, 0.9);
-	padding: 10px 0;
-	border-radius: 6px;
-	min-width: 160px;
-	z-index: 1000;
-}
-
-.submenu a {
-	color: white;
-	padding: 8px 20px;
-	text-decoration: none;
-	font-size: 0.9rem;
-	white-space: nowrap;
-}
-
-.submenu a:hover {
-	background-color: rgba(255, 255, 255, 0.2);
-}
-
-.dropdown:hover .submenu {
-	display: flex;
-}
-
-/* 전체 드롭다운 표시 트리거 */
-.top-bar:hover+.dropdown-wrapper, .center-menu:hover+.dropdown-wrapper,
-	.dropdown-wrapper:hover {
-	display: flex !important;
-}
-
-/* 메가 드롭다운 */
-.mega-dropdown {
-	display: none;
-	position: absolute;
-	top: 100%;
-	left: 0;
-	padding: 15px 20px;
-	background: rgba(0, 0, 0, 0.9);
-	z-index: 999;
-	flex-direction: row;
-	gap: 40px;
-}
-
-.mega-dropdown .dropdown-column {
-	display: flex;
-	flex-direction: column;
-}
-
-.mega-dropdown .dropdown-column a {
-	color: white;
-	text-decoration: none;
-	padding: 6px 12px;
-	font-size: 0.9rem;
-}
-
-.mega-dropdown .dropdown-column a:hover {
-	background-color: rgba(255, 255, 255, 0.1);
-}
-
-/* 모든 상단 메뉴 hover 시 전체 드롭다운 */
-.top-bar:hover ~ .mega-dropdown, .mega-dropdown:hover {
-	display: flex;
-}
-
-/* 검색창 */
+/* ========== Hero (메인 인사 문구) ========== */
 .search-container {
-	margin-top: 150px;
-	text-align: center;
+  position: relative;               /* 아이콘을 문구 위 중앙에 얹기 위해 */
+  width: 100%;
+  padding: 20px;
 }
 
 .search-container h1 {
-	font-size: 1.6rem;
-	font-weight: bold;
-	margin-bottom: 20px;
-	text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+  /* 화면 크기에 따라 자연스럽게 커지는 글자 */
+  font-size: clamp(1.8rem, 2.6vw + 1rem, 2.1rem);
+  font-weight: 700;
+  line-height: 1.6;
+  text-align: center;
+  color: #fff;
+  text-shadow: 0 3px 8px rgba(0,0,0,.35);
+  margin: 0 auto;
+  max-width: 1500px;
 }
 
-.search-box {
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	width: 320px;
-	margin: 15px auto;
+/* ========== Dropdowns ========== */
+.dropdown-wrapper {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  padding-top: 10px;
+  justify-content: center;
+  gap: 40px;
+  z-index: 999;
+  background: transparent;
 }
 
-.search-input {
-	border-radius: 30px 0 0 30px;
-	padding: 10px;
-	border: none;
-	width: 100%;
-	font-size: 0.9rem;
+.dropdown-column { display: flex; flex-direction: column; }
+
+.dropdown-column a {
+  color: #fff;
+  text-decoration: none;
+  padding: 6px 12px;
+  white-space: nowrap;
+  font-size: 0.9rem;
 }
 
-.search-btn {
-	border-radius: 0 30px 30px 0;
-	border: none;
-	padding: 10px 18px;
-	background-color: #dc3545;
-	color: white;
-	font-size: 0.9rem;
-	writing-mode: horizontal-tb;
-	line-height: 1;
-	white-space: nowrap;
+.dropdown-column a:hover {
+  text-decoration: underline;
+  background-color: rgba(255,255,255,0.1);
 }
 
-/* 뉴스 섹션 */
-.news-section {
-	padding: 60px 0;
+.dropdown-wrap:hover .mega-dropdown { display: flex; }
+
+/* 개별 드롭다운 */
+.nav-item { position: relative; }
+
+.submenu {
+  position: absolute; top: 100%; left: 0; display: none;
+  flex-direction: column; background: rgba(0,0,0,0.9);
+  padding: 10px 0; border-radius: 6px; min-width: 160px; z-index: 1000;
 }
 
-.news-section .card {
-	background-color: rgba(255, 255, 255, 0.85);
+.submenu a { color: #fff; padding: 8px 20px; text-decoration: none; font-size: 0.9rem; white-space: nowrap; }
+.submenu a:hover { background: rgba(255,255,255,0.2); }
+.dropdown:hover .submenu { display: flex; }
+
+/* 전체 드롭다운 표시 트리거 */
+.top-bar:hover + .dropdown-wrapper,
+.center-menu:hover + .dropdown-wrapper,
+.dropdown-wrapper:hover { display: flex !important; }
+
+/* 메가 드롭다운 */
+.mega-dropdown {
+  display: none; position: absolute; top: 100%; left: 0;
+  padding: 15px 20px; background: rgba(0,0,0,0.9);
+  z-index: 999; flex-direction: row; gap: 40px;
 }
 
+.mega-dropdown .dropdown-column { display: flex; flex-direction: column; }
+.mega-dropdown .dropdown-column a { color: #fff; text-decoration: none; padding: 6px 12px; font-size: 0.9rem; }
+.mega-dropdown .dropdown-column a:hover { background: rgba(255,255,255,0.1); }
+
+.top-bar:hover ~ .mega-dropdown, .mega-dropdown:hover { display: flex; }
+
+/* ========== News / FAQ ========== */
+.news-section { padding: 60px 0; }
+.news-section .card { background: rgba(255,255,255,0.85); color: #111; }
 .news-title {
-	text-align: center;
-	font-size: 1.8rem;
-	font-weight: bold;
-	margin-bottom: 30px;
-	color: white;
-	text-shadow: 1px 1px 3px black;
+  text-align: center; font-size: 1.8rem; font-weight: 700; margin-bottom: 30px;
+  color: #fff; text-shadow: 1px 1px 3px #000;
 }
 
-/* FAQ 섹션 */
-.faq-section {
-	background-color: #212529;
-	color: white;
-	padding: 60px 20px;
+.faq-section { background: #212529; color: #fff; padding: 60px 20px; }
+.accordion-button { background: #343a40; color: #fff; }
+.accordion-button:not(.collapsed) { background: #495057; }
+.accordion-body { background: #2c2f33; color: #ccc; }
+img.card-img-top { width: 100%; height: 200px; object-fit: cover; }
+
+/* ========== Floating Icon (재민이 아이콘) ========== */
+/* 1) search-container 안에 있을 때: 문구 위 중앙 배치 */
+.search-container .floating-icon {
+  position: absolute;
+  left: 50%;
+  top: -88px;                     /* 여기 숫자만 조절하면 위/아래 미세 조정됨 */
+  transform: translateX(-50%);
+  z-index: 5;
 }
 
-.accordion-button {
-	background-color: #343a40;
-	color: #fff;
-}
-
-.accordion-button:not(.collapsed) {
-	background-color: #495057;
-}
-
-.accordion-body {
-	background-color: #2c2f33;
-	color: #ccc;
-}
-
-img.card-img-top {
-	width: 100%;
-	height: 200px;
-	object-fit: cover;
-}
-
-/* ===== 우측 하단 플로팅 이모티콘 ===== */
+/* 2) 컨테이너 밖에 있을 때를 대비한 fallback: 우하단 고정 */
 .floating-icon {
-	position: fixed;
-	right: 22px;
-	bottom: 22px;
-	z-index: 2000;
-	cursor: pointer;
+  position: fixed;
+  right: 22px;
+  bottom: 20vh;                   /* 화면 높이 기준으로 약간 띄움 */
+  z-index: 9999;
+  cursor: pointer;
 }
 
 .floating-icon img {
-	width: 76px;
-	height: 76px;
-	object-fit: cover;
-	border-radius: 50%;
-	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.35);
-	transition: transform .18s ease-in-out, box-shadow .18s ease-in-out;
-	background: #fff;
+  width: 76px; height: 76px; object-fit: cover;
+  border-radius: 50%; background: #fff;
+  box-shadow: 0 6px 14px rgba(0,0,0,.35);
+  transition: transform .18s ease-in-out, box-shadow .18s ease-in-out;
+}
+.floating-icon:hover img { transform: scale(1.07); box-shadow: 0 10px 18px rgba(0,0,0,.45); }
+
+/* 모바일 최적화 */
+@media (max-width: 576px) {
+  .search-container .floating-icon { top: -70px; }
+  .floating-icon { bottom: 12vh; }
+  .floating-icon img { width: 60px; height: 60px; }
 }
 
-.floating-icon:hover img {
-	transform: scale(1.07);
-	box-shadow: 0 10px 18px rgba(0, 0, 0, 0.45);
-}
+/* ========== Chat Modal ========== */
+.chat-modal .modal-dialog { max-width: 420px; }
 
-@media ( max-width : 576px) {
-	.floating-icon img {
-		width: 60px;
-		height: 60px;
-	}
-}
-
-/* ===== 채팅 모달 ===== */
+/* 우하단 고정(모달) */
 .chat-modal .modal-dialog {
-	max-width: 420px;
+  position: fixed; right: 24px; bottom: 110px; margin: 0;
 }
 
-/* 우하단 고정 배치 (부트스트랩 중앙 배치 대신) */
-.chat-modal .modal-dialog {
-	position: fixed;
-	right: 24px;
-	bottom: 110px; /* 플로팅 아이콘과 간격 */
-	margin: 0;
-}
-
-.chat-modal .modal-content {
-	border-radius: 16px;
-	overflow: hidden;
-}
-
-.chat-header {
-	background: #dc3545;
-	color: #fff;
-	padding: 12px 16px;
-}
+.chat-modal .modal-content { border-radius: 16px; overflow: hidden; }
+.chat-header { background: #dc3545; color: #fff; padding: 12px 16px; }
 
 .chat-body {
-	height: 360px;
-	overflow-y: auto;
-	background: #f6f7f9;
-	padding: 12px;
+  height: 360px; overflow-y: auto; background: #f6f7f9; padding: 12px;
 }
 
 .chat-footer {
-	display: flex;
-	gap: 8px;
-	padding: 10px 12px 14px;
-	background: #fff;
-	border-top: 1px solid #eee;
+  display: flex; gap: 8px; padding: 10px 12px 14px;
+  background: #fff; border-top: 1px solid #eee;
 }
 
 .chat-input {
-	flex: 1;
-	resize: none;
-	height: 44px;
-	padding: 10px 12px;
-	border: 1px solid #ddd;
-	border-radius: 10px;
-	outline: none;
+  flex: 1; resize: none; height: 44px; padding: 10px 12px;
+  border: 1px solid #ddd; border-radius: 10px; outline: none;
 }
 
 .chat-send-btn {
-	border: none;
-	border-radius: 10px;
-	padding: 0 16px;
-	background: #dc3545;
-	color: #fff;
-	font-weight: 600;
+  border: none; border-radius: 10px; padding: 0 16px;
+  background: #dc3545; color: #fff; font-weight: 600;
 }
 
 .chat-bubble {
-	max-width: 78%;
-	margin: 6px 0;
-	padding: 10px 12px;
-	border-radius: 14px;
-	line-height: 1.4;
-	word-break: break-word;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
-	font-size: .95rem;
+  max-width: 78%; margin: 6px 0; padding: 10px 12px; border-radius: 14px;
+  line-height: 1.4; word-break: break-word; box-shadow: 0 1px 2px rgba(0,0,0,.06);
+  font-size: .95rem; color: #111;
 }
-
-.chat-bubble.user {
-	margin-left: auto;
-	background: #ffe3e6;
-}
-
-.chat-bubble.bot {
-	margin-right: auto;
-	background: #fff;
-}
-
-.chat-time {
-	display: block;
-	margin-top: 2px;
-	font-size: .75rem;
-	opacity: .6;
-}
+.chat-bubble.user { margin-left: auto; background: #ffe3e6; }
+.chat-bubble.bot  { margin-right: auto; background: #fff; }
+.chat-time { display: block; margin-top: 2px; font-size: .75rem; opacity: .6; }
 </style>
 </head>
 
@@ -375,15 +231,16 @@ img.card-img-top {
 	<div class="main-section main-background">
 
 		<div class="search-container backInUp">
-			<h1>저희 재난 알림 사이트를 방문해주셔서 감사합니다.</h1>
-			<div class="search-box">
-				<form action="${CP}/search" method="get"
-					style="display: flex; width: 100%;">
-					<input type="text" name="keyword" class="search-input"
-						placeholder="원하시는 검색 단어를 입력해주세요." required>
-					<button type="submit" class="search-btn">검색</button>
-				</form>
-			</div>
+			<!-- 우측 하단 고정 아이콘 -->
+			<a class="floating-icon" href="#" aria-label="도움말 또는 채팅 열기"
+				title="재민이"> <img src="${CP}/resources/image/Jaemini_bo.jpg"
+				alt="재민이 아이콘">
+			</a>
+
+			<h1>
+				재민이가 여러분의 안전을 함께 지켜요!<br> 최신 재난 소식과 상황별 행동요령을 신속·정확하게 안내해 여러분의
+				안전을 지키겠습니다.
+			</h1>
 		</div>
 	</div>
 
@@ -458,11 +315,6 @@ img.card-img-top {
 		</div>
 	</div>
 
-	<!-- 우측 하단 고정 아이콘 -->
-	<a class="floating-icon" href="#" aria-label="도움말 또는 채팅 열기"
-		title="도움말/채팅"> <img src="${CP}/resources/image/Jaemini_bo.jpg"
-		alt="재민이 아이콘">
-	</a>
 
 	<!-- 채팅 모달 -->
 	<div class="modal fade chat-modal" id="chatModal" tabindex="-1"
