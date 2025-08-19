@@ -9,7 +9,7 @@ public interface ShelterService {
 	List<ShelterDTO> selectByBBox(double minLat, double maxLat, double minLon, double maxLon, String q, Integer limit)
 			throws Exception;
 
-	ShelterDTO selectOne(long shelterNo) throws Exception;
+	ShelterDTO selectOne(Integer shelterNo) throws Exception;
 
 	List<ShelterDTO> selectList(Integer limit) throws Exception;
 
