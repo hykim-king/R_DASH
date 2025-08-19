@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.pcwk.ehr.service.FireDisasterService;
+import com.pcwk.ehr.service.FireExitService;
 import com.pcwk.ehr.service.FireSafeService;
 import com.pcwk.ehr.service.FirestationService;
 
@@ -24,6 +26,31 @@ public class FireController {
 	@Autowired
 	private FireSafeService fireSafeService;
 	
+	@Autowired
+	private FireDisasterService fireDiasterService;
+	
+	@Autowired
+	private FireExitService fireExitService;
+
+	@GetMapping("/fire-ext")
+	@ResponseBody
+	public List<Map<String,Object>> getSubwayExtCount() {
+	    return fireExitService.getSubwayExtCount();
+	}
+
+	
+	@GetMapping("/fire-yearly")
+	@ResponseBody
+    public List<Map<String, Object>> getYearlyFire() {
+        return fireDiasterService.getYearlyFireCount();
+    }
+
+    @GetMapping("/fire-damage")
+    @ResponseBody
+    public List<Map<String, Object>> getFireDamage() {
+        return fireDiasterService.getFireTypeDamage();
+    }
+    
 	@GetMapping("/fire-safe.do")
 	@ResponseBody
     public List<Map<String, Object>> getFireSafe() {
