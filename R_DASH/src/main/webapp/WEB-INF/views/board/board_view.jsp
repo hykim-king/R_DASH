@@ -17,38 +17,93 @@
 <link href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo-svg.css" rel="stylesheet" />
 <link href="/ehr/resources/template/dashboard/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <title>${vo.title}</title>
-
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+console.log('DOMContentLoaded');
+    
+    function isEmpty(value) {
+        return value == null || value.trim() === '';
+    }
+    const boardNo = document.querySelector("#boardNo").value;
+	   
+   $("#moveToUpdate").on('click',function(){
+	   if (confirm('수정하시겠습니까?')) {
+		    // 확인(Y) 버튼을 누른 경우 실행
+		    alert("수정 화면으로 이동합니다.");
+		    window.location.href = '/ehr/board/doUpdateView.do?boardNo='+boardNo;
+		} else {
+		    // 취소(N) 버튼을 누른 경우 실행
+		    alert("취소되었습니다.");
+		}
+   });
+   $("#moveToList").on('click',function(){
+	   alert("목록으로 이동합니다.");
+       window.location.href = '/ehr/board/doRetrieve.do';
+   });
+   $("#doDelete").on('click',function(){
+	   if (confirm('정말로 삭제하시겠습니까?')) {
+           
+         //ajax 비동기 통신
+           $.ajax({
+               type : "POST", //GET/POST
+               url : "/ehr/board/doDelete.do", //서버측 URL
+               asyn : "true", //비동기
+               dataType : "html",//서버에서 받을 데이터 타입
+               data : { //파라메터
+                   "boardNo" : '${vo.boardNo}'
+               },
+               success : function(response) {//요청 성공
+                   console.log("success:" + response)
+                   //문자열 : javascript 객체
+                   const message = JSON.parse(response);
+                   //{"messageId":1,"message":"제목등록되었습니다.","no":0,"totalCnt":0,"pageSize":0,"pageNo":0}
+                   if (message.messageId === 1) { //등록 성공
+                       alert(message.message);
+       
+                       //목록 화면으로 이동
+                       window.location.href = '/ehr/board/doRetrieve.do';
+                   } else {
+                       alert(message.message);
+                   }
+               },
+               error : function(response) {//요청 실패
+                   console.log("error:" + response)
+               }
+       
+           });
+           
+       } else {
+           // 취소(N) 버튼을 누른 경우 실행
+           alert("취소되었습니다.");
+       }
+   });
+   
+   
+});
+   
+</script>
 </head>
 <body>
 <div class="main-content">
-	<div class="header bg-warning pb-6 header bg-gradient-warning py-7 py-lg-8 pt-lg-9">
-		<span class="mask bg-gradient-default opacity-8"></span>
-		<div class="container-fluid d-flex align-items-center">
-		  <div class="row">
-            <div class="col-lg-7 col-md-10">
-                <div>
-                    <span>🏠   홈</span><span> > </span><span>공지사항</span><span> > </span><span>상세보기</span>
-                </div>
-                <h1 class="display-2 text-white">${vo.title}</h1>
-                <p class="text-white mt-0 mb-5">이번 공지에서는 시민 여러분께 중요한 정보를 전해드립니다.                         
-                                                                                                            재난 안전 수칙이나 주요 소식 등 꼭 알아야 할 사항을 놓치지 말고 확인해 주세요.<br></p>
-            <!--    <input type="button" id="moveTolist" class="btn btn-neutral" value="목록으로 "> -->
-            </div>
-        </div>
-		</div>
+	<div class="header bg-warning pb-6 header bg-gradient-warning py-4 py-lg-6 pt-lg-6">
+		<span class="mask bg-gradient-warning opacity-8"></span>
+		  <div class="container-fluid d-flex justify-content-center align-items-center text-center" style="min-height:200px; position:relative; z-index:1;">
+		    <h1 class="display-2 text-white text-shadow mb-0">${vo.title}</h1>
+		  </div>
 	</div><!-- //header -->
 	<!-- Page Contents -->
-	<div class="container-fluid mt--6" style="min-height: 700px; max-width:1700px; margin:0 auto;">
+	<div class="container-fluid" style="margin:0 auto;">
 	    <div class="row">
-	    <div class="col-xl-8 offset-xl-2 order-xl-1" >
+	    <div class="col" >
             <div class="card">
              <div class="card-header">
                 <div class="row align-items-center border-0 d-flex align-items-center">
+                   <input type="hidden" id="boardNo" name="boardNo" value="<c:out value='${vo.boardNo }'/>">
                    <div class="col-8 d-flex align-items-center">
                       <h3 class="mb-0">${vo.title}</h3>
                    </div>
                    <div class="col-4 text-right">
-                     <input type="button" id="doUpdate" class="btn btn-sm btn-primary" value="수정">
+                     <input type="button" id="moveToUpdate" class="btn btn-sm btn-primary" value="수정">
                      <input type="button" id="doDelete" class="btn btn-sm btn-primary" value="삭제">
                      <input type="button" id="moveToList" class="btn btn-sm btn-primary" value="목록으로">
                    </div>
@@ -72,36 +127,6 @@
 	
 	
 </div> <!--//main-content  -->
-
-
-
-
-
-
-<%-- <!-- 목록 버튼 -->
-<div>
-    <input type="button" id="moveToList" value="목록으로">
-</div>
-<!--//목록 버튼 -->
-<!-- 글 상세 -->
-<div>
-	<div>
-	   <p>${vo.title}</p>
-	</div>
-   <span>${vo.modId }</span><span>조회 ${vo.viewCnt}</span><span>${vo.modDt}</span>
-   <hr/>
-   <div>
-      <p>${vo.contents}</p>
-   </div>
-</div>
-<!-- //글 상세 -->
-<!-- 버튼 -->
-<div>
-    <input type="button" id="doUpdate" value="수정">
-    <input type="button" id="doDelete" value="삭제">
-</div>
-<!--//버튼 -->
- --%>
 
 </body>
 </html>

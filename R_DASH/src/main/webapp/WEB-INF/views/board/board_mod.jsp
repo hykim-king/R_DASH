@@ -25,8 +25,8 @@
 </head>
 <body>
 <div class="main-content">
-<div class="header bg-warning pb-6 header bg-gradient-warning py-7 py-lg-8 pt-lg-9">
-    <span class="mask bg-gradient-default opacity-8"></span>
+<div class="header bg-warning pb-6 header bg-gradient-warning py-4 py-lg-6 pt-lg-6">
+    <span class="mask bg-gradient-default opacity-4"></span>
     <div class="container-fluid d-flex align-items-center">
         <div class="row">
             <div class="col-lg-7 col-md-10">
@@ -34,9 +34,9 @@
                     <span>🏠   홈</span><span> > </span><span>공지사항</span><span> > </span><span>수정</span>
                 </div>
                 <h1 class="display-2 text-white">공지사항 수정 안내문</h1>
-                <p class="text-white mt-0 mb-5">기존에 등록된 공지 내용을 확인하고 필요 시 수정해 주세요.     
-                                                                                                            수정한 내용도 시민분들께 명확하게 전달될 수 있도록 신중히 작성해 주시기 바랍니다.<br>  
-                                                                                                            알림 버튼을 누르면 변경된 공지가 사이트를 방문하는 모든 회원에게 다시 전달됩니다.</p>
+                <p class="text-white mt-0 mb-5">기존에 등록된 공지 내용을 확인하고 필요 시 수정해 주세요.       
+												수정한 내용도 시민분들께 명확하게 전달될 수 있도록 신중히 작성해 주시기 바랍니다.
+												알림 버튼을 누르면 변경된 공지가 사이트를 방문하는 모든 회원에게 다시 전달됩니다.</p>
             <!--    <input type="button" id="moveTolist" class="btn btn-neutral" value="목록으로 "> -->
             </div>
         </div>
@@ -47,15 +47,15 @@
 <!-- Page Contents -->
 <div class="container-fluid mt--6" style="min-height: 700px; max-width:1700px; margin:0 auto;">
     <div class="row">
-    <div class="col-xl-8 offset-xl-2 order-xl-1" >
+    <div class="col-xl-10 offset-xl-1 order-xl-1" >
         <div class="card">
             <div class="card-header">
                 <div class="row align-items-center border-0 d-flex align-items-center">
                    <div class="col-8 d-flex align-items-center">
-                       <h3 class="mb-0">공지 등록</h3>
+                       <h3 class="mb-0">공지 수정</h3>
                         <label class="custom-toggle ml-3">
-                            <input type="checkbox" checked>
-                            <span class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="알림"></span>
+                            <input id="checkbox" type="checkbox" checked>
+                            <span id="notice" class="custom-toggle-slider rounded-circle" data-label-off="No" data-label-on="알림"></span>
                         </label>
                    </div>
                    <div class="col-4 text-right">
@@ -65,21 +65,21 @@
                </div>
             </div>
             <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 300px;"">
-             <div class="pl-lg-4 w-75">
-                <div class="row">
-                <form action="doUpdate" method="post" enctype="multipart/form-data">
+             <div class="pl-lg-4 w-100">
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <form action="doUpdate" method="post" class="w-100" enctype="multipart/form-data">
                    <input type="hidden" name="boardNo" id="boardNo" value="<c:out value='${vo.boardNo}'/>" >
-                    <div class="form-group d-flex">
+                    <div class="form-group w-100">
                         <label for="title"></label>
-                        <input type="text" class="form-control" name="title" id="title" maxlength="150" value="<c:out value='${vo.title}'/>">
+                        <input type="text" class="form-control w-100" name="title" id="title" maxlength="50" value="<c:out value='${vo.title}'/>">
                     </div>
-                    <div class="form-group d-flex">
+                    <div class="form-group w-100">
                         <label for="modId"></label>
-                        <input type="text" class="form-control" name="modId" id="modId" autocomplete="modId" maxlength="50" required placeholder="${vo.modId }" disabled="disabled" disabled value="${vo.modId }">             
+                        <input type="text" class="form-control w-100" name="modId" id="modId" autocomplete="modId" maxlength="50" required placeholder="${vo.modId }" disabled="disabled" disabled value="${vo.modId }">             
                     </div>              
-                    <div class="form-group d-flex">
+                    <div class="form-group w-100">
                         <label for="summernote"></label>
-                        <textarea class="form-control" id="summernote" name="contents" class="contents" style="white-space: pre-wrap; overflow-wrap: break-word; resize: vertical;">${vo.contents }</textarea>
+                        <textarea class="form-control w-100" id="summernote" name="contents" class="contents" style="white-space: pre-wrap; overflow-wrap: break-word; resize: vertical;">${vo.contents }</textarea>
                     </div>
                  </form>
                  </div>
@@ -104,12 +104,12 @@ $(document).ready(function() {
     var $summernote = $('#summernote');
 
     $summernote.summernote({
-        height: 300,
+        height: 500,
         minHeight: null,
         maxHeight: null,
         focus: true,
         lang: "ko-KR",
-        placeholder: '최대 500자까지 쓸 수 있습니다',
+        placeholder: '최대 1500자까지 쓸 수 있습니다',
         toolbar: [
             ['style', ['bold', 'italic', 'underline', 'clear']],
             ['fontname', ['fontname']],
