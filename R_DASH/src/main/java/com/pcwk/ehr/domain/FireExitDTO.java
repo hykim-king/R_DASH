@@ -13,6 +13,12 @@ public class FireExitDTO {
 	private String locPl; // 역 층 구분
 
 	/**
+	 * 
+	 */
+	public FireExitDTO() {
+	}
+
+	/**
 	 * @param exitNo
 	 * @param subNo
 	 * @param subName

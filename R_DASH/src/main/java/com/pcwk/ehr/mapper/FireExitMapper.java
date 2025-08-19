@@ -10,15 +10,15 @@ import com.pcwk.ehr.domain.FireExitDTO;
 
 @Mapper
 public interface FireExitMapper extends WorkDiv<FireExitDTO> {
-	
+
 	int insertFire(FireExitDTO fire);
-	
+
 	int deleteFire(FireExitDTO fire);
-	
+
 	int deleteAll();
-	
+
 	int updateFire(FireExitDTO fire);
-	
-	List<Map<String,Object>> selectSubwayFireExtCount();
-	
+
+	List<Map<String, Object>> selectSubwayFireExtCount();
+
 }

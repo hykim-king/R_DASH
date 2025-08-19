@@ -1,6 +1,7 @@
 package com.pcwk.ehr.service;
 
 import java.util.List;
+import java.util.Map;
 
 import com.pcwk.ehr.domain.DustDTO;
 
@@ -17,4 +18,10 @@ public interface DustService {
 	            String airType, String day,
 	            Integer limit
 	    );
+
+		List<Map<String, Object>> getTop5PM10();
+
+		List<Map<String, Object>> getBottom5PM10();
+
+		Double getAvgPM10();
 	}
