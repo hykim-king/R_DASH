@@ -66,7 +66,7 @@ public class FireController {
 	
 	@GetMapping("/statsPage")
 	public String statsPage(Model model) throws SQLException {
-		model.addAttribute("pageType", "fire"); // 기본값: weather
+		model.addAttribute("pageType", "fire");
 
 		return "stats/statsMain";
 	}
