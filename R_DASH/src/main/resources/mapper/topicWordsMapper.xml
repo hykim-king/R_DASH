@@ -4,6 +4,7 @@
 	<select id="top150" resultType="TopicWordsDTO">
 	        SELECT * 
 			FROM WORD
+			AND TRUNC(REG_DT) = TRUNC(SYSDATE)
 			ORDER BY FREQ DESC
 			FETCH FIRST 150 ROWS ONLY
     </select>
@@ -11,6 +12,8 @@
     <select id="top10" resultType="TopicWordsDTO">
         SELECT * 
 		FROM TOPIC_WORDS
+		WHERE
+		AND TRUNC(REG_DT) = TRUNC(SYSDATE)
 		ORDER BY FREQ DESC
 		FETCH FIRST 10 ROWS ONLY
     </select>
@@ -21,6 +24,7 @@
 		       DECODE(PREV_FREQ,0,1,PREV_FREQ))*100,2) 
 		       AS CHANGE_RATE
 		FROM TOPIC_WORDS
+		AND TRUNC(REG_DT) = TRUNC(SYSDATE)
 		ORDER BY FREQ DESC
 		FETCH FIRST 5 ROWS ONLY
     </select>
