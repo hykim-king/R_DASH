@@ -8,11 +8,11 @@ import com.pcwk.ehr.domain.TopicWordsDTO;
 
 @Mapper
 public interface TopicWordsMapper {
-	List<TopicWordsDTO> top150(TopicWordsDTO param);
+	List<TopicWordsDTO> top100();
 	
-	List<TopicWordsDTO> top10(TopicWordsDTO param);
+	List<TopicWordsDTO> top10();
 		
-	List<TopicWordsDTO> getChangeRate(TopicWordsDTO param);
+	List<TopicWordsDTO> getChangeRate();
 	
 	void deleteAll();
 	
