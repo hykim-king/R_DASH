@@ -57,8 +57,6 @@ public interface FirestationMapper extends WorkDiv<FirestationDTO> {
     List<String> autocompleteStation(@Param("prefix") String prefix,
                                      @Param("area") String area,
                                      @Param("limit") Integer limit);
-<<<<<<< HEAD
-=======
     
     /**
      * 소방서 수
@@ -66,5 +64,4 @@ public interface FirestationMapper extends WorkDiv<FirestationDTO> {
      */
     List<Map<String, Object>> firestationCount();
     
->>>>>>> 1057c5d13ab91655304dcb36ed37aea2814bccf1
 }

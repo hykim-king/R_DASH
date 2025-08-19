@@ -55,13 +55,10 @@ public class FirestationServiceImpl implements FirestationService {
     public List<String> autocompleteStation(String prefix, String area, Integer limit) {
         return mapper.autocompleteStation(prefix, area, limit);
     }
-<<<<<<< HEAD
-=======
     
     @Override
 	public List<Map<String, Object>> getfirestationCounts() {
 	    return mapper.firestationCount();
 	}
 	
->>>>>>> 1057c5d13ab91655304dcb36ed37aea2814bccf1
 }
