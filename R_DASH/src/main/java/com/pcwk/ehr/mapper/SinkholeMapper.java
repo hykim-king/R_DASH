@@ -1,26 +1,25 @@
 package com.pcwk.ehr.mapper;
 
-import java.util.List;
-import java.util.Map;
-
+import com.pcwk.ehr.domain.SinkholeDTO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.pcwk.ehr.cmn.WorkDiv;
-import com.pcwk.ehr.domain.SinkholeDTO;
-
+import java.util.List;
+import java.util.Map;
 
 @Mapper
-public interface SinkholeMapper extends WorkDiv<SinkholeDTO> {
-	
-//지도 뷰포트(BBox) + 선택검색
-	List<SinkholeDTO> selectByBBox(@Param("minLat") double minLat, @Param("maxLat") double maxLat,
-			@Param("minLon") double minLon, @Param("maxLon") double maxLon, @Param("q") String q,
-			@Param("from") String from, @Param("to") String to);
+public interface SinkholeMapper {
 
-//	단건 상세 
-	SinkholeDTO findById(@Param("sinkholeNo") Integer sinkholeNo);
-	
-	//범례/필터용 상태별 건수 집계
-	List<Map<String, Object>> countByState();
+    List<SinkholeDTO> selectAll();
+
+    List<SinkholeDTO> selectByBBox(
+        @Param("minLat") double minLat, @Param("maxLat") double maxLat,
+        @Param("minLon") double minLon, @Param("maxLon") double maxLon
+    );
+
+    // ServiceImpl.findById()와 정확히 이름/파라미터 일치
+    SinkholeDTO findById(@Param("sinkholeNo") int sinkholeNo);
+
+    // 상태별 집계 (STATE_NM별 count)
+    List<Map<String, Object>> countByState();
 }

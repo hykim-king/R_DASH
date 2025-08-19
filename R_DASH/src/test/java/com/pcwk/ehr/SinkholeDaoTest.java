@@ -9,106 +9,89 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
 
 import com.pcwk.ehr.domain.SinkholeDTO;
 import com.pcwk.ehr.mapper.SinkholeMapper;
 
-@WebAppConfiguration
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/root-context.xml",
-		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml" })
-public class SinkholeDaoTest {
-	Logger log = LogManager.getLogger(getClass());
+@ContextConfiguration(locations = {
+    "file:src/main/webapp/WEB-INF/spring/root-context.xml"
+})
 
-	@Autowired
-	SinkholeMapper mapper;
+class SinkholeDaoTest {
 
-	@Autowired
-	ApplicationContext context;
+    private final Logger log = LogManager.getLogger(getClass());
 
-	@BeforeEach
-	public void setUp() throws Exception {
-		log.debug("┌────────────────────┐");
-		log.debug("│ setUp()            │");
-		log.debug("└────────────────────┘");
+    @Autowired
+    private SinkholeMapper mapper;
 
-	}
+    @Autowired
+    private ApplicationContext context;
 
-	@AfterEach
-	public void tearDown() throws Exception {
-		log.debug("┌────────────────────┐");
-		log.debug("│ tearDown()         │");
-		log.debug("└────────────────────┘");
-	}
-	
-	
-	
-	/** BBox 기본 조회 (대한민국 전체 범위) */
-//	@Disabled
-    @Test
-    void selectByBBox_allKorea() {
-        double minLat = 33.0, maxLat = 39.5;
-        double minLon = 124.0, maxLon = 132.0;
-
-        List<SinkholeDTO> rows = mapper.selectByBBox(
-                minLat, maxLat, minLon, maxLon,
-                null, null, null
-        );
-
-        assertNotNull(rows, "rows must not be null");
-        log.debug("rows.size={}", rows.size());
-        if (!rows.isEmpty()) {
-            SinkholeDTO first = rows.get(0);
-            log.debug("first: no={}, addr={} {}, pos={}/{}, state={}, occurDt={}",
-                    first.getSinkholeNo(), //시퀀스
-                    first.getSidoNm(), first.getSignguNm(), // 발생 지역
-                    first.getLat(), first.getLon(),			//위경도
-                    first.getStateNm(), first.getOccurDt());//복구현황 및 발생 일시
-        }
-        assertTrue(rows.size() >= 0);
+    @BeforeEach
+    void setUp() {
+        log.debug("┌────────────────────┐");
+        log.debug("│ setUp()            │");
+        log.debug("└────────────────────┘");
     }
 
-    /** BBox + 키워드 + 날짜 조건 */
-//	@Disabled
-    @Test
-    void selectByBBox_withKeywordAndDate() {
-        double minLat = 35.0, maxLat = 38.0;
-        double minLon = 126.0, maxLon = 129.0;
-
-        List<SinkholeDTO> rows = mapper.selectByBBox(
-                minLat, maxLat, minLon, maxLon,
-                "성남",            // 키워드 (null/"" 가능)
-                "2010-01-01",     // from (YYYY-MM-DD)
-                "2025-08-14"      // to   (YYYY-MM-DD, 당일 포함)
-        );
-
-        assertNotNull(rows, "rows must not be null");
-        log.debug("cond rows.size={}", rows.size());
-        assertTrue(rows.size() >= 0);
+    @AfterEach
+    void tearDown() {
+        log.debug("┌────────────────────┐");
+        log.debug("│ tearDown()         │");
+        log.debug("└────────────────────┘");
     }
 
+    @Test
+    @DisplayName("컨텍스트/빈 주입 확인")
+    void beans() {
+        assertNotNull(mapper);
+        assertNotNull(context);
+        log.debug("mapper: {}", mapper);
+        log.debug("context: {}", context);
+    }
 
-	
-	
-	@Disabled
-	@Test
-	void beans() {
-		log.debug("┌────────────────────┐");
-		log.debug("│ beans()            │");
-		log.debug("└────────────────────┘");
+    @Test
+    @DisplayName("selectAll(): 전체 목록 조회")
+    void selectAllTest() {
+        List<SinkholeDTO> list = mapper.selectAll();
+        assertNotNull(list);
+        log.debug("조회 건수 = {}", list.size());
+        // 데이터가 보장되면 다음 라인도 활성화
+        // assertTrue(list.size() > 0);
+    }
 
-		assertNotNull(mapper);
-		assertNotNull(context);
+    @Test
+    @DisplayName("findById(): 단건 조회 (예: 1001)")
+    void findOneTest() {
+        // 픽스처가 없다면 존재하는 PK로 바꾸세요.
+        SinkholeDTO dto = mapper.findById(1001);
+        // 픽스처 없으면 아래는 느슨하게:
+        // assertTrue(dto == null || dto.getSinkholeNo() == 1001);
+        // 픽스처가 있다면:
+        // assertNotNull(dto);
+        // assertEquals(1001, dto.getSinkholeNo());
+        log.debug("findById(1001) -> {}", dto);
+    }
 
-		log.debug("mapper: {}" + mapper);
-		log.debug("context: {}" + context);
-	}
+    @Test
+    @DisplayName("selectByBBox(): BBOX 내 조회")
+    void selectByBBoxTest() {
+        double minLat = 35.0, maxLat = 38.0, minLon = 126.0, maxLon = 129.5;
+        List<SinkholeDTO> list = mapper.selectByBBox(minLat, maxLat, minLon, maxLon);
+        assertNotNull(list);
+        log.debug("BBOX 조회 건수 = {}", list.size());
+        // 좌표 범위 검증(옵션)
+        list.forEach(r -> {
+            assertTrue(r.getLat() >= minLat && r.getLat() <= maxLat);
+            assertTrue(r.getLon() >= minLon && r.getLon() <= maxLon);
+        });
+    }
 }

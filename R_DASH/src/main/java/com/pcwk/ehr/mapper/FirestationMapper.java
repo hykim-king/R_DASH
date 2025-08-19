@@ -1,6 +1,7 @@
 package com.pcwk.ehr.mapper;
 
 import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -56,4 +57,14 @@ public interface FirestationMapper extends WorkDiv<FirestationDTO> {
     List<String> autocompleteStation(@Param("prefix") String prefix,
                                      @Param("area") String area,
                                      @Param("limit") Integer limit);
+<<<<<<< HEAD
+=======
+    
+    /**
+     * 소방서 수
+     * @return List<Map<String, Object>>
+     */
+    List<Map<String, Object>> firestationCount();
+    
+>>>>>>> 1057c5d13ab91655304dcb36ed37aea2814bccf1
 }

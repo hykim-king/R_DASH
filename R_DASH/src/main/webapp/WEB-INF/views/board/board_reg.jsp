@@ -19,14 +19,18 @@
 <link href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo-svg.css" rel="stylesheet" />
 <link href="/ehr/resources/template/dashboard/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="/ehr/resources/summernote/summernote-lite.min.css">
-
+<style>
+.row {
+    width: 100%; /* 카드 안에서 꽉 차게 */
+}
+</style>
 <title>공지사항 등록하기</title>
 </head>
 <body>
 
 <div class="main-content">
-<div class="header bg-warning pb-6 header bg-gradient-warning py-7 py-lg-8 pt-lg-9">
-    <span class="mask bg-gradient-default opacity-8"></span>
+<div class="header bg-warning pb-6 header bg-gradient-warning py-4 py-lg-5 pt-lg-5">
+    <span class="mask bg-gradient-default opacity-4"></span>
     <div class="container-fluid d-flex align-items-center">
         <div class="row">
             <div class="col-lg-7 col-md-10">
@@ -46,7 +50,7 @@
 <!-- Page Contents -->
 <div class="container-fluid mt--6" style="min-height: 700px; max-width:1700px; margin:0 auto;">
     <div class="row">
-    <div class="col-xl-8 offset-xl-2 order-xl-1" >
+    <div class="col-xl-10 offset-xl-1 order-xl-1" >
         <div class="card">
             <div class="card-header">
                 <div class="row align-items-center border-0 d-flex align-items-center">
@@ -63,13 +67,13 @@
                    </div>
                </div>
             </div>
-            <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 300px;"">
-             <div class="pl-lg-4 w-75">
-                <div class="row">
+            <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 500px;">
+             <div class="pl-lg-4 w-100">
+                <div class="card-body d-flex flex-column">
                 <form action="#" method="post" enctype="multipart/form-data">
                     <div class="form-group d-flex">
                         <label for="title"></label>
-                        <input type="text" class="form-control" id="title" name="title" autocomplete="title" maxlength="50" required placeholder="제목을 입력해주세요." >
+                        <input style="width:1000px;" type="text" class="form-control" id="title" name="title" autocomplete="title" maxlength="50" required placeholder="제목을 입력해주세요." >
                     </div>              
                     <div class="form-group d-flex">
                         <label for="summernote"></label>
@@ -105,12 +109,13 @@ $(document).ready(function() {
     var $summernote = $('#summernote');
 
     $summernote.summernote({
-        height: 300,
+        height: 500,
+        width:1000,
         minHeight: null,
         maxHeight: null,
         focus: true,
         lang: "ko-KR",
-        placeholder: '최대 500자까지 쓸 수 있습니다',
+        placeholder: '최대 1500자까지 쓸 수 있습니다',
         toolbar: [
             ['style', ['bold', 'italic', 'underline', 'clear']],
             ['fontname', ['fontname']],

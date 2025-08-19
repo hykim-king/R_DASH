@@ -49,7 +49,6 @@ public class NewsController {
 	//6. 뉴스 키워드 조회 Get0
 	//7. 뉴스 전체 조회 Get0
 	
-		
 	
 	@GetMapping("/doUpdateView.do")
 	public String doUpdateView(@RequestParam("topicNo") int topicNo,Model model,HttpSession session) throws SQLException{
@@ -58,17 +57,12 @@ public class NewsController {
 		log.debug("└────────────────────────┘");
 		
 		String viewStirng = "news/topic_mod";
-		log.debug("viewStirng: ",viewStirng);
 		
-		//UserDTO loginUser = (UserDTO) session.getAttribute("user");
-		//model.addAttribute("user", loginUser);
-		
-		TopicDTO param = new TopicDTO();
-		param.setTopicNo(topicNo);
-		
-		TopicDTO outVO = service.doSelectOne(param);
-		model.addAttribute("vo", outVO);
-		log.debug("outVO: {}"+outVO);
+		TopicDTO vo = new TopicDTO();
+	    vo.setTopicNo(topicNo);
+
+	    TopicDTO outVO = service.doSelectOne(vo);
+	    model.addAttribute("vo", outVO);
 		
 		return viewStirng;
 	}
@@ -83,14 +77,32 @@ public class NewsController {
 		log.debug("viewStirng: ",viewStirng);
 		
 		
-		
 		//UserDTO loginUser = (UserDTO) session.getAttribute("user");
 		//model.addAttribute("user", loginUser);
 		
 		return viewStirng;
 	}
+	//AJAX 호출용
+	@GetMapping(value="/topicDetail.do",produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public TopicDTO getTopicDetail(@RequestParam("topicNo") int topicNo) {
+	    TopicDTO topic = new TopicDTO();
+	    topic.setTopicNo(topicNo);
+	    TopicDTO topicVO = service.doSelectOne(topic);
+	    return topicVO;
+	}
 	
+	@GetMapping(value="/newsKeywordSearch.do", produces="application/json;charset=UTF-8")
+	@ResponseBody
+	public List<NewsDTO> newsKeywordSearch(@RequestParam("keyword") String keyword) {
+	    log.debug("┌─────────────────────────────────────────────┐");
+	    log.debug("│ *newsKeywordSearch()* keyword=" + keyword +"│");
+	    log.debug("└─────────────────────────────────────────────┘");
 
+	    NewsDTO news = new NewsDTO();
+	    news.setKeyword(keyword);
+	    return service.searchByKeyword(news);
+	}
 	
 	@GetMapping(value="/newsPage.do", produces = "text/plain;charset=UTF-8")
 	public String newsPage(SearchDTO search,NewsDTO news,TopicDTO topic,Model model) {
@@ -118,7 +130,7 @@ public class NewsController {
 	    List<TopicDTO> todayTopics = service.getTodayTopicsList(topic);
 	    model.addAttribute("todayTopics", todayTopics);
 
-	    // 4. 토픽 단건 조회 (topicNo가 있을 때만)
+	    // 4. 토픽 단건 조회 (topicNo가 있을 때만) -> 페이지 초기 로딩용
 	    if (todayTopics != null && !todayTopics.isEmpty()) {
 	        List<TopicDTO> topicDetails = new ArrayList<>();
 	        
