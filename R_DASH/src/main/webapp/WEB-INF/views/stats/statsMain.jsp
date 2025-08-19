@@ -12,19 +12,46 @@
 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"/>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <style>
         .canvasContainer {
             width: 500px; 
             height: 300px;
             margin-top: 20px;
         }
-		
-		footer {
-		    position: relative; /* fixed로 바꾸면 layout에 맞게 조정 필요 */
-		}
-		
+	
 		#fireTables {
 		    margin-top: 50px; /* 차트와 겹치지 않게 */
+		}
+		
+		/* dust avg 카드 */
+		.card {
+            display: inline-block;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            font-size: 18px;
+        }
+        .very-bad { background-color: #e74c3c; color: white; }
+        .bad { background-color: #f39c12; color: white; }
+        .normal { background-color: #27ae60; color: white; }
+        table { border-collapse: collapse; width: 50%; margin-bottom: 50px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        
+        body {
+		    display: flex;
+		    flex-direction: column;
+		    min-height: 100vh; /* 화면 전체 높이 확보 */
+		}
+		
+		main {
+		    flex: 1; /* main 영역이 남은 공간을 차지하도록 */
+		    padding-bottom: 80px; /* footer 높이만큼 여백 확보 */
+		}
+		
+		footer {
+		    height: 80px;
 		}
     </style>
 </head>
@@ -131,6 +158,30 @@
             </table>
         </div>
     <script src="${pageContext.request.contextPath}/resources/js/fire.js"></script>
+    </c:when>
+    <c:when test="${type == 'dust'}">
+	    <div id="avgCard" class="card"></div>
+	    
+	    <h2>TOP 5 지역</h2>
+	    <table id="top5Table">
+	        <tr>
+	            <th>순위</th>
+	            <th>지역</th>
+	            <th>PM10</th>
+	            <th>등급</th>
+	        </tr>
+	    </table>
+
+	    <h2>BOTTOM 5 지역</h2>
+	    <table id="bottom5Table">
+	        <tr>
+	            <th>순위</th>
+	            <th>지역</th>
+	            <th>PM10</th>
+	            <th>등급</th>
+	        </tr>
+	    </table>
+	<script src="${pageContext.request.contextPath}/resources/js/dust.js"></script>
     </c:when>
 </c:choose>
 </body>

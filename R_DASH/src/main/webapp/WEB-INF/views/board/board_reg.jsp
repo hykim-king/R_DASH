@@ -29,7 +29,7 @@
 <body>
 
 <div class="main-content">
-<div class="header bg-warning pb-6 header bg-gradient-warning py-4 py-lg-5 pt-lg-5">
+<div class="header bg-warning pb-6 header bg-gradient-warning py-4 py-lg-6 pt-lg-6">
     <span class="mask bg-gradient-default opacity-4"></span>
     <div class="container-fluid d-flex align-items-center">
         <div class="row">
@@ -67,17 +67,17 @@
                    </div>
                </div>
             </div>
-            <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 500px;">
+            <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 300px;">
              <div class="pl-lg-4 w-100">
-                <div class="card-body d-flex flex-column">
-                <form action="#" method="post" enctype="multipart/form-data">
-                    <div class="form-group d-flex">
-                        <label for="title"></label>
-                        <input style="width:1000px;" type="text" class="form-control" id="title" name="title" autocomplete="title" maxlength="50" required placeholder="제목을 입력해주세요." >
+                <div class="card-body d-flex flex-column justify-content-center align-items-center">
+                <form action="doSave" method="post" class="w-100" enctype="multipart/form-data">
+                    <div class="form-group w-100">
+                        <label for="title" class="mr-2"></label>
+                        <input type="text" class="form-control w-100" id="title" name="title" autocomplete="title" maxlength="50" required placeholder="제목을 입력해주세요." >
                     </div>              
-                    <div class="form-group d-flex">
+                    <div class="form-group w-100">
                         <label for="summernote"></label>
-                        <textarea class="form-control" id="summernote" name="contents" class="contents" style="white-space: pre-wrap; overflow-wrap: break-word; resize: vertical;"></textarea>
+                        <textarea class="form-control w-100" id="summernote" name="contents" class="contents" style="white-space: pre-wrap; overflow-wrap: break-word; resize: vertical;"></textarea>
                     </div>
                  </form>
                  </div>
@@ -110,7 +110,6 @@ $(document).ready(function() {
 
     $summernote.summernote({
         height: 500,
-        width:1000,
         minHeight: null,
         maxHeight: null,
         focus: true,
@@ -204,6 +203,7 @@ $(document).ready(function() {
     $summernote.on('summernote.init', function() {
         console.log('Summernote is ready!');
     });
+    
 
     // 등록 버튼 클릭 이벤트도 여기 안에 넣기
     $('#doSave').on('click', function() {
@@ -212,10 +212,16 @@ $(document).ready(function() {
             alert('내용을 입력하세요');
             return;
         }
+        
+        // 클릭 시점 체크박스 상태 읽기
+        const is_notice = $('#checkbox').is(':checked') ? 'Y' : 'N';
+
 
         const formData = new FormData();
         formData.append("title", $('#title').val());
         formData.append("contents", summernoteContent);
+        formData.append("isNotice", is_notice);
+        console.log("is_notice: ",is_notice)
 
         $.ajax({
             type: "POST",
@@ -241,6 +247,7 @@ $(document).ready(function() {
     	alert("목록으로 이동합니다.");
     	window.location.href = '/ehr/board/doRetrieve.do';
     });
+    
 });
 </script>
 </body>

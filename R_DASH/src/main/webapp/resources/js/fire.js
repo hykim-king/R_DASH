@@ -109,34 +109,50 @@ jq36(document).ready(function() {
             const ctxYearly = document.getElementById('yearlyChart').getContext('2d');
 
             new Chart(ctxYearly, {
-                type: 'line',
+                type: 'doughnut', // 순수 도넛 차트
                 data: {
                     labels: labels,
                     datasets: [{
                         label: '화재 건수',
                         data: counts,
-                        borderColor: 'rgba(255, 159, 64, 1)',
-                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
-                        fill: true,
-                        tension: 0.2
+                        backgroundColor: [
+                            '#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#FF9F40'
+                        ],
+                        borderColor: '#fff',
+                        borderWidth: 2
                     }]
                 },
                 options: {
                     responsive: true,
                     plugins: {
-                        title: { display: true, text: '년도별 화재 통계' },
-                        legend: { display: true }
+                        title: {
+                            display: true,
+                            text: '년도별 화재 통계'
+                        },
+                        datalabels: {
+                            color: 'black',
+                            font: {
+                                weight: 'bold',
+                                size: 14
+                            },
+                            formatter: (value, context) => {
+                                return value; 
+                            },
+                            anchor: 'center',
+                            align: 'center'
+                        }
                     },
-                    scales: {
-                        y: { beginAtZero: true, title: { display: true, text: '건수' } }
-                    }
-                }
+                    rotation: 0, // 시작 각도 0
+                    circumference: 360 // 전체 360도
+                },
+                plugins: [ChartDataLabels] // datalabels 플러그인 활성화
             });
         },
         error: function(xhr, status, error) {
             console.error('년도별 화재 통계 AJAX 오류:', error);
         }
     });
+
 
     jq36.ajax({
         url: '/ehr/fire/fire-damage', 

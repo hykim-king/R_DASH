@@ -1,6 +1,8 @@
 package com.pcwk.ehr.mapper;
 
 import java.util.List;
+import java.util.Map;
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import com.pcwk.ehr.cmn.WorkDiv;
@@ -26,4 +28,10 @@ public interface DustMapper extends WorkDiv<DustDTO> {
         @Param("day")     String day,     // YYYY-MM-DD (옵션)
         @Param("limit")   Integer limit
     );
+    
+    List<Map<String, Object>> selectTop5PM10();
+
+    List<Map<String, Object>> selectBottom5PM10();
+
+    Double selectAvgPM10();
 }

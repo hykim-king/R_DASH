@@ -11,7 +11,7 @@ public class BoardDTO extends DTO{
 	private String regId     ;
 	private String modDt     ;
 	private String modId     ;
-	private String isNotice;
+	private String isNotice ;
 	
 	
 	public BoardDTO() {}
@@ -102,7 +102,7 @@ public class BoardDTO extends DTO{
 		return isNotice;
 	}
 	
-	public void IsNotice(String isNotice) {
+	public void setIsNotice(String isNotice) {
 		this.isNotice = isNotice;
 	}
 
