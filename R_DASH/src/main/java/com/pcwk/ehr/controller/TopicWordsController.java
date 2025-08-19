@@ -39,15 +39,15 @@ public class TopicWordsController {
 		
 		String viewName = "freq/topic_words";
 		
-		List<TopicWordsDTO> top10 = wordsService.top10(param);
+		List<TopicWordsDTO> top10 = wordsService.top10();
 		log.debug("top10: {}"+top10);
 		model.addAttribute("top10", top10);
 		
-		List<TopicWordsDTO> top150 = wordsService.top150(param);
-		log.debug("top150: {}"+top150);
-		model.addAttribute("top150", top150);
+		List<TopicWordsDTO> top100 = wordsService.top100();
+		log.debug("top100: {}"+top100);
+		model.addAttribute("top100", top100);
 		
-		List<TopicWordsDTO> rate = wordsService.getChangeRate(param);
+		List<TopicWordsDTO> rate = wordsService.getChangeRate();
 		log.debug("rate: {}"+rate);
 		model.addAttribute("rate", rate);
 		

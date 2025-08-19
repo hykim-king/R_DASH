@@ -5,7 +5,7 @@ public class TopicWordsDTO {
 	private int wordNo;
 	private String word;
 	private int freq;
-	private int prevFreg;
+	private int prevFreq;
 	private String regDt;
 	
 	
@@ -14,12 +14,12 @@ public class TopicWordsDTO {
 	}
 
 
-	public TopicWordsDTO(int wordNo, String word, int freq, int prevFreg, String regDt) {
+	public TopicWordsDTO(int wordNo, String word, int freq, int prevFreq, String regDt) {
 		super();
 		this.wordNo = wordNo;
 		this.word = word;
 		this.freq = freq;
-		this.prevFreg = prevFreg;
+		this.prevFreq = prevFreq;
 		this.regDt = regDt;
 	}
 
@@ -54,13 +54,13 @@ public class TopicWordsDTO {
 	}
 
 
-	public int getPrevFreg() {
-		return prevFreg;
+	public int getPrevFreq() {
+		return prevFreq;
 	}
 
 
-	public void setPrevFreg(int prevFreg) {
-		this.prevFreg = prevFreg;
+	public void setPrevFreq(int prevFreq) {
+		this.prevFreq = prevFreq;
 	}
 
 
@@ -76,7 +76,7 @@ public class TopicWordsDTO {
 
 	@Override
 	public String toString() {
-		return "TopicWordsDTO [wordNo=" + wordNo + ", word=" + word + ", freq=" + freq + ", prevFreg=" + prevFreg
+		return "TopicWordsDTO [wordNo=" + wordNo + ", word=" + word + ", freq=" + freq + ", prevFreq=" + prevFreq
 				+ ", regDt=" + regDt + ", toString()=" + super.toString() + "]";
 	}
 	
