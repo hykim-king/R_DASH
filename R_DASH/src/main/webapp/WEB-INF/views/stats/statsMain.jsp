@@ -16,7 +16,16 @@
         .canvasContainer {
             width: 500px; 
             height: 300px;
+            margin-top: 20px;
         }
+		
+		footer {
+		    position: relative; /* fixed로 바꾸면 layout에 맞게 조정 필요 */
+		}
+		
+		#fireTables {
+		    margin-top: 50px; /* 차트와 겹치지 않게 */
+		}
     </style>
 </head>
 <body>
@@ -88,27 +97,43 @@
 		<script src="${pageContext.request.contextPath}/resources/js/nowcast.js"></script>
 	</c:when>
 	<c:when test="${type == 'fire'}">
-        <h2>시/군/구별 소방서 개수</h2>
-		
-		<table id="firestationTable" class="display" border="1">
-		    <thead>
-		        <tr>
-		            <th>순위</th>
-		            <th>지역</th>
-		            <th>소방서 개수</th>
-		        </tr>
-		    </thead>
-		    <tbody>
-		        <!-- AJAX로 채워짐 -->
-		    </tbody>
-		</table>
-        <script src="${pageContext.request.contextPath}/resources/js/fire.js"></script>
-        
         <div class = "canvasContainer">
 		    <canvas id="fireSafeChart"></canvas>
+		</div>		
+
+        <div id="fireCharts">
+		    <div class="canvasContainer">
+		        <canvas id="yearlyChart"></canvas>
+		    </div>
+		    <div class="canvasContainer">
+		        <canvas id="damageChart"></canvas>
+		    </div>
 		</div>
+		
+		<!-- 호선별 소화기 차트 -->
+		<div class="canvasContainer">
+		    <canvas id="subwayChart"></canvas>
+		</div>
+    
+        <div class = "fireTables">
+            <h2>시/군/구별 소방서 개수</h2>
+            <table id="firestationTable" class="display" border="1">
+                <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>지역</th>
+                        <th>소방서 개수</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- AJAX -->
+                </tbody>
+            </table>
+        </div>
+    <script src="${pageContext.request.contextPath}/resources/js/fire.js"></script>
     </c:when>
 </c:choose>
 </body>
 </html>
+
 
