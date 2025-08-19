@@ -60,7 +60,7 @@ class MainControllerTest {
 
 		mockMvc.perform(get("/home"))
 				.andExpect(status().isOk())
-				.andExpect(view().name("main"))
+				.andExpect(view().name("main/main"))
 				.andExpect(model().attributeExists("msg"))
 				.andExpect(model().attribute("msg", "저희 재난 알림 사이트를 방문해주셔서 감사합니다."));
 	}
