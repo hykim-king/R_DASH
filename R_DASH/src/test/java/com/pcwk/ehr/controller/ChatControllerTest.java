@@ -63,7 +63,7 @@ class ChatControllerTest {
 		log.debug("테스트 종료");
 	}
 
-	//@Disabled
+	// @Disabled
 	@Test
 	void sendChat_success() throws Exception {
 		ChatDTO in = new ChatDTO();
@@ -84,7 +84,7 @@ class ChatControllerTest {
 		assertNotNull(out.getAnswer()); // FakeBotService → "테스트 응답"
 	}
 
-	//@Disabled
+	// @Disabled
 	@Test
 	void sendChat_badRequest_empty() throws Exception {
 		ChatDTO in = new ChatDTO();
@@ -95,7 +95,7 @@ class ChatControllerTest {
 				.andExpect(status().isBadRequest());
 	}
 
-	//@Disabled
+	// @Disabled
 	@Test
 	void getChat_byLogNo() throws Exception {
 		// 1) 하나 생성
@@ -123,7 +123,7 @@ class ChatControllerTest {
 		assertEquals(logNo, out.getLogNo());
 	}
 
-	//@Disabled
+	// @Disabled
 	@Test
 	void chatList_withSearch() throws Exception {
 		// 3건 생성
@@ -154,7 +154,7 @@ class ChatControllerTest {
 		assertTrue(list.size() >= 3);
 	}
 
-	//@Disabled
+	// @Disabled
 	@Test
 	void deleteChat_ok() throws Exception {
 		// 생성
@@ -173,22 +173,21 @@ class ChatControllerTest {
 		mockMvc.perform(MockMvcRequestBuilders.delete("/api/chat/{logNo}", logNo)).andExpect(status().isOk());
 	}
 
-	//@Disabled
+	// @Disabled
 	@Test
-  	void beans() {
-  		log.debug("┌────────────────────┐");
-  		log.debug("│ beans()            │");
-  		log.debug("└────────────────────┘");
-  		
-  		assertNotNull(wac);
-  		assertNotNull(mockMvc);
-  		assertNotNull(mockMvc);
-  		
-  		
-  		log.debug("wac: {}"+wac);
-  		log.debug("mockMvc: {}"+mockMvc);
-  		log.debug("chatService: {}"+chatService);
-  		
-  	}
+	void beans() {
+		log.debug("┌────────────────────┐");
+		log.debug("│ beans()            │");
+		log.debug("└────────────────────┘");
+
+		assertNotNull(wac);
+		assertNotNull(mockMvc);
+		assertNotNull(mockMvc);
+
+		log.debug("wac: {}" + wac);
+		log.debug("mockMvc: {}" + mockMvc);
+		log.debug("chatService: {}" + chatService);
+
+	}
 
 }
