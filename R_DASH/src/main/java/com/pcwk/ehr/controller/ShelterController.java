@@ -17,7 +17,9 @@ import com.pcwk.ehr.service.ShelterService;
 @RequestMapping("/api/shelters")
 public class ShelterController {
 
-    private final ShelterService service;
+	
+	@Autowired
+    ShelterService service;
 
     @Autowired
     public ShelterController(ShelterService service) {
@@ -39,7 +41,7 @@ public class ShelterController {
 
     /** 단건 상세 */
     @GetMapping("/{shelterNo}")
-    public ShelterDTO getOne(@PathVariable long shelterNo) throws Exception {
+    public ShelterDTO getOne(@PathVariable Integer shelterNo) throws Exception {
         return service.selectOne(shelterNo);
     }
 

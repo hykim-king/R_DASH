@@ -22,61 +22,86 @@ import com.pcwk.ehr.mapper.ShelterMapper;
 
 @WebAppConfiguration
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/root-context.xml",
-		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml" })
+@ContextConfiguration(locations = { 
+    "file:src/main/webapp/WEB-INF/spring/root-context.xml",
+    "file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml"
+})
 class ShelterDaoTest {
-	Logger log = LogManager.getLogger(getClass());
 
-	@Autowired
-	ShelterMapper mapper;
+    Logger log = LogManager.getLogger(getClass());
 
-	@Autowired
-	ApplicationContext context;
+    @Autowired
+    ShelterMapper mapper;
 
-	@BeforeEach
-	public void setUp() throws Exception {
-		log.debug("┌────────────────────┐");
-		log.debug("│ setUp()            │");
-		log.debug("└────────────────────┘");
+    @Autowired
+    ApplicationContext context;
 
-	}
+    @BeforeEach
+    public void setUp() throws Exception {
+        log.debug("┌────────────────────┐");
+        log.debug("│ setUp()            │");
+        log.debug("└────────────────────┘");
+    }
 
-	@AfterEach
-	public void tearDown() throws Exception {
-		log.debug("┌────────────────────┐");
-		log.debug("│ tearDown()         │");
-		log.debug("└────────────────────┘");
-	}
+    @AfterEach
+    public void tearDown() throws Exception {
+        log.debug("┌────────────────────┐");
+        log.debug("│ tearDown()         │");
+        log.debug("└────────────────────┘");
+    }
 
-	@Test
-	void selectByBBox_basic() {
-		double minLat = 37.45, maxLat = 37.60;
-		double minLon = 126.80, maxLon = 127.10;
+    
+    
+    //나중 구현 가능
+    @Test
+    void selectByBBox_basic() {
+        double minLat = 37.45, maxLat = 37.60;
+        double minLon = 126.80, maxLon = 127.10;
 
-		List<ShelterDTO> rows = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, null, 100);
-		assertNotNull(rows, "rows must not be null");
-		log.info("rows size={}", rows.size());
-	}
+        List<ShelterDTO> rows = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, null, 100);
+        assertNotNull(rows, "rows must not be null");
+        log.info("rows size={}", rows.size());
+    }
 
-	@Test
-	void selectOne_basic() {
-		ShelterDTO dto = mapper.selectOne(1L); // PK=1 테스트
-		log.info("selectOne(1) -> {}", dto);
-		assertTrue(true); // 실행 확인용
-	}
+    @Test
+    void selectOne_basic() {
+        ShelterDTO dto = mapper.selectOne(1); // PK=1 테스트
+        log.info("selectOne(1) -> {}", dto);
+        assertTrue(true); // 실행 확인용
+    }
 
-	@Test
-//	@Disabled
-	void beans() {
-		log.debug("┌────────────────────┐");
-		log.debug("│ beans()            │");
-		log.debug("└────────────────────┘");
+    @Test
+    void selectList_basic() {
+        List<ShelterDTO> rows = mapper.selectList(5);
+        assertNotNull(rows);
+        log.info("selectList(5) size={}", rows.size());
+    }
 
-		assertNotNull(mapper);
-		assertNotNull(context);
+    @Test
+    void suggestAddress_basic() {
+        List<String> result = mapper.suggestAdress("서울");
+        assertNotNull(result);
+        log.info("suggestAdress -> {}", result);
+    }
 
-		log.debug("mapper: {}" + mapper);
-		log.debug("context: {}" + context);
-	}
+    @Test
+    void suggestReareNm_basic() {
+        List<String> result = mapper.suggestReareNm("학교");
+        assertNotNull(result);
+        log.info("suggestReareNm -> {}", result);
+    }
+
+    @Test
+    void beans() {
+        log.debug("┌────────────────────┐");
+        log.debug("│ beans()            │");
+        log.debug("└────────────────────┘");
+
+        assertNotNull(mapper);
+        assertNotNull(context);
+
+        log.debug("mapper: {}", mapper);
+        log.debug("context: {}", context);
+    }
 
 }
