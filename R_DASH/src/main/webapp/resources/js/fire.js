@@ -25,7 +25,8 @@ jq36(document).ready(function() {
             jq36('#firestationTable').DataTable({
                 pageLength: 10,
                 searching: true,
-                ordering: true
+                ordering: true,
+                destroy: true
             });
         },
         error: function(xhr, status, error) {
@@ -39,7 +40,6 @@ jq36(document).ready(function() {
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-            console.log('복구 데이터:', data);
             const labels = data.map(row => row.YEAR);                 // 연도
             const damage = data.map(row => row.TOTALDAMAGE);         // 피해금액
             const recovery = data.map(row => row.TOTALRECOVERY);     // 복구금액
@@ -97,4 +97,120 @@ jq36(document).ready(function() {
             console.error('AJAX 오류:', error);
         }
     });
+
+    jq36.ajax({
+        url: '/ehr/fire/fire-yearly',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            const labels = data.map(row => row.YEAR);
+            const counts = data.map(row => row.FIRE_COUNT);
+
+            const ctxYearly = document.getElementById('yearlyChart').getContext('2d');
+
+            new Chart(ctxYearly, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '화재 건수',
+                        data: counts,
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        fill: true,
+                        tension: 0.2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: '년도별 화재 통계' },
+                        legend: { display: true }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: '건수' } }
+                    }
+                }
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error('년도별 화재 통계 AJAX 오류:', error);
+        }
+    });
+
+    jq36.ajax({
+        url: '/ehr/fire/fire-damage', 
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            const labels = data.map(row => row.FIRE_TYPE);
+            const damage = data.map(row => row.TOTAL_DAMAGE);
+
+            const ctxDamage = document.getElementById('damageChart').getContext('2d');
+
+            new Chart(ctxDamage, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '재산피해 합계',
+                        data: damage,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: '화재유형별 재산피해' },
+                        legend: { display: true }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, title: { display: true, text: '재산피해 (원)' } }
+                    }
+                }
+            });
+        },
+        error: function(xhr, status, error) {
+            console.error('화재유형별 재산피해 AJAX 오류:', error);
+        }
+    });
+
+    jq36.ajax({
+        url: '/ehr/fire/fire-ext',
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            const labels = data.map(d => d.SUB_NO);
+            const counts = data.map(d => d.EXTINGUISHER_COUNT);
+
+            const ctx = document.getElementById('subwayChart').getContext('2d');
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: '소화기 개수',
+                        data: counts,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: { display: true, text: '호선별 소화기 개수' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        },
+        error: function() { console.error('호선별 소화기 AJAX 오류'); }
+    });
+    
 });
