@@ -4,6 +4,29 @@
 
 <mapper namespace="com.pcwk.ehr.mapper.DustMapper">
 
+    
+	<!-- 최고 PM10 TOP5 -->
+	<select id="selectTop5PM10" resultType="map">
+	    SELECT STN_NM, LAT, LON, PM10
+	    FROM DUST
+	    ORDER BY PM10 DESC
+	    FETCH FIRST 5 ROWS ONLY
+	</select>
+	
+	<!-- 최저 PM10 BOTTOM5 -->
+	<select id="selectBottom5PM10" resultType="map">
+	    SELECT STN_NM, LAT, LON, PM10
+	    FROM DUST
+	    ORDER BY PM10 ASC
+	    FETCH FIRST 5 ROWS ONLY
+	</select>
+	
+	<!-- 평균 PM10 -->
+	<select id="selectAvgPM10" resultType="double">
+	    SELECT ROUND(AVG(PM10), 2) AS avg_pm10
+	    FROM DUST
+	</select>
+    
   <resultMap id="DustMap" type="com.pcwk.ehr.domain.DustDTO">
     <id     property="dustNo" column="DUST_NO"/>
     <result property="tm"     column="TM"/>
