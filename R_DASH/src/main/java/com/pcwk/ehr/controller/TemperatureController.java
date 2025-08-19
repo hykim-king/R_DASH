@@ -22,79 +22,78 @@ import com.pcwk.ehr.service.TemperatureService;
 @RequestMapping("/temperature")
 public class TemperatureController {
 
-    @Autowired
-    private TemperatureService temperatureService;
-    
-    @GetMapping("/weather.do")
-    @ResponseBody
-    public List<NowcastDTO> getTopWeather(
-            @RequestParam String category) {
+	@Autowired
+	private TemperatureService temperatureService;
 
-        switch (category) {
-            case "T1H":
-                return temperatureService.getTopT1H();
-            case "REH":
-                return temperatureService.getTopREH();
-            case "RN1":
-                return temperatureService.getTopRN1();
-            default:
-                return null;
-        }
-    }
-    @GetMapping("/summary.do")
-    @ResponseBody
-    public List<PatientsDTO> getPatientsSummary(
-            @RequestParam(required = false) String groupType,
-            @RequestParam(required = false) String year,
-            @RequestParam(required = false) String sidoNm) throws SQLException {
+	@GetMapping("/weather.do")
+	@ResponseBody
+	public List<NowcastDTO> getTopWeather(@RequestParam String category) {
 
-        Map<String, Object> param = new HashMap<>();
-        param.put("groupType", groupType);
-        param.put("sidoNm", sidoNm);
-        if (year != null && !year.isEmpty()) {
-            param.put("year", Integer.parseInt(year));
-        } else {
-            param.put("year", null); // 연도가 선택되지 않으면 null을 전달
-        }
-        
+		switch (category) {
+		case "T1H":
+			return temperatureService.getTopT1H();
+		case "REH":
+			return temperatureService.getTopREH();
+		case "RN1":
+			return temperatureService.getTopRN1();
+		default:
+			return null;
+		}
+	}
 
-        return temperatureService.selectPatientsSummary(param);
-    }
-    
-    @PostMapping("/save-patients.do")
-    @ResponseBody
-    public String insertPatient() throws SQLException {
-    	temperatureService.insertPatient();
-        return "Patient 등록 완료!";
-    }
-    
-    @GetMapping("/select-patients.do")
-    @ResponseBody
-    public List<PatientsDTO> getPatients() throws SQLException {
-        return temperatureService.getAllPatients();
-    }
-    
-    @PostMapping("/save-nowcast.do")
-    @ResponseBody
-    public String mergeNowcast() throws SQLException {
-    	temperatureService.insertNowcast();
-    	return "NowCast 등록 완료!";
-    }
-    
-    @GetMapping("/statsPage")
-    public String patientsPage(Model model) throws SQLException {
-        List<String> yearList = temperatureService.getYearList();
-        List<String> sidoList = temperatureService.getSidoList();
+	@GetMapping("/summary.do")
+	@ResponseBody
+	public List<PatientsDTO> getPatientsSummary(@RequestParam(required = false) String groupType,
+			@RequestParam(required = false) String year, @RequestParam(required = false) String sidoNm)
+			throws SQLException {
 
-        model.addAttribute("yearList", yearList);
-        model.addAttribute("sidoList", sidoList);
+		Map<String, Object> param = new HashMap<>();
+		param.put("groupType", groupType);
+		param.put("sidoNm", sidoNm);
+		if (year != null && !year.isEmpty()) {
+			param.put("year", Integer.parseInt(year));
+		} else {
+			param.put("year", null); // 연도가 선택되지 않으면 null을 전달
+		}
 
-        return "stats/statsMain";
-    }
+		return temperatureService.selectPatientsSummary(param);
+	}
 
-    @GetMapping("/main.do")
-    public String main() {
-        return "stats/main";
-    }
-    
+	@PostMapping("/save-patients.do")
+	@ResponseBody
+	public String insertPatient() throws SQLException {
+		temperatureService.insertPatient();
+		return "Patient 등록 완료!";
+	}
+
+	@GetMapping("/select-patients.do")
+	@ResponseBody
+	public List<PatientsDTO> getPatients() throws SQLException {
+		return temperatureService.getAllPatients();
+	}
+
+	@PostMapping("/save-nowcast.do")
+	@ResponseBody
+	public String mergeNowcast() throws SQLException {
+		temperatureService.insertNowcast();
+		return "NowCast 등록 완료!";
+	}
+
+	@GetMapping("/statsPage")
+	public String statsPage(Model model) throws SQLException {
+		List<String> yearList = temperatureService.getYearList();
+		List<String> sidoList = temperatureService.getSidoList();
+
+		model.addAttribute("yearList", yearList);
+		model.addAttribute("sidoList", sidoList);
+		model.addAttribute("pageType", "weather"); // 기본값: weather
+
+		return "stats/statsMain";
+	}
+
+	@GetMapping("/main.do")
+	public String main() {
+		return "stats/main";
+	}
+
 }

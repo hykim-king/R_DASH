@@ -9,25 +9,21 @@ import com.pcwk.ehr.domain.DustDTO;
 @Mapper
 public interface DustMapper extends WorkDiv<DustDTO> {
 
-    List<DustDTO> selectStationAvgAt10(
-        @Param("day") String day,
-        @Param("minLat") Double minLat,
-        @Param("minLon") Double minLon,
-        @Param("maxLat") Double maxLat,
-        @Param("maxLon") Double maxLon
+	  // BBox 안에서 airType의 최신 1건/측정소
+    List<DustDTO> selectLatestByTypeBBox(
+        @Param("airType") String airType,
+        @Param("day")     String day,     // YYYY-MM-DD (옵션)
+        @Param("minLat")  Double minLat,
+        @Param("maxLat")  Double maxLat,
+        @Param("minLon")  Double minLon,
+        @Param("maxLon")  Double maxLon,
+        @Param("limit")   Integer limit
     );
 
-    // XML이 day만 받도록 짜여있다면 warn/caution 파라미터는 일단 제거하거나 XML과 맞추세요.
-    List<DustDTO> selectLegendBucketsAt10(
-        @Param("day") String day
-    );
-
-    List<DustDTO> selectLatestByOrgAt10(
-        @Param("day") String day,
-        @Param("org") String org,
-        @Param("minLat") Double minLat,
-        @Param("minLon") Double minLon,
-        @Param("maxLat") Double maxLat,
-        @Param("maxLon") Double maxLon
+    // 전국 airType 최신 1건/측정소
+    List<DustDTO> selectLatestByTypeAll(
+        @Param("airType") String airType,
+        @Param("day")     String day,     // YYYY-MM-DD (옵션)
+        @Param("limit")   Integer limit
     );
 }
