@@ -68,8 +68,8 @@ public class BoardController {
 //	삭제	/board/doDelete.do	POST 0
 //	상세 조회	/board/doSelectOne.do	GET 0
 //	목록 조회	/board/doRetrieve.do	GET 0
-//	등록 화면	/board/doSaveView.do	POST
-//	수정 화면	/board/doUpdateView.do	POST
+//	등록 화면	/board/doSaveView.do	GET 0
+//	수정 화면	/board/doUpdateView.do	GET 0
 	
     /**
      * 마크다운을 HTML로 변환하는 API
