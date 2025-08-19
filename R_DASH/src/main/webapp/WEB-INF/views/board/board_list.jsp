@@ -59,7 +59,7 @@ span {
 </style>
 </head>
 <body>
-<jsp:include page="/WEB-INF/views/loading/loading.jsp"></jsp:include>
+<jsp:include page="/WEB-INF/views/common/loading.jsp"></jsp:include>
 <div class=main-content>
 	
 	<!-- header2 -->

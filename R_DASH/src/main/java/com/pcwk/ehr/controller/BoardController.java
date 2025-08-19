@@ -291,6 +291,7 @@ public class BoardController {
 	@ResponseBody
 	public String doSave(BoardDTO param) {
 	    log.debug("param:{}", param);
+	    log.debug("isNotice: {}", param.getIsNotice());
 	    int flag = 0;
 	    
 	    try {
@@ -298,6 +299,7 @@ public class BoardController {
 	    } catch (Exception e) {
 	        log.error("DB 저장 오류", e);
 	    }
+	    //param = service.doSelectOne(param);
 	    
 	    // 공지 글이면 websocket 알림 
 	    if("Y".equals(param.getIsNotice())) {
@@ -308,6 +310,10 @@ public class BoardController {
 	    	
 	    	simpMessagingTemplate.convertAndSend("/topic/notice",noticeMsg);
 	    }
+	    
+	    log.debug("boardNo: {}", param.getBoardNo());
+	    log.debug("title: {}", param.getTitle());
+	    log.debug("isNotice: {}", param.getIsNotice());
 	    
 	    String message = "";
 

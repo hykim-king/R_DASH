@@ -15,10 +15,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
@@ -39,6 +43,7 @@ import com.pcwk.ehr.service.BoardService;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/root-context.xml",
 		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml" })
+
 class BoardControllerTest {
 	Logger log = LogManager.getLogger(getClass());
 
@@ -50,6 +55,7 @@ class BoardControllerTest {
 	
 	@Autowired
 	BoardService service;
+	
 
 	// 웹 브라우저 대역 객체
 	MockMvc mockMvc;
@@ -279,7 +285,7 @@ class BoardControllerTest {
 		assertEquals("제목1등록되었습니다.", resultMessage.getMessage());
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void beans() {
 		log.debug("┌───────────────────────┐");
@@ -289,10 +295,12 @@ class BoardControllerTest {
 		assertNotNull(webApplicationContext);
 		assertNotNull(mockMvc);
 		assertNotNull(mapper);
+		assertNotNull(simpMessagingTemplate);
 
 		log.debug("webApplicationContext:{}", webApplicationContext);
 		log.debug("mockMvc:{}", mockMvc);
 		log.debug("mapper:{}", mapper);
+		log.debug("simpMessagingTemplate:{}", simpMessagingTemplate);
 	}
 	void isSameBoard(BoardDTO outVO,BoardDTO dto01) {
 		assertEquals(outVO.getBoardNo(),dto01.getBoardNo());

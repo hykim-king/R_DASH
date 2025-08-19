@@ -204,6 +204,7 @@ $(document).ready(function() {
     $summernote.on('summernote.init', function() {
         console.log('Summernote is ready!');
     });
+    
 
     // 등록 버튼 클릭 이벤트도 여기 안에 넣기
     $('#doSave').on('click', function() {
@@ -212,10 +213,16 @@ $(document).ready(function() {
             alert('내용을 입력하세요');
             return;
         }
+        
+        // 클릭 시점 체크박스 상태 읽기
+        const is_notice = $('#checkbox').is(':checked') ? 'Y' : 'N';
+
 
         const formData = new FormData();
         formData.append("title", $('#title').val());
         formData.append("contents", summernoteContent);
+        formData.append("isNotice", is_notice);
+        console.log("is_notice: ",is_notice)
 
         $.ajax({
             type: "POST",
@@ -241,6 +248,7 @@ $(document).ready(function() {
     	alert("목록으로 이동합니다.");
     	window.location.href = '/ehr/board/doRetrieve.do';
     });
+    
 });
 </script>
 </body>
