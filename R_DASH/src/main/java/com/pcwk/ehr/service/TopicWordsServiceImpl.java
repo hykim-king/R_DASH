@@ -19,21 +19,21 @@ public class TopicWordsServiceImpl implements TopicWordsService {
 	TopicWordsMapper wordsMapper;
 	
 	@Override
-	public List<TopicWordsDTO> top150(TopicWordsDTO param) {
+	public List<TopicWordsDTO> top100() {
 		// TODO Auto-generated method stub
-		return wordsMapper.top150(param);
+		return wordsMapper.top100();
 	}
 
 	@Override
-	public List<TopicWordsDTO> top10(TopicWordsDTO param) {
+	public List<TopicWordsDTO> top10() {
 		// TODO Auto-generated method stub
-		return wordsMapper.top10(param);
+		return wordsMapper.top10();
 	}
 
 	@Override
-	public List<TopicWordsDTO> getChangeRate(TopicWordsDTO param) {
+	public List<TopicWordsDTO> getChangeRate() {
 		// TODO Auto-generated method stub
-		return wordsMapper.getChangeRate(param);
+		return wordsMapper.getChangeRate();
 	}
 	
 	// 테스트용으로 미사용
