@@ -295,12 +295,10 @@ class BoardControllerTest {
 		assertNotNull(webApplicationContext);
 		assertNotNull(mockMvc);
 		assertNotNull(mapper);
-		assertNotNull(simpMessagingTemplate);
 
 		log.debug("webApplicationContext:{}", webApplicationContext);
 		log.debug("mockMvc:{}", mockMvc);
 		log.debug("mapper:{}", mapper);
-		log.debug("simpMessagingTemplate:{}", simpMessagingTemplate);
 	}
 	void isSameBoard(BoardDTO outVO,BoardDTO dto01) {
 		assertEquals(outVO.getBoardNo(),dto01.getBoardNo());
