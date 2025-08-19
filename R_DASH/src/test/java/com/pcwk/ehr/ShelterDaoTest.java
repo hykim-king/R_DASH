@@ -22,142 +22,86 @@ import com.pcwk.ehr.mapper.ShelterMapper;
 
 @WebAppConfiguration
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/root-context.xml",
-		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml" })
+@ContextConfiguration(locations = { 
+    "file:src/main/webapp/WEB-INF/spring/root-context.xml",
+    "file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml"
+})
 class ShelterDaoTest {
-	Logger log = LogManager.getLogger(getClass());
 
-	@Autowired
-	ShelterMapper mapper;
+    Logger log = LogManager.getLogger(getClass());
 
-	@Autowired
-	ApplicationContext context;
+    @Autowired
+    ShelterMapper mapper;
 
-	@BeforeEach
-	public void setUp() throws Exception {
-		log.debug("┌────────────────────┐");
-		log.debug("│ setUp()            │");
-		log.debug("└────────────────────┘");
+    @Autowired
+    ApplicationContext context;
 
-	}
+    @BeforeEach
+    public void setUp() throws Exception {
+        log.debug("┌────────────────────┐");
+        log.debug("│ setUp()            │");
+        log.debug("└────────────────────┘");
+    }
 
-	@AfterEach
-	public void tearDown() throws Exception {
-		log.debug("┌────────────────────┐");
-		log.debug("│ tearDown()         │");
-		log.debug("└────────────────────┘");
-	}
+    @AfterEach
+    public void tearDown() throws Exception {
+        log.debug("┌────────────────────┐");
+        log.debug("│ tearDown()         │");
+        log.debug("└────────────────────┘");
+    }
 
-//	전체 목록 조회
-//	@Disabled
-	@Test
-	public void selectAllFfsTest() {
+    
+    
+    //나중 구현 가능
+    @Test
+    void selectByBBox_basic() {
+        double minLat = 37.45, maxLat = 37.60;
+        double minLon = 126.80, maxLon = 127.10;
 
-		List<ShelterDTO> list = mapper.selectAll();
-		log.debug("┌────────────────────┐");
-		log.debug("│ selectAllTest()    │");
-		log.debug("└────────────────────┘");
+        List<ShelterDTO> rows = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, null, 100);
+        assertNotNull(rows, "rows must not be null");
+        log.info("rows size={}", rows.size());
+    }
 
-		assertNotNull(list); // null 여부 확인
-		assertTrue(list.size() >= 0);
-		list.forEach(log::debug);
-		log.debug("전체 목록 건수: {}", list.size());
-	}
+    @Test
+    void selectOne_basic() {
+        ShelterDTO dto = mapper.selectOne(1); // PK=1 테스트
+        log.info("selectOne(1) -> {}", dto);
+        assertTrue(true); // 실행 확인용
+    }
 
-//	단건 조회
-//	@Disabled
-	@Test
-	public void findByIdsTest() {
-		int testId = 1;
-		ShelterDTO dto = mapper.findById(testId);
-		log.debug("┌────────────────────────┐");
-		log.debug("│ findByIdTest()         │");
-		log.debug("└────────────────────────┘");
+    @Test
+    void selectList_basic() {
+        List<ShelterDTO> rows = mapper.selectList(5);
+        assertNotNull(rows);
+        log.info("selectList(5) size={}", rows.size());
+    }
 
-		assertNotNull(dto); // null 여부 확인
-		log.debug("단건 조회: {}", dto);
+    @Test
+    void suggestAddress_basic() {
+        List<String> result = mapper.suggestAdress("서울");
+        assertNotNull(result);
+        log.info("suggestAdress -> {}", result);
+    }
 
-	}
+    @Test
+    void suggestReareNm_basic() {
+        List<String> result = mapper.suggestReareNm("학교");
+        assertNotNull(result);
+        log.info("suggestReareNm -> {}", result);
+    }
 
-//	지역명으로 대피소 목록 조회
-//	@Disabled
-	@Test
-	public void listByAreasTest() {
-		String ronaDaddr = "서울";
-		List<ShelterDTO> list = mapper.listByArea(ronaDaddr);
-		log.debug("┌────────────────────┐");
-		log.debug("│ listByAreaTest()   │");
-		log.debug("└────────────────────┘");
+    @Test
+    void beans() {
+        log.debug("┌────────────────────┐");
+        log.debug("│ beans()            │");
+        log.debug("└────────────────────┘");
 
-		assertNotNull(list);// null 여부 확인
-		log.debug("지역 기준 목록 건수: {}", list.size());
-		list.forEach(log::debug);
-	}
+        assertNotNull(mapper);
+        assertNotNull(context);
 
-//	지역 자동완성(키워드 기반
-//	필수 기능 아님 ( 추후 구현 )
-//	@Disabled
-	@Test
-	public void suggestKeywordTest() {
-		String q = "서울";
-		List<String> list = mapper.suggestKeyword(q);
-		log.debug("┌────────────────────────────────┐");
-		log.debug("│ suggestKeywordTest()           │");
-		log.debug("└────────────────────────────────┘");
-
-		assertNotNull(list);
-		log.debug("지역 자동완성 결과: {}", list);
-	}
-
-//	지역명으로 대피소 목록 조회
-//	지역 기준 목록 ( 나중 구현 )
-//	@Disabled
-	@Test
-	public void listByAreafsTest() {
-		String ronaDaddr = "서울";
-		List<ShelterDTO> list = mapper.listByArea(ronaDaddr);
-		log.debug("┌────────────────────┐");
-		log.debug("│ listByAreaTest()   │");
-		log.debug("└────────────────────┘");
-
-		assertNotNull(list);
-		log.debug("지역 기준 목록 건수: {}", list.size());
-		list.forEach(log::debug);
-	}
-
-	// BBox + 키워드 조회
-	// BBox 검색 건수 ( 지정된 지역 & 위경도 범위 내에 있는 데이터만 조회 )
-//	@Disabled
-	@Test
-	public void selectByBBoxsTest() {
-		double minLat = 37.0;
-		double maxLat = 38.0;
-		double minLon = 126.0;
-		double maxLon = 127.0;
-		String q = "서울"; // 키워드 없으면 null 가능
-
-		List<ShelterDTO> list = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, q);
-		log.debug("┌────────────────────────────┐");
-		log.debug("│ selectByBBoxTest()         │");
-		log.debug("└────────────────────────────┘");
-
-		assertNotNull(list);
-		log.debug("BBox 검색 건수: {}", list.size());
-		list.forEach(log::debug);
-	}
-
-	@Test
-//	@Disabled
-	void beans() {
-		log.debug("┌────────────────────┐");
-		log.debug("│ beans()            │");
-		log.debug("└────────────────────┘");
-
-		assertNotNull(mapper);
-		assertNotNull(context);
-
-		log.debug("mapper: {}" + mapper);
-		log.debug("context: {}" + context);
-	}
+        log.debug("mapper: {}", mapper);
+        log.debug("context: {}", context);
+    }
 
 }

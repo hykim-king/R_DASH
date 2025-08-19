@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 from rdash_package.oracle_db import OracleConnection
 
+
 def save_topic_to_db(name, summary, reg_id, count):
     load_dotenv()  # 현재 경로의 .env 파일을 로드
 

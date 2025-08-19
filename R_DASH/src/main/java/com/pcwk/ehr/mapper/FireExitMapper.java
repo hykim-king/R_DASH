@@ -2,6 +2,9 @@ package com.pcwk.ehr.mapper;
 
 import java.util.List;
 
+import java.util.Map;
+
+
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -10,6 +13,7 @@ import com.pcwk.ehr.domain.FireExitDTO;
 
 @Mapper
 public interface FireExitMapper extends WorkDiv<FireExitDTO> {
+
 
 	// PK 단건 조회
 
@@ -34,3 +38,17 @@ public interface FireExitMapper extends WorkDiv<FireExitDTO> {
 		throw new UnsupportedOperationException("READ-ONLY");
 	}
 }
+
+	
+	int insertFire(FireExitDTO fire);
+	
+	int deleteFire(FireExitDTO fire);
+	
+	int deleteAll();
+	
+	int updateFire(FireExitDTO fire);
+	
+	List<Map<String,Object>> selectSubwayFireExtCount();
+	
+}
+

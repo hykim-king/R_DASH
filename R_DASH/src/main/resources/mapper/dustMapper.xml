@@ -1,85 +1,74 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper
-  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.pcwk.ehr.mapper.DustMapper">
-  <!-- ✅ TM이 DATE 타입일 때 -->
-<!-- TM이 VARCHAR2일 때 -->
-<sql id="whereDay"><![CDATA[
-  SUBSTR(TM, 1, 10) = #{day}
-]]></sql>
-  <select id="selectStationAvgAt10" resultType="com.pcwk.ehr.domain.DustDTO">
-    WITH base AS (
-      SELECT
-        STN_NM, LAT, LON, AVG, TM,
-        ROW_NUMBER() OVER (PARTITION BY STN_NM ORDER BY TM DESC) AS rn
-      FROM DUST
-      WHERE <include refid="whereDay"/>
-      <if test="minLat != null and minLon != null and maxLat != null and maxLon != null">
-        AND LAT BETWEEN #{minLat} AND #{maxLat}
-        AND LON BETWEEN #{minLon} AND #{maxLon}
-      </if>
-    )
+
+  <resultMap id="DustMap" type="com.pcwk.ehr.domain.DustDTO">
+    <id     property="dustNo" column="DUST_NO"/>
+    <result property="tm"     column="TM"/>
+    <result property="stnNm"  column="STN_NM"/>
+    <result property="lat"    column="LAT"/>
+    <result property="lon"    column="LON"/>
+    <result property="org"    column="ORG"/>
+    <result property="pm10"   column="PM10"/>
+    <result property="avg"    column="AVG"/>
+  </resultMap>
+
+  <sql id="dustColumns">
+    DUST_NO, TM, STN_NM, LAT, LON, ORG, PM10, AVG
+  </sql>
+
+  <!-- 1) BBox 버전 -->
+<select id="selectLatestByTypeBBox" resultType="com.pcwk.ehr.domain.DustDTO">
+  SELECT *
+  FROM (
     SELECT
-      STN_NM   AS stnNm,
-      MAX(LAT) AS lat,
-      MAX(LON) AS lon,
-      MAX(AVG) AS avg
-    FROM base
-    WHERE rn = 1
-    GROUP BY STN_NM
-    ORDER BY STN_NM
-  </select>
+      d.DUST_NO                      AS dustNo,
+      TO_CHAR(d.TM_DATE,'YYYY-MM-DD HH24:MI:SS') AS tm,
+      d.STN_NM                       AS stnNm,
+      d.LAT                          AS lat,
+      d.LON                          AS lon,
+      TRIM(d.ORG)                    AS org,
+      d.PM10                         AS pm10,
+      d.AVG                          AS avg,
+      d.MAX                          AS max,
+      d.CNT                          AS cnt,
+      ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
+    FROM DUST d
+    WHERE d.LAT BETWEEN #{minLat} AND #{maxLat}
+      AND d.LON BETWEEN #{minLon} AND #{maxLon}
+      AND TRIM(d.ORG) = TRIM(#{airType})
+  )
+  WHERE rn = 1
+  <if test="limit != null">
+    FETCH FIRST #{limit} ROWS ONLY
+  </if>
+</select>
 
-
-
-  <select id="selectLegendBucketsAt10" resultType="com.pcwk.ehr.domain.DustDTO">
+<select id="selectLatestByTypeAll" resultType="com.pcwk.ehr.domain.DustDTO">
+  SELECT *
+  FROM (
     SELECT
-      CASE
-        WHEN AVG > 30 THEN '경고'
-        WHEN AVG > 20 THEN '주의'
-        ELSE '관심'
-      END AS org,
-      COUNT(*) AS cnt
-    FROM DUST
-    WHERE <include refid="whereDay"/> AND AVG IS NOT NULL
-    GROUP BY
-      CASE
-        WHEN AVG > 30 THEN '경고'
-        WHEN AVG > 20 THEN '주의'
-        ELSE '관심'
-      END
-    ORDER BY 1
-  </select>
+      d.DUST_NO                      AS dustNo,
+      TO_CHAR(d.TM_DATE,'YYYY-MM-DD HH24:MI:SS') AS tm,
+      d.STN_NM                       AS stnNm,
+      d.LAT                          AS lat,
+      d.LON                          AS lon,
+      TRIM(d.ORG)                    AS org,
+      d.PM10                         AS pm10,
+      d.AVG                          AS avg,
+      d.MAX                          AS max,
+      d.CNT                          AS cnt,
+      ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
+    FROM DUST d
+    WHERE TRIM(d.ORG) = TRIM(#{airType})
+  )
+  WHERE rn = 1
+  <if test="limit != null">
+    FETCH FIRST #{limit} ROWS ONLY
+  </if>
+</select>
 
-  <select id="selectLatestByOrgAt10" resultType="com.pcwk.ehr.domain.DustDTO">
-    WITH ranked AS (
-      SELECT
-        STN_NM, ORG, LAT, LON, PM10, AVG, MAX, CNT, TM,
-        ROW_NUMBER() OVER (PARTITION BY STN_NM ORDER BY TM DESC) AS rn
-      FROM DUST
-      WHERE <include refid="whereDay"/>
-        <if test="org != null and org != ''">
-          AND ORG = #{org}
-        </if>
-        <if test="minLat != null and minLon != null and maxLat != null and maxLon != null">
-          AND LAT BETWEEN #{minLat} AND #{maxLat}
-          AND LON BETWEEN #{minLon} AND #{maxLon}
-        </if>
-    )
-    SELECT
-      STN_NM AS stnNm,
-      ORG,
-      LAT,
-      LON,
-      PM10,
-      AVG,
-      MAX,
-      CNT,
-      TM AS tm 
-    FROM ranked
-    WHERE rn = 1
-    ORDER BY STN_NM
-  </select>
+
 </mapper>

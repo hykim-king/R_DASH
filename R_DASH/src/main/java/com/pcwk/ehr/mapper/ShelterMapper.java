@@ -9,19 +9,18 @@ import com.pcwk.ehr.cmn.WorkDiv;
 import com.pcwk.ehr.domain.ShelterDTO;
 
 @Mapper
-public interface ShelterMapper extends WorkDiv<ShelterDTO>{
-//	전체 소방서 목록
-	List<ShelterDTO> selectAll();
+public interface ShelterMapper extends WorkDiv<ShelterDTO> {
+	/** 단건 상세 */
+	ShelterDTO selectOne(@Param("shelterNo") Integer shelterNo);
 
-//    단건 조회
-	ShelterDTO findById(@Param("shelterNo") int shelterNo);
+	/** 단순 리스트(상위 N개) */
+	List<ShelterDTO> selectList(@Param("limit") Integer limit);
 
-//    특정 지역의 소방서 목록
-	List<ShelterDTO> listByArea(@Param("ronaDaddr") String ronaDaddr);
+	/** 자동완성 - 주소 */
+	List<String> suggestAdress(@Param("q") String q);
 
-//    지역명 자동완성(q 검색 키워드)
-	List<String> suggestKeyword(@Param("q") String q);
-
+	/** 자동완성 - 시설명 */
+	List<String> suggestReareNm(@Param("q") String q);
 
 	/**
 	 * 지도 BBox + 키워드 검색
@@ -33,5 +32,6 @@ public interface ShelterMapper extends WorkDiv<ShelterDTO>{
 	 * @param q      검색 키워드(지역명/대피소명)
 	 */
 	List<ShelterDTO> selectByBBox(@Param("minLat") double minLat, @Param("maxLat") double maxLat,
-			@Param("minLon") double minLon, @Param("maxLon") double maxLon, @Param("q") String q);
+			@Param("minLon") double minLon, @Param("maxLon") double maxLon, @Param("q") String q,
+			@Param("limit") Integer limit);
 }
