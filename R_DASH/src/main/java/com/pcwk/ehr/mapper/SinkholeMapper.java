@@ -22,4 +22,12 @@ public interface SinkholeMapper {
 
     // 상태별 집계 (STATE_NM별 count)
     List<Map<String, Object>> countByState();
+    
+    List<Map<String, Object>> selectYearlyCounts();
+    
+    List<Map<String, Object>> selectSignguCounts();
+    
+    List<Map<String, Object>> selectMonthlyCounts();
+    
+    List<Map<String, Object>> selectYearlyDamageStats();
 }

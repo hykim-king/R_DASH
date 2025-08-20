@@ -119,11 +119,11 @@
             <div class="card-header bg-transparent pb-5">
               <div class="text-center mt-2 mb-3"><small>소셜 로그인</small></div>
               <div class="btn-wrapper text-center">
-                <a href="#" class="btn btn-neutral btn-icon">
-                  <span class="btn-inner--icon"><img src="/ehr/resources/template/dashboard/assets/img/icons/common/github.svg"></span>
-                  <span class="btn-inner--text">Github</span>
+                <a href="/ehr/oauth2/authorization/kakao" class="btn btn-neutral btn-icon">
+                  <span class="btn-inner--icon"><img src="/ehr/resources/template/dashboard/assets/img/icons/common/kakao.png"></span>
+                  <span class="btn-inner--text">Kakao</span>
                 </a>
-                <a href="#" class="btn btn-neutral btn-icon">
+                <a href="/ehr/oauth2/authorization/google" class="btn btn-neutral btn-icon">
                   <span class="btn-inner--icon"><img src="/ehr/resources/template/dashboard/assets/img/icons/common/google.svg"></span>
                   <span class="btn-inner--text">Google</span>
                 </a>
