@@ -1,88 +1,124 @@
 package com.pcwk.ehr.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.junit.jupiter.api.Assertions.*;
+
+import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.ui.ConcurrentModel;
+import org.springframework.ui.Model;
+
+import com.pcwk.ehr.domain.DustDTO;
 
 /**
- * ✅ MockMvc를 사용해 실제 컨트롤러/서비스/매퍼/DB를 타는 통합 테스트 ✅ @MockBean 같은 가짜(Mock) 객체는 전혀
- * 사용하지 않음 ✅ /api/dust/latest REST API를 호출하고 응답 상태/타입을 검증
+ * ✅ 순수 스프링 컨텍스트 + 컨트롤러 직접 호출 (No Mock, No Spring Boot, No MockMvc)
+ * - 실 서비스/매퍼/DB를 사용
  */
-@WebAppConfiguration // 웹 애플리케이션 컨텍스트(WebApplicationContext)를 로딩
-@ExtendWith(SpringExtension.class) // JUnit5 + Spring TestContext Framework 통합
+@WebAppConfiguration
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {
-		// 스프링 빈 설정 파일 경로 지정 (root-context: 서비스/매퍼/DB, servlet-context: 컨트롤러/MVC)
-		"file:src/main/webapp/WEB-INF/spring/root-context.xml",
-		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml" })
-public class DustControllerTest {
+    "file:src/main/webapp/WEB-INF/spring/root-context.xml",
+    "file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml"
+})
+class DustControllerTest {
 
-	Logger log = LogManager.getLogger(getClass());
+    private final Logger log = LogManager.getLogger(getClass());
 
-	@Autowired
-	private WebApplicationContext wac; // 실제 웹 애플리케이션 컨텍스트 주입
+    @Autowired
+    private DustController controller; // 컨트롤러 빈 직접 주입
 
-	private MockMvc mockMvc; // HTTP 요청/응답을 흉내내는 테스트 클라이언트
+    @BeforeEach
+    void setUp() {
+        assertNotNull(controller, "DustController 주입 실패: 컴포넌트 스캔/빈 등록 확인");
+    }
 
-	@BeforeEach
-	void setUp() {
-		// WebApplicationContext 기반으로 MockMvc 생성 → 실제 빈들을 모두 사용
-		mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
-	}
+    @Test
+    @DisplayName("전국 조회: airType만으로 최신 데이터 반환")
+    void latest_all_ok() {
+        String airType = "도시대기"; // ORG 컬럼 값과 정확히 일치해야 함 (도시대기/도로변대기/교외대기)
+        Integer limit = 5;
 
-	/**
-	 * ✅ BBox(지도 화면 범위) 조건이 있을 때 API 호출 테스트
-	 */
-	@Test
-	void latest_bbox_ok() throws Exception {
-		MvcResult result = mockMvc
-				.perform(get("/api/dust/latest").param("airType", "도시대기").param("minLat", "33.0")
-						.param("maxLat", "38.7").param("minLon", "124.5").param("maxLon", "131.0").param("limit", "5"))
-				.andDo(print()).andReturn();
+        List<DustDTO> rows = controller.latest(airType, null, null, null, null, null, limit);
 
-		// 예외가 있었다면 로그로 확인
-		if (result.getResolvedException() != null) {
-			log.error("🔥 Controller threw exception", result.getResolvedException());
-		}
+        assertNotNull(rows, "latest() 결과 null");
+        assertTrue(rows.size() <= limit, "limit 초과 반환");
+        if (!rows.isEmpty()) {
+            DustDTO d = rows.get(0);
+            assertNotNull(d.getStnNm(), "측정소명(stnNm) null");
+            assertEquals(airType, d.getOrg(), "ORG(대기종류) 불일치");
+            log.info("latest_all_ok -> size={}, first={}", rows.size(), d);
+        }
+    }
 
-		// 응답 본문 로그
-		log.info("📌 Response Status = {}", result.getResponse().getStatus());
-		log.info("📌 Response Body   = {}", result.getResponse().getContentAsString());
-	}
+    @Test
+    @DisplayName("BBox 조회: 화면 영역 내 최신 데이터 반환")
+    void latest_bbox_ok() {
+        String airType = "도로변대기";
+        String day = null; // 필요 시 "2025-08-05" 등 존재하는 날짜 지정
+        double minLat = 33.0, maxLat = 38.7, minLon = 124.5, maxLon = 131.0;
+        int limit = 5;
 
-	/**
-	 * ✅ 전국 단위(전제 BBox 없이) API 호출 테스트
-	 */
-	@Test
-	void latest_all_ok() throws Exception {
-		MvcResult r = mockMvc.perform(get("/api/dust/latest").param("airType", "교외대기") // SQL에선 미사용
-				.param("limit", "5")).andDo(print()).andReturn();
+        List<DustDTO> rows = controller.latest(
+            airType, day, minLat, maxLat, minLon, maxLon, limit
+        );
 
-		int status = r.getResponse().getStatus();
-		String body = r.getResponse().getContentAsString();
-		Throwable ex = r.getResolvedException();
+        assertNotNull(rows, "latest(BBox) 결과 null");
+        assertTrue(rows.size() <= limit, "limit 초과 반환");
+        if (!rows.isEmpty()) {
+            DustDTO d = rows.get(0);
+            assertTrue(d.getLat() >= minLat && d.getLat() <= maxLat, "위도 범위 벗어남");
+            assertTrue(d.getLon() >= minLon && d.getLon() <= maxLon, "경도 범위 벗어남");
+            assertEquals(airType, d.getOrg(), "ORG(대기종류) 불일치");
+            log.info("latest_bbox_ok -> size={}, first={}", rows.size(), d);
+        }
+    }
 
-		log.info("latest_all_ok :: status={}", status);
-		log.info("latest_all_ok :: body={}", body);
-		if (ex != null) {
-			log.error("latest_all_ok :: exception", ex);
-		}
+    @Test
+    @DisplayName("특정 일자 + airType 조회: 최신 데이터 반환")
+    void latest_airtype_with_day_ok() {
+        String airType = "교외대기";
+        String day = "2025-08-05"; // DB에 존재하는 날짜로 조정 가능
+        int limit = 5;
 
-		// 문제 파악 끝나면 assert로 200 확인
-		org.junit.jupiter.api.Assertions.assertEquals(200, status,
-				"expected 200 but was " + status + " / body=" + body);
-	}
+        List<DustDTO> rows = controller.latest(airType, day, null, null, null, null, limit);
 
+        assertNotNull(rows, "latest(day) 결과 null");
+        assertTrue(rows.size() <= limit, "limit 초과 반환");
+        // 데이터가 없을 수도 있으니 배열 여부만 확인
+        log.info("latest_airtype_with_day_ok -> size={}", rows.size());
+    }
+
+    @Test
+    @DisplayName("통계: PM10 Top5/Bottom5/Avg")
+    void stats_endpoints_ok() {
+        List<Map<String, Object>> top5 = controller.getTop5PM10();
+        List<Map<String, Object>> bottom5 = controller.getBottom5PM10();
+        Double avg = controller.getAvgPM10();
+
+        assertNotNull(top5, "top5 null");
+        assertNotNull(bottom5, "bottom5 null");
+        assertNotNull(avg, "avg null");
+        assertTrue(avg >= 0 || avg.isNaN() == false, "avg 값 비정상");
+        log.info("stats -> top5={}, bottom5={}, avg={}", top5.size(), bottom5.size(), avg);
+    }
+
+    @Test
+    @DisplayName("뷰 라우팅: /dust/statsPage")
+    void statsPage_view_ok() throws Exception {
+        Model model = new ConcurrentModel();
+        String view = controller.statsPage(model);
+
+        assertEquals("stats/statsMain", view, "뷰 이름 불일치");
+        assertEquals("dust", model.asMap().get("pageType"), "pageType 모델 값 불일치");
+    }
 }

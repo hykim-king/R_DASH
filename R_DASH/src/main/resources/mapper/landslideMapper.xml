@@ -1,84 +1,136 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 반드시 인터페이스 FQN과 동일 -->
 <mapper namespace="com.pcwk.ehr.mapper.LandslideMapper">
 
-    <!-- DTO 매핑 -->
-    <!-- com.pcwk.ehr.domain.LandslideDTO 의 필드명 예시:
-         landslideNo, lndApntCd, lndApntNm, lndApntStts, lndApntDt, lndInstNm, lat, lon -->
-    <resultMap id="LandslideMap" type="com.pcwk.ehr.domain.LandslideDTO">
-        <id     property="landslideNo" column="LANDSLIDE_NO"/>
-        <result property="lndApntCd"   column="LND_APNT_CD"/>
-        <result property="lndApntNm"   column="LND_APNT_NM"/>
-        <result property="lndApntStts" column="LND_APNT_STTS"/>
-        <result property="lndApntDt"   column="LND_APNT_DT"/>
-        <result property="lndInstNm"   column="LND_INST_NM"/>
-        <result property="lat"         column="LAT"/>
-        <result property="lon"         column="LON"/>
-    </resultMap>
+  <!-- =========================================================
+       DTO 매핑: com.pcwk.ehr.domain.LandslideDTO
+       필드:
+         - int     lndApntCd
+         - String  lndApntNm
+         - String  lndApntStts
+         - String  lndApntDt
+         - String  lndInstNm
+         - double  lat
+         - double  lon
+         - Integer landslideNo
+       ========================================================= -->
+  <resultMap id="LandslideResultMap" type="com.pcwk.ehr.domain.LandslideDTO">
+    <id     property="landslideNo" column="LANDSLIDE_NO"/>
+    <result property="lndApntCd"   column="LND_APNT_CD"/>
+    <result property="lndApntNm"   column="LND_APNT_NM"/>
+    <result property="lndApntStts" column="LND_APNT_STTS"/>
+    <result property="lndApntDt"   column="LND_APNT_DT"/>
+    <result property="lndInstNm"   column="LND_INST_NM"/>
+    <result property="lat"         column="LAT"/>
+    <result property="lon"         column="LON"/>
+  </resultMap>
 
-    <!-- 공통 컬럼 묶음 -->
-    <sql id="LandslideColumns">
-        LANDSLIDE_NO,
-        LND_APNT_CD,
-        LND_APNT_NM,
-        LND_APNT_STTS,
-        LND_APNT_DT,
-        LND_INST_NM,
-        LAT,
-        LON
-    </sql>
+  <!-- =========================================================
+       1) BBox 내 포인트(단건) 목록 조회
+       파라미터: minLat, maxLat, minLon, maxLon, q
+       정렬: 발생일시 최신순 -> PK 역순
+       ========================================================= -->
+  <select id="selectByBBox" resultMap="LandslideResultMap">
+    SELECT
+           L.LANDSLIDE_NO,
+           L.LND_APNT_CD,
+           L.LND_APNT_NM,
+           L.LND_APNT_STTS,
+           L.LND_APNT_DT,
+           L.LND_INST_NM,
+           L.LAT,
+           L.LON
+      FROM LANDSLIDE L
+     WHERE L.LAT BETWEEN #{minLat} AND #{maxLat}
+       AND L.LON BETWEEN #{minLon} AND #{maxLon}
+    <if test="q != null and q != ''">
+       AND (
+            L.LND_INST_NM   LIKE '%' || #{q} || '%'
+         OR L.LND_APNT_NM   LIKE '%' || #{q} || '%'
+         OR L.LND_APNT_STTS LIKE '%' || #{q} || '%'
+       )
+    </if>
+     ORDER BY L.LND_APNT_DT DESC NULLS LAST,
+              L.LANDSLIDE_NO DESC
+  </select>
 
-    <!-- BBox + 키워드(선택) -->
-    <select id="selectByBBox" resultMap="LandslideMap">
-        SELECT
-            <include refid="LandslideColumns"/>
-        FROM LANDSLIDE
-        WHERE
-            LAT BETWEEN #{minLat} AND #{maxLat}
-            AND LON BETWEEN #{minLon} AND #{maxLon}
-        <if test="q != null and q != ''">
-            AND (
-                UPPER(LND_INST_NM) LIKE '%' || UPPER(#{q}) || '%'
-                OR UPPER(LND_APNT_NM) LIKE '%' || UPPER(#{q}) || '%'
-                OR UPPER(LND_APNT_STTS) LIKE '%' || UPPER(#{q}) || '%'
-            )
-        </if>
-        ORDER BY LND_APNT_DT DESC, LANDSLIDE_NO DESC
-        FETCH FIRST 500 ROWS ONLY
-    </select>
-    
-    
-    
-        <!-- 단건 상세 -->
-    <select id="findById" resultMap="LandslideMap">
-        SELECT
-            <include refid="LandslideColumns"/>
-        FROM LANDSLIDE
-        WHERE LANDSLIDE_NO = #{landslideNo}
-    </select>
-    
+  <!-- =========================================================
+       2) 단건 상세
+       파라미터: landslideNo
+       ========================================================= -->
+  <select id="findById" resultMap="LandslideResultMap">
+    SELECT
+           L.LANDSLIDE_NO,
+           L.LND_APNT_CD,
+           L.LND_APNT_NM,
+           L.LND_APNT_STTS,
+           L.LND_APNT_DT,
+           L.LND_INST_NM,
+           L.LAT,
+           L.LON
+      FROM LANDSLIDE L
+     WHERE L.LANDSLIDE_NO = #{landslideNo}
+  </select>
 
-    <!-- 버블맵용: 지역별 COUNT (BBox 제한) -->
-    <select id="countByRegionInBBox" resultType="map">
-        SELECT
-            LND_INST_NM    AS region,
-            COUNT(*)       AS cnt,
-            MAX(LND_APNT_DT) AS latestDt
-        FROM LANDSLIDE
-        WHERE
-            LAT BETWEEN #{minLat} AND #{maxLat}
-            AND LON BETWEEN #{minLon} AND #{maxLon}
-        <if test="q != null and q != ''">
-            AND (
-                UPPER(LND_INST_NM) LIKE '%' || UPPER(#{q}) || '%'
-                OR UPPER(LND_APNT_NM) LIKE '%' || UPPER(#{q}) || '%'
-                OR UPPER(LND_APNT_STTS) LIKE '%' || UPPER(#{q}) || '%'
-            )
-        </if>
-        GROUP BY LND_INST_NM
-        ORDER BY cnt DESC
-        FETCH FIRST 300 ROWS ONLY
-    </select>
+  <!-- =========================================================
+       3) BBox 내 "시군구/지역명" 집계 (버블용)
+       - 행정구역 보조테이블 없이 LND_INST_NM 기준 그룹핑
+       - 버블 좌표: 해당 그룹 포인트의 평균 좌표(간이 중심)
+       반환 키(따옴표 alias로 Map 키 고정):
+         "regionName", "lat", "lon", "cnt"
+       ========================================================= -->
+  <select id="countByRegionInBBox" resultType="map">
+    SELECT
+           L.LND_INST_NM        AS "regionName",
+           AVG(L.LAT)           AS "lat",
+           AVG(L.LON)           AS "lon",
+           COUNT(*)             AS "cnt"
+      FROM LANDSLIDE L
+     WHERE L.LAT BETWEEN #{minLat} AND #{maxLat}
+       AND L.LON BETWEEN #{minLon} AND #{maxLon}
+    <if test="q != null and q != ''">
+       AND (
+            L.LND_INST_NM   LIKE '%' || #{q} || '%'
+         OR L.LND_APNT_NM   LIKE '%' || #{q} || '%'
+         OR L.LND_APNT_STTS LIKE '%' || #{q} || '%'
+       )
+    </if>
+     GROUP BY L.LND_INST_NM
+     ORDER BY "cnt" DESC, "regionName"
+  </select>
+
+  <!-- =========================================================
+       4) BBox 내 "시/도" 집계 (줌아웃 버블)
+       - 지역명 규칙에 맞춰 상위 행정구역만 추출
+       - 예: '강원특별자치도 강릉시' 형태면 SUBSTR/REGEXP으로 앞부분만
+       - 아래 예시는 간단히 첫 두 글자를 시/도로 가정(프로젝트 규칙에 맞게 수정)
+       반환 키:
+         "sidoNm", "lat", "lon", "cnt"
+       ========================================================= -->
+  <select id="countBySidoInBBox" resultType="map">
+    SELECT
+           /* 👇 실제 명명 규칙에 맞게 교체 권장 */
+           SUBSTR(L.LND_INST_NM, 1, 2) AS "sidoNm",
+           AVG(L.LAT)                  AS "lat",
+           AVG(L.LON)                  AS "lon",
+           COUNT(*)                    AS "cnt"
+      FROM LANDSLIDE L
+     WHERE L.LAT BETWEEN #{minLat} AND #{maxLat}
+       AND L.LON BETWEEN #{minLon} AND #{maxLon}
+    <if test="q != null and q != ''">
+       AND (
+            L.LND_INST_NM   LIKE '%' || #{q} || '%'
+         OR L.LND_APNT_NM   LIKE '%' || #{q} || '%'
+         OR L.LND_APNT_STTS LIKE '%' || #{q} || '%'
+       )
+    </if>
+     GROUP BY SUBSTR(L.LND_INST_NM, 1, 2)
+     ORDER BY "cnt" DESC, "sidoNm"
+  </select>
+
 
 </mapper>
