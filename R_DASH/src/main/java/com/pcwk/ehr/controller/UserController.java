@@ -201,7 +201,7 @@ public class UserController {
 			// 세션에 저장
 			session.setAttribute("loginUser", user);
 			result.put("success", true);
-			result.put("message", user.getName() + "환영합니다.");
+			result.put("message", user.getName() + "님 환영합니다.");
 		}
 		log.debug("result:{}", result);
 

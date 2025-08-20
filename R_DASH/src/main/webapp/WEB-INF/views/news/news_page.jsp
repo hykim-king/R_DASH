@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function(){
        const left = (screenWidth - 600)/2;
        const top = (screenHeight - 400)/2;
 
-       let options = `width=600,height=600, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+       let options = `width=600,height=600, top=${top}, left=${left}, resizable=no, scrollbars=no`;
        window.open(url,"_blank",options);
     });
     //수정 모달
@@ -252,10 +252,26 @@ document.addEventListener('DOMContentLoaded', function(){
        const left = (screenWidth - 600)/2;
        const top = (screenHeight - 400)/2;
 
-       let options = `width=600,height=700, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+       let options = `width=900,height=700, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
        window.open(url,"_blank",options);
     });
+    
+    //오늘의 키워드 모달
+    const clickMeDiv = document.querySelector("#clickMe");
+    clickMeDiv.addEventListener("click",function(e){
+    	let url = "/ehr/freq/topic/words.do";
+        const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
+        console.log('screenWidth: '+screenWidth);
+        console.log('screenHeight: '+screenHeight);
 
+       const left = (screenWidth - 900)/2;
+       const top = (screenHeight - 800)/2;
+
+       let options = `width=900,height=800, top=${top}, left=${left}, resizable=no, scrollbars=no`;
+       window.open(url,"_blank",options);
+    });
+    
 });
 </script>
 </head>
@@ -344,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	           </div>
 	       </div>
 	       <!-- 오늘의 키워드 보여줄 click me -->
-	       <div class="clickMeWrapper">
+	       <div id="clickMe" class="clickMeWrapper">
 		        <img class="clickMeImg" src="/ehr/resources/image/news_Jeamin.png" alt="나를 클릭해봐">
 		        <div class="clickMeIcon">
 		           <!--  <i class="ni ni-chat-round"></i> -->
