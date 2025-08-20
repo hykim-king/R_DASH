@@ -14,7 +14,7 @@ import com.pcwk.ehr.domain.FirestationDTO;
 import com.pcwk.ehr.service.FirestationService;
 
 @Controller
-@RequestMapping("/api/firestations")
+@RequestMapping("/firestations")
 public class FirestationController {
 	
 	Logger log = LogManager.getLogger(getClass());

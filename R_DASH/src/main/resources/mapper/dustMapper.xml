@@ -42,52 +42,59 @@
     DUST_NO, TM, STN_NM, LAT, LON, ORG, PM10, AVG
   </sql>
 
-  <!-- 1) BBox 버전 -->
+ <!-- BBox 버전 -->
 <select id="selectLatestByTypeBBox" resultType="com.pcwk.ehr.domain.DustDTO">
-  SELECT *
+  SELECT
+    d.DUST_NO                              AS dustNo,
+    TO_CHAR(d.TM_DATE, 'YYYY-MM-DD HH24:MI:SS') AS tm,
+    d.STN_NM                               AS stnNm,
+    d.LAT                                  AS lat,
+    d.LON                                  AS lon,
+    TRIM(d.ORG)                            AS org,
+    d.PM10                                 AS pm10,
+    d.AVG                                  AS avg,
+    d.MAX                                  AS max,
+    d.CNT                                  AS cnt
   FROM (
-    SELECT
-      d.DUST_NO                      AS dustNo,
-      TO_CHAR(d.TM_DATE,'YYYY-MM-DD HH24:MI:SS') AS tm,
-      d.STN_NM                       AS stnNm,
-      d.LAT                          AS lat,
-      d.LON                          AS lon,
-      TRIM(d.ORG)                    AS org,
-      d.PM10                         AS pm10,
-      d.AVG                          AS avg,
-      d.MAX                          AS max,
-      d.CNT                          AS cnt,
-      ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
+    SELECT d.*,
+           ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
     FROM DUST d
     WHERE d.LAT BETWEEN #{minLat} AND #{maxLat}
       AND d.LON BETWEEN #{minLon} AND #{maxLon}
       AND TRIM(d.ORG) = TRIM(#{airType})
-  )
-  WHERE rn = 1
+      <if test="day != null and day != ''">
+        AND TRUNC(d.TM_DATE) = TO_DATE(#{day}, 'YYYY-MM-DD')
+      </if>
+  ) d
+  WHERE d.rn = 1
   <if test="limit != null">
     FETCH FIRST #{limit} ROWS ONLY
   </if>
 </select>
 
+<!-- 전국 버전 -->
 <select id="selectLatestByTypeAll" resultType="com.pcwk.ehr.domain.DustDTO">
-  SELECT *
+  SELECT
+    d.DUST_NO                              AS dustNo,
+    TO_CHAR(d.TM_DATE, 'YYYY-MM-DD HH24:MI:SS') AS tm,
+    d.STN_NM                               AS stnNm,
+    d.LAT                                  AS lat,
+    d.LON                                  AS lon,
+    TRIM(d.ORG)                            AS org,
+    d.PM10                                 AS pm10,
+    d.AVG                                  AS avg,
+    d.MAX                                  AS max,
+    d.CNT                                  AS cnt
   FROM (
-    SELECT
-      d.DUST_NO                      AS dustNo,
-      TO_CHAR(d.TM_DATE,'YYYY-MM-DD HH24:MI:SS') AS tm,
-      d.STN_NM                       AS stnNm,
-      d.LAT                          AS lat,
-      d.LON                          AS lon,
-      TRIM(d.ORG)                    AS org,
-      d.PM10                         AS pm10,
-      d.AVG                          AS avg,
-      d.MAX                          AS max,
-      d.CNT                          AS cnt,
-      ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
+    SELECT d.*,
+           ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
     FROM DUST d
     WHERE TRIM(d.ORG) = TRIM(#{airType})
-  )
-  WHERE rn = 1
+      <if test="day != null and day != ''">
+        AND TRUNC(d.TM_DATE) = TO_DATE(#{day}, 'YYYY-MM-DD')
+      </if>
+  ) d
+  WHERE d.rn = 1
   <if test="limit != null">
     FETCH FIRST #{limit} ROWS ONLY
   </if>
