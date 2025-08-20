@@ -99,41 +99,46 @@
     </select>
     
     <select id="selectPatientsSummary" parameterType="map" resultType="PatientsDTO">
-	    SELECT 
-	        <choose>
-	            <when test="groupType == 'region'">
-	                SIDO_NM AS groupKey
-	            </when>
-	            <when test="groupType == 'year'">
-	                YEAR AS groupKey
-	            </when>
-	        </choose>,
-	        SUM(PATIENTS_TOT) AS patientsTot,
-		    SUM(OUT_SUBTOT) AS outSubTot,
-		    SUM(IN_SUBTOT) AS inSubTot
-	    FROM PATIENTS
-	    <where>
-	        <!-- 특정 년도의 지역별 합계 -->
-	        <if test="year != null and year != ''">
-	            YEAR = #{year}
-	        </if>
-	
-	        <!-- 특정 지역의 년도별 합계 -->
-	        <if test="sidoNm != null and sidoNm != ''">
-	             AND SIDO_NM = #{sidoNm}
-	        </if>
-	    </where>
-	    <choose>
-	        <when test="groupType == 'region'">
-	            GROUP BY SIDO_NM
-	            ORDER BY SIDO_NM
-	        </when>
-	        <when test="groupType == 'year'">
-	            GROUP BY YEAR
-	            ORDER BY YEAR
-	        </when>
-	    </choose>
-	</select>
+        SELECT 
+            <choose>
+                <when test="groupType == 'region'">
+                    SIDO_NM AS groupKey
+                </when>
+                <when test="groupType == 'year'">
+                    YEAR AS groupKey
+                </when>
+            </choose>,
+            SUM(PATIENTS_TOT) AS patientsTot,
+            SUM(OUT_SUBTOT) AS outSubTot,
+            SUM(IN_SUBTOT) AS inSubTot
+        FROM PATIENTS
+        <where>
+            <!-- 특정 년도의 지역별 합계 -->
+            <if test="year != null and year != ''">
+                YEAR = #{year}
+            </if>
+    
+            <!-- 특정 지역의 년도별 합계 -->
+            <if test="sidoNm != null and sidoNm != ''">
+                 SIDO_NM = #{sidoNm}
+            </if>
+        </where>
+        <choose>
+            <when test="groupType == 'region'">
+                GROUP BY SIDO_NM
+                ORDER BY SIDO_NM
+            </when>
+            <when test="groupType == 'year'">
+                GROUP BY YEAR
+                ORDER BY YEAR
+            </when>
+            <otherwise>
+			    <!-- 기본값 처리 -->
+			    GROUP BY SIDO_NM
+			    ORDER BY SIDO_NM
+			</otherwise>
+        </choose>
+    </select>
    
     <select id="pSido" resultType="string">
 	    SELECT DISTINCT SIDO_NM FROM PATIENTS ORDER BY SIDO_NM
@@ -150,5 +155,5 @@
     <delete id="deleteAll">
         DELETE FROM PATIENTS
     </delete>
-    
+
 </mapper>

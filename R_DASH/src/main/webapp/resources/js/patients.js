@@ -28,8 +28,8 @@ $(document).ready(function() {
             url: '/ehr/temperature/summary.do',
             type: 'GET',
             data: { groupType, year, sidoNm },
-            success: function(data) {
-                let filteredData = data.filter(d => d.groupKey !== "전국" && d.groupKey !== "합계");
+            success: function(data) {   
+                let filteredData = data.filter(d => d.groupKey && d.groupKey !== "전국" && d.groupKey !== "합계");
 
                 let labels = filteredData.map(d => d.groupKey);
                 let totalValues = filteredData.map(d => d.patientsTot);
@@ -39,6 +39,9 @@ $(document).ready(function() {
                 let ctx = document.getElementById('patientsChart').getContext('2d');
                 let inOutdoorCtx = document.getElementById('inOutdoorChart').getContext('2d');
 
+                console.log(data);
+                console.log(filteredData);
+                console.log(totalValues, inValues, outValues);
                 // 1. 기존 차트 제거
                 if (chartInstance) {
                     chartInstance.destroy();
