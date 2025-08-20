@@ -132,11 +132,6 @@
                 GROUP BY YEAR
                 ORDER BY YEAR
             </when>
-            <otherwise>
-			    <!-- 기본값 처리 -->
-			    GROUP BY SIDO_NM
-			    ORDER BY SIDO_NM
-			</otherwise>
         </choose>
     </select>
    

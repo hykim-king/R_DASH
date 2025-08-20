@@ -45,4 +45,25 @@ public class LandslideServiceImpl implements LandslideService {
         log.debug("getDetail id={}", landslideNo);
         return mapper.findById(landslideNo);
     }
+    
+    @Override
+    public List<Map<String,Object>> getByYear() {
+    	return mapper.selectByYear();
+    }
+    
+    @Override
+    public List<Map<String,Object>> getByRegion() {
+    	return mapper.selectByRegion();
+    }
+    
+    @Override
+    public List<Map<String,Object>> getByMonth() {
+    	return mapper.selectByMonth();
+    }
+    
+    @Override
+    public List<Map<String,Object>> getByStatus() {
+    	return mapper.selectByStatus();
+    }
+    
 }
