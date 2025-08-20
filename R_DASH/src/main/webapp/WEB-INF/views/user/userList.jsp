@@ -207,8 +207,14 @@ function pagerDoRetrieve(url, pageNo){
 			                      ${vo.no }
 			                    </td>
 			                    <td>
-			                      <span class="badge badge-dot mr-4">
-			                        <span class="status">${vo.email }</span>
+			                      <span class="badge badge-dot mr-4 btn-icon">
+				                        <c:if test="${vo.social == 'kakao' }"><img src="">
+				                            <span class="btn-inner--icon"><img src="/ehr/resources/template/dashboard/assets/img/icons/common/kakao.png"></span>
+				                        </c:if>
+				                        <c:if test="${vo.social == 'google' }"><img src="">
+                                            <span class="btn-inner--icon"><img src="/ehr/resources/template/dashboard/assets/img/icons/common/google.svg"></span>
+                                        </c:if>
+                                     <span class="status">${vo.email }</span>
 			                      </span>
 			                    </td>
 			                    <td>
