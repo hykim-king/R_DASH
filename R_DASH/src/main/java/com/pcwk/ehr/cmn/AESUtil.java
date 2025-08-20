@@ -24,17 +24,19 @@ public class AESUtil {
 
 	private static final String ALGORITHM = "AES";
 
-	@Value("${aes.secret.key}")
-	private String secretKey;
+	//@Value("${aes.secret.key}")
+	//private String secretKey;
+	
+    private static final String SELECT_KEY = "123456789O123456";
 
 	/**
 	 * 테스트용: 실 서비스에서는 삭제 할것
 	 * 
 	 * @return the secretKey
 	 */
-	public String getSecretKey() {
-		return secretKey;
-	}
+//	public String getSecretKey() {
+//		return secretKey;
+//	}
 
 	/**
 	 * 복호화
@@ -45,7 +47,7 @@ public class AESUtil {
 	 */
 	public String decrypt(String encryptedTest) throws Exception {
 		// 바이트 배열로 부터 AES용 키 객체 생성
-		SecretKeySpec key = new SecretKeySpec(secretKey.getBytes(), ALGORITHM);
+		SecretKeySpec key = new SecretKeySpec(SELECT_KEY.getBytes(), ALGORITHM);
 		Cipher cipher = Cipher.getInstance(ALGORITHM);// "AES" 알고리즘의 암호화 객체 생성
 		cipher.init(Cipher.DECRYPT_MODE, key);// 복호화 모드로 초기화
 
@@ -64,7 +66,7 @@ public class AESUtil {
 	 */
 	public String encrypt(String plainText) throws Exception {
 		// 바이트 배열로 부터 AES용 키 객체 생성
-		SecretKeySpec key = new SecretKeySpec(secretKey.getBytes(), ALGORITHM);
+		SecretKeySpec key = new SecretKeySpec(SELECT_KEY.getBytes(), ALGORITHM);
 		Cipher cipher = Cipher.getInstance(ALGORITHM);// "AES" 알고리즘의 암호화 객체 생성
 		cipher.init(Cipher.ENCRYPT_MODE, key);// 암호화 모드로 초기화
 

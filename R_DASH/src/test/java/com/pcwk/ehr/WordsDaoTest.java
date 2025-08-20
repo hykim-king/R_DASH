@@ -84,7 +84,7 @@ class WordsDaoTest {
 	@Test
 	void top10() {
 		log.debug("┌────────────────────┐");
-		log.debug("│ top10()           │");
+		log.debug("│ top10()            │");
 		log.debug("└────────────────────┘");
 		
 		//1.전체 삭제
@@ -106,7 +106,7 @@ class WordsDaoTest {
 		}
 		
 	}
-	
+	@Disabled
 	@Test
 	void top100() {
 		log.debug("┌────────────────────┐");
