@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function(){
        const left = (screenWidth - 600)/2;
        const top = (screenHeight - 400)/2;
 
-       let options = `width=600,height=600, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+       let options = `width=600,height=600, top=${top}, left=${left}, resizable=no, scrollbars=no`;
        window.open(url,"_blank",options);
     });
     //수정 모달
@@ -252,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function(){
        const left = (screenWidth - 600)/2;
        const top = (screenHeight - 400)/2;
 
-       let options = `width=600,height=700, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+       let options = `width=900,height=700, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
        window.open(url,"_blank",options);
     });
     
@@ -265,10 +265,10 @@ document.addEventListener('DOMContentLoaded', function(){
         console.log('screenWidth: '+screenWidth);
         console.log('screenHeight: '+screenHeight);
 
-       const left = (screenWidth - 600)/2;
-       const top = (screenHeight - 400)/2;
+       const left = (screenWidth - 900)/2;
+       const top = (screenHeight - 800)/2;
 
-       let options = `width=1000,height=800, top=${top}, left=${left}, resizable=no, scrollbars=no`;
+       let options = `width=900,height=800, top=${top}, left=${left}, resizable=no, scrollbars=no`;
        window.open(url,"_blank",options);
     });
     

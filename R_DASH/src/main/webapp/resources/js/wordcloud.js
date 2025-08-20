@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
 
-	var width = 800, height = 300;
+	var width = 800, height = 350;
 
 	var svg = d3.select("#wordcloud").append("svg") //div id="wordcloud"
 	.attr("width", width)
@@ -11,12 +11,16 @@ document.addEventListener('DOMContentLoaded', function() {
 	//단어 빈도 스케일
 	var wordScale = d3.scale.linear()
 	                   .domain([0, d3.max(wordData, function(d){ return d.freq;})]) //데이터의 범위, 입력 크기
-	                   .range([30, 100]) 
+	                   .range([5, 76]) 
                        .clamp(true); //도메인 크기를 넘긴 값에 대해 도메인 최대값으로 고정
 
-    //var colorScale = d3.scale.linear()
-          //  .domain([0, d3.max(wordData, function(d){ return d.freq; })]);
-            //.range(["#FFE5B4", "#FF8C00"]);
+    var colorScale1 = d3.scale.linear()
+        .domain([0, d3.max(wordData, function(d){ return d.freq; })])
+        .range(["#FFE5B4", "#FF8C00"]);
+
+    var colorScale2 = d3.scale.linear()
+    .domain([0, d3.max(wordData, function(d){ return d.freq; })])
+    .range(["#b4f3ffff", "#8792d2ff"]);
 	
 	function showCloud(data){
 		d3.layout.cloud().size([width,height])
@@ -33,9 +37,9 @@ document.addEventListener('DOMContentLoaded', function() {
         cloud.enter()
             .append("text")
             .attr("text-anchor", "middle") 
-            .style("fill", function (d) {
-                        return (keywordTexts.indexOf(d.text) > -1 ? "#fbc280" : "#405275");
-                    })
+            .style("fill", function(d) {
+                return (keywordTexts.indexOf(d.text) > -1 ? colorScale1(d.freq) : "#395a8dff");
+            })
             .attr('font-size', function(d){ return wordScale(d.freq) + "px"; }) //freq 기반 적용
             .text(function (d) {
                 return d.text;

@@ -21,7 +21,7 @@
     display: flex;                /* 가로 배치 */
     gap: 20px;
     margin: 20px auto 0 auto;     /* 상단 20px, 좌우 auto → 가운데 정렬 */
-    width: 90%;                   /* 전체 폭의 90% */
+    width: 800px;                   /* 전체 폭의 90% */
     justify-content: center;       /* 여분 공간이 있을 때 요소 중앙 정렬 */
 }
 
@@ -35,6 +35,7 @@
     align-items: center;
     height: 250px;               /* 높이 고정 → table과 chart 동일 */
     box-sizing: border-box;
+    box-shadow: 0 2px 6px #ccc;
 }
 
 /* Table div 안에서 스크롤 생길 수 있게 */
@@ -48,15 +49,25 @@
     text-align: center;
     padding: 5px;
 }
-
-
+.box.chart-box {
+    padding-top: 0;
+}
 
 .wordcloud {
     border: solid 1px #ccc;
     border-radius: 12px;
     margin: 20px auto;
-    width: 90%;
-    height: 300px;
+    width: 800px;
+    height: 350px;
+    box-shadow: 0 2px 6px #ccc;
+}
+h3 {
+    margin-left : 30px;
+    font-size: 24px;         /* 기존 폰트 크기 유지 */
+}
+p {
+   margin-left : 30px;
+   margin-bottom: 0;
 }
 </style>
 
@@ -108,13 +119,17 @@
 </script>
 <script src="${pageContext.request.contextPath}/resources/js/wordcloud.js"></script> 
 <script src="${pageContext.request.contextPath}/resources/js/top10.js"></script> 
-
+<div class="newsModal">
 <div class="main-container">
     <div class="row">
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-header">
                     <h3>오늘의 키워드</h3>
+                <div>
+                    <p>매일 100건의 재난 뉴스를 분석해 일일 단어 통계를 제공합니다.<br/>
+                                                     최신 재난 정보와 트렌드를 쉽게 확인해 보세요.</p>
+                </div>
                 </div>
 
                 <!-- Table + Chart 가로 배치 -->
@@ -143,7 +158,7 @@
                                     <td>
 									    <c:choose>
 									        <c:when test="${word.prevFreq == 0}">
-									            <span style="color: green;">New</span>
+									            <span style="color: green;">-</span>
 									        </c:when>
 									
 									        <c:otherwise>
@@ -168,7 +183,7 @@
                     </div>
 
                     <div class="box chart-box">
-                        <canvas id="top10Chart" width="400" height="300"></canvas>
+                        <canvas id="top10Chart" style="width:390px; height:270px;"></canvas>
                     </div>
                 </div>
                 <!-- //Table + Chart -->
@@ -181,4 +196,5 @@
             </div>         
         </div>     
     </div>  
+</div>
 </div>
