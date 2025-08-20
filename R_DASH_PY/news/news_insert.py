@@ -5,6 +5,7 @@ import os
 from rdash_package.oracle_db import OracleConnection
 
 
+
 def save_news_to_db(title, keyword, company, url,pub_dt):
     load_dotenv()  # 현재 경로의 .env 파일을 로드
 
