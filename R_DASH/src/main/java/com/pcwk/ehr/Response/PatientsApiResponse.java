@@ -38,7 +38,7 @@ public class PatientsApiResponse {
         private String bas_yy;
         private String regi;
         private String tot;
-        private String outdoor_subtot;
+        private String otdoor_subtot;
         private String indoor_subtot;
 		/**
 		 * @return the bas_yy
@@ -79,14 +79,14 @@ public class PatientsApiResponse {
 		/**
 		 * @return the otdoor_subtot
 		 */
-		public String getOutdoor_subtot() {
-			return outdoor_subtot;
+		public String getOtdoor_subtot() {
+			return otdoor_subtot;
 		}
 		/**
 		 * @param otdoor_subtot the otdoor_subtot to set
 		 */
-		public void setOutdoor_subtot(String outdoor_subtot) {
-			this.outdoor_subtot = outdoor_subtot;
+		public void setOtdoor_subtot(String otdoor_subtot) {
+			this.otdoor_subtot = otdoor_subtot;
 		}
 		/**
 		 * @return the indoor_subtot

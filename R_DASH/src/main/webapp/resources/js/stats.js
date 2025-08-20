@@ -29,14 +29,13 @@ document.addEventListener('DOMContentLoaded', function() {
   const myChart = new Chart(canvas, {
     type: 'doughnut',
     data: {
-      labels: ['화재', '폭염', '한파', '산사태', '싱크홀', '황사'],
+      labels: ['화재', '기온', '산사태', '싱크홀', '황사'],
       datasets: [{
         label: '통계 선택',
-        data: [1, 1, 1, 1, 1, 1],
+        data: [1, 1, 1, 1, 1],
         hoverOffset: hoverOff,
         backgroundColor: [ // 색상을 명시적으로 지정하여 라벨 색상(white)과 대비되게 합니다.
             'rgb(255, 99, 132)',
-            'rgb(54, 162, 235)',
             'rgb(255, 205, 86)',
             'rgb(75, 192, 192)',
             'rgb(153, 102, 255)',
@@ -57,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       },
       plugins: {
-        // ***** 핵심: datalabels 플러그인 설정 *****
+        // ** datalabels 플러그인 설정 **
         tooltip: {
             enabled: false
         },
@@ -66,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         datalabels: {
           display: true,
+          hoverOffset: hoverOff,
           color: 'black', // 라벨 텍스트 색상
           textAlign: 'center', // 텍스트 정렬
           font: {
@@ -74,13 +74,12 @@ document.addEventListener('DOMContentLoaded', function() {
           },
           formatter: (value, context) => {
             const labelName = context.chart.data.labels[context.dataIndex]; //1. 라벨 이름
-
             // 2. 라벨 이름 리턴
             return labelName;
-
           },
           anchor: 'center', // 라벨을 도넛 조각의 중앙에 위치시킴
           align: 'center', // 라벨 텍스트 정렬 (anchor와 함께 사용)
+          offset: 0
         }
       },
     },
@@ -93,9 +92,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const idx = points[0].index;
         const label = myChart.data.labels[idx]; // '화재' 등
         // 라벨을 type 코드로 매핑 (안정성을 위해 매핑 사용 권장)
-        const map = { '화재': 'fire', '폭염': 'temperature', '한파': 'coldwave', '산사태': 'landslide', '싱크홀': 'sinkhole', '황사': 'dust' };
+        const map = { '화재': 'fire', '기온': 'temperature', '산사태': 'landslide', '싱크홀': 'sinkholes', '황사': 'dust' };
         const type = map[label] || '';
         window.location.href = `/ehr/${encodeURIComponent(type)}/statsPage`;
     }
   };
+
 }) 
+
