@@ -33,7 +33,8 @@ public class DustController {
         this.dustService = dustService;
     }
 
-    @GetMapping("/latest")
+    @GetMapping(value = "/latest", produces = "application/json; charset=UTF-8")
+    @ResponseBody
     public List<DustDTO> latest(
             @RequestParam String airType,                   // ex) "교외대기", "도로변대기", "도시대기"
             @RequestParam(required = false) String day,     // ex) "2025-08-17" (옵션)
@@ -43,15 +44,35 @@ public class DustController {
             @RequestParam(required = false) Double maxLon,
             @RequestParam(required = false, defaultValue = "500") Integer limit
     ) {
-        boolean hasBBox = Objects.nonNull(minLat) && Objects.nonNull(maxLat)
-                       && Objects.nonNull(minLon) && Objects.nonNull(maxLon);
+        // 1) 파라미터 정리
+        final String type = airType == null ? null : airType.trim();   // ORG 비교용
+        final String dayStr = (day == null || day.trim().isEmpty()) ? null : day.trim();
+        final int lim = (limit == null || limit <= 0) ? 500 : limit;
 
+        // 2) BBox 유효성: 네 값 모두 있을 때만 사용
+        boolean hasBBox = (minLat != null && maxLat != null && minLon != null && maxLon != null);
+        // min/max 뒤바뀐 경우 보정
+        if (hasBBox && minLat > maxLat) {
+            double t = minLat; minLat = maxLat; maxLat = t;
+        }
+        if (hasBBox && minLon > maxLon) {
+            double t = minLon; minLon = maxLon; maxLon = t;
+        }
+
+        // 3) 분기
         if (hasBBox) {
-            return dustService.getLatestByTypeBBox(airType, day, minLat, maxLat, minLon, maxLon, limit);
+            return dustService.getLatestByTypeBBox(type, dayStr, minLat, maxLat, minLon, maxLon, lim);
         } else {
-            return dustService.getLatestByTypeAll(airType, day, limit);
+            return dustService.getLatestByTypeAll(type, dayStr, lim);
         }
     }
+    
+    
+    
+    
+    
+    
+    
     
     @GetMapping("/dust-top5")
     @ResponseBody

@@ -14,7 +14,7 @@ import com.pcwk.ehr.service.ShelterService;
 
 /** 대피소 REST 컨트롤러 */
 @RestController
-@RequestMapping("/api/shelters")
+@RequestMapping("/shelters")
 public class ShelterController {
 
 	

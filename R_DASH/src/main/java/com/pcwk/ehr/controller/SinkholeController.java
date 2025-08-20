@@ -16,7 +16,7 @@ import com.pcwk.ehr.service.SinkholeService;
  * 싱크홀 API 컨트롤러 - 지도 BBox 내 검색(+ 선택 검색어/기간) - 단건 상세 - 상태별 집계
  */
 @RestController
-@RequestMapping("/api/sinkholes")
+@RequestMapping("/sinkholes")
 public class SinkholeController {
 
     @Autowired
