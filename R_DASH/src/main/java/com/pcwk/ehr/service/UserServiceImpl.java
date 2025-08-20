@@ -39,18 +39,18 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public int deleteUser(UserDTO param) {
 		int flag = 0;
-		//admin 계정은 암호화 예외
-		if(param.getEmail().equals("admin")) {
+		// admin 계정은 암호화 예외
+		if (param.getEmail().equals("admin")) {
 			flag = mapper.checkPw(param);
-			
+
 			return flag;
 		}
-		//로그인된 유저 정보 
+		// 로그인된 유저 정보
 		UserDTO user = mapper.selectUser(param.getUserNo());
-		//입력된 비밀번호와 암호화된 유저 비밀번호 일치 확인
+		// 입력된 비밀번호와 암호화된 유저 비밀번호 일치 확인
 		boolean isMatch = passwordEncoder.matches(param.getPassword(), user.getPassword());
-		
-		if(isMatch) {
+
+		if (isMatch) {
 			mapper.deleteUser(user.getUserNo());
 			flag = 1;
 		}
@@ -77,14 +77,14 @@ public class UserServiceImpl implements UserService {
 			return flag;
 		}
 		// admin 계정 암호화 예외
-		if(param.getEmail().equals("admin")) {
-			if(mapper.checkPw(param) == 1) {
+		if (param.getEmail().equals("admin")) {
+			if (mapper.checkPw(param) == 1) {
 				return flag;
-			}else {
+			} else {
 				flag = 20;
 				return flag;
 			}
-			
+
 		}
 
 		// 비밀번호 비교
@@ -93,12 +93,12 @@ public class UserServiceImpl implements UserService {
 		int userNo = mapper.getUserNo(param.getEmail());
 		UserDTO user = mapper.selectUser(userNo);
 		String inputPassword = param.getPassword();
-		System.out.println("user.getPassword() : "+user.getPassword());
-		System.out.println("inputPassword : "+inputPassword);
-		
+		System.out.println("user.getPassword() : " + user.getPassword());
+		System.out.println("inputPassword : " + inputPassword);
+
 		// 비밀번호 확인
 		boolean isMatch = passwordEncoder.matches(inputPassword, user.getPassword());
-		System.out.println("isMath:"+isMatch);
+		System.out.println("isMath:" + isMatch);
 		if (isMatch == false) {
 			flag = 20;
 
@@ -176,6 +176,31 @@ public class UserServiceImpl implements UserService {
 
 		}
 		return flag;
+	}
+
+	@Override
+	public UserDTO socialLogin(String email, String name, String social) {
+		UserDTO user;
+		// 존재하는 계정인지 확인
+		int flag = mapper.checkEmail(email);
+		// 없는 계정이면
+		if (flag == 0) {
+			user = new UserDTO();
+			user.setEmail(email);
+			user.setName(name);
+			user.setSocial(social);
+			mapper.insertUser(user);
+		}
+		
+		int userNo = mapper.getUserNo(email);
+		user = mapper.selectUser(userNo);
+		if (user.getSocial() == null || user.getSocial() == "") {
+			user.setSocial("google");
+			mapper.updateUser(user);
+		}
+		
+
+		return user;
 	}
 
 }

@@ -58,19 +58,18 @@
 		<dispatcher>ERROR</dispatcher>
 	</filter-mapping>
 	
-	<!-- 컨테이너가 만드는 404/500/그 외 예외를 모두 /error 로 포워드 -->
-	<!-- 
-	<error-page>
-	  <error-code>404</error-code>
-	  <location>/user/error</location>
-	</error-page>
-	<error-page>
-	  <error-code>500</error-code>
-	  <location>/user/error</location>
-	</error-page>
-	<error-page>
-	  <exception-type>java.lang.Throwable</exception-type>
-	  <location>/user/error</location>
-	</error-page>
-	 -->
+	  <!-- Spring Security: 이름 = springSecurityFilterChain -->
+	<filter>
+	  <filter-name>springSecurityFilterChain</filter-name>
+	  <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	  <init-param>
+	    <param-name>contextAttribute</param-name>
+	    <param-value>org.springframework.web.servlet.FrameworkServlet.CONTEXT.appServlet</param-value>
+	  </init-param>
+	</filter>
+	<filter-mapping>
+	  <filter-name>springSecurityFilterChain</filter-name>
+	  <url-pattern>/*</url-pattern>
+	</filter-mapping>
+
 </web-app>
