@@ -24,8 +24,9 @@ document.addEventListener('DOMContentLoaded', function() {
         scales: {
                x: {
                 beginAtZero: true,  // x축 0부터 시작
-                min: 800,
                 max: 1000,
+                barPercentage: 0.8,      // 막대 자체 너비
+                categoryPercentage: 0.9,  // 카테고리 간격
                 ticks: {
                     stepSkip : 10
                 }

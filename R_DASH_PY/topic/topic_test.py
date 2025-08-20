@@ -27,6 +27,7 @@ def main():
     print("\n[토픽별 문서 수]")
     for topic_num, count in lda_results["topic_counts"].items():
         print(f"토픽 {topic_num}: {count}건")
+        save_topic_to_db(topic_num, count)
 
     # 5) 토픽별 핵심 단어 출력
     print("\n[토픽별 핵심 단어]")
@@ -54,11 +55,11 @@ def main():
 
         save_topic_to_db(name, summary, reg_id, count)
 
-    words, freqs = topic_topN.top_n(df)
-    print(words)
-    print(freqs)
+    #words, freqs = topic_topN.top_n(df)
+    #print(words)
+    #print(freqs)
 
-    topicWordCloud.make_wordcloud(df)
+    #topicWordCloud.make_wordcloud(df)
 
 if __name__ == '__main__':
     main()
