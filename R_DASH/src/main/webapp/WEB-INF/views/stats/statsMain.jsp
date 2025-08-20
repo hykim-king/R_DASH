@@ -20,10 +20,10 @@
             height: 500px;
             margin-top: 20px;
         }
-        
-        #top5Table, #bottom5Table {
-		    width: 100%;  /* col 안에서 최대 폭 사용 */
-		    min-width: 300px; /* 너무 작아지지 않도록 최소 폭 지정 */
+		
+		.topTable {
+		    width: 100%;
+		    min-width: 300px;
 		}
 	
 		#fireTables {
@@ -80,6 +80,12 @@
 		  overflow: visible;
 		  z-index: 1;
 		}
+		
+		.stateChart {
+		    width: 40%;   
+		    margin: 0 auto; /* 좌우 가운데 정렬 */
+		}
+		
     </style>
 </head>
 <body>
@@ -112,51 +118,54 @@
 		        <option value="${sido}">${sido}</option>
 		    </c:forEach>
 		</select>
-		
 		<!-- 환자 전체 합계 -->
-		<div class = "canvasContainer">
-		    <canvas id="patientsChart"></canvas>
+		<h1>온열질환자</h1>
+		<div class="row mb-2">
+            <div class="col-md-6 canvasContainer">
+	            <canvas id="patientsChart"></canvas>
+	        </div>
+	        <div class="col-md-6 canvasContainer">
+                <canvas id="inOutdoorChart"></canvas>
+            </div>
 		</div>
-		
-		<!-- 환자 실내외 소계 -->
-		<div class = "canvasContainer">
-		    <canvas id="inOutdoorChart"></canvas>
+		<div class="row mb-6">
+		  <div class="col-md-6">
+			<h2>기온 Top5</h2>
+	        <table class="topTable" border="1">
+	            <thead>
+	                <tr>
+	                    <th>순위</th>
+	                    <th>지역</th>
+	                    <th>기온(℃)</th>
+	                </tr>
+	            </thead>
+	            <tbody id="t1hTable">
+	                <!-- JS에서 채움 -->
+	            </tbody>
+	        </table>
+	      </div>
+	      <div class="col-md-6">
+	        <h2>습도와 강수량 Top5</h2>
+	        <table class="topTable" border="1" >
+	            <thead>
+	                <tr>
+	                    <th>순위</th>
+	                    <th>지역</th>
+	                    <th>습도(%)</th>
+	                    <th>강수량(mm)</th>
+	                </tr>
+	            </thead>
+	            <tbody id="rehRn1Table">
+	                <!-- JS에서 채움 -->
+	            </tbody>
+	        </table>
+	      </div>
 		</div>
-		
-		<h3>기온(T1H) Top5</h3>
-		<table border="1">
-		    <thead>
-		        <tr>
-		            <th>순위</th>
-		            <th>지역</th>
-		            <th>기온(℃)</th>
-		        </tr>
-		    </thead>
-		    <tbody id="t1hTable">
-		        <!-- JS에서 채움 -->
-		    </tbody>
-		</table>
-		
-		<h3>습도(REH) & 강수량(RN1) Top5</h3>
-		<table border="1">
-		    <thead>
-		        <tr>
-		            <th>순위</th>
-		            <th>지역</th>
-		            <th>습도(%)</th>
-		            <th>강수량(mm)</th>
-		        </tr>
-		    </thead>
-		    <tbody id="rehRn1Table">
-		        <!-- JS에서 채움 -->
-		    </tbody>
-		</table>
-		
 		<script src="${pageContext.request.contextPath}/resources/js/patients.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/nowcast.js"></script>
 	</c:when>
 	<c:when test="${type == 'fire'}">
-        <div class="row mb-7">
+        <div class="row mb-6">
 		    <div class="col-md-6">
 		      <canvas id="fireSafeChart"></canvas>
 		    </div>
@@ -167,7 +176,7 @@
 			  </div>
 		  </div>
 		
-		  <div class="row mb-7">
+		  <div class="row mb-6">
 		    <div class="col-md-6">
 		      <canvas id="damageChart"></canvas>
 		    </div>
@@ -203,9 +212,9 @@
 	        </div>
 	    </div>
 	    <div class="row mb-6">
-            <div class="col-md-6 canvasContainer">
+            <div class="col-md-6">
                 <h2>TOP 5 지역</h2>
-		        <table id="top5Table">
+		        <table id="top5Table" class="topTable">
 		            <tr>
 		                <th>순위</th>
 		                <th>지역</th>
@@ -214,9 +223,9 @@
 		            </tr>
 		        </table>
             </div>
-            <div class="col-md-6" style="margin-top: 19px;">
+            <div class="col-md-6">
                 <h2>BOTTOM 5 지역</h2>
-		        <table id="bottom5Table">
+		        <table id="bottom5Table" class="topTable">
 		            <tr>
 		                <th>순위</th>
 		                <th>지역</th>
@@ -227,6 +236,31 @@
             </div>
         </div> 
 	<script src="${pageContext.request.contextPath}/resources/js/dust.js"></script>
+    </c:when>
+    <c:when test="${type == 'sinkhole'}">
+    <div class="row mb-7">
+        <div class="col-md-6">
+		    <canvas id="yearlyChart"></canvas>
+		</div>
+		<div class="col-md-6">
+            <canvas id="signguChart"></canvas>
+        </div>
+        
+	</div>
+	<div class="row mb-7">
+	    <div class="col-md-6">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="damageChart"></canvas>
+        </div>
+    </div>
+    <div class="row mb-7">
+        <div class="stateChart">
+            <canvas id="stateChart"></canvas>
+        </div>
+    </div>
+    <script src="${pageContext.request.contextPath}/resources/js/sinkhole.js"></script>
     </c:when>
 </c:choose>
 </div>

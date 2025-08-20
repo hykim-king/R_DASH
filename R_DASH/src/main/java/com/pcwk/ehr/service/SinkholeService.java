@@ -14,4 +14,12 @@ public interface SinkholeService {
 	List<SinkholeDTO> selectAll();
 	
     List<Map<String,Object>> countByState();
+
+	List<Map<String, Object>> getYearlyCounts();
+
+	List<Map<String, Object>> getSignguCounts();
+
+	List<Map<String, Object>> getMonthlyCounts();
+
+	List<Map<String, Object>> getYearlyDamageStats();
 }
