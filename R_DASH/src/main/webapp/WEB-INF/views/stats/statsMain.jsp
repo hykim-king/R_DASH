@@ -262,6 +262,26 @@
     </div>
     <script src="${pageContext.request.contextPath}/resources/js/sinkhole.js"></script>
     </c:when>
+    <c:when test="${type == 'landslide'}">
+    <div class="row mb-6">
+        <div class="col-md-6">
+            <canvas id="yearChart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="monthChart"></canvas>
+        </div>
+        
+    </div>
+    <div class="row mb-6">
+        <div class="col-md-6">
+            <canvas id="regionChart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+    <script src="${pageContext.request.contextPath}/resources/js/landslide.js"></script>
+    </c:when>
 </c:choose>
 </div>
 </div>
