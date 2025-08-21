@@ -192,10 +192,6 @@
 			전 대기 시간(밀리 초) maxLifetime : 연결이 풀에서 제거되기 전 최대 생존 시간 입니다.(밀리 초) -->
 
 	</bean>
-	<!-- MVC Exception Resolver: SecurityConfig에서 @Qualifier("exceptionResolver")로 
-		주입 받을 대상 -->
-	<bean id="handlerExceptionResolver"
-		class="org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver" />
-	<alias name="handlerExceptionResolver" alias="exceptionResolver" />
+	
 
 </beans>
