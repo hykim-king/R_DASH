@@ -3,19 +3,16 @@
 <mapper namespace="com.pcwk.ehr.mapper.BoardMapper">
     <sql id="boardWhere">
         <choose>
+            <when test="searchDiv ==''">
+                WHERE (title LIKE '%'||#{searchWord}||'%'
+                      OR 
+                      contents LIKE '%'||#{searchWord}||'%')
+            </when>
             <when test="searchDiv =='10'">
-                 WHERE title LIKE '%' ||#{searchWord} || '%'
+                 WHERE title LIKE '%'||#{searchWord}||'%'
             </when>
             <when test="searchDiv =='20'">
-                 WHERE contents LIKE '%' ||#{searchWord} || '%'
-            </when>
-            <when test="searchDiv =='30'">
-                 WHERE boardNo LIKE '%'||#{searchWord} || '%'
-            </when>
-            <when test="searchDiv =='40'">
-                  WHERE (title LIKE '%'||#{searchWord}||'%' 
-                       OR 
-                      contents LIKE '%'||#{searchWord}||'%')
+                 WHERE contents LIKE '%'||#{searchWord}||'%'
             </when>
         </choose>
     </sql>
