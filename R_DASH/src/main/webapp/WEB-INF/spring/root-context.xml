@@ -55,10 +55,10 @@
     </bean>
     
         
-    <!-- aes.properties 파일 읽기 -->
+<!--     aes.properties 파일 읽기
     <context:property-placeholder location="classpath:aes.properties"/>
-    <!-- 양방향 암호화 -->
-    <bean id="aesUtil" class="com.pcwk.ehr.cmn.AESUtil"></bean>
+    양방향 암호화
+    <bean id="aesUtil" class="com.pcwk.ehr.cmn.AESUtil"></bean> -->
     
     <!-- 단방향 암호화 -->
     <bean id="passwordEncoder" 
