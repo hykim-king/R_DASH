@@ -64,6 +64,16 @@ document.addEventListener('DOMContentLoaded', function(){
     
     	window.location.href = '/ehr/board/doSaveView.do';
  });
+    
+    if('${search.searchDiv}'===''){
+        searchWord.disabled = false;
+    }else{
+        document.querySelector('#selectDivButton').value = '${search.searchDiv}';
+    }
+    
+    if('${search.searchWord}'!==''){
+        document.querySelector('#searchWord').value = '${search.searchWord}';
+    }
 });
 //페이징 
 function pagerDoRetrieve(url, pageNo){   
@@ -73,6 +83,33 @@ function pagerDoRetrieve(url, pageNo){
     document.querySelector('#pageNo').value= pageNo;
     
     searchButton.click();     
+    
+}
+//공지사항 검색
+function search(){
+    const selectDivButton = document.querySelector('#selectDivButton');
+    const searchWord = document.querySelector('#searchWord');
+    const pageNo = document.querySelector('#pageNo')
+    window.location.href = '/ehr/board/doRetrieve.do?searchDiv=' + selectDivButton.value + '&searchWord=' + searchWord.value + '&pageNo=' + pageNo.value;
+}
+//searchDiv 설정
+function selectDiv(div){
+    const selectDivButton = document.querySelector('#selectDivButton');
+    const searchWord = document.querySelector('#searchWord');
+    
+    if(div===10){
+        selectDivButton.innerText = '제목';
+        selectDivButton.value=div;
+        searchWord.disabled = false;
+    }else if(div === 20){
+        selectDivButton.innerText = '내용';
+        selectDivButton.value=div;
+        searchWord.disabled = false;
+    }else{
+        selectDivButton.innerText = '전체';
+        selectDivButton.value='';
+        searchWord.disabled = false;  
+    }
     
 }
 </script>
@@ -126,34 +163,36 @@ span {
 	<!-- Page content -->
 	<div class="container-fluid mt--6" style="min-height: 700px; max-width:1700px; margin:0 auto;">
 		<div class="row">
+	 <!-- Light table -->
 		<div class="col">
   		    <div class="card"> 
+  		    <!-- Card header -->
 		        <div class="card-header border-0 d-flex align-items-center">
-		            <h3 class="mb-0">공지사항</h3>
+		            <h3 class="mb-0">공지사항 <span>(${ totalCnt} 건)</span></h3>
 		            <!-- 검색란 -->
-		            <div class="ml-auto d-flex flex-row align-items-center" ><!-- 오른쪽 끝으로 밀기 -->
-		            <select name="searchDiv" class="btn btn-secondary dropdown-toggle">    
-		                <option class="dropdown-item" >전체</option>
-                        <option class="dropdown-item" value="10" <c:if test="${search.searchDiv == 10 }">selected</c:if>>제목</option> 
-                        <option class="dropdown-item" value="20" <c:if test="${search.searchDiv == 20 }">selected</c:if>>내용</option> 
-                        <option class="dropdown-item" value="30" <c:if test="${search.searchDiv == 30 }">selected</c:if>>번호</option>  
-                        <option class="dropdown-item" value="40" <c:if test="${search.searchDiv == 40 }">selected</c:if>>제목+내용</option>    
-		              
-		            </select>		   
-			            <div class="form-group mb-0 d-flex flex-row align-items-center ">       
-				            <div class="input-group input-group-alternative input-group-merge me-2">
-					            <div class="input-group-prepend">
-					               <span class="input-group-text"><i class="fas fa-search"></i></span>
-					            </div>
-					            <input class="form-control" placeholder="Search" type="text">
-				            </div>
-				            <input type="hidden"id="pageNo" name="pageNo">
-				            <button type="button" id="searchButton" class="ml-md-n-2 btn btn-sm btn-default" style="width: 70px; height:40px;">검색</button>
-				            <button type="button" id="moveToReg" class="btn btn-sm btn-default wide-btn" style="width: 70px; height:40px;">등록</button>
-				        </div>
-		            </div>   
-		            <!-- //검색란 -->
-		        </div>
+		            <div class="ml-auto d-flex align-items-center" ><!-- 오른쪽 끝으로 밀기 -->
+		            <!-- 드롭다운 -->
+		             <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" value="" id="selectDivButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <c:choose>
+                        <c:when test="${search.searchDiv == '10' }">제목</c:when>
+                        <c:when test="${search.searchDiv == '20' }">내용</c:when>
+                        <c:otherwise>전체</c:otherwise>
+                    </c:choose>
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" onclick="javascript:selectDiv('')">전체</a>
+                    <a class="dropdown-item" onclick="javascript:selectDiv(10)">제목</a>
+                    <a class="dropdown-item" onclick="javascript:selectDiv(20)">내용</a>
+                  </div>
+                </div>
+                <!-- //드롭다운 -->
+		         <input type="text" class="form-control" id="searchWord" name="searchWord">
+                <input type="hidden"id="pageNo" name="pageNo" value="${search.pageNo != 0 ? search.pageNo : 1}">  
+                <button type="button" id="searchButton" onclick="javascript:search()" class="btn btn-default text-nowrap" style="margin-left:10px">검색</button>
+                <button type="button" id="moveToReg" class="btn btn-default text-nowrap" style="margin-left:3px">등록</button>
+              </div>
+            </div>   
     <!-- //Page content -->
 		<!-- Light table -->
 		<div class="table-responsive">
@@ -205,7 +244,11 @@ span {
 			<!-- //Light table -->
 			<!-- 카드 푸터 -->
 			<div class="card-footer py-4">
-			     <nav aria-label="...">
+			<%
+                out.print(pageHtml);
+            %>
+			<!-- 기존 페이징 디자인 -->
+<!-- 			     <nav aria-label="...">
 			         <ul class="pagination justify-content-end mb-0">
 			             <li class="page-item disabled"> 
 			                 <a class="page-link" href="#" tabindex="-1"><i class="fas fa-angle-left"></i> 
@@ -217,7 +260,7 @@ span {
 			             <li class="page-item"><a class="page-link" href="#"><i class="fas fa-angle-right"></i> 
 			             <span class="sr-only">Next</span></a></li>
 			          </ul>
-			       </nav>
+			       </nav> -->
 			 </div>
 			<!-- //카드 푸터 -->
 		    </div>
