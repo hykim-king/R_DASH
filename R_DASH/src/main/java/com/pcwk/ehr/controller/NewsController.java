@@ -119,7 +119,12 @@ public class NewsController {
 	    List<NewsDTO> newsList = service.doRetrieve(search);
 	    model.addAttribute("newsList", newsList);
 	    model.addAttribute("search", search);
-
+	    
+	    // * 최종 업데이트 일자 반영 *
+	    if(newsList != null && !newsList.isEmpty()) {
+	        NewsDTO latest = newsList.get(0); // 최신 뉴스
+	        model.addAttribute("latestRegDt", latest.getRegDt());
+	    }
 
 	    // 2. 키워드 뉴스 (keyword 파라미터가 있을 때만)
 	    if (news.getKeyword() != null && !news.getKeyword().isEmpty()) {
