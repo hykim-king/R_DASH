@@ -103,6 +103,25 @@ public class NewsController {
 	    news.setKeyword(keyword);
 	    return service.searchByKeyword(news);
 	}
+    // JSON 반환용 -> AJAX fetch 호출
+//    @GetMapping(value = "/doRetrieve.do", produces = "application/json;charset=UTF-8")
+//    public List<NewsDTO> newsRetrieveJson(@RequestParam(defaultValue = "1") int pageNo,
+//                                          @RequestParam(defaultValue = "10") int pageSize) {
+//        SearchDTO search = new SearchDTO();
+//        search.setPageNo(pageNo);
+//        search.setPageSize(pageSize);
+//        return service.doRetrieve(search);
+//    }
+    
+//	@GetMapping("/news/doRetrieve.do")
+//	@ResponseBody
+//	public List<NewsDTO> doRetrieve(@RequestParam int pageNo,
+//	                                @RequestParam int pageSize) {
+//	    SearchDTO searchDTO = new SearchDTO();
+//	    searchDTO.setPageNo(pageNo);
+//	    searchDTO.setPageSize(pageSize);
+//	    return service.doRetrieve(searchDTO);
+//	}
 	
 	@GetMapping(value="/newsPage.do", produces = "text/plain;charset=UTF-8")
 	public String newsPage(SearchDTO search,NewsDTO news,TopicDTO topic,Model model) {
@@ -112,8 +131,8 @@ public class NewsController {
 		
 		String viewName = "news/news_page";
 		// 1. 전체 뉴스
-	    int pageNo = PcwkString.nvlZero(search.getPageNo(), 1);
-	    int pageSize = PcwkString.nvlZero(search.getPageSize(), 10);
+		int pageNo = search.getPageNo() <= 0 ? 1 : search.getPageNo();
+	    int pageSize = search.getPageSize() <= 0 ? 10 : search.getPageSize();
 	    search.setPageNo(pageNo);
 	    search.setPageSize(pageSize);
 	    List<NewsDTO> newsList = service.doRetrieve(search);
