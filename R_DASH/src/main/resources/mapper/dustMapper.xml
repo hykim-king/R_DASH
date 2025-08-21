@@ -42,22 +42,21 @@
     DUST_NO, TM, STN_NM, LAT, LON, ORG, PM10, AVG
   </sql>
 
- <!-- BBox 버전 -->
+<!-- BBox 쿼리 -->
 <select id="selectLatestByTypeBBox" resultType="com.pcwk.ehr.domain.DustDTO">
   SELECT
-    d.DUST_NO                              AS dustNo,
+    d.DUST_NO AS dustNo,
     TO_CHAR(d.TM_DATE, 'YYYY-MM-DD HH24:MI:SS') AS tm,
-    d.STN_NM                               AS stnNm,
-    d.LAT                                  AS lat,
-    d.LON                                  AS lon,
-    TRIM(d.ORG)                            AS org,
-    d.PM10                                 AS pm10,
-    d.AVG                                  AS avg,
-    d.MAX                                  AS max,
-    d.CNT                                  AS cnt
+    d.STN_NM AS stnNm,
+    d.LAT AS lat,
+    d.LON AS lon,
+    TRIM(d.ORG) AS org,
+    d.PM10 AS pm10,
+    d.AVG AS avg,
+    d.MAX AS max,
+    d.CNT AS cnt
   FROM (
-    SELECT d.*,
-           ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
+    SELECT d.*, ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
     FROM DUST d
     WHERE d.LAT BETWEEN #{minLat} AND #{maxLat}
       AND d.LON BETWEEN #{minLon} AND #{maxLon}
@@ -67,27 +66,27 @@
       </if>
   ) d
   WHERE d.rn = 1
-  <if test="limit != null">
-    FETCH FIRST #{limit} ROWS ONLY
-  </if>
+<!-- ✅ 수정 후 (권장) -->
+<if test="limit != null">
+  AND ROWNUM &lt;= #{limit}
+</if>
 </select>
 
-<!-- 전국 버전 -->
+<!-- 전국 쿼리 -->
 <select id="selectLatestByTypeAll" resultType="com.pcwk.ehr.domain.DustDTO">
   SELECT
-    d.DUST_NO                              AS dustNo,
+    d.DUST_NO AS dustNo,
     TO_CHAR(d.TM_DATE, 'YYYY-MM-DD HH24:MI:SS') AS tm,
-    d.STN_NM                               AS stnNm,
-    d.LAT                                  AS lat,
-    d.LON                                  AS lon,
-    TRIM(d.ORG)                            AS org,
-    d.PM10                                 AS pm10,
-    d.AVG                                  AS avg,
-    d.MAX                                  AS max,
-    d.CNT                                  AS cnt
+    d.STN_NM AS stnNm,
+    d.LAT AS lat,
+    d.LON AS lon,
+    TRIM(d.ORG) AS org,
+    d.PM10 AS pm10,
+    d.AVG AS avg,
+    d.MAX AS max,
+    d.CNT AS cnt
   FROM (
-    SELECT d.*,
-           ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
+    SELECT d.*, ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
     FROM DUST d
     WHERE TRIM(d.ORG) = TRIM(#{airType})
       <if test="day != null and day != ''">
@@ -95,10 +94,10 @@
       </if>
   ) d
   WHERE d.rn = 1
-  <if test="limit != null">
-    FETCH FIRST #{limit} ROWS ONLY
-  </if>
+<!-- ✅ 수정 후 (권장) -->
+<if test="limit != null">
+  AND ROWNUM &lt;= #{limit}
+</if>
 </select>
-
 
 </mapper>
