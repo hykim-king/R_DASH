@@ -1,5 +1,6 @@
 package com.pcwk.ehr.controller;
 
+import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriUtils;
 
 import com.pcwk.ehr.domain.DustDTO;
 import com.pcwk.ehr.service.DustService;
@@ -25,49 +27,47 @@ import com.pcwk.ehr.service.DustService;
 @Controller
 @RequestMapping("/dust")
 public class DustController {
-
     private final DustService dustService;
 
     @Autowired
-    public DustController(DustService dustService) {
-        this.dustService = dustService;
+    public DustController(DustService svc) {
+        this.dustService = svc;
     }
 
-    @GetMapping(value = "/latest", produces = "application/json; charset=UTF-8")
+    // /dust → /map?layer=dust&airType=ALL (혹은 전달된 값)로 리다이렉트
+    @GetMapping({"", "/"})
+    public String dustEntry(@RequestParam(required = false, defaultValue = "ALL") String airType) {
+        String type = airType != null ? airType.trim() : "ALL";
+        if (type.isEmpty()) type = "ALL";
+        String enc  = UriUtils.encode(type, StandardCharsets.UTF_8);
+        return "redirect:/map?layer=dust&airType=" + enc;
+    }
+
+    // 데이터 API: 단일 타입 최신 (BBox 있으면 BBox, 없으면 전국)
+    @GetMapping("/latest")
     @ResponseBody
     public List<DustDTO> latest(
-            @RequestParam String airType,                   // ex) "교외대기", "도로변대기", "도시대기"
-            @RequestParam(required = false) String day,     // ex) "2025-08-17" (옵션)
+            @RequestParam("airType") String airType,
+            @RequestParam(required = false) String day,
             @RequestParam(required = false) Double minLat,
             @RequestParam(required = false) Double maxLat,
             @RequestParam(required = false) Double minLon,
             @RequestParam(required = false) Double maxLon,
             @RequestParam(required = false, defaultValue = "500") Integer limit
     ) {
-        // 1) 파라미터 정리
-        final String type = airType == null ? null : airType.trim();   // ORG 비교용
-        final String dayStr = (day == null || day.trim().isEmpty()) ? null : day.trim();
-        final int lim = (limit == null || limit <= 0) ? 500 : limit;
-
-        // 2) BBox 유효성: 네 값 모두 있을 때만 사용
         boolean hasBBox = (minLat != null && maxLat != null && minLon != null && maxLon != null);
-        // min/max 뒤바뀐 경우 보정
-        if (hasBBox && minLat > maxLat) {
-            double t = minLat; minLat = maxLat; maxLat = t;
-        }
-        if (hasBBox && minLon > maxLon) {
-            double t = minLon; minLon = maxLon; maxLon = t;
-        }
+        if (hasBBox && minLat > maxLat) { double t = minLat; minLat = maxLat; maxLat = t; }
+        if (hasBBox && minLon > maxLon) { double t = minLon; minLon = maxLon; maxLon = t; }
 
-        // 3) 분기
-        if (hasBBox) {
-            return dustService.getLatestByTypeBBox(type, dayStr, minLat, maxLat, minLon, maxLon, lim);
-        } else {
-            return dustService.getLatestByTypeAll(type, dayStr, lim);
-        }
+        String type   = (airType == null || airType.trim().isEmpty()) ? null : airType.trim();
+        String dayStr = (day == null || day.trim().isEmpty()) ? null : day.trim();
+        int lim       = (limit == null || limit <= 0) ? 500 : limit;
+
+        return hasBBox
+                ? dustService.getLatestByTypeBBox(type, dayStr, minLat, maxLat, minLon, maxLon, lim)
+                : dustService.getLatestByTypeAll(type, dayStr, lim);
     }
-    
-    
+
     
     
     
