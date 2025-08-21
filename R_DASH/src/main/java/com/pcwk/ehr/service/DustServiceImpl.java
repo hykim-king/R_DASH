@@ -14,7 +14,8 @@ public class DustServiceImpl implements DustService {
 
     @Autowired
     private DustMapper dustMapper;
-
+    
+    
     @Autowired
     public DustServiceImpl(DustMapper dustMapper) {
         this.dustMapper = dustMapper;
@@ -25,15 +26,16 @@ public class DustServiceImpl implements DustService {
                                              Double minLat, Double maxLat,
                                              Double minLon, Double maxLon,
                                              Integer limit) {
-        return dustMapper.selectLatestByTypeBBox(
-                airType, day, minLat, maxLat, minLon, maxLon, limit
-        );
+        return dustMapper.selectLatestByTypeBBox(airType, day, minLat, maxLat, minLon, maxLon, limit);
     }
 
     @Override
     public List<DustDTO> getLatestByTypeAll(String airType, String day, Integer limit) {
         return dustMapper.selectLatestByTypeAll(airType, day, limit);
     }
+    
+    
+    
     
     @Override
     public List<Map<String, Object>> getTop5PM10() {
