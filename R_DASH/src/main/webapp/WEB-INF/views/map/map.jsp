@@ -14,7 +14,7 @@
   <div id="map"></div>
   <!-- <div id = "staticMap"></div> -->
   <!-- kakao SDK 불러오기 (onload에서 위 함수 호출) -->
-  <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=b442e080c0a64cb3d347d6158376d1da&autoload=false"
+  <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoJsKey}&autoload=false"
           onload="loadKakaoMap()"></script>
           
 </body>
