@@ -5,110 +5,149 @@
 
 <mapper namespace="com.pcwk.ehr.mapper.ChatMapper">
 
-  <resultMap id="chatResultMap" type="com.pcwk.ehr.domain.ChatDTO">
-    <id     property="logNo"     column="LOG_NO"/>
-    <result property="userNo"    column="USER_NO"/>
-    <result property="sessionId" column="SESSION_ID"/>
-    <result property="question"  column="QUESTION"/>
-    <result property="answer"    column="ANSWER"/>
-    <result property="regDt"     column="REG_DT"/>
-  </resultMap>
+	<resultMap id="chatResultMap"
+		type="com.pcwk.ehr.domain.ChatDTO">
+		<id property="logNo" column="LOG_NO" />
+		<result property="userNo" column="USER_NO" />
+		<result property="sessionId" column="SESSION_ID" />
+		<result property="question" column="QUESTION" />
+		<result property="answer" column="ANSWER" />
+		<result property="regDt" column="REG_DT" />
+	</resultMap>
 
-  <sql id="search">
-    <where>
-      <if test="searchDiv != null and searchDiv != '' and searchWord != null and searchWord != ''">
-        <choose>
-          <when test="searchDiv == '10'">
-            (QUESTION LIKE '%' || #{searchWord} || '%')
-          </when>
-          <when test="searchDiv == '20'">
-            (ANSWER  LIKE '%' || #{searchWord} || '%')
-          </when>
-          <when test="searchDiv == '30'">
-            <if test="@java.util.regex.Pattern@matches('^\\d+$', searchWord)">
-              (USER_NO = TO_NUMBER(#{searchWord}))
-            </if>
-          </when>
-        </choose>
-      </if>
-    </where>
-  </sql>
+	<sql id="search">
+		<where>
+			<if
+				test="searchDiv != null and searchDiv != '' and searchWord != null and searchWord != ''">
+				<choose>
+					<when test="searchDiv == '10'">
+						(QUESTION LIKE '%' || #{searchWord} || '%')
+					</when>
+					<when test="searchDiv == '20'">
+						(ANSWER LIKE '%' || #{searchWord} || '%')
+					</when>
+					<when test="searchDiv == '30'">
+						<if
+							test="@java.util.regex.Pattern@matches('^\\d+$', searchWord)">
+							(USER_NO = TO_NUMBER(#{searchWord}))
+						</if>
+					</when>
+				</choose>
+			</if>
+		</where>
+	</sql>
 
-  <select id="selectChat" parameterType="java.lang.Long" resultMap="chatResultMap">
-    SELECT LOG_NO, USER_NO, SESSION_ID, QUESTION, ANSWER,
-           TO_CHAR(REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
-      FROM JM.CHAT_LOG
-     WHERE LOG_NO = #{logNo}
-  </select>
+	<select id="selectChat" parameterType="java.lang.Long"
+		resultMap="chatResultMap">
+		SELECT LOG_NO, USER_NO, SESSION_ID, QUESTION, ANSWER,
+		TO_CHAR(REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
+		FROM JM.CHAT_LOG
+		WHERE LOG_NO = #{logNo}
+	</select>
 
-  <select id="chatList" parameterType="SearchDTO" resultMap="chatResultMap">
-    SELECT A.*, B.TOTAL_CNT
-      FROM (
-        SELECT TT3.RNUM AS NO,
-               TT3.LOG_NO, TT3.USER_NO, TT3.SESSION_ID, TT3.QUESTION, TT3.ANSWER,
-               TO_CHAR(TT3.REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
-          FROM (
-            SELECT ROWNUM AS RNUM, TT2.*
-              FROM (
-                SELECT T1.*
-                  FROM JM.CHAT_LOG T1
-                  <include refid="search"/>
-                 ORDER BY T1.REG_DT DESC
-              ) TT2
+	<select id="chatList" parameterType="SearchDTO"
+		resultMap="chatResultMap">
+		SELECT A.*, B.TOTAL_CNT
+		FROM (
+		SELECT TT3.RNUM AS NO,
+		TT3.LOG_NO, TT3.USER_NO, TT3.SESSION_ID, TT3.QUESTION, TT3.ANSWER,
+		TO_CHAR(TT3.REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
+		FROM (
+		SELECT ROWNUM AS RNUM, TT2.*
+		FROM (
+		SELECT T1.*
+		FROM JM.CHAT_LOG T1
+		<include refid="search" />
+		ORDER BY T1.REG_DT DESC
+		) TT2
               <![CDATA[
              WHERE ROWNUM <= ( NVL(#{pageSize},10) * (NVL(#{pageNo},1) - 1) + NVL(#{pageSize},10) )]]>
-          ) TT3
+		) TT3
           <![CDATA[
          WHERE RNUM >= ( NVL(#{pageSize},10) * (NVL(#{pageNo},1) - 1) + 1 )
          ]]>
-      ) A
- CROSS JOIN (
-    SELECT COUNT(*) AS TOTAL_CNT
-      FROM JM.CHAT_LOG
-      <include refid="search"/>
- ) B
-  </select>
+		) A
+		CROSS JOIN (
+		SELECT COUNT(*) AS TOTAL_CNT
+		FROM JM.CHAT_LOG
+		<include refid="search" />
+		) B
+	</select>
 
-  <insert id="insertChat"
-        parameterType="ChatDTO"
-        useGeneratedKeys="true"
-        keyProperty="logNo"
-        keyColumn="LOG_NO">
-  INSERT INTO JM.CHAT_LOG (USER_NO, SESSION_ID, QUESTION, ANSWER, REG_DT)
-  VALUES (#{userNo, jdbcType=NUMERIC}, #{sessionId}, #{question}, #{answer}, SYSDATE)
-</insert>
+	<insert id="insertChat" parameterType="ChatDTO"
+		useGeneratedKeys="true" keyProperty="logNo" keyColumn="LOG_NO">
+		INSERT INTO JM.CHAT_LOG (USER_NO, SESSION_ID, QUESTION, ANSWER, REG_DT)
+		VALUES (#{userNo, jdbcType=NUMERIC}, #{sessionId}, #{question},
+		#{answer}, SYSDATE)
+	</insert>
 
-  <update id="updateChat" parameterType="ChatDTO">
-    UPDATE JM.CHAT_LOG
-       SET
-         <trim suffixOverrides=",">
-           <if test="userNo != null">USER_NO = #{userNo},</if>
-           <if test="sessionId != null and sessionId != ''">SESSION_ID = #{sessionId},</if>
-           <if test="question != null">QUESTION = #{question},</if>
-           <if test="answer != null">ANSWER = #{answer},</if>
-         </trim>
-     WHERE LOG_NO = #{logNo}
-  </update>
+	<update id="updateChat" parameterType="ChatDTO">
+		UPDATE JM.CHAT_LOG
+		SET
+		<trim suffixOverrides=",">
+			<if test="userNo != null">USER_NO = #{userNo},</if>
+			<if test="sessionId != null and sessionId != ''">SESSION_ID = #{sessionId},</if>
+			<if test="question != null">QUESTION = #{question},</if>
+			<if test="answer != null">ANSWER = #{answer},</if>
+		</trim>
+		WHERE LOG_NO = #{logNo}
+	</update>
 
-  <select id="findRecentBySession" resultMap="chatResultMap">
-    SELECT *
-      FROM (
-        SELECT t.LOG_NO, t.USER_NO, t.SESSION_ID, t.QUESTION, t.ANSWER,
-               TO_CHAR(t.REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
-          FROM JM.CHAT_LOG t
-         WHERE t.SESSION_ID = #{sessionId}
-           <if test="userNo != null">AND t.USER_NO = #{userNo}</if>
-         ORDER BY t.REG_DT DESC
-      )
-     WHERE ROWNUM &lt;= #{limit}
-  </select>
+	<select id="findRecentBySession" resultMap="chatResultMap">
+		SELECT *
+		FROM (
+		SELECT t.LOG_NO, t.USER_NO, t.SESSION_ID, t.QUESTION, t.ANSWER,
+		TO_CHAR(t.REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
+		FROM JM.CHAT_LOG t
+		WHERE t.SESSION_ID = #{sessionId}
+		<if test="userNo != null">AND t.USER_NO = #{userNo}</if>
+		ORDER BY t.REG_DT DESC
+		)
+		WHERE ROWNUM &lt;= #{limit}
+	</select>
 
-  <delete id="deleteChat" parameterType="java.lang.Long">
-    DELETE FROM JM.CHAT_LOG WHERE LOG_NO = #{logNo}
-  </delete>
+	<!-- === 세션(방) 목록: 최근 업데이트 순 === -->
+	<select id="listSessions"
+		resultType="com.pcwk.ehr.domain.ChatSessionSummary">
+		SELECT
+		t.session_id AS sessionId,
+		TO_CHAR(MAX(t.reg_dt),'YYYY-MM-DD HH24:MI:SS') AS updatedAt,
+		MAX(t.log_no) KEEP (DENSE_RANK LAST ORDER BY t.reg_dt) AS lastLogNo,
+		/* 첫 질문 30자 */
+		SUBSTR(MAX(t.question) KEEP (DENSE_RANK FIRST ORDER BY t.log_no), 1, 30) AS title,
+		/* 최신 답변이 있으면 답변, 없으면 최신 질문 30자 */
+		SUBSTR(
+		NVL(
+		MAX(t.answer) KEEP (DENSE_RANK LAST ORDER BY t.reg_dt),
+		MAX(t.question) KEEP (DENSE_RANK LAST ORDER BY t.reg_dt)
+		), 1, 30
+		) AS lastMsg
+		FROM JM.CHAT_LOG t
+		WHERE t.user_no = #{userNo}
+		GROUP BY t.session_id
+		ORDER BY MAX(t.reg_dt) DESC
+		FETCH FIRST #{limit} ROWS ONLY
+	</select>
 
-  <delete id="deleteAll">
-    DELETE FROM JM.CHAT_LOG
-  </delete>
+	<!-- === 특정 세션의 메시지 페이지(최신→과거 N개) === -->
+	<select id="listMessagesBySession" resultMap="chatResultMap">
+		SELECT
+		t.LOG_NO, t.USER_NO, t.SESSION_ID, t.QUESTION, t.ANSWER,
+		TO_CHAR(t.REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
+		FROM JM.CHAT_LOG t
+		WHERE t.SESSION_ID = #{sessionId}
+		<if test="userNo != null">AND t.USER_NO = #{userNo}</if>
+		<if test="beforeLogNo != null">AND t.LOG_NO &lt; #{beforeLogNo}</if>
+		ORDER BY t.LOG_NO DESC
+		FETCH FIRST #{limit} ROWS ONLY
+	</select>
+
+	<delete id="deleteChat" parameterType="java.lang.Long">
+		DELETE FROM JM.CHAT_LOG WHERE LOG_NO = #{logNo}
+	</delete>
+
+	<delete id="deleteAll">
+		DELETE FROM JM.CHAT_LOG
+	</delete>
 
 </mapper>

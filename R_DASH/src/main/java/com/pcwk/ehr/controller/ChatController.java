@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.ChatDTO;
+import com.pcwk.ehr.domain.ChatSessionSummary;
 import com.pcwk.ehr.service.BotService;
 import com.pcwk.ehr.service.ChatService;
 
@@ -42,11 +43,13 @@ public class ChatController {
 	@PostMapping(value = "/send", consumes = "application/json", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<ChatDTO> sendChat(@RequestBody @Valid ChatDTO chat,
 			@RequestHeader(value = "X-Session-Id", required = false) String sessionId,
+			@RequestHeader(value = "X-User-No", required = false) Integer userNoHeader, // ★ 추가
 			@AuthenticationPrincipal Object principal // 실제 CustomUser 사용 시 타입 교체
 	) {
 		log.debug("┌──────── sendChat ────────┐");
 		log.debug("chat={}", chat);
 		log.debug("sessionId(header)={}", sessionId);
+		log.debug("userNo(header)={}", userNoHeader);
 		log.debug("└──────────────────────────┘");
 
 		// 1) 세션/사용자 보정
@@ -54,8 +57,14 @@ public class ChatController {
 			sessionId = UUID.randomUUID().toString(); // 컨트롤러에서 생성해 클라이언트에 돌려줌
 		}
 		chat.setSessionId(sessionId);
+
+		// 로그인 정보를 쓰는 경우:
 		// if (principal instanceof CustomUser) chat.setUserNo(((CustomUser)
 		// principal).getUserNo());
+		// 헤더 값이 들어왔다면 우선 적용 (비로그인/임시 처리용)
+		if (chat.getUserNo() == null && userNoHeader != null) {
+			chat.setUserNo(userNoHeader);
+		}
 
 		// 2) 질문 검증
 		if (chat.getQuestion() == null || chat.getQuestion().trim().isEmpty()) {
@@ -73,7 +82,6 @@ public class ChatController {
 		chat.setAnswer(answer);
 
 		// 4) 여기서 추가 INSERT 금지 (BotService에서 이미 저장함)
-		// int inserted = chatService.insertChat(chat);
 
 		// 5) 응답 (세션ID를 헤더로 돌려주면 프론트에서 이어서 사용하기 좋음)
 		return ResponseEntity.ok().header("X-Session-Id", sessionId).body(chat);
@@ -101,18 +109,45 @@ public class ChatController {
 		return (flag == 1) ? ResponseEntity.ok("삭제 성공") : ResponseEntity.status(404).body("삭제 실패");
 	}
 
+	/** (기존) 세션별 최근 N개 히스토리 */
 	@GetMapping(value = "/history", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<List<ChatDTO>> history(
 			@RequestHeader(value = "X-Session-Id", required = false) String sessionId,
-			@RequestHeader(value = "X-User-No", required = false) Integer userNo, // 필요시
+			@RequestHeader(value = "X-User-No", required = false) Integer userNo,
 			@RequestParam(defaultValue = "50") int limit) {
 
 		if (sessionId == null || sessionId.trim().isEmpty()) {
 			return ResponseEntity.badRequest().build();
 		}
 		List<ChatDTO> list = chatService.findRecentBySession(sessionId, userNo, Math.max(1, Math.min(limit, 200)));
-		// DB는 최신→과거로 가져오도록 되어 있으니 화면에 그리기 쉬우라고 오래된→최신으로 뒤집어서 주기
-		java.util.Collections.reverse(list);
+		java.util.Collections.reverse(list); // 오래된→최신
 		return ResponseEntity.ok(list);
+	}
+
+	// ========= 아래 3개 엔드포인트가 "좌측 방 목록 + 방별 메시지"에 필요 =========
+
+	/** 좌측 패널: 내 세션(방) 목록 (최근 대화 순) */
+	@GetMapping(value = "/sessions", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<List<ChatSessionSummary>> sessions(@RequestHeader("X-User-No") Integer userNo,
+			@RequestParam(defaultValue = "100") int limit) {
+		return ResponseEntity.ok(chatService.listSessions(userNo, Math.max(1, Math.min(limit, 200))));
+	}
+
+	/** 새 세션 시작(프론트가 받은 세션ID를 이후 /send 호출시 X-Session-Id로 사용) */
+	@PostMapping(value = "/sessions/new", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<String> newSession() {
+		return ResponseEntity.ok(chatService.newSessionId());
+	}
+
+	/** 특정 세션의 메시지 페이지(무한스크롤: beforeLogNo < 가장 오래 로드된 logNo) */
+	@GetMapping(value = "/sessions/{sessionId}/messages", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<List<ChatDTO>> messages(@PathVariable String sessionId,
+			@RequestHeader(value = "X-User-No", required = false) Integer userNo,
+			@RequestParam(required = false) Long beforeLogNo, @RequestParam(defaultValue = "30") int limit) {
+
+		List<ChatDTO> rows = chatService.listMessagesBySession(sessionId, userNo, beforeLogNo,
+				Math.max(1, Math.min(limit, 200)));
+		java.util.Collections.reverse(rows); // 오래된→최신으로 반환
+		return ResponseEntity.ok(rows);
 	}
 }
