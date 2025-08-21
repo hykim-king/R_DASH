@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function(){
  });
     
     if('${search.searchDiv}'===''){
-        searchWord.disabled = true;
+        searchWord.disabled = false;
     }else{
         document.querySelector('#selectDivButton').value = '${search.searchDiv}';
     }
@@ -105,18 +105,10 @@ function selectDiv(div){
         selectDivButton.innerText = '내용';
         selectDivButton.value=div;
         searchWord.disabled = false;
-    }else if(div === 30){
-        selectDivButton.innerText = '번호';
-        selectDivButton.value=div;
-        searchWord.disabled = false;
-    }else if(div === 40){
-        selectDivButton.innerText = '제목+내용';
-        selectDivButton.value=div;
-        searchWord.disabled = false;
     }else{
         selectDivButton.innerText = '전체';
         selectDivButton.value='';
-        searchWord.disabled = true;
+        searchWord.disabled = false;  
     }
     
 }
@@ -185,8 +177,6 @@ span {
                     <c:choose>
                         <c:when test="${search.searchDiv == '10' }">제목</c:when>
                         <c:when test="${search.searchDiv == '20' }">내용</c:when>
-                        <c:when test="${search.searchDiv == '30' }">번호</c:when>
-                        <c:when test="${search.searchDiv == '40' }">제목+내용</c:when>
                         <c:otherwise>전체</c:otherwise>
                     </c:choose>
                   </button>
@@ -194,13 +184,11 @@ span {
                     <a class="dropdown-item" onclick="javascript:selectDiv('')">전체</a>
                     <a class="dropdown-item" onclick="javascript:selectDiv(10)">제목</a>
                     <a class="dropdown-item" onclick="javascript:selectDiv(20)">내용</a>
-                    <a class="dropdown-item" onclick="javascript:selectDiv(30)">번호</a>
-                    <a class="dropdown-item" onclick="javascript:selectDiv(40)">제목+내용</a>
                   </div>
                 </div>
                 <!-- //드롭다운 -->
 		         <input type="text" class="form-control" id="searchWord" name="searchWord">
-                <input type="hidden"id="pageNo" name="pageNo">  
+                <input type="hidden"id="pageNo" name="pageNo" value="${search.pageNo != 0 ? search.pageNo : 1}">  
                 <button type="button" id="searchButton" onclick="javascript:search()" class="btn btn-default text-nowrap" style="margin-left:10px">검색</button>
                 <button type="button" id="moveToReg" class="btn btn-default text-nowrap" style="margin-left:3px">등록</button>
               </div>
