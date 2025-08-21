@@ -11,22 +11,22 @@ import com.pcwk.ehr.domain.DustDTO;
 @Mapper
 public interface DustMapper extends WorkDiv<DustDTO> {
 
-	  // BBox 안에서 airType의 최신 1건/측정소
+    // BBox 안에서 airType의 최신 1건/측정소
     List<DustDTO> selectLatestByTypeBBox(
-        @Param("airType") String airType,
-        @Param("day")     String day,     // YYYY-MM-DD (옵션)
-        @Param("minLat")  Double minLat,
-        @Param("maxLat")  Double maxLat,
-        @Param("minLon")  Double minLon,
-        @Param("maxLon")  Double maxLon,
-        @Param("limit")   Integer limit
+    		 @Param("airType") String airType,
+    	        @Param("day")     String day,
+    	        @Param("minLat")  Double minLat,
+    	        @Param("maxLat")  Double maxLat,
+    	        @Param("minLon")  Double minLon,
+    	        @Param("maxLon")  Double maxLon,
+    	        @Param("limit")   Integer limit
     );
 
     // 전국 airType 최신 1건/측정소
     List<DustDTO> selectLatestByTypeAll(
-        @Param("airType") String airType,
-        @Param("day")     String day,     // YYYY-MM-DD (옵션)
-        @Param("limit")   Integer limit
+    		@Param("airType") String airType,
+            @Param("day")     String day,
+            @Param("limit")   Integer limit
     );
     
     List<Map<String, Object>> selectTop5PM10();
