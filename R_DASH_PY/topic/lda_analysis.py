@@ -20,6 +20,7 @@ def run_lda(df, num_topics):
         iterations=100
     )
 
+    # 토픽
     # 각 문서의 대표 토픽 찾기.
     main_topics = []
     for bow in corpus:
@@ -35,6 +36,10 @@ def run_lda(df, num_topics):
         terms = lda_model.show_topic(idx, topn=5)  # [(단어, 확률), ...]
         topic_terms[idx] = terms
 
+    #  전체 단어 개수
+    all_words = [w for doc in texts for w in doc]
+    word_counter = Counter(all_words)
+
     for topic_num, count in topic_counters.items():
         print(f'토픽 {topic_num}: {count}건')
 
@@ -44,7 +49,8 @@ def run_lda(df, num_topics):
             print(f"  {word} ({weight:.4f})")
     lda_result = {
         "topic_counts": dict(topic_counters),
-        "topic_terms": topic_terms
+        "topic_terms": topic_terms,
+        "word_counts": dict(word_counter)
     }
     return lda_result
 
@@ -63,6 +69,10 @@ def main():
     print("토픽별 문서 개수:", result["topic_counts"])
     for idx, terms in result["topic_terms"].items():
         print(f"토픽 {idx + 1}: {', '.join([w for w, _ in terms])}")
+
+    for word, count in result["word_counts"].items():
+        print(f"{word}: {count}")
+
 
 if __name__ == '__main__':
     main()

@@ -30,6 +30,12 @@ application-destination-prefix="/ehr">
 <websocket:simple-broker prefix="/topic" />
 
 </websocket:message-broker>
+<!-- 
+    <task:scheduler id="cronScheduler" pool-size="3"/>
+Cron 스케줄링
+    <task:scheduled-tasks scheduler="cronScheduler">
+       <task:scheduled ref="newsCron" method="runNewsTask" cron="0 */1 * * * *"/>
+    </task:scheduled-tasks> -->
 
 <!--
 	<task:scheduler id="cronScheduler" pool-size="3"/>
