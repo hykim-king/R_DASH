@@ -44,38 +44,44 @@
     highlight(air);
   }
 
-  document.addEventListener('DOMContentLoaded', function(){
-    // 1) URL 상태 적용
-    applyFromURL();
+  document.addEventListener('DOMContentLoaded', function () {
+  activateFromURL(0);
 
-    // 2) 사이드바 "황사" 메뉴 → ALL로 진입
-    var dustLink = document.getElementById('nav-dust');
-    if (!dustLink) {
-      var links = document.querySelectorAll('#sidenav-collapse-main a.nav-link');
-      for (var i=0;i<links.length;i++){
-        var t=(links[i].textContent||links[i].innerText||'').replace(/\s+/g,'');
-        if (t.indexOf('황사')>-1){ dustLink=links[i]; break; }
-      }
+  // 여기 블록을 "교체"합니다
+  var dustLink = document.getElementById('nav-dust');
+  if (!dustLink) {
+    var ctx = document.body && document.body.getAttribute('data-context-path') || '';
+    var dustPath = ctx + '/dust';
+    var links = document.querySelectorAll('a.nav-link, a');
+    for (var i = 0; i < links.length; i++) {
+      var href = links[i].getAttribute('href') || '';
+      if (href === dustPath || href.endsWith('/dust')) { dustLink = links[i]; break; }
     }
-    if (dustLink){
-      dustLink.addEventListener('click', function(e){
+  }
+
+  if (dustLink) {
+    dustLink.addEventListener('click', function (e) {
+      var ctx = document.body && document.body.getAttribute('data-context-path') || '';
+      var mapPath = ctx + '/map';
+      if (location.pathname === mapPath) {
         e.preventDefault();
-        setQS({ airType: 'ALL' });
+        setQS({ layer: 'dust', airType: 'ALL' });
+        if (window.AppMap && AppMap.activate) AppMap.activate('dust', { airType: 'ALL' });
         putBBoxInURL();
-        applyFromURL();
-      });
-    }
-
-    // 3) 우측 버튼 클릭 시 URL 갱신
-    document.addEventListener('click', function(e){
-      var btn = e.target.closest('#dustFilter .flt'); if (!btn) return;
-      var air = btn.getAttribute('data-air');
-      setQS({ airType: air, limit: 500 });
-      putBBoxInURL();
-      highlight(air);
+      }
     });
+  }
 
-    // 4) 뒤/앞으로 가기
-    window.addEventListener('popstate', applyFromURL);
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('#dustFilter .flt');
+    if (!btn) return;
+    var air = btn.getAttribute('data-air') || 'ALL';
+    setQS({ layer: 'dust', airType: air, limit: 500 });
+    if (window.AppMap && AppMap.activate) AppMap.activate('dust', { airType: air });
+    putBBoxInURL();
   });
+
+  window.addEventListener('popstate', function(){ activateFromURL(0); });
+});
+
 })();
