@@ -10,6 +10,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.UserDTO;
 import com.pcwk.ehr.mapper.UserMapper;
+import com.pcwk.ehr.service.MailService;
 import com.pcwk.ehr.service.UserService;
 
 @Controller
@@ -31,9 +34,61 @@ public class UserController {
 	UserService service;
 	@Autowired
 	UserMapper mapper;
+	@Autowired
+	MailService mailService;
+	
+	@GetMapping("findPw")
+	public String findPw() {
+		String viewName = "user/findPw";
+		return viewName;
+	}
+	
+	@PostMapping(value="/sendMail", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String,Object> sendMail(String email){
+		Map<String,Object> result = new HashMap<>();
+		mailService.sendcode(email);
+		
+		result.put("success", true);
+		result.put("expiresInSec", 180);
+		
+		return result;
+	}
+	@PostMapping(value="/verify", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String,Object> verify(String email,String code){
+		Map<String,Object> result = new HashMap<>();
+		int flag = mailService.verify(email, code);
+		
+		if(flag == 1) {
+			result.put("success", true);
+			result.put("message", "인증 번호가 일치합니다.");
+		}else {
+			result.put("success", false);
+			result.put("message", "인증 번호가 일치하지 않습니다.");			
+		}
+		
+		return result;
+	}
+	
+	@PostMapping(value="/resetPw", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public Map<String,Object> verify(String email){
+		Map<String,Object> result = new HashMap<>();
+		mailService.resetPwToMail(email);
+		result.put("message", "메일로 비밀번호를 전송했습니다.");		
+		
+		return result;
+	}
 	
 	@GetMapping("userList")
-	public String userList(HttpServletRequest request,Model model) {
+	public String userList(HttpServletRequest request,Model model,HttpSession session) {
+		UserDTO user = (UserDTO) session.getAttribute("loginUser");
+		//접근 제한
+		if(user == null || user.getRole()!=1) {
+			throw new AccessDeniedException("관리자만 접속 가능");
+		}
+		
 		String viewName = "user/userList";
 		SearchDTO search = new SearchDTO();
 		//pageNo 설정
@@ -83,7 +138,7 @@ public class UserController {
 	public String modMyPage(HttpSession session) {
 		String viewName = "user/modMyPage";
 		if(session.getAttribute("loginUser") == null) {
-			return "redirect:/user/login";
+			throw new AccessDeniedException("로그인 해야함");
 		}
 
 		return viewName;
