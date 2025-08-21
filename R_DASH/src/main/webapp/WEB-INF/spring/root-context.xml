@@ -10,6 +10,19 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+		
+	<!-- Redis -->
+	<bean id="redisConnectionFactory"
+	      class="org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory">
+	  <property name="hostName" value="localhost"/>
+	  <property name="port" value="6379"/>
+	  <!-- 비밀번호 쓰면 아래 추가 -->
+	  <!-- <property name="password" value="your-password"/> -->
+	</bean>
+	
+	<bean id="redisTemplate" class="org.springframework.data.redis.core.StringRedisTemplate">
+	  <constructor-arg ref="redisConnectionFactory"/>
+	</bean>
 	
 	<bean id="transactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
 	  <constructor-arg ref="transactionManager"/>
@@ -136,9 +149,26 @@
     <bean id="dummyMailService"
         class="com.pcwk.ehr.user.service.DummyMailService"></bean> 
 
-    <!-- Naver smtp -->
-
-    <!-- google smtp -->
+    <!-- Mail -->
+	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
+	  <property name="host" value="smtp.gmail.com"/>
+	  <property name="port" value="587"/>
+	  <property name="username" value="2025rdash@gmail.com"/>
+	  <property name="password" value="pchrqgvwfvqhfmqj"/>
+	  <property name="defaultEncoding" value="UTF-8"/>
+	  <property name="javaMailProperties">
+	    <props>
+	      <prop key="mail.smtp.auth">true</prop>
+	      <prop key="mail.smtp.starttls.enable">true</prop>
+	      <prop key="mail.smtp.connectiontimeout">10000</prop>
+	      <prop key="mail.smtp.timeout">10000</prop>
+	      <prop key="mail.smtp.writetimeout">10000</prop>
+	    </props>
+	  </property>
+	</bean>
+    
+    <!-- google smpt -->
+    <!--
     <bean id="mailSenderImpl"
         class="org.springframework.mail.javamail.JavaMailSenderImpl">
         <property name="host" value="smtp.gmail.com" />
@@ -156,7 +186,7 @@
             </props>
         </property>
     </bean>
-    
+    -->
     
     <bean id="transactionManager"
         class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
