@@ -8,6 +8,37 @@
 <c:set var="CP" value="${pageContext.request.contextPath }" />
 <c:set var="now" value="<%=new java.util.Date()%>" />
 <c:set var="sysDate"><fmt:formatDate value="${now}" pattern="yyyy-MM-dd_HH:mm:ss" /></c:set>
+<%
+    int bottomCount = 5;
+    int pageSize    = 0;//페이지 사이즈
+    int pageNo      = 0;//페이지 번호
+    int maxNum      = 0;//총글수
+    
+    String url      = "";//호출URL
+    String scriptName="";//자바스크립트 이름
+    
+    
+    //request: 요청 처리를 할수 있는 jsp 내장 객체
+    String totalCntString = request.getAttribute("totalCnt").toString();
+    //out.print("totalCntString:"+totalCntString);
+    maxNum = Integer.parseInt(totalCntString);  
+    
+    SearchDTO  paramVO = (SearchDTO)request.getAttribute("search");   
+    pageSize = paramVO.getPageSize();
+    pageNo   = paramVO.getPageNo();
+    
+    String cp = request.getContextPath();
+       //out.print("cp:"+cp);
+       
+       url = cp+"/board/doRetireve.do";
+       //out.print("url:"+url);
+       
+       scriptName = "pagerDoRetrieve";
+       
+       String pageHtml=PcwkString.bootstrapRenderingPager(maxNum, pageNo, pageSize, bottomCount, url, scriptName);
+       
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,6 +65,16 @@ document.addEventListener('DOMContentLoaded', function(){
     	window.location.href = '/ehr/board/doSaveView.do';
  });
 });
+//페이징 
+function pagerDoRetrieve(url, pageNo){   
+    //button
+    const searchButton = document.querySelector('#searchButton');
+    
+    document.querySelector('#pageNo').value= pageNo;
+    
+    searchButton.click();     
+    
+}
 </script>
 <style type="text/css">
 span {
@@ -60,7 +101,7 @@ span {
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/common/loading.jsp"></jsp:include>
-<div class=main-content>
+<div class="main-content">
 	
 	<!-- header2 -->
 	<div class="header bg-warning pb-6 header bg-gradient-warning py-5 py-lg-6 pt-lg-6">
@@ -106,7 +147,8 @@ span {
 					            </div>
 					            <input class="form-control" placeholder="Search" type="text">
 				            </div>
-				            <button type="button" class="ml-md-n-2 btn btn-sm btn-default" style="width: 70px; height:40px;">검색</button>
+				            <input type="hidden"id="pageNo" name="pageNo">
+				            <button type="button" id="searchButton" class="ml-md-n-2 btn btn-sm btn-default" style="width: 70px; height:40px;">검색</button>
 				            <button type="button" id="moveToReg" class="btn btn-sm btn-default wide-btn" style="width: 70px; height:40px;">등록</button>
 				        </div>
 		            </div>   

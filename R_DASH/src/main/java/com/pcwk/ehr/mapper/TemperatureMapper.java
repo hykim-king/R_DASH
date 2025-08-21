@@ -30,6 +30,10 @@ public interface TemperatureMapper {
 	
 	List<PatientsDTO> selectPatientsSummary(Map<String, Object> map) throws SQLException;
 	
+    List<PatientsDTO> selectByYear(int year);
+
+    List<PatientsDTO> selectBySido(String sidoNm);
+	
 	//드롭다운 만들기 위해 값가져오기
 	List<String> pSido() throws SQLException;
 	List<String> pYear() throws SQLException;

@@ -33,5 +33,47 @@
     GROUP BY STATE_NM
     ORDER BY CNT DESC
   </select>
+  
+  <!-- 년도별 발생 횟수 -->
+  <select id="selectYearlyCounts" resultType="map">
+    SELECT
+      TO_CHAR(OCCUR_DT, 'YYYY') AS YEAR,
+      COUNT(*) AS CNT
+    FROM SINKHOLE
+    GROUP BY TO_CHAR(OCCUR_DT, 'YYYY')
+    ORDER BY YEAR
+  </select>
+
+  <!-- 지역별 발생 횟수 (시군구 단위) -->
+  <select id="selectSignguCounts" resultType="map">
+    SELECT
+      SIGNGU_NM AS SIGNGU_NM,
+      COUNT(*)  AS CNT
+    FROM SINKHOLE
+    GROUP BY SIGNGU_NM
+    ORDER BY SIGNGU_NM
+  </select>
+
+  <!-- 월별 발생 횟수 -->
+  <select id="selectMonthlyCounts" resultType="map">
+    SELECT
+      TO_CHAR(OCCUR_DT, 'MM') AS MONTH,
+      COUNT(*) AS CNT
+    FROM SINKHOLE
+    GROUP BY TO_CHAR(OCCUR_DT, 'MM')
+    ORDER BY TO_NUMBER(MONTH)
+  </select>
+
+  <!-- 년도별 피해 통계 -->
+  <select id="selectYearlyDamageStats" resultType="map">
+    SELECT
+      TO_CHAR(OCCUR_DT, 'YYYY') AS YEAR,
+      SUM(NVL(DPRS_CNT,   0)) AS DPRS_TOT,
+      SUM(NVL(INJPSN_CNT, 0)) AS INJ_TOT,
+      SUM(NVL(VEHCLE_CNT, 0)) AS VEH_TOT
+    FROM SINKHOLE
+    GROUP BY TO_CHAR(OCCUR_DT, 'YYYY')
+    ORDER BY YEAR
+  </select>
 
 </mapper>

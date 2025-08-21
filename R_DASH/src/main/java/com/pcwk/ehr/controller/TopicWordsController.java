@@ -14,7 +14,7 @@ import com.pcwk.ehr.domain.TopicWordsDTO;
 import com.pcwk.ehr.service.TopicWordsService;
 
 @Controller
-@RequestMapping("/freq")
+@RequestMapping("/freq/topic")
 public class TopicWordsController {
 	Logger log = LogManager.getLogger(getClass());
 	
@@ -31,29 +31,26 @@ public class TopicWordsController {
 	//top150	GET
 	//getChangeRate	GET
 	
-	@GetMapping(value="/topicWords.do", produces = "text/plain;charset=UTF-8")
+	@GetMapping(value="/words.do")
 	public String topicWords(TopicWordsDTO param, Model model) {
 		log.debug("┌───────────────────────────┐");
-		log.debug("│ *topicWords()*            │");
+		log.debug("│ *words()*                 │");
 		log.debug("└───────────────────────────┘");
-		
-		String viewName = "freq/topic_words";
-		
+				
 		List<TopicWordsDTO> top10 = wordsService.top10();
 		log.debug("top10: {}"+top10);
 		model.addAttribute("top10", top10);
 		
 		List<TopicWordsDTO> top100 = wordsService.top100();
 		log.debug("top100: {}"+top100);
-		model.addAttribute("top100", top100);
+		model.addAttribute("cloud", top100);
 		
 		List<TopicWordsDTO> rate = wordsService.getChangeRate();
 		log.debug("rate: {}"+rate);
 		model.addAttribute("rate", rate);
 		
-		return viewName;
+		return "/freq/topic/words";
 		
 	}
 	
-
 }

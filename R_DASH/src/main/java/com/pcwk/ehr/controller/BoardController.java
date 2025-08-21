@@ -306,7 +306,12 @@ public class BoardController {
 	    	Map<String,String> noticeMsg = new HashMap<>();
 	    	noticeMsg.put("boardNo", String.valueOf(param.getBoardNo()));
 	    	noticeMsg.put("title", param.getTitle());
-	    	noticeMsg.put("contents", param.getContents());
+	    	
+	    	String contents = param.getContents();
+	    	if(contents != null && contents.length() > 20) {
+	    		contents = contents.substring(0,20)+"...";
+	    	}
+	    	noticeMsg.put("contents", contents);
 	    	
 	    	simpMessagingTemplate.convertAndSend("/topic/notice",noticeMsg);
 	    }

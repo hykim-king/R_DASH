@@ -8,7 +8,7 @@ public class MapController {
 
 	@GetMapping("/map")
 	public String mapPage() {
-
+		// → /WEB-INF/views/map/map.jsp (tiles면 "map" definition)
 		return "map/map";
 	}
 }

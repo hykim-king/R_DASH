@@ -45,4 +45,12 @@ public interface LandslideMapper extends WorkDiv<LandslideDTO> {
         @Param("maxLon") double maxLon,
         @Param("q") String q
     );
+    
+    List<Map<String,Object>> selectByYear();
+    
+    List<Map<String,Object>> selectByRegion();
+    
+    List<Map<String,Object>> selectByMonth();
+    
+    List<Map<String,Object>> selectByStatus();
 }
