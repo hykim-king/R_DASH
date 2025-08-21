@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	//단어 빈도 스케일
 	var wordScale = d3.scale.linear()
 	                   .domain([0, d3.max(wordData, function(d){ return d.freq;})]) //데이터의 범위, 입력 크기
-	                   .range([5, 76]) 
+	                   .range([5, 80]) 
                        .clamp(true); //도메인 크기를 넘긴 값에 대해 도메인 최대값으로 고정
 
     var colorScale1 = d3.scale.linear()
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	function showCloud(data){
 		d3.layout.cloud().size([width,height])
 		.words(data)
-		.rotate(function(d){ return d.text.length > 3 ? 0 : 90;})
+		.rotate(function(d) { return d.text.length > 3 ? (Math.random() < 0.5 ? 0 : 90) : 0; })
 	    .fontSize(function(d){return wordScale(d.freq);})
 	    .on("end",draw)//클라우드 레이아웃을 초기화 > end 이벤트 발생 > 연결된 함수 작동
 	    .start();
