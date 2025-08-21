@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pcwk.ehr.mapper.TopicWordsMapper">
+	<select id="top100" resultType="TopicWordsDTO">
+	        SELECT WORD_NO,WORD, FREQ, PREV_FREQ,TO_CHAR(REG_DT,'YYYY/MM/DD') as regDt
+			FROM TOPIC_WORDS
+			WHERE TRUNC(REG_DT) = TRUNC(SYSDATE)
+			ORDER BY FREQ DESC
+			FETCH FIRST 100 ROWS ONLY
+    </select>
+    
+    <select id="top10" resultType="TopicWordsDTO">
+        SELECT WORD_NO,WORD, FREQ, PREV_FREQ,TO_CHAR(REG_DT,'YYYY/MM/DD') as regDt
+		FROM TOPIC_WORDS
+		WHERE TRUNC(REG_DT) = TRUNC(SYSDATE)
+		ORDER BY FREQ DESC
+		FETCH FIRST 10 ROWS ONLY
+    </select>
+    
+    <select id="getChangeRate" resultType="TopicWordsDTO">
+        SELECT WORD_NO, WORD, FREQ, PREV_FREQ,
+		       ROUND(((FREQ - PREV_FREQ)/
+		       DECODE(PREV_FREQ,0,1,PREV_FREQ))*100,2) 
+		       AS CHANGE_RATE
+		FROM TOPIC_WORDS
+		WHERE TRUNC(REG_DT) = TRUNC(SYSDATE)
+		ORDER BY FREQ DESC
+		FETCH FIRST 5 ROWS ONLY
+    </select>
+    
+    <insert id="saveAll">
+        INSERT INTO TOPIC_WORDS (WORD, FREQ, PREV_FREQ, REG_DT)
+		SELECT 
+		    CASE 
+	<![CDATA[   WHEN LEVEL <= 33 THEN '사과' || LEVEL
+		        WHEN LEVEL <= 66 THEN '바나나' || (LEVEL-33)
+		        ELSE '포도' || (LEVEL-66)
+		    END AS WORD,
+		    TRUNC(DBMS_RANDOM.VALUE(1, 1000)) AS freq,
+		    TRUNC(DBMS_RANDOM.VALUE(1, 1000)) AS prevFreg,
+		    SYSDATE AS regDt
+		FROM dual 
+		CONNECT BY LEVEL <= 100 ]]>
+    </insert>
+    
+    <select id="getCount" resultType="java.lang.Integer">
+        select count(*) as cnt FROM TOPIC_WORDS 
+    </select>
+    
+	<delete id="deleteAll">
+	    Delete FROM TOPIC_WORDS 
+	</delete>
+</mapper>

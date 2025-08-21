@@ -54,6 +54,7 @@
                 tt3.email,                                                 
                 tt3.image,
                 tt3.role,
+                tt3.social,
                 DECODE(TO_CHAR(tt3.reg_dt,'YYYY-MM-DD'),TO_CHAR(SYSDATE,'YYYY-MM-DD'),
                         TO_CHAR(tt3.reg_dt,'HH24:MI'),TO_CHAR(tt3.reg_dt,'YYYY-MM-DD')) AS regDt
          FROM (                                                            
@@ -104,6 +105,7 @@
 			<if test="tel != null">tel=#{tel},</if>
 			<if test="zipCode != null">zip_code=#{zipCode},</if>
 			<if test="address != null">address=#{address},</if>
+			<if test="social != null">social=#{social},</if>
 			<if test="detailAddress != null">detail_address=#{detailAddress},</if>
 			</set>
 			WHERE
@@ -126,6 +128,7 @@
         INSERT INTO USER_JM (
 				    email,
 				    password,
+				    social,
 				    image,
 				    name,
 				    zip_code,
@@ -133,13 +136,14 @@
 				    detail_address,
 				    role,
 				    reg_dt
-				) VALUES ( #{email},
-				           #{password},
+				) VALUES ( #{email, jdbcType=VARCHAR},
+				           #{password, jdbcType=VARCHAR},
+				           #{social, jdbcType=VARCHAR},
 				           'defaultProfile.jpg',
-				           #{name},
+				           #{name, jdbcType=NVARCHAR},
 				           #{zipCode, jdbcType=INTEGER},
-				           #{address},
-				           #{detailAddress},
+				           #{address, jdbcType=NVARCHAR},
+				           #{detailAddress, jdbcType=NVARCHAR},
 				           2,
 				           SYSDATE
 				        )

@@ -34,4 +34,24 @@ public class SinkholeServiceImpl implements SinkholeService {
     public List<SinkholeDTO> selectAll() {
         return mapper.selectAll();
     }
+    
+    @Override
+    public List<Map<String, Object>> getYearlyCounts() {
+        return mapper.selectYearlyCounts();
+    }
+
+    @Override
+    public List<Map<String, Object>> getSignguCounts() {
+        return mapper.selectSignguCounts();
+    }
+
+    @Override
+    public List<Map<String, Object>> getMonthlyCounts() {
+        return mapper.selectMonthlyCounts();
+    }
+
+    @Override
+    public List<Map<String, Object>> getYearlyDamageStats() {
+        return mapper.selectYearlyDamageStats();
+    }
 }

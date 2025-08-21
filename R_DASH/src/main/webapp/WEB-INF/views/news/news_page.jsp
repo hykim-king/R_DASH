@@ -62,10 +62,19 @@
     color: black;
 }
 
-#detailTitle,#detailContents{
-    color:#525f7f;
+#detailTitle{
+    color:black;
     font-weight: bold;
     font-size: 24px;
+    margin-bottom: 30px !important;
+}
+#detailTitleDiv{
+    margin-bottom: 20px;
+
+}
+#detailContents{
+    color:black;
+    font-size: 22px;
 }
 .h3.mb-0{
     color:#172b4d;
@@ -73,6 +82,60 @@
 }
 .budget{
     font-size:18px !important;
+}
+.heihlight{
+     box-shadow: inset 0 -20px 0 #FFFF00;
+}
+.budget{
+    color:black !important;
+  
+}
+/* 왼쪽 카드 기준으로 위치 */
+.col-xl-5.position-relative {
+    position: relative; /* clickMeWrapper 기준 */
+}
+
+.clickMeWrapper {
+    position: absolute;  /* 왼쪽 카드 안에서 절대 위치 */
+    top: 14.6px;          /* 카드 위쪽으로 띄움 */
+    left: 20px;          /* 카드 왼쪽 안쪽 */
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 9999;
+}
+
+.clickMeImg {
+    width: 100px;
+    height: auto;
+}
+
+.clickMeIcon {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 5px 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+.clickMeIcon i {
+    font-size: 24px;
+    color: orange;
+    margin-right: 5px;
+}
+
+.chatText {
+    font-size: 14px;
+    color: #333;
+}
+
+table thead th:nth-child(1),
+table thead th:nth-child(3),
+table td:nth-child(1),
+table td:nth-child(3) {
+    vertical-align: middle !important; /* 세로 가운데 정렬 */
+    text-align: center !important;  
 }
 </style>
 <script>
@@ -165,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function(){
        const left = (screenWidth - 600)/2;
        const top = (screenHeight - 400)/2;
 
-       let options = `width=600,height=600, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+       let options = `width=600,height=600, top=${top}, left=${left}, resizable=no, scrollbars=no`;
        window.open(url,"_blank",options);
     });
     //수정 모달
@@ -189,10 +252,26 @@ document.addEventListener('DOMContentLoaded', function(){
        const left = (screenWidth - 600)/2;
        const top = (screenHeight - 400)/2;
 
-       let options = `width=600,height=700, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+       let options = `width=900,height=700, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
        window.open(url,"_blank",options);
     });
+    
+    //오늘의 키워드 모달
+    const clickMeDiv = document.querySelector("#clickMe");
+    clickMeDiv.addEventListener("click",function(e){
+    	let url = "/ehr/freq/topic/words.do";
+        const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
+        console.log('screenWidth: '+screenWidth);
+        console.log('screenHeight: '+screenHeight);
 
+       const left = (screenWidth - 900)/2;
+       const top = (screenHeight - 800)/2;
+
+       let options = `width=900,height=800, top=${top}, left=${left}, resizable=no, scrollbars=no`;
+       window.open(url,"_blank",options);
+    });
+    
 });
 </script>
 </head>
@@ -235,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	<div class="container-fluid mt--6">
 	   <div class="row d-flex align-items-stretch">
 	   <!-- 왼쪽 : 토픽 카드 -->
-	       <div class="col-xl-4 d-flex">
+	       <div class="col-xl-5 d-flex">
 	           <div class="card flex-fill">
 	               <div class="card-header bg-transparent d-flex justify-content-center align-items-center">
                        <div class="row align-items-center">
@@ -248,9 +327,9 @@ document.addEventListener('DOMContentLoaded', function(){
 	               <div class="table-responsive">
 	                   <table class="table align-items-center table-flush">
 	                   <colgroup>
+	                        <col style="width: 15%;"> <!-- 2 -->
+	                        <col style="width: 65%;" class="left-col"> <!-- 6 -->
 	                        <col style="width: 20%;"> <!-- 2 -->
-	                        <col style="width: 70%;" class="left-col"> <!-- 6 -->
-	                        <col style="width: 10%;"> <!-- 2 -->
 	                    </colgroup>
 	                   <thead class="thead-light">
 	                       <tr>
@@ -280,8 +359,16 @@ document.addEventListener('DOMContentLoaded', function(){
 	               </div>
 	           </div>
 	       </div>
+	       <!-- 오늘의 키워드 보여줄 click me -->
+	       <div id="clickMe" class="clickMeWrapper">
+		        <img class="clickMeImg" src="/ehr/resources/image/news_Jeamin.png" alt="나를 클릭해봐">
+		        <div class="clickMeIcon">
+		           <!--  <i class="ni ni-chat-round"></i> -->
+		            <span class="chatText"> 나를 클릭해 봐 ! 📊</span>
+		        </div>
+		    </div>
 	       <!-- 오른쪽 : 토픽 상세 -->
-	       <div class="col-xl-8 d-flex my-topic-card">
+	       <div class="col-xl-7 d-flex my-topic-card">
 	           <div class="card flex-fill topic-card">
 	               <div class="card-header bg-transparent d-flex justify-content-center align-items-center">
 				        <button class="arrow left">
@@ -289,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function(){
 				        </button>
 	                   <div class="row align-items-center">
 	                   <div class="col align-content-center">
-	                       <h5 class="h3 mb-0">✨재민이AI의 오늘의 토픽 요약✨</h5>
+	                       <h5 id="heihlight" class="h3 mb-0">✨재민이AI의 오늘의 토픽 요약✨</h5>
 	                   </div>
 	                   </div>
 	                   <button class="arrow right">
@@ -297,8 +384,10 @@ document.addEventListener('DOMContentLoaded', function(){
 		                </button>
 	               </div>
 	               <div class="card-body">             
-	                   <div>
-		                 <p id="detailTitle"></p>
+	                   <div id="detailTitleDiv">
+		                 <span id="detailTitle" class="heihlight"></span>
+		               </div>
+		               <div>
 		                 <p id="detailContents"></p>
 	                   </div>
 	               </div><!-- //카드 body -->
@@ -307,6 +396,8 @@ document.addEventListener('DOMContentLoaded', function(){
            <!--//오른쪽 : 토픽 상세  -->
 	   </div>
 	</div>
+
+	
 	<div class="col-xl-12">
 	   <div class="col-xl-12">
 	       <div class="card">
@@ -326,8 +417,8 @@ document.addEventListener('DOMContentLoaded', function(){
 	           <div id="allNewsTable" class="table-responsive">
 	               <table class="table align-items-center table-flush">
 	               <colgroup>
-		                <col style="width: 20%;"> <!-- 2 -->
-		                <col style="width: 60%;" class="left-col"> <!-- 6 -->
+		                <col style="width: 15%;"> <!-- 2 -->
+		                <col style="width: 65%;" class="left-col"> <!-- 6 -->
 		                <col style="width: 20%;"> <!-- 2 -->
 		            </colgroup>
 	               <thead style="display: none;">
