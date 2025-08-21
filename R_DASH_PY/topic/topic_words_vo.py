@@ -13,7 +13,7 @@ def main():
     """
     
     """
-    topic01 = TopicWordsVO(word='토마토', freq=100, prev_freq=0, reg_dt="")
+    topic01 = TopicWordsVO(word='토마토', freq=100)
 
     print(f'topic01: {topic01}')
     print(f'topic01.title: {topic01.word}')
