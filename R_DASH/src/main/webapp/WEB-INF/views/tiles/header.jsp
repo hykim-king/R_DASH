@@ -50,7 +50,7 @@
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a id="nav-dust" href="${pageContext.request.contextPath}/dust" class="nav-link">
                       <span class="sidenav-mini-icon"> 황사 </span>
                       <span class="sidenav-normal"> 황사 </span>
                     </a>

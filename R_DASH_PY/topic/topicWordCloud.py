@@ -40,6 +40,7 @@ def make_wordcloud(df,mask_path=None):
     plt.axis('off')
     #plt.show()
     plt.close()
+    print(f"워드클라우드 이미지 저장 경로: {image_path}")
 
 
 def main():

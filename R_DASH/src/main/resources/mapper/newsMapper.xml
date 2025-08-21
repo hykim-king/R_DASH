@@ -12,15 +12,18 @@
 		                    title,
 		                    company,
 		                    url,
-		                    pub_dt,
-		                    reg_dt
+		                    pub_dt AS pubDt,
+                            reg_dt AS regDt
+<!-- 		                    TO_CHAR(pub_dt,'YYYY/MM/DD HH24:MI') as pubDt,
+		                    TO_CHAR(reg_dt,'YYYY/MM/DD HH24:MI:SS') as regDt -->
 		                FROM
 		                    news
-		                WHERE (TRUNC(reg_dt) = TRUNC(SYSDATE))		                
+		                WHERE (TRUNC(reg_dt) = TRUNC(SYSDATE))
+		                ORDER BY reg_dt DESC		                
 		        ) t1
 		 <![CDATA[    WHERE ROWNUM <= #{pageSize}*#{pageNo} + #{pageSize}
 		)t2
-		WHERE RNUM >= #{pageSize}*#{pageNo} +#{pageNo} ]]>
+		WHERE RNUM >=  1  ]]>
     </select>
 
     <insert id="saveAll">
@@ -32,7 +35,7 @@
 		    '주제' || (LEVEL + 1) AS title,
 		    '신문사' || MOD(LEVEL, 3) AS company,
 		    'naver.com' || (LEVEL + 1) AS url,
-		    SYSDATE || (LEVEL - 1)AS pub_dt,
+		    SYSDATE + (LEVEL - 1) AS pub_dt,
 		    SYSDATE  AS reg_dt
 		FROM dual
 	<![CDATA[	CONNECT BY LEVEL <= 100 ]]>
@@ -53,8 +56,10 @@
 		    title,
 		    company,
 		    url,
-		    pub_dt,
-		    reg_dt
+		    pub_dt AS pubDt,
+            reg_dt AS regDt
+<!-- 		    TO_CHAR(pub_dt,'YYYY/MM/DD HH24:MI') as pubDt,
+            TO_CHAR(reg_dt,'YYYY/MM/DD HH24:MI:SS') as regDt -->
 		FROM
 		    news
 		WHERE (TRUNC(reg_dt) = TRUNC(SYSDATE))
@@ -68,8 +73,8 @@
             title,
             company,
             url,
-            pub_dt,
-            reg_dt
+            pub_dt AS pubDt,
+            reg_dt AS regDt
         FROM
             news
         WHERE url = #{url}
@@ -92,7 +97,12 @@
 	            t1.reg_dt = SYSDATE
 	    WHEN NOT MATCHED THEN
 	        INSERT (keyword, title, company, url, pub_dt, reg_dt)
-	        VALUES (#{keyword}, #{title}, #{company}, #{url}, #{pubDt}, SYSDATE)
+	        VALUES (#{keyword}, 
+	        #{title}, 
+	        #{company}, 
+	        #{url}, 
+	        #{pubDt}, 
+	        SYSDATE)
 	</update>
 
     <insert id="doSave" parameterType="NewsDTO" 
