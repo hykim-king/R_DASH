@@ -4,11 +4,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.oauth2.client.*;
-import org.springframework.security.oauth2.client.registration.*;
-import org.springframework.security.oauth2.core.*;
+import org.springframework.security.oauth2.client.InMemoryOAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
+import org.springframework.security.oauth2.core.AuthorizationGrantType;
+import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
@@ -30,11 +33,8 @@ public class SecurityConfig {
 							// 또는 원하는 에러 페이지로 리다이렉트:
 							// res.sendRedirect("/error/oauth");
 						}))
-				.logout(l -> l.logoutSuccessUrl("/home")
-						.logoutUrl("/user/logout")
-						.clearAuthentication(true)
-						.invalidateHttpSession(true)
-						.deleteCookies("JSESSIONID") // GET
+				.logout(l -> l.logoutSuccessUrl("/home").logoutUrl("/user/logout").clearAuthentication(true)
+						.invalidateHttpSession(true).deleteCookies("JSESSIONID") // GET
 				// 로그아웃 지원(선택)
 				);
 
