@@ -4,6 +4,7 @@ import com.pcwk.ehr.cmn.DTO;
 
 public class UserDTO extends DTO {
 	private int userNo; // 회원번호
+	private String social; //소셜 로그인 구분
 	private String password; // 비밀번호
 	private String name; // 이름
 	private String nickname; // 닉네임
@@ -44,6 +45,14 @@ public class UserDTO extends DTO {
 
 	public void setUserNo(int userNo) {
 		this.userNo = userNo;
+	}
+
+	public String getSocial() {
+		return social;
+	}
+
+	public void setSocial(String social) {
+		this.social = social;
 	}
 
 	public String getPassword() {
@@ -136,10 +145,13 @@ public class UserDTO extends DTO {
 
 	@Override
 	public String toString() {
-		return "UserDTO [userNo=" + userNo + ", password=" + password + ", name=" + name + ", nickname=" + nickname
-				+ ", image=" + image + ", email=" + email + ", tel=" + tel + ", zipCode=" + zipCode + ", address="
-				+ address + ", detailAddress=" + detailAddress + ", role=" + role + ", regDt=" + regDt + "]";
+		return "UserDTO [userNo=" + userNo + ", social=" + social + ", password=" + password + ", name=" + name
+				+ ", nickname=" + nickname + ", image=" + image + ", email=" + email + ", tel=" + tel + ", zipCode="
+				+ zipCode + ", address=" + address + ", detailAddress=" + detailAddress + ", role=" + role + ", regDt="
+				+ regDt + "]";
 	}
+
+
 
 
 

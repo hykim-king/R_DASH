@@ -57,4 +57,9 @@ public class ChatServiceImpl implements ChatService {
 	public int deleteAll() {
 		return chatMapper.deleteAll();
 	}
+
+	@Override
+	public List<ChatDTO> findRecentBySession(String sessionId, Integer userNo, int limit) {
+		return chatMapper.findRecentBySession(sessionId, userNo, limit);
+	}
 }

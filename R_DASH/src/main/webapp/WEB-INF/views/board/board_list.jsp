@@ -60,7 +60,7 @@ span {
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/common/loading.jsp"></jsp:include>
-<div class=main-content>
+<div class="main-content">
 	
 	<!-- header2 -->
 	<div class="header bg-warning pb-6 header bg-gradient-warning py-5 py-lg-6 pt-lg-6">

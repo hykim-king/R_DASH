@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pcwk.ehr.cmn.SearchDTO;
@@ -98,5 +99,20 @@ public class ChatController {
 	public ResponseEntity<String> deleteChat(@PathVariable Long logNo) {
 		int flag = chatService.deleteChat(logNo);
 		return (flag == 1) ? ResponseEntity.ok("삭제 성공") : ResponseEntity.status(404).body("삭제 실패");
+	}
+
+	@GetMapping(value = "/history", produces = "application/json;charset=UTF-8")
+	public ResponseEntity<List<ChatDTO>> history(
+			@RequestHeader(value = "X-Session-Id", required = false) String sessionId,
+			@RequestHeader(value = "X-User-No", required = false) Integer userNo, // 필요시
+			@RequestParam(defaultValue = "50") int limit) {
+
+		if (sessionId == null || sessionId.trim().isEmpty()) {
+			return ResponseEntity.badRequest().build();
+		}
+		List<ChatDTO> list = chatService.findRecentBySession(sessionId, userNo, Math.max(1, Math.min(limit, 200)));
+		// DB는 최신→과거로 가져오도록 되어 있으니 화면에 그리기 쉬우라고 오래된→최신으로 뒤집어서 주기
+		java.util.Collections.reverse(list);
+		return ResponseEntity.ok(list);
 	}
 }

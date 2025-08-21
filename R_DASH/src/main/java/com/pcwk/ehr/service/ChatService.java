@@ -52,4 +52,7 @@ public interface ChatService {
 	 * @return 삭제 건수
 	 */
 	int deleteAll();
+
+	List<ChatDTO> findRecentBySession(String sessionId, Integer userNo, int limit);
+
 }

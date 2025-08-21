@@ -13,12 +13,18 @@
 	<script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/stats.js"></script>
     <style>
         .canvasContainer {
-            width: 500px; 
-            height: 300px;
+            width: 700px; 
+            height: 500px;
             margin-top: 20px;
         }
+		
+		.topTable {
+		    width: 100%;
+		    min-width: 300px;
+		}
 	
 		#fireTables {
 		    margin-top: 50px; /* 차트와 겹치지 않게 */
@@ -28,21 +34,34 @@
 		.card {
             display: inline-block;
             padding: 20px;
-            margin: 10px;
+            margin: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
             font-size: 18px;
+            font-weight: bold;
         }
-        .very-bad { background-color: #e74c3c; color: white; }
-        .bad { background-color: #f39c12; color: white; }
-        .normal { background-color: #27ae60; color: white; }
-        table { border-collapse: collapse; width: 50%; margin-bottom: 50px; }
+        .very-bad { background-color: #e74c3c; color: black; }
+        .bad { background-color: #f39c12; color: black; }
+        .normal { background-color: #d0fb50; color: black; }
+        .good { background-color: #0ed13c; color: black; }
+        table { border-collapse: collapse; table-layout: fixed; width: 50%; margin-bottom: 50px; }
         th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+        th { background-color: coral; color: black; }
         
         body {
 		    display: flex;
 		    flex-direction: column;
 		    min-height: 100vh; /* 화면 전체 높이 확보 */
+		}
+		
+		.body-container {
+		    width: 80%;
+		    margin: 0 auto; /* 상하 0, 좌우 자동 중앙 정렬 */
+		}
+		
+		.main-container {
+		    width: 100%; /* 또는 원하는 너비 */
+		    margin: 0 auto; /* 부모 안에서 중앙 정렬 */
 		}
 		
 		main {
@@ -53,10 +72,29 @@
 		footer {
 		    height: 80px;
 		}
+		
+		.menuChart {
+		  position: relative;
+		  width: 280px;      
+		  height: 280px;
+		  overflow: visible;
+		  z-index: 1;
+		}
+		
+		.stateChart {
+		    width: 40%;   
+		    margin: 0 auto; /* 좌우 가운데 정렬 */
+		}
+		
     </style>
 </head>
 <body>
+<div class="body-container">
 <c:set var="type" value="${not empty param.type ? param.type : (not empty pageType ? pageType : 'weather')}" />
+<div class="menuChart mt--7">
+    <canvas id="SelectTemperature"></canvas>
+</div>
+<div class="main-container">
 <c:choose>
     <c:when test="${type == 'weather'}">
 		<!-- 그룹 타입 선택 -->
@@ -80,110 +118,173 @@
 		        <option value="${sido}">${sido}</option>
 		    </c:forEach>
 		</select>
-		
 		<!-- 환자 전체 합계 -->
-		<div class = "canvasContainer">
-		    <canvas id="patientsChart"></canvas>
+		<h1>온열질환자</h1>
+		<div class="row mb-2">
+            <div class="col-md-6 canvasContainer">
+	            <canvas id="patientsChart"></canvas>
+	        </div>
+	        <div class="col-md-6 canvasContainer">
+                <canvas id="inOutdoorChart"></canvas>
+            </div>
 		</div>
-		
-		<!-- 환자 실내외 소계 -->
-		<div class = "canvasContainer">
-		    <canvas id="inOutdoorChart"></canvas>
+		<div class="row mb-6">
+		  <div class="col-md-6">
+			<h2>기온 Top5</h2>
+	        <table class="topTable" border="1">
+	            <thead>
+	                <tr>
+	                    <th>순위</th>
+	                    <th>지역</th>
+	                    <th>기온(℃)</th>
+	                </tr>
+	            </thead>
+	            <tbody id="t1hTable">
+	                <!-- JS에서 채움 -->
+	            </tbody>
+	        </table>
+	      </div>
+	      <div class="col-md-6">
+	        <h2>습도와 강수량 Top5</h2>
+	        <table class="topTable" border="1" >
+	            <thead>
+	                <tr>
+	                    <th>순위</th>
+	                    <th>지역</th>
+	                    <th>습도(%)</th>
+	                    <th>강수량(mm)</th>
+	                </tr>
+	            </thead>
+	            <tbody id="rehRn1Table">
+	                <!-- JS에서 채움 -->
+	            </tbody>
+	        </table>
+	      </div>
 		</div>
-		
-		<h3>기온(T1H) Top5</h3>
-		<table border="1">
-		    <thead>
-		        <tr>
-		            <th>순위</th>
-		            <th>지역</th>
-		            <th>기온(℃)</th>
-		        </tr>
-		    </thead>
-		    <tbody id="t1hTable">
-		        <!-- JS에서 채움 -->
-		    </tbody>
-		</table>
-		
-		<h3>습도(REH) & 강수량(RN1) Top5</h3>
-		<table border="1">
-		    <thead>
-		        <tr>
-		            <th>순위</th>
-		            <th>지역</th>
-		            <th>습도(%)</th>
-		            <th>강수량(mm)</th>
-		        </tr>
-		    </thead>
-		    <tbody id="rehRn1Table">
-		        <!-- JS에서 채움 -->
-		    </tbody>
-		</table>
-		
 		<script src="${pageContext.request.contextPath}/resources/js/patients.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/nowcast.js"></script>
 	</c:when>
 	<c:when test="${type == 'fire'}">
-        <div class = "canvasContainer">
-		    <canvas id="fireSafeChart"></canvas>
-		</div>		
-
-        <div id="fireCharts">
-		    <div class="canvasContainer">
-		        <canvas id="yearlyChart"></canvas>
+        <div class="row mb-6">
+		    <div class="col-md-6">
+		      <canvas id="fireSafeChart"></canvas>
 		    </div>
-		    <div class="canvasContainer">
-		        <canvas id="damageChart"></canvas>
-		    </div>
-		</div>
+		    <div class="col-md-6 mt-n5 d-flex justify-content-end"> 
+			    <div style="width: 80%; height: 450px;">
+			      <canvas id="yearlyChart"></canvas>
+			    </div>
+			  </div>
+		  </div>
 		
-		<!-- 호선별 소화기 차트 -->
-		<div class="canvasContainer">
-		    <canvas id="subwayChart"></canvas>
-		</div>
-    
-        <div class = "fireTables">
-            <h2>시/군/구별 소방서 개수</h2>
-            <table id="firestationTable" class="display" border="1">
-                <thead>
-                    <tr>
-                        <th>순위</th>
-                        <th>지역</th>
-                        <th>소방서 개수</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- AJAX -->
-                </tbody>
-            </table>
-        </div>
+		  <div class="row mb-6">
+		    <div class="col-md-6">
+		      <canvas id="damageChart"></canvas>
+		    </div>
+		    <div class="col-md-6">
+		      <canvas id="subwayChart"></canvas>
+		    </div>
+		  </div>
+		
+		  <!-- 데이터테이블 -->
+		  <div class="row">
+		    <div class="col-12">
+		      <h2>시/군/구별 소방서 개수</h2>
+		      <table id="firestationTable" class="table table-bordered display">
+		        <thead>
+		          <tr>
+		            <th>순위</th>
+		            <th>지역</th>
+		            <th>소방서 개수</th>
+		          </tr>
+		        </thead>
+		        <tbody>
+		          <!-- AJAX로 채워짐 -->
+		        </tbody>
+		      </table>
+		    </div>
+		  </div>
     <script src="${pageContext.request.contextPath}/resources/js/fire.js"></script>
     </c:when>
     <c:when test="${type == 'dust'}">
-	    <div id="avgCard" class="card"></div>
-	    
-	    <h2>TOP 5 지역</h2>
-	    <table id="top5Table">
-	        <tr>
-	            <th>순위</th>
-	            <th>지역</th>
-	            <th>PM10</th>
-	            <th>등급</th>
-	        </tr>
-	    </table>
-
-	    <h2>BOTTOM 5 지역</h2>
-	    <table id="bottom5Table">
-	        <tr>
-	            <th>순위</th>
-	            <th>지역</th>
-	            <th>PM10</th>
-	            <th>등급</th>
-	        </tr>
-	    </table>
+        <div class="row mb-6">
+            <div class="col-md-12">
+	           <div id="avgCard" class="card"></div>
+	        </div>
+	    </div>
+	    <div class="row mb-6">
+            <div class="col-md-6">
+                <h2>TOP 5 지역</h2>
+		        <table id="top5Table" class="topTable">
+		            <tr>
+		                <th>순위</th>
+		                <th>지역</th>
+		                <th>PM10</th>
+		                <th>등급</th>
+		            </tr>
+		        </table>
+            </div>
+            <div class="col-md-6">
+                <h2>BOTTOM 5 지역</h2>
+		        <table id="bottom5Table" class="topTable">
+		            <tr>
+		                <th>순위</th>
+		                <th>지역</th>
+		                <th>PM10</th>
+		                <th>등급</th>
+		            </tr>
+		        </table>
+            </div>
+        </div> 
 	<script src="${pageContext.request.contextPath}/resources/js/dust.js"></script>
     </c:when>
+    <c:when test="${type == 'sinkhole'}">
+    <div class="row mb-7">
+        <div class="col-md-6">
+		    <canvas id="yearlyChart"></canvas>
+		</div>
+		<div class="col-md-6">
+            <canvas id="signguChart"></canvas>
+        </div>
+        
+	</div>
+	<div class="row mb-7">
+	    <div class="col-md-6">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="damageChart"></canvas>
+        </div>
+    </div>
+    <div class="row mb-7">
+        <div class="stateChart">
+            <canvas id="stateChart"></canvas>
+        </div>
+    </div>
+    <script src="${pageContext.request.contextPath}/resources/js/sinkhole.js"></script>
+    </c:when>
+    <c:when test="${type == 'landslide'}">
+    <div class="row mb-6">
+        <div class="col-md-6">
+            <canvas id="yearChart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="monthChart"></canvas>
+        </div>
+        
+    </div>
+    <div class="row mb-6">
+        <div class="col-md-6">
+            <canvas id="regionChart"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+    <script src="${pageContext.request.contextPath}/resources/js/landslide.js"></script>
+    </c:when>
 </c:choose>
+</div>
+</div>
 </body>
 </html>
 

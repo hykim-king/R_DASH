@@ -37,4 +37,7 @@ public interface UserService {
 	
 	// 이메일 중복 확인
 	public int checkEmail(String email);
+	
+	// 소셜 로그인 확인
+	public UserDTO socialLogin(String email,String name, String social);
 }
