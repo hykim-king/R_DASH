@@ -158,7 +158,7 @@
           </div>
           <div class="row mt-3">
             <div class="col-6">
-              <a href="#" class="text-gray"><small>비밀번호 찾기</small></a>
+              <a href="findPw" class="text-gray"><small>비밀번호 찾기</small></a>
             </div>
             <div class="col-6 text-right">
               <a href="regist" class="text-gray"><small>회원가입</small></a>
