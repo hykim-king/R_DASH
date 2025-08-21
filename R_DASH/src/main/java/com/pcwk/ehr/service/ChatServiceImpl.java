@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.ChatDTO;
+import com.pcwk.ehr.domain.ChatSessionSummary;
 import com.pcwk.ehr.mapper.ChatMapper;
 
 @Service("chatService")
@@ -61,5 +62,15 @@ public class ChatServiceImpl implements ChatService {
 	@Override
 	public List<ChatDTO> findRecentBySession(String sessionId, Integer userNo, int limit) {
 		return chatMapper.findRecentBySession(sessionId, userNo, limit);
+	}
+
+	@Override
+	public List<ChatSessionSummary> listSessions(Integer userNo, int limit) {
+		return chatMapper.listSessions(userNo, Math.max(1, Math.min(limit, 200)));
+	}
+
+	@Override
+	public List<ChatDTO> listMessagesBySession(String sessionId, Integer userNo, Long beforeLogNo, int limit) {
+		return chatMapper.listMessagesBySession(sessionId, userNo, beforeLogNo, Math.max(1, Math.min(limit, 200)));
 	}
 }
