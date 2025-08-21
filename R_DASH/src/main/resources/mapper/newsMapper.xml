@@ -2,29 +2,17 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pcwk.ehr.mapper.NewsMapper">
     <select id="doRetrieve" parameterType="SearchDTO" resultType="NewsDTO">
-        SELECT RNUM AS NO,t2.*
-		FROM(
-		        SELECT ROWNUM AS RNUM, t1.*
-		        FROM (
-		               SELECT 
-		                    news_no,
-		                    keyword,
-		                    title,
-		                    company,
-		                    url,
-		                    pub_dt AS pubDt,
-                            reg_dt AS regDt
-<!-- 		                    TO_CHAR(pub_dt,'YYYY/MM/DD HH24:MI') as pubDt,
-		                    TO_CHAR(reg_dt,'YYYY/MM/DD HH24:MI:SS') as regDt -->
-		                FROM
-		                    news
-		                WHERE (TRUNC(reg_dt) = TRUNC(SYSDATE))
-		                ORDER BY reg_dt DESC		                
-		        ) t1
-		 <![CDATA[    WHERE ROWNUM <= #{pageSize}*#{pageNo} + #{pageSize}
-		)t2
-		WHERE RNUM >=  1  ]]>
-    </select>
+       SELECT * FROM (
+	        SELECT ROWNUM AS rnum, t.*
+	        FROM (
+	            SELECT news_no, keyword, title, company, url, pub_dt AS pubDt, reg_dt AS regDt
+	            FROM news
+	            ORDER BY reg_dt DESC
+	        ) t
+	 <![CDATA[  WHERE ROWNUM <= #{pageSize} * #{pageNo}
+	    )
+	    WHERE rnum > #{pageSize} * (#{pageNo} - 1) ]]>
+	</select>
 
     <insert id="saveAll">
        INSERT INTO NEWS (
