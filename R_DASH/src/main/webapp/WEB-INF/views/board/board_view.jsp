@@ -23,6 +23,7 @@
     justify-content: flex-end;
     gap:1px;
     }
+
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -92,7 +93,7 @@ console.log('DOMContentLoaded');
 </head>
 <body>
 <div class="main-content">
-	<div class="header bg-warning pb-6 header bg-gradient-warning py-4 py-lg-6 pt-lg-6">
+	<div class="header bg-warning pb-6 header bg-gradient-warning py-3 py-lg-5 pt-lg-5">
 		<span class="mask bg-gradient-warning opacity-8"></span>
 		  <div class="container-fluid d-flex flex-column justify-content-center align-items-center text-center" 
                style="min-height:200px; position:relative; z-index:1;">
@@ -115,9 +116,9 @@ console.log('DOMContentLoaded');
 <div class="container-fluid d-flex justify-content-center align-items-start" 
      style="margin:0; padding:20px; background:white; min-height:100vh;">
     <div class="row w-100 d-flex justify-content-center">
-        <div class="col-12 d-flex justify-content-center">
-            <div class="card w-80" style="max-height:90vh; overflow-y:auto;">
-                <div class="card-body">
+        <div class="col-8 d-flex justify-content-center" >
+            <div class="card w-100" style="min-height: 1000px; box-shadow: none !important;">
+                <div class="card-body" style="min-width: 800px;">
                     <input type="hidden" id="boardNo" name="boardNo" value="<c:out value='${vo.boardNo }'/>">
                     <p>${vo.contents}</p>
                     <!-- 내용 길면 스크롤 가능 -->
