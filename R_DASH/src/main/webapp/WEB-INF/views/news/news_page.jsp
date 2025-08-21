@@ -299,7 +299,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
     function loadNews(pageNo) {
         $.ajax({
-            url: '/ehr/news/newsPage.do',  // 정확히 매핑된 URL
+            url: "<c:url value='/news/doRetrieve.do'/>",  // 정확히 매핑된 URL
             type: 'GET',
             data: { pageNo: pageNo, pageSize: 10 },
             dataType: 'json',
@@ -308,12 +308,12 @@ document.addEventListener('DOMContentLoaded', function(){
                     $('#loadMore').hide();
                     return;
                 }
-                data.forEach(vo => {
+                data.forEach(function(vo) {
                 	 $('#newsList').append(
                 		        `<tr>
-                		            <td class="budget">${vo.company}</td>
-                		            <td class="budget"><a href="${vo.url}" target="_blank">${vo.title}</a></td>
-                		            <td class="budget">${vo.pubDt}</td>
+                		            <td class="budget"><c:out value="${vo.company }"/></td>
+                                    <td class="budget"><a href="${vo.url}" target ="_blank"><c:out value="${vo.title }"/></a></td>
+                                    <td class="budget"><c:out value="${vo.pubDt }"/></td> 
                 		        </tr>`
                 		    );
                 });
@@ -489,16 +489,13 @@ document.addEventListener('DOMContentLoaded', function(){
 	                       <th>발행일자</th>
 	                   </tr>
 	               </thead>
-	      <%--          <tbody class="list" id="newsList">
+	               <tbody class="list" id="newsList">
 				    <c:choose>
 				        <c:when test="${newsList.size() > 0 }">
 						    <c:forEach var="vo" items="${newsList }">
 	                            <tr>
 		                            <td class="budget"><c:out value="${vo.company }"/></td>
-		                            <td class="budget">
-		                              <a href="${vo.url}" target ="_blank">
-		                              <c:out value="${vo.title }"/></a>
-		                            </td>
+		                            <td class="budget"><a href="${vo.url}" target ="_blank"><c:out value="${vo.title }"/></a></td>
 		                            <td class="budget"><c:out value="${vo.pubDt }"/></td>   
 					           </tr>
 					        </c:forEach>
@@ -506,7 +503,7 @@ document.addEventListener('DOMContentLoaded', function(){
 				        <c:otherwise>
 				        </c:otherwise>
 				    </c:choose>
-				    </tbody> --%>
+				    </tbody> 
 				    <tbody class="list" id="newsList"></tbody>
 				    </table>
 				 </div>  <!-- //전체 조회 테이블 -->
