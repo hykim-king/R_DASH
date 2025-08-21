@@ -113,15 +113,18 @@ public class NewsController {
 //        return service.doRetrieve(search);
 //    }
     
-//	@GetMapping("/news/doRetrieve.do")
-//	@ResponseBody
-//	public List<NewsDTO> doRetrieve(@RequestParam int pageNo,
-//	                                @RequestParam int pageSize) {
-//	    SearchDTO searchDTO = new SearchDTO();
-//	    searchDTO.setPageNo(pageNo);
-//	    searchDTO.setPageSize(pageSize);
-//	    return service.doRetrieve(searchDTO);
-//	}
+	@GetMapping("/doRetrieve.do")
+	@ResponseBody
+	public String doRetrieve(@RequestParam int pageNo,
+	                                @RequestParam int pageSize) {
+		SearchDTO searchDTO = new SearchDTO();
+	    searchDTO.setPageNo(pageNo);
+	    searchDTO.setPageSize(pageSize);
+	    List<NewsDTO> list = service.doRetrieve(searchDTO);
+	    String json = new Gson().toJson(list);
+	    log.debug("json: {}", json);   // 실제 JSON이 잘 만들어지는지 확인
+	    return json;
+	}
 	
 	@GetMapping(value="/newsPage.do", produces = "text/plain;charset=UTF-8")
 	public String newsPage(SearchDTO search,NewsDTO news,TopicDTO topic,Model model) {
