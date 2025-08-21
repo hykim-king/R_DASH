@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.ChatDTO;
+import com.pcwk.ehr.domain.ChatSessionSummary;
 
 public interface ChatService {
 	/**
@@ -54,5 +55,13 @@ public interface ChatService {
 	int deleteAll();
 
 	List<ChatDTO> findRecentBySession(String sessionId, Integer userNo, int limit);
+
+	List<ChatSessionSummary> listSessions(Integer userNo, int limit);
+
+	List<ChatDTO> listMessagesBySession(String sessionId, Integer userNo, Long beforeLogNo, int limit);
+
+	default String newSessionId() {
+		return java.util.UUID.randomUUID().toString();
+	}
 
 }

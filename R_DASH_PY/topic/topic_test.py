@@ -9,11 +9,13 @@ from wordcloud import WordCloud
 import asyncio
 from topic_dao import TopicDao
 from topic_insert import save_topic_to_db
+from topic_insert import save_word_to_db
+
 import topicWordCloud
 
 def main():
     # 1) 크롤링: 뉴스 데이터 가져오기
-    c = crawler(query='재난', max_link=5)  # 인스턴스 생성하면서 인자 전달
+    c = crawler(query='재난', max_link=10)  # 인스턴스 생성하면서 인자 전달
     df = asyncio.run(c.naver_crawler())  # 인스턴스 메서드 호출
 
     # 2) 명사 추출: df에 'nouns' 컬럼 추가
@@ -23,10 +25,16 @@ def main():
 
     lda_results = lda_analysis.run_lda(df,num_topics=4)
 
+
     # 4) 토픽별 문서 개수 출력
     print("\n[토픽별 문서 수]")
     for topic_num, count in lda_results["topic_counts"].items():
         print(f"토픽 {topic_num}: {count}건")
+
+    # 추가 ) 단어 : 문자 개수 출력 후 topic_words에 저장
+    for word, count in lda_results["word_counts"].items():
+        print(f"{word}: {count}")
+        save_word_to_db(word,count)
 
     # 5) 토픽별 핵심 단어 출력
     print("\n[토픽별 핵심 단어]")
@@ -54,11 +62,11 @@ def main():
 
         save_topic_to_db(name, summary, reg_id, count)
 
-    words, freqs = topic_topN.top_n(df)
-    print(words)
-    print(freqs)
+    #words, freqs = topic_topN.top_n(df)
+    #print(words)
+    #print(freqs)
 
-    topicWordCloud.make_wordcloud(df)
+    #topicWordCloud.make_wordcloud(df)
 
 if __name__ == '__main__':
     main()

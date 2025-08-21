@@ -2,17 +2,85 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<style>
+/* 모달 그림자 & 둥근 모서리 */
+.modal-content {
+    border-radius: 16px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+/* 헤더 글자 강조 */
+.modal-header .modal-title {
+    font-size: 1.25rem;
+}
+
+/* 푸터 버튼 hover */
+.modal-footer .btn-warning:hover {
+    background-color: #ff7000;
+    border-color: #ff7000;
+}
+
+/* 모바일 화면에서 폰트 조정 */
+@media (max-width: 576px) {
+    .modal-body {
+        font-size: 0.9rem;
+    }
+    .modal-footer .btn {
+        width: 100%;
+    }
+}
+<style>
+  /* fade 효과 제거 */
+  .moveToboard {
+    display: inline-block;
+    font-weight: 600;
+    color: #fff;
+    text-align: center;
+    vertical-align: middle;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    background-color: #333;
+    border: 1px solid transparent;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.25rem;
+    align-items : center;  /*세로축 정렬 */
+    justify-content: center;
+}
+
+/* 호버 상태 스타일 */
+.moveToboard:hover {
+    color: #fff; /* 텍스트 색상 */
+    background-color: #4e73df; /* 배경색 */
+    border-color: #4e73df; /* 테두리 색상 */
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 123, 255, 0.15); /* 그림자 효과 */
+}
+.moveBtn{
+  display: flex; 
+  align-items : center;  /*세로축 정렬 */
+  justify-content: center;
+  padding: 10px 0;         /* 필요시 여백 조정 */
+}
+</style>
+</style>
+
 
 <div class="modal fade" id="noticeModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content rounded-3 shadow-lg">
-      <div class="modal-header bg-dark text-white">
-        <h5 id="noticeTitle" class="modal-title">공지</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+    <div class="modal-content rounded-4 shadow-lg border-0">
+      <!-- 헤더 -->
+      <div class="modal-header bg-gradient" style="background: linear-gradient(90deg, #FF8C00, #FFA500); color: white;">
+        <h4 class="modal-title fw-bold">재난 관련 공지사항을 전달드립니다.</h4>
+         </div>
+      <!-- 내용 -->
+      <div class="modal-body" style="font-size: 1rem; color: #333;">
+        <div id="noticeTitle" class="mb-0"></div>
+        <div id="noticeContents" class="mb-0"></div>
       </div>
-      <div class="modal-body">
-<!--         <h6 id="noticeTitle" class="fw-bold"></h6>
- -->        <div id="noticeContents" class="mb-0"></div>
+      <div class="moveBtn">
+       <input  class="moveToboard" type="button" value="공지사항 더보기 >">
       </div>
     </div>
   </div>
@@ -43,14 +111,15 @@
        let noticeModal = new bootstrap.Modal(document.getElementById("noticeModal"));
        noticeModal.show();
    });
+	$("#moveToboard").on('click',function(){
+		console.log("moveToboard click");
+		
+		alret("공지사항으로 이동합니다.");
+		
+		// 새 탭에서 열기
+	    window.open('/ehr/board/doRetrieve.do', '_blank');
+		
+	})
 });
-   const closeBtn = queryselector(".btn-close.btn-close-white");
-   
-   closeBtn.addEventListener("click",function(event){
-	   console.log('closeBtn click');
-	   
-	   $("#noticeModal").hide();
-	   
-   });
    
 </script>

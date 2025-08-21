@@ -137,6 +137,25 @@ table td:nth-child(3) {
     vertical-align: middle !important; /* 세로 가운데 정렬 */
     text-align: center !important;  
 }
+/*카드 푸터 +더보기 */
+.card-footer.py-4{
+    display:flex;
+    align-item : center;
+    justify-content: center;
+}
+/*뉴스 카드 키워드 버튼 */
+.card-header.border-0{
+    display:flex;
+    flex-wrap: wrap;       /* 화면 넘어가면 줄바꿈 허용 */
+    justify-content: flex-start;  /* 버튼 왼쪽부터 채우기 */
+    gap: 10px;
+}
+.card-header.border-0 input[type="button"] {
+    flex: 1;           /* 남은 공간을 균등 분배 */
+    min-width: 175px;   /* 너무 작아지지 않도록 최소 크기 설정 */
+    max-width: 175px;
+    box-sizing: border-box;
+}
 </style>
 <script>
 document.addEventListener('DOMContentLoaded', function(){
@@ -228,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function(){
        const left = (screenWidth - 600)/2;
        const top = (screenHeight - 400)/2;
 
-       let options = `width=600,height=600, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+       let options = `width=600,height=600, top=${top}, left=${left}, resizable=no, scrollbars=no`;
        window.open(url,"_blank",options);
     });
     //수정 모달
@@ -252,10 +271,26 @@ document.addEventListener('DOMContentLoaded', function(){
        const left = (screenWidth - 600)/2;
        const top = (screenHeight - 400)/2;
 
-       let options = `width=600,height=700, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+       let options = `width=900,height=700, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
        window.open(url,"_blank",options);
     });
+    
+    //오늘의 키워드 모달
+    const clickMeDiv = document.querySelector("#clickMe");
+    clickMeDiv.addEventListener("click",function(e){
+    	let url = "/ehr/freq/topic/words.do";
+        const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
+        console.log('screenWidth: '+screenWidth);
+        console.log('screenHeight: '+screenHeight);
 
+       const left = (screenWidth - 900)/2;
+       const top = (screenHeight - 800)/2;
+
+       let options = `width=900,height=800, top=${top}, left=${left}, resizable=no, scrollbars=no`;
+       window.open(url,"_blank",options);
+    });
+    
 });
 </script>
 </head>
@@ -344,7 +379,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	           </div>
 	       </div>
 	       <!-- 오늘의 키워드 보여줄 click me -->
-	       <div class="clickMeWrapper">
+	       <div id="clickMe" class="clickMeWrapper">
 		        <img class="clickMeImg" src="/ehr/resources/image/news_Jeamin.png" alt="나를 클릭해봐">
 		        <div class="clickMeIcon">
 		           <!--  <i class="ni ni-chat-round"></i> -->
@@ -457,32 +492,10 @@ document.addEventListener('DOMContentLoaded', function(){
 	               <span>+더보기</span>
 	           </div>
 	          </div>
+                 <div>최종 업데이트 일자 : <c:out value="${latestRegDt}"/></div>
 	          </div>
 	          </div>
-		       <div class="row">
-			       <div class="col-xl-12">
-			       <h3>오늘의 키워드</h3>
-			           <!-- 키워드  -->
-			       <div class="row mt-4"> 
-			           <div class="col-xl-6">
-			               <div class="card p-0">
-			                   <img src="/ehr/resources/newspage/wordcloud_result.png"
-			                   class="card-img-top" 
-		                       style="width: 100%; height: 100%; object-fit: cover;">
-			               </div>
-			           </div>
-			           <div class="col-xl-6">
-			               <div class="card p-0">
-		                      <img src="/ehr/resources/newspage/topn_result.png"
-		                      class="card-img-top" 
-		                      style="width: 100%; height: 100%; object-fit: cover;">
-		                   </div>  
-		               </div>
-		           </div>
-               <!-- //키워드 -->
-                 <div>최종 업데이트:</div>
-               </div>
-           </div>
+			      
 	   </div><!-- //main -->
 
 
