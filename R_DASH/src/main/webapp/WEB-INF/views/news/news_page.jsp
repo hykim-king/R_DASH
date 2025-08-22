@@ -102,7 +102,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    z-index: 9999;
+    z-index: 10;
 }
 
 .clickMeImg {
@@ -136,6 +136,28 @@ table td:nth-child(1),
 table td:nth-child(3) {
     vertical-align: middle !important; /* 세로 가운데 정렬 */
     text-align: center !important;  
+}
+/*카드 푸터 +더보기 */
+.card-footer.py-4{
+    display:flex;
+    align-item : center;
+    justify-content: center;
+}
+/*뉴스 카드 키워드 버튼 */
+.card-header.border-0{
+    display:flex;
+    flex-wrap: wrap;       /* 화면 넘어가면 줄바꿈 허용 */
+    justify-content: flex-start;  /* 버튼 왼쪽부터 채우기 */
+    gap: 10px;
+}
+.card-header.border-0 input[type="button"] {
+    flex: 1;           /* 남은 공간을 균등 분배 */
+    min-width: 175px;   /* 너무 작아지지 않도록 최소 크기 설정 */
+    max-width: 175px;
+    box-sizing: border-box;
+}
+#newsLoadMore:hover {
+	color: #ff9077;
 }
 </style>
 <script>
@@ -228,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function(){
        const left = (screenWidth - 600)/2;
        const top = (screenHeight - 400)/2;
 
-       let options = `width=600,height=600, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+       let options = `width=600,height=600, top=${top}, left=${left}, resizable=no, scrollbars=no`;
        window.open(url,"_blank",options);
     });
     //수정 모달
@@ -252,11 +274,66 @@ document.addEventListener('DOMContentLoaded', function(){
        const left = (screenWidth - 600)/2;
        const top = (screenHeight - 400)/2;
 
-       let options = `width=600,height=700, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+       let options = `width=600,height=600, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
        window.open(url,"_blank",options);
     });
+    
+    //오늘의 키워드 모달
+    const clickMeDiv = document.querySelector("#clickMe");
+    clickMeDiv.addEventListener("click",function(e){
+    	let url = "/ehr/freq/topic/words.do";
+        const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
+        console.log('screenWidth: '+screenWidth);
+        console.log('screenHeight: '+screenHeight);
 
+       const left = (screenWidth - 900)/2;
+       const top = (screenHeight - 800)/2;
+
+       let options = `width=900,height=800, top=${top}, left=${left}, resizable=no, scrollbars=no`;
+       window.open(url,"_blank",options);
+    });
+   // 더보기 버튼
+    let pageNo = 1;
+    const pageSize = 10;
+
+    function loadNews(pageNo) {
+        $.ajax({
+            url: "<c:url value='/news/doRetrieve.do'/>",  // 정확히 매핑된 URL
+            type: 'GET',
+            data: { pageNo: pageNo, pageSize: 10 },
+            dataType: 'json',
+            success: function(data) {
+                if (!data || data.length === 0) {
+                    $('#loadMore').hide();
+                    return;
+                }
+                data.forEach(function(vo) {
+                	 $('#newsList').append(
+                		        `<tr>
+                		            <td class="budget"><c:out value="${vo.company }"/></td>
+                                    <td class="budget"><a href="${vo.url}" target ="_blank"><c:out value="${vo.title }"/></a></td>
+                                    <td class="budget"><c:out value="${vo.pubDt }"/></td> 
+                		        </tr>`
+                		    );
+                });
+            },
+            error: function(err) {
+                console.error("AJAX Error:", err);
+            }
+        });
+    }
+
+    // 초기 로딩
+    loadNews(pageNo);
+
+    // 더보기 버튼
+    $('#newsLoadMore').click(function() {
+        pageNo++;
+        loadNews(pageNo);
+    });
 });
+
 </script>
 </head>
 <body>
@@ -344,7 +421,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	           </div>
 	       </div>
 	       <!-- 오늘의 키워드 보여줄 click me -->
-	       <div class="clickMeWrapper">
+	       <div id="clickMe" class="clickMeWrapper">
 		        <img class="clickMeImg" src="/ehr/resources/image/news_Jeamin.png" alt="나를 클릭해봐">
 		        <div class="clickMeIcon">
 		           <!--  <i class="ni ni-chat-round"></i> -->
@@ -412,16 +489,13 @@ document.addEventListener('DOMContentLoaded', function(){
 	                       <th>발행일자</th>
 	                   </tr>
 	               </thead>
-	               <tbody class="list">
+	               <tbody class="list" id="newsList">
 				    <c:choose>
 				        <c:when test="${newsList.size() > 0 }">
 						    <c:forEach var="vo" items="${newsList }">
 	                            <tr>
 		                            <td class="budget"><c:out value="${vo.company }"/></td>
-		                            <td class="budget">
-		                              <a href="${vo.url}" target ="_blank">
-		                              <c:out value="${vo.title }"/></a>
-		                            </td>
+		                            <td class="budget"><a href="${vo.url}" target ="_blank"><c:out value="${vo.title }"/></a></td>
 		                            <td class="budget"><c:out value="${vo.pubDt }"/></td>   
 					           </tr>
 					        </c:forEach>
@@ -429,15 +503,16 @@ document.addEventListener('DOMContentLoaded', function(){
 				        <c:otherwise>
 				        </c:otherwise>
 				    </c:choose>
-				    </tbody>
+				    </tbody> 
+				    <tbody class="list" id="newsList"></tbody>
 				    </table>
 				 </div>  <!-- //전체 조회 테이블 -->
 				    <!-- 키워드 테이블 (처음엔 숨기기) -->
 				  <div id="keywordNewsTable" class="table-responsive" style="display:none;">
                    <table class="table align-items-center table-flush">
                    <colgroup>
-                        <col style="width: 20%;"> <!-- 2 -->
-                        <col style="width: 60%;" class="left-col"> <!-- 6 -->
+                        <col style="width: 15%;"> <!-- 2 -->
+                        <col style="width: 65%;" class="left-col"> <!-- 6 -->
                         <col style="width: 20%;"> <!-- 2 -->
                     </colgroup>
                    <thead style="display: none;">
@@ -454,35 +529,15 @@ document.addEventListener('DOMContentLoaded', function(){
 	           </div>
 	           <!-- news footer -->
 	           <div class="card-footer py-4">
-	               <span>+더보기</span>
+	               <div id="newsLoadMore" data-page="1">
+	                <span>+더보기</span>
+	               </div>
 	           </div>
 	          </div>
+                 <div>최종 업데이트 일자 : <c:out value="${latestRegDt}"/></div>
 	          </div>
 	          </div>
-		       <div class="row">
-			       <div class="col-xl-12">
-			       <h3>오늘의 키워드</h3>
-			           <!-- 키워드  -->
-			       <div class="row mt-4"> 
-			           <div class="col-xl-6">
-			               <div class="card p-0">
-			                   <img src="/ehr/resources/newspage/wordcloud_result.png"
-			                   class="card-img-top" 
-		                       style="width: 100%; height: 100%; object-fit: cover;">
-			               </div>
-			           </div>
-			           <div class="col-xl-6">
-			               <div class="card p-0">
-		                      <img src="/ehr/resources/newspage/topn_result.png"
-		                      class="card-img-top" 
-		                      style="width: 100%; height: 100%; object-fit: cover;">
-		                   </div>  
-		               </div>
-		           </div>
-               <!-- //키워드 -->
-                 <div>최종 업데이트:</div>
-               </div>
-           </div>
+			      
 	   </div><!-- //main -->
 
 

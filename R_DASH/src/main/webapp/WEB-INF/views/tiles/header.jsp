@@ -50,7 +50,7 @@
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a id="nav-dust" href="${pageContext.request.contextPath}/dust" class="nav-link">
                       <span class="sidenav-mini-icon"> 황사 </span>
                       <span class="sidenav-normal"> 황사 </span>
                     </a>
@@ -112,9 +112,9 @@
               <div class="collapse" id="navbar-tables">
                 <ul class="nav nav-sm flex-column">
                   <li class="nav-item">
-                    <a href="/ehr/resources/template/dashboardpages/tables/tables.html" class="nav-link">
-                      <span class="sidenav-mini-icon"> T </span>
-                      <span class="sidenav-normal"> Tables </span>
+                    <a href="/ehr/news/newsPage.do" class="nav-link">
+                      <span class="sidenav-mini-icon"></span>
+                      <span class="sidenav-normal"> 재난 뉴스 </span>
                     </a>
                   </li>
                 </ul>
@@ -128,9 +128,9 @@
               <div class="collapse" id="navbar-maps">
                 <ul class="nav nav-sm flex-column">
                   <li class="nav-item">
-                    <a href="/ehr/resources/template/dashboardpages/maps/google.html" class="nav-link">
-                      <span class="sidenav-mini-icon"> G </span>
-                      <span class="sidenav-normal"> Google </span>
+                    <a href="/ehr/board/doRetrieve.do" class="nav-link">
+                      <span class="sidenav-mini-icon"></span>
+                      <span class="sidenav-normal"> 공지보기 </span>
                     </a>
                   </li>
                 </ul>

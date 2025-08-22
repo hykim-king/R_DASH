@@ -215,8 +215,15 @@ public class BoardController {
 		
 		List<BoardDTO> list = service.doRetrieve(param);
 		
+		//총 글 수
+		int totalCnt = 0;
+	    if (!list.isEmpty()) {
+	        totalCnt = list.get(0).getTotalCnt(); // 첫 번째 row에서 가져오기
+	    }
+		
 		model.addAttribute("list",list);
 		model.addAttribute("search", param);
+		model.addAttribute("totalCnt", totalCnt);
 		
 		return viewName;
 	}
@@ -306,7 +313,12 @@ public class BoardController {
 	    	Map<String,String> noticeMsg = new HashMap<>();
 	    	noticeMsg.put("boardNo", String.valueOf(param.getBoardNo()));
 	    	noticeMsg.put("title", param.getTitle());
-	    	noticeMsg.put("contents", param.getContents());
+	    	
+	    	String contents = param.getContents();
+	    	if(contents != null && contents.length() > 20) {
+	    		contents = contents.substring(0,20)+"...";
+	    	}
+	    	noticeMsg.put("contents", contents);
 	    	
 	    	simpMessagingTemplate.convertAndSend("/topic/notice",noticeMsg);
 	    }

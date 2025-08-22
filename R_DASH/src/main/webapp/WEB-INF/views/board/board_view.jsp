@@ -17,6 +17,14 @@
 <link href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo-svg.css" rel="stylesheet" />
 <link href="/ehr/resources/template/dashboard/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <title>${vo.title}</title>
+<style>
+.boardBtns{
+    align-items: flex-end;
+    justify-content: flex-end;
+    gap:1px;
+    }
+
+</style>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 console.log('DOMContentLoaded');
@@ -85,48 +93,40 @@ console.log('DOMContentLoaded');
 </head>
 <body>
 <div class="main-content">
-	<div class="header bg-warning pb-6 header bg-gradient-warning py-4 py-lg-6 pt-lg-6">
+	<div class="header bg-warning pb-6 header bg-gradient-warning py-3 py-lg-5 pt-lg-5">
 		<span class="mask bg-gradient-warning opacity-8"></span>
-		  <div class="container-fluid d-flex justify-content-center align-items-center text-center" style="min-height:200px; position:relative; z-index:1;">
+		  <div class="container-fluid d-flex flex-column justify-content-center align-items-center text-center" 
+               style="min-height:200px; position:relative; z-index:1;">
 		    <h1 class="display-2 text-white text-shadow mb-0">${vo.title}</h1>
+		    <div class="text-white mb-0 mt-2">
+		        <span>등록자: ${vo.modId}</span>
+                <span> | </span>
+                <span>조회 ${vo.viewCnt}</span>
+                <span> | </span>
+                <span>${vo.modDt}</span>
+		    </div>
 		  </div>
+		    <div class="boardBtns position-absolute" style="bottom:15px; right:20px;">
+		      <input type="button" id="moveToUpdate" class="btn btn-sm btn-primary" value="수정">
+              <input type="button" id="doDelete" class="btn btn-sm btn-primary" value="삭제">
+              <input type="button" id="moveToList" class="btn btn-sm btn-primary" value="목록으로">
+		    </div>
 	</div><!-- //header -->
-	<!-- Page Contents -->
-	<div class="container-fluid" style="margin:0 auto;">
-	    <div class="row">
-	    <div class="col" >
-            <div class="card">
-             <div class="card-header">
-                <div class="row align-items-center border-0 d-flex align-items-center">
-                   <input type="hidden" id="boardNo" name="boardNo" value="<c:out value='${vo.boardNo }'/>">
-                   <div class="col-8 d-flex align-items-center">
-                      <h3 class="mb-0">${vo.title}</h3>
-                   </div>
-                   <div class="col-4 text-right">
-                     <input type="button" id="moveToUpdate" class="btn btn-sm btn-primary" value="수정">
-                     <input type="button" id="doDelete" class="btn btn-sm btn-primary" value="삭제">
-                     <input type="button" id="moveToList" class="btn btn-sm btn-primary" value="목록으로">
-                   </div>
-                   <span>등록자: ${vo.modId}</span><span>조회 ${vo.viewCnt}</span><span>${vo.modDt}</span>
-                </div><!-- row -->
-             </div> <!-- card header -->
-             <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 300px;"">
-              <div class="pl-lg-4 w-75">
-                <div class="row">
-                    <div>
-				      <p>${vo.contents}</p>
-				   </div>
+
+<div class="container-fluid d-flex justify-content-center align-items-start" 
+     style="margin:0; padding:20px; background:white; min-height:100vh;">
+    <div class="row w-100 d-flex justify-content-center">
+        <div class="col-8 d-flex justify-content-center" >
+            <div class="card w-100" style="min-height: 1000px; box-shadow: none !important;">
+                <div class="card-body" style="min-width: 800px;">
+                    <input type="hidden" id="boardNo" name="boardNo" value="<c:out value='${vo.boardNo }'/>">
+                    <p>${vo.contents}</p>
+                    <!-- 내용 길면 스크롤 가능 -->
                 </div>
-              </div>
-             </div>
             </div><!-- card -->
         </div>
-	    
-	    </div>
     </div>
-	
-	
+</div>
 </div> <!--//main-content  -->
-
 </body>
 </html>
