@@ -35,11 +35,11 @@ document.addEventListener('DOMContentLoaded', function() {
         data: [1, 1, 1, 1, 1],
         hoverOffset: hoverOff,
         backgroundColor: [ // 색상을 명시적으로 지정하여 라벨 색상(white)과 대비되게 합니다.
-            'rgb(255, 99, 132)',
-            'rgb(255, 205, 86)',
+            'rgba(255, 40, 40,1)',
+            'rgb(255, 159, 64)',
             'rgb(75, 192, 192)',
             'rgb(153, 102, 255)',
-            'rgb(255, 159, 64)'
+            'rgb(255, 205, 86)'
         ],
       }]
     },
