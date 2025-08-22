@@ -9,9 +9,30 @@
   <title>비밀번호 찾기</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script>
+  let codeTimer = null;
+  
   function sendMail(){
 	  const emailInput = document.querySelector('#email');
 	  const codeBox = document.querySelector('#codeBox');
+	  //이메일 형식 체크
+	  const valid_email = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
+	  
+      if(emailInput.value === ''){
+          alert('이메일을 입력하세요.');
+          emailInput.focus();
+          return;
+      }
+      
+      if(valid_email.test(emailInput.value)===false){
+          alert('이메일 형식이 올바르지 않습니다.');
+          emailInput.focus();
+          
+          return;
+      }
+      
+      codeBox.style.display='block'; 
+      emailInput.readOnly = true;
+      document.querySelector('#sendMailButton').disabled = true;
 	  
 	  $.ajax({
 	        method:"POST",    //GET/POST
@@ -21,23 +42,17 @@
 	            "email": emailInput.value
 	        },
 	        success:function(result){//요청 성공
-	        	codeBox.style.display='block'; 
-	            emailInput.readOnly = true;
-	            document.querySelector('#sendMailButton').disabled = true;
 
 	             // 3분 카운트다운
 	            let t = result.expiresInSec||180;
-	            console.log(result.expiresInSec);
-	            const itv = setInterval(()=>{
+	            codeTimer = setInterval(()=>{
 	              const timerEl = document.querySelector('#timer');
 	              const m = Math.floor(t/60);
 	              const s = String(t%60).padStart(2,'0');
-	              console.log(m);
-	              console.log(s);
 	              timerEl.textContent = `남은 시간: \${m}:\${s}`;
 	              timerEl.style.color = 'red';
 	              if (--t < 0) { 
-	            	  clearInterval(itv); 
+	            	  clearInterval(codeTimer); 
 	            	  timerEl.textContent = '만료됨';
 	            	  
 	              }
@@ -67,7 +82,9 @@
         	  if(result.success === true){
         		  buttonBox.style.display='block';
         		  codeInput.readOnly = true;
+        		  clearInterval(codeTimer); 
         		  document.querySelector('#verifyButton').disabled = true;
+        		  document.querySelector('#timer').textContent = '만료됨';
         		  return;
         	  }else{
         		  alert(result.message);

@@ -82,12 +82,12 @@ document.addEventListener('DOMContentLoaded',function(){
 			 return;
 		 }
 		 
-		 if(duplicateInput.innerText !== '가능한 이메일입니다.'){
-			 alert('메일 중복을 확인하세요.');
+		 if(timer.innerText !== '인증'){
+			 alert('메일 인증을 완료하세요.');
 			 
 			 return;
 		 }
-		 
+		 		 
 		 
 		 $.ajax({
 	            method:"POST",    //GET/POST
@@ -124,54 +124,6 @@ document.addEventListener('DOMContentLoaded',function(){
 	 });
 	 
 });
-function checkEmail(){
-	//이메일 input
-    const emailInput = document.querySelector("#email");
-    const duplicateInput = document.querySelector("#duplicate");
-    //이메일 형식 체크
-    const valid_email = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
-    
-    if(emailInput.value === ''){
-    	alert('이메일을 입력하세요');
-    	
-    	return;
-    }
-    
-    if(valid_email.test(emailInput.value)===false){
-        alert('이메일 형식이 올바르지 않습니다.');
-        emailInput.focus();
-        
-        return;
-    }
-    
-	$.ajax({
-        method:"POST",    //GET/POST
-        url:"/ehr/user/checkEmail", //서버측 URL
-        dataType:"json",//서버에서 받을 데이터 타입
-        data:{          //파라메터
-            "email": emailInput.value
-        },
-        success:function(result){//요청 성공
-            if(false === result.success){
-                duplicateInput.textContent = result.message;
-                duplicateInput.style.color = "red";
-                return;
-            }else{
-            	duplicateInput.textContent = result.message;
-            	duplicateInput.style.color = "green";
-            	return;
-            } 
-                
-        },
-        error:function(result){//요청 실패
-            console.log("error:"+result)
-            alert(result);
-        }
-        
-        
-    });
-}
-
 
 function searchAddress(){
 	new daum.Postcode({
@@ -182,6 +134,122 @@ function searchAddress(){
 	        // 예제를 참고하여 다양한 활용법을 확인해 보세요.
 	    }
 	}).open();
+}
+
+let codeTimer = null;
+
+function sendMail(){
+    const emailInput = document.querySelector('#email');
+    const codeBox = document.querySelector('#codeBox');
+    //이메일 형식 체크
+    const valid_email = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
+    
+    if(emailInput.value === ''){
+        alert('이메일을 입력하세요.');
+        emailInput.focus();
+        return;
+    }
+    
+    if(valid_email.test(emailInput.value)===false){
+        alert('이메일 형식이 올바르지 않습니다.');
+        emailInput.focus();
+        
+        return;
+    }
+    
+    $.ajax({
+        method:"POST",    //GET/POST
+        url:"/ehr/user/checkEmail", //서버측 URL
+        dataType:"json",//서버에서 받을 데이터 타입
+        data:{          //파라메터
+            "email": emailInput.value
+        },
+        success:function(result){//요청 성공
+            if(false === result.success){
+                alert(result.message);
+                return;
+            }else{
+            	codeBox.style.display='block'; 
+                emailInput.readOnly = true;
+                document.querySelector('#sendMailButton').disabled = true;
+                
+                $.ajax({
+                      method:"POST",    //GET/POST
+                      url:"/ehr/user/sendMail", //서버측 URL
+                      dataType:"json",//서버에서 받을 데이터 타입
+                      data:{          //파라메터
+                          "email": emailInput.value
+                      },
+                      success:function(result){//요청 성공
+
+                           // 3분 카운트다운
+                          let t = result.expiresInSec||180;
+                          codeTimer = setInterval(()=>{
+                            const timerEl = document.querySelector('#timer');
+                            const m = Math.floor(t/60);
+                            const s = String(t%60).padStart(2,'0');
+                            timerEl.textContent = `남은 시간: \${m}:\${s}`;
+                            timerEl.style.color = 'red';
+                            if (--t < 0) { 
+                                clearInterval(codeTimer); 
+                                timerEl.textContent = '만료됨';
+                                
+                            }
+                          }, 1000);
+                          
+                      },
+                      error:function(result){//요청 실패
+                          alert('문제가 발생했습니다. 다음에 다시 요청해주세요.');
+                      }
+                      
+                      
+                  });
+            }
+        },
+        error:function(result){//요청 실패
+            console.log("error:"+result)
+            alert(result);
+        }
+        
+        
+    });   
+    
+    
+}
+
+
+function verify(){
+    const emailInput = document.querySelector('#email');
+    const codeInput = document.querySelector('#code');
+    const buttonBox = document.querySelector('#buttonBox')
+    $.ajax({
+        method:"POST",    //GET/POST
+        url:"/ehr/user/verify", //서버측 URL
+        dataType:"json",//서버에서 받을 데이터 타입
+        data:{          //파라메터
+            "email": emailInput.value,
+            "code" : codeInput.value
+        },
+        success:function(result){//요청 성공
+            if(result.success === true){
+                codeInput.readOnly = true;
+                clearInterval(codeTimer); 
+                document.querySelector('#verifyButton').disabled = true;
+                document.querySelector('#timer').textContent = '인증';
+                document.querySelector('#timer').style.color = 'green';
+                return;
+            }else{
+                alert(result.message);
+                return;
+            }
+                               
+        },
+        error:function(result){//요청 실패
+            alert('문제가 발생했습니다. 다음에 다시 요청해주세요.');
+        }
+        
+        
+    });
 }
 </script>
 </head>
@@ -246,12 +314,22 @@ function searchAddress(){
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
                     <input class="form-control" name="email" id="email" placeholder="이메일" type="email">
-                    <input type="button" onclick="checkEmail()" id="checkEmailButton" class="btn btn-default btn-sm" value="메일중복 확인" style="margin-left: 10px;">
+                    <input type="button" onclick="sendMail()" id="sendMailButton" class="btn btn-default btn-sm" value="메일 전송" style="margin-left: 10px;">
                   </div>
                 </div>
-                <div id="duplicate" >
-                
+                <div class="form-group" id="codeBox" style="display:none;">
+                  <div class="input-group input-group-merge input-group-alternative mb-3">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"><i class="ni ni-email-83"></i></span>
+                    </div>
+                    <input class="form-control" id="code" placeholder="인증 코드">
+                    <input type="button" onclick="verify()" id="verifyButton" class="btn btn-default btn-sm" value="코드 인증" style="margin-left: 10px;">
+                  </div>
+                  <div id="timer">
+                  
+                  </div>
                 </div>
+                
                 <div class="form-group">
                   <div class="input-group input-group-merge input-group-alternative">
                     <div class="input-group-prepend">
