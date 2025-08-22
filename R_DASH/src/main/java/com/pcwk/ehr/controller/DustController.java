@@ -2,6 +2,7 @@ package com.pcwk.ehr.controller;
 
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,16 +35,6 @@ public class DustController {
         this.dustService = svc;
     }
 
-    // /dust → /map?layer=dust&airType=ALL (혹은 전달된 값)로 리다이렉트
-    @GetMapping({"", "/"})
-    public String dustEntry(@RequestParam(required = false, defaultValue = "ALL") String airType) {
-        String type = airType != null ? airType.trim() : "ALL";
-        if (type.isEmpty()) type = "ALL";
-        String enc  = UriUtils.encode(type, StandardCharsets.UTF_8);
-        return "redirect:/map?layer=dust&airType=" + enc;
-    }
-
-    // 데이터 API: 단일 타입 최신 (BBox 있으면 BBox, 없으면 전국)
     @GetMapping("/latest")
     @ResponseBody
     public List<DustDTO> latest(
@@ -59,13 +50,47 @@ public class DustController {
         if (hasBBox && minLat > maxLat) { double t = minLat; minLat = maxLat; maxLat = t; }
         if (hasBBox && minLon > maxLon) { double t = minLon; minLon = maxLon; maxLon = t; }
 
-        String type   = (airType == null || airType.trim().isEmpty()) ? null : airType.trim();
         String dayStr = (day == null || day.trim().isEmpty()) ? null : day.trim();
-        int lim       = (limit == null || limit <= 0) ? 500 : limit;
+        int lim = (limit == null || limit <= 0) ? 500 : limit;
 
+        // airType 정규화 (공백/대소문자/한글 '전체' 허용)
+        String raw = airType == null ? "" : airType.trim();
+        String key = raw.replaceAll("\\s+", "").toLowerCase();
+
+        String typeCanon;
+        if ("all".equals(key) || "전체".equals(raw)) {
+            typeCanon = "ALL";
+        } else if ("교외대기".equals(key)) {
+            typeCanon = "교외대기";
+        } else if ("도로변대기".equals(key)) {        // 공백 유무 모두 허용
+            // DB/매퍼에서 쓰는 표준 표기로 맞추세요:
+            typeCanon = "도로변 대기";               // <- DB가 공백 없이 저장이면 "도로변대기"로 교체
+        } else if ("도시대기".equals(key)) {
+            typeCanon = "도시대기";
+        } else {
+            typeCanon = raw;
+        }
+
+        // ALL이면 3유형 합쳐서 반환
+        if ("ALL".equals(typeCanon)) {
+            String road = "도로변 대기";             // ↑ 위 선택과 동일하게 유지
+            String[] TYPES = { "교외대기", road, "도시대기" };
+            int per = Math.max(1, lim / TYPES.length);
+            List<DustDTO> out = new ArrayList<>();
+            for (String t : TYPES) {
+                List<DustDTO> part = hasBBox
+                        ? dustService.getLatestByTypeBBox(t, dayStr, minLat, maxLat, minLon, maxLon, per)
+                        : dustService.getLatestByTypeAll(t,  dayStr, per);
+                if (part != null && !part.isEmpty()) out.addAll(part);
+            }
+            return out;
+        }
+
+        // 단일 유형
+        String type = typeCanon.isEmpty() ? null : typeCanon; // type=null이면 전체에서 필터 없이 조회
         return hasBBox
                 ? dustService.getLatestByTypeBBox(type, dayStr, minLat, maxLat, minLon, maxLon, lim)
-                : dustService.getLatestByTypeAll(type, dayStr, lim);
+                : dustService.getLatestByTypeAll(type,  dayStr, lim);
     }
 
     

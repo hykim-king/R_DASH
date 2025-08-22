@@ -78,27 +78,33 @@
               <div class="collapse" id="navbar-examples">
                 <ul class="nav nav-sm flex-column">
                   <li class="nav-item">
-                    <a href="/ehr/resources/template/dashboardpages/examples/login.html" class="nav-link">
+                    <a href="/ehr/fire/statsPage" class="nav-link">
                       <span class="sidenav-mini-icon"> 화재 </span>
                       <span class="sidenav-normal"> 화재 </span>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="/ehr/resources/template/dashboardpages/examples/login.html" class="nav-link">
-                      <span class="sidenav-mini-icon"> 소화기 </span>
-                      <span class="sidenav-normal"> 소화기 </span>
+                    <a href="/ehr/temperature/statsPage" class="nav-link">
+                      <span class="sidenav-mini-icon"> 기온 </span>
+                      <span class="sidenav-normal"> 기온 </span>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="/ehr/resources/template/dashboardpages/examples/login.html" class="nav-link">
-                      <span class="sidenav-mini-icon"> 환자 </span>
-                      <span class="sidenav-normal"> 환자 수 </span>
+                    <a href="/ehr/dust/statsPage" class="nav-link">
+                      <span class="sidenav-mini-icon"> 황사 </span>
+                      <span class="sidenav-normal"> 황사 </span>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="/ehr/resources/template/dashboardpages/examples/login.html" class="nav-link">
-                      <span class="sidenav-mini-icon"> 피해 </span>
-                      <span class="sidenav-normal"> 피해,복구 </span>
+                    <a href="/ehr/sinkholes/statsPage" class="nav-link">
+                      <span class="sidenav-mini-icon"> 싱크홀 </span>
+                      <span class="sidenav-normal"> 싱크홀 </span>
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a href="/ehr/landslide/statsPage" class="nav-link">
+                      <span class="sidenav-mini-icon"> 산사태 </span>
+                      <span class="sidenav-normal"> 산사태 </span>
                     </a>
                   </li>
                 </ul>
@@ -112,9 +118,9 @@
               <div class="collapse" id="navbar-tables">
                 <ul class="nav nav-sm flex-column">
                   <li class="nav-item">
-                    <a href="/ehr/resources/template/dashboardpages/tables/tables.html" class="nav-link">
-                      <span class="sidenav-mini-icon"> T </span>
-                      <span class="sidenav-normal"> Tables </span>
+                    <a href="/ehr/news/newsPage.do" class="nav-link">
+                      <span class="sidenav-mini-icon">뉴스</span>
+                      <span class="sidenav-normal"> 재난 뉴스 </span>
                     </a>
                   </li>
                 </ul>
@@ -128,9 +134,9 @@
               <div class="collapse" id="navbar-maps">
                 <ul class="nav nav-sm flex-column">
                   <li class="nav-item">
-                    <a href="/ehr/resources/template/dashboardpages/maps/google.html" class="nav-link">
-                      <span class="sidenav-mini-icon"> G </span>
-                      <span class="sidenav-normal"> Google </span>
+                    <a href="/ehr/board/doRetrieve.do" class="nav-link">
+                      <span class="sidenav-mini-icon">공지</span>
+                      <span class="sidenav-normal"> 공지보기 </span>
                     </a>
                   </li>
                 </ul>

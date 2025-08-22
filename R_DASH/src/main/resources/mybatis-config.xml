@@ -20,6 +20,9 @@
     <typeAlias alias="FireExitDTO" type="com.pcwk.ehr.domain.FireExitDTO"/>
     <typeAlias alias="FireDisasterDTO" type="com.pcwk.ehr.domain.FireDisasterDTO"/>
     <typeAlias alias="TopicWordsDTO" type="com.pcwk.ehr.domain.TopicWordsDTO"/>
+    <typeAlias alias="DustDTO" type="com.pcwk.ehr.domain.DustDTO"/>
+    <typeAlias alias="ShelterDTO" type="com.pcwk.ehr.domain.ShelterDTO"/>
+    
  </typeAliases>
  
  
