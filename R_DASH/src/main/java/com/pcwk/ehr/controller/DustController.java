@@ -29,12 +29,19 @@ import com.pcwk.ehr.service.DustService;
 @RequestMapping("/dust")
 public class DustController {
     private final DustService dustService;
+    public DustController(DustService svc){ this.dustService = svc; }
 
-    @Autowired
-    public DustController(DustService svc) {
-        this.dustService = svc;
-    }
+//    // 페이지: /ehr/dust  (map.jsp 불필요)
+//    @GetMapping("/ehr/dust")
+//    public String dustPage(
+//            @RequestParam(defaultValue = "ALL") String airType,
+//            org.springframework.ui.Model model
+//    ) {
+//        model.addAttribute("airType", airType);
+//        return "ehr/dust"; // → /WEB-INF/views/ehr/dust.jsp
+//    }
 
+    // 데이터 API: /dust/latest
     @GetMapping("/latest")
     @ResponseBody
     public List<DustDTO> latest(
@@ -53,27 +60,18 @@ public class DustController {
         String dayStr = (day == null || day.trim().isEmpty()) ? null : day.trim();
         int lim = (limit == null || limit <= 0) ? 500 : limit;
 
-        // airType 정규화 (공백/대소문자/한글 '전체' 허용)
         String raw = airType == null ? "" : airType.trim();
         String key = raw.replaceAll("\\s+", "").toLowerCase();
 
         String typeCanon;
-        if ("all".equals(key) || "전체".equals(raw)) {
-            typeCanon = "ALL";
-        } else if ("교외대기".equals(key)) {
-            typeCanon = "교외대기";
-        } else if ("도로변대기".equals(key)) {        // 공백 유무 모두 허용
-            // DB/매퍼에서 쓰는 표준 표기로 맞추세요:
-            typeCanon = "도로변 대기";               // <- DB가 공백 없이 저장이면 "도로변대기"로 교체
-        } else if ("도시대기".equals(key)) {
-            typeCanon = "도시대기";
-        } else {
-            typeCanon = raw;
-        }
+        if ("all".equals(key) || "전체".equals(raw)) typeCanon = "ALL";
+        else if ("교외대기".equals(key))           typeCanon = "교외대기";
+        else if ("도로변대기".equals(key))          typeCanon = "도로변 대기"; // DB 표준에 맞춰 변경
+        else if ("도시대기".equals(key))           typeCanon = "도시대기";
+        else                                       typeCanon = raw;
 
-        // ALL이면 3유형 합쳐서 반환
         if ("ALL".equals(typeCanon)) {
-            String road = "도로변 대기";             // ↑ 위 선택과 동일하게 유지
+            String road = "도로변 대기";
             String[] TYPES = { "교외대기", road, "도시대기" };
             int per = Math.max(1, lim / TYPES.length);
             List<DustDTO> out = new ArrayList<>();
@@ -86,11 +84,12 @@ public class DustController {
             return out;
         }
 
-        // 단일 유형
-        String type = typeCanon.isEmpty() ? null : typeCanon; // type=null이면 전체에서 필터 없이 조회
+        String type = typeCanon.isEmpty() ? null : typeCanon;
         return hasBBox
                 ? dustService.getLatestByTypeBBox(type, dayStr, minLat, maxLat, minLon, maxLon, lim)
                 : dustService.getLatestByTypeAll(type,  dayStr, lim);
+                
+                
     }
 
     

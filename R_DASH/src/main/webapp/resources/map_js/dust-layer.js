@@ -2,14 +2,17 @@
 (function () {
   'use strict';
 
+  // AppMap 준비되면 초기화
   if (window.AppMap) init();
   else window.addEventListener('appmap:ready', init, { once: true });
 
   function init() {
     var App = window.AppMap;
     if (!App || !App.map) { setTimeout(init, 100); return; }
+
     var map = App.map;
 
+    // ===== HUD =====
     function mountHud(){
       if (document.getElementById('dustHud')) return;
       var hud = document.createElement('div');
@@ -28,9 +31,34 @@
         '  <button class="flt" data-air="도시대기" style="display:block;width:100%;margin:6px 0;padding:6px 8px;font-size:12px;border:1px solid #eee;border-radius:6px;background:#fff;cursor:pointer">도시대기</button>' +
         '</div>';
       document.body.appendChild(hud);
+
+// HUD 클릭 핸들러 안
+hud.addEventListener('click', function(e){
+  var b = e.target.closest('.flt');
+  if (!b) return;
+  var t = b.getAttribute('data-air');
+  if (t) {
+    setType(t);
+    syncURL(t);  // ★ 추가
+  }
+});
     }
     mountHud();
+    
+    // dust-layer.js 내부, 최상단 함수들 근처에 추가
+function syncURL(airType){
+  try {
+    var url = new URL(window.location.href);
+    var qs = url.searchParams;
+    qs.set('layer', 'dust');                 // 현재 레이어 표시
+    if (airType) qs.set('airType', airType); // 선택한 유형 반영
+    else qs.delete('airType');
+    // 페이지 이동 없이 주소만 갱신
+    history.replaceState(null, '', url.pathname + '?' + qs.toString());
+  } catch (e) { console.warn('[dust] syncURL failed', e); }
+}
 
+    // ===== Heatmap Canvas =====
     var heatCanvas = document.createElement('canvas');
     heatCanvas.style.position = 'absolute';
     heatCanvas.style.left = 0;
@@ -45,11 +73,17 @@
     var dataCache = null;
 
     function ensureHeat(){
-      var w = map.getNode().clientWidth, h = map.getNode().clientHeight;
+      var node = map.getNode();
+      if (!node) return;
+      var w = node.clientWidth, h = node.clientHeight;
       if (heatCanvas.width !== w || heatCanvas.height !== h) {
         heatCanvas.width = w; heatCanvas.height = h;
       }
-      if (!heat && window.simpleheat) {
+      if (!heat) {
+        if (!window.simpleheat) {
+          console.warn('[dust] simpleheat가 로드되지 않았습니다. 히트맵이 표시되지 않습니다.');
+          return;
+        }
         heat = window.simpleheat(heatCanvas);
         heat.gradient({ 0.0:'#c8f6d7', 0.35:'#f9f3c2', 0.65:'#f6d2a8', 1.0:'#f2a6a6' });
         heat.max(1);
@@ -73,6 +107,7 @@
         if (isNaN(lat)||isNaN(lon)) continue;
         var pm10 = d.pm10!=null && d.pm10!=='' ? d.pm10 : (d.avg!=null ? d.avg : null);
         var p = proj.containerPointFromCoords(new kakao.maps.LatLng(lat, lon));
+        if (!p) continue;
         pts.push([p.x, p.y, norm(pm10)]);
       }
       heat.data(pts);
@@ -80,26 +115,44 @@
       heat.draw(0.38);
     }
 
-    function buildUrl(airType, bbox, limit){
-      var ctx = document.body.getAttribute('data-context-path') || '';
-      var qs = new URLSearchParams({ airType: airType, limit: limit || 1000 });
+    // ===== Fetch =====
+    function canonicalType(t){
+      if (!t) return 'ALL';
+      var k = String(t).replace(/\s+/g,'').toLowerCase();
+      if (k === 'all' || t === '전체') return 'ALL';
+      if (k === '교외대기') return '교외대기';
+      if (k === '도로변대기') return '도로변 대기';
+      if (k === '도시대기') return '도시대기';
+      return t;
+    }
+
+   function buildUrl(airType, bbox, limit){
+  var ctx = document.body.getAttribute('data-context-path') || ''; // 지금은 ""
+  var qs = new URLSearchParams({ airType, limit: limit || 1000 });
       if (bbox && isFinite(bbox.minLat) && isFinite(bbox.maxLat) && isFinite(bbox.minLon) && isFinite(bbox.maxLon)) {
         qs.set('minLat', bbox.minLat);
         qs.set('maxLat', bbox.maxLat);
         qs.set('minLon', bbox.minLon);
         qs.set('maxLon', bbox.maxLon);
       }
-      return ctx + '/dust/latest?' + qs.toString();
+      return ctx + '/dust/latest?' + qs.toString(); // 예: /ehr/dust/latest
     }
+
     function fetchAndRender(airType){
       var bbox = (App && App.getBBox) ? App.getBBox() : null;
       var url  = buildUrl(airType, bbox, 1200);
-      return fetch(url)
+      console.log('[dust] fetch:', url);
+      return fetch(url, { headers: { 'Accept': 'application/json' } })
         .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
-        .then(function(list){ dataCache = Array.isArray(list)? list : []; clearHeat(); drawHeat(dataCache); })
+        .then(function(list){
+          dataCache = Array.isArray(list)? list : [];
+          clearHeat();
+          drawHeat(dataCache);
+        })
         .catch(function(e){ console.error('[dust] fetch error', e); });
     }
 
+    // ===== 이벤트 / 리사이즈 =====
     function debounce(fn, ms){ var t; return function(){ var a=arguments,c=this; clearTimeout(t); t=setTimeout(function(){ fn.apply(c,a); }, ms); }; }
     var redraw = debounce(function(){
       if (!active) return;
@@ -107,15 +160,19 @@
       if (dataCache) drawHeat(dataCache);
       fetchAndRender(currentType);
     }, 250);
+
     kakao.maps.event.addListener(map, 'idle', redraw);
     window.addEventListener('resize', function(){ if (active) redraw(); });
 
+    // ===== 활성/비활성 & 타입 전환 =====
     function activate(opts){
       active = true;
       heatCanvas.style.display = 'block';
       var hud = document.getElementById('dustHud'); if (hud) hud.style.display = 'block';
-      if (opts && typeof opts.airType === 'string') currentType = opts.airType;
 
+      if (opts && typeof opts.airType === 'string') currentType = canonicalType(opts.airType);
+
+      // 전국 고정 + 인터랙션 제한
       var bounds = new kakao.maps.LatLngBounds();
       bounds.extend(new kakao.maps.LatLng(33.0, 124.5));
       bounds.extend(new kakao.maps.LatLng(38.7, 132.0));
@@ -136,13 +193,41 @@
       map.setDraggable(true);
     }
 
+function setType(type){
+  currentType = canonicalType(type);
+  syncURL(currentType);          // ★ 추가
+  if (active) fetchAndRender(currentType);
+}
+
+    // App 레이어 등록
     App.registerLayer('dust', {
       activate: activate,
       deactivate: deactivate,
-      setType: function(type){ currentType = type || 'ALL'; fetchAndRender(currentType); },
+      setType: setType,
       refresh: function(){ fetchAndRender(currentType); }
     });
 
-    // 클릭 바인딩은 url-sync.js에서 처리
+    // 전역 API
+    window.DustLayer = window.DustLayer || {};
+    window.DustLayer.activate   = function(opts){ activate(opts || {}); };
+    window.DustLayer.deactivate = function(){ deactivate(); };
+    window.DustLayer.setType    = setType;
+    window.DustLayer.refresh    = function(){ fetchAndRender(currentType); };
+
+    // ===== URL 자동 부팅 (경로 & 쿼리 모두 지원) =====
+    (function autoBoot(){
+      var p = new URLSearchParams(location.search);
+      var path = (location.pathname || '').toLowerCase(); // ex) /ehr/map/dust
+      var isDustPath  = /\/map\/dust$/.test(path) || /\/dust$/.test(path);
+      var isDustQuery = (p.get('layer') || '').toLowerCase() === 'dust';
+
+      if (isDustPath || isDustQuery) {
+        var airType = p.get('airType') || 'ALL';
+        console.log('[dust] auto-activate:', isDustPath ? 'path' : 'query', ', airType=', airType);
+        window.DustLayer.activate({ airType: airType });
+      }
+    })();
+
+    // 클릭/URL 동기화는 url-sync.js에서 별도로 처리
   }
 })();

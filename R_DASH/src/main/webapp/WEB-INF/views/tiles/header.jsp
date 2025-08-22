@@ -50,19 +50,19 @@
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a id="nav-dust" href="${pageContext.request.contextPath}/dust" class="nav-link">
-                      <span class="sidenav-mini-icon"> 황사 </span>
-                      <span class="sidenav-normal"> 황사 </span>
-                    </a>
+                  <a href="${pageContext.request.contextPath}/map/dust" class="nav-link">
+					  <span class="sidenav-mini-icon"> 황사 </span>
+					  <span class="sidenav-normal"> 황사 </span>
+					</a>
                   </li>
                   <li class="nav-item">
-                    <a href="#" class="nav-link">
+                   <a href="${pageContext.request.contextPath}/map/firestation" class="nav-link">
                       <span class="sidenav-mini-icon"> 소방서 </span>
                       <span class="sidenav-normal"> 소방서 </span>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="#" class="nav-link">
+                     <a href="${pageContext.request.contextPath}/map/shelter" class="nav-link">
                       <span class="sidenav-mini-icon"> 대피소 </span>
                       <span class="sidenav-normal"> 대피소 </span>
                     </a>
