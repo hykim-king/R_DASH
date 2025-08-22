@@ -33,10 +33,7 @@
     <span class="mask bg-gradient-default opacity-4"></span>
     <div class="container-fluid d-flex align-items-center">
         <div class="row">
-            <div class="col-lg-7 col-md-10">
-                <div>
-                    <span>🏠   홈</span><span> > </span><span>공지사항</span><span> > </span><span>등록</span>
-                </div>
+            <div class="col-lg-7 col-md-10">         
                 <h1 class="display-2 text-white">공지사항 등록 안내문</h1>
                 <p class="text-white mt-0 mb-5">시민분들께 전달할 재난 최신 정보와 안전 수칙을 쉽고 명확하게 작성해 주세요.     
                                                                                                             작성 후에는 내용 확인 및 수정도 언제든지 가능하니 편하게 관리해 주세요.<br>  

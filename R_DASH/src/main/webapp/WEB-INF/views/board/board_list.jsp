@@ -54,6 +54,8 @@
 document.addEventListener('DOMContentLoaded', function(){
     console.log('DOMContentLoaded');
     
+    //언어 선택
+    const langSelect = document.querySelector("#lang");
     //조회버튼
     const moveToRegBtn =document.querySelector("#moveToReg");
     console.log(moveToRegBtn);
@@ -74,11 +76,22 @@ document.addEventListener('DOMContentLoaded', function(){
     if('${search.searchWord}'!==''){
         document.querySelector('#searchWord').value = '${search.searchWord}';
     }
+    // 언어 변경 이벤트
+    langSelect.addEventListener("change", function(){
+        const selectLang = langSelect.value;
+        const selectDivButton = document.querySelector('#selectDivButton').value;
+        const searchWord = document.querySelector('#searchWord').value;
+        const pageNo = document.querySelector('#pageNo').value;
+
+        window.location.href = '/ehr/board/doRetrieve.do?lang='+selectLang+'&searchDiv='+selectDivButton + '&searchWord=' + searchWord + '&pageNo=' + pageNo;
+    });
 });
+
+
 //페이징 
 function pagerDoRetrieve(url, pageNo){   
     //button
-    const searchButton = document.querySelector('#searchButton');
+    /*  const searchButton = document.querySelector('#searchButton');  */
     
     document.querySelector('#pageNo').value= pageNo;
     
@@ -87,11 +100,17 @@ function pagerDoRetrieve(url, pageNo){
 }
 //공지사항 검색
 function search(){
-    const selectDivButton = document.querySelector('#selectDivButton');
-    const searchWord = document.querySelector('#searchWord');
-    const pageNo = document.querySelector('#pageNo')
-    window.location.href = '/ehr/board/doRetrieve.do?searchDiv=' + selectDivButton.value + '&searchWord=' + searchWord.value + '&pageNo=' + pageNo.value;
+	const selectDiv = document.querySelector('#selectDivButton').dataset.value;
+    const searchWord = document.querySelector('#searchWord').value;
+    const pageNo = document.querySelector('#pageNo').value;
+    const lang = document.querySelector('#lang').value;
+
+    window.location.href = '/ehr/board/doRetrieve.do?lang=' + lang
+                            + '&searchDiv=' + selectDiv
+                            + '&searchWord=' + encodeURIComponent(searchWord)
+                            + '&pageNo=' + pageNo;
 }
+
 //searchDiv 설정
 function selectDiv(div){
     const selectDivButton = document.querySelector('#selectDivButton');
@@ -110,7 +129,7 @@ function selectDiv(div){
         selectDivButton.value='';
         searchWord.disabled = false;  
     }
-    
+   
 }
 </script>
 <style type="text/css">
@@ -137,8 +156,26 @@ span {
 </style>
 </head>
 <body>
-<jsp:include page="/WEB-INF/views/common/loading.jsp"></jsp:include>
 <div class="main-content">
+    <div class="form-group">
+	    <label for="lang"></label>
+	    <select id="lang" name="lang">
+	        <c:choose>
+	            <c:when test="${lang == 'ko'}">
+	                <option value="ko" selected>KO</option>
+	                <option value="en">EN</option>
+	            </c:when>
+	            <c:when test="${lang == 'en'}">
+	                <option value="ko">KO</option>
+	                <option value="en" selected>EN</option>
+	            </c:when>
+	            <c:otherwise>
+	                <option value="ko">KO</option>
+	                <option value="en">EN</option>
+	            </c:otherwise>
+	        </c:choose>
+	    </select>
+	</div>
 	
 	<!-- header2 -->
 	<div class="header bg-warning pb-6 header bg-gradient-warning py-5 py-lg-6 pt-lg-6">
@@ -147,13 +184,10 @@ span {
         <div class="row">
         
           <div style="margin-left:100px;">
-           <div>
-                <span>🏠   홈</span><span>></span><span>재난 공지사항</span>
-           </div>
-            <h1 class="display-2 text-white">📢 재난 공지사항 안내</h1>
-            <p class="text-white mt-0 mb-5">이 페이지에서는 최신 재난 소식과 안전 관련 안내를 확인하실 수 있습니다. <br>
-                                                                                                    태풍, 폭우, 화재 등 각종 재난 상황에 대한 정보를 신속하게 제공하여 <br>
-                                                                                                    시민 여러분의 안전한 생활을 돕습니다.  </p>
+            <h1 class="display-2 text-white">📢 ${msgs.saveBoardTitle}</h1>
+            <p class="text-white mt-0 mb-5">${msgs.saveBoardComment1} <br>
+                                            ${msgs.saveBoardComment2} <br>
+                                            ${msgs.saveBoardComment3} </p>
           </div>
         </div>
       </div>
@@ -168,26 +202,27 @@ span {
   		    <div class="card"> 
   		    <!-- Card header -->
 		        <div class="card-header border-0 d-flex align-items-center">
-		            <h3 class="mb-0">공지사항 <span>(${ totalCnt} 건)</span></h3>
+		            <h3 class="mb-0">${msgs.noticeBoard} <span>(${ totalCnt}${msgs.gun})</span></h3>
 		            <!-- 검색란 -->
 		            <div class="ml-auto d-flex align-items-center" ><!-- 오른쪽 끝으로 밀기 -->
 		            <!-- 드롭다운 -->
 		             <div class="dropdown">
                   <button class="btn btn-secondary dropdown-toggle" type="button" value="" id="selectDivButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <c:choose>
-                        <c:when test="${search.searchDiv == '10' }">제목</c:when>
-                        <c:when test="${search.searchDiv == '20' }">내용</c:when>
-                        <c:otherwise>전체</c:otherwise>
+                        <c:when test="${search.searchDiv == '10' }">${msgs.title}</c:when>
+                        <c:when test="${search.searchDiv == '20' }">${msgs.contents}</c:when>
+                        <c:otherwise>${msgs.all}</c:otherwise>
                     </c:choose>
                   </button>
                   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" onclick="javascript:selectDiv('')">전체</a>
-                    <a class="dropdown-item" onclick="javascript:selectDiv(10)">제목</a>
-                    <a class="dropdown-item" onclick="javascript:selectDiv(20)">내용</a>
+                    <a class="dropdown-item" onclick="javascript:selectDiv('')">${msgs.all}</a>
+                    <a class="dropdown-item" onclick="javascript:selectDiv(10)">${msgs.title}</a>
+                    <a class="dropdown-item" onclick="javascript:selectDiv(20)">${msgs.contents}</a>
                   </div>
                 </div>
                 <!-- //드롭다운 -->
-		         <input type="text" class="form-control" id="searchWord" name="searchWord">
+                <input type="hidden" id="searchDivValue" value="${search.searchDiv}">
+		        <input type="text" class="form-control" id="searchWord" name="searchWord">
                 <input type="hidden"id="pageNo" name="pageNo" value="${search.pageNo != 0 ? search.pageNo : 1}">  
                 <button type="button" id="searchButton" onclick="javascript:search()" class="btn btn-default text-nowrap" style="margin-left:10px">검색</button>
                 <button type="button" id="moveToReg" class="btn btn-default text-nowrap" style="margin-left:3px">등록</button>
@@ -205,10 +240,10 @@ span {
 		    </colgroup>
 			    <thead class="thead-light">
 			       <tr>
-				        <th scope="col" >번호</th>
-				        <th scope="col" >제목</th>
-				        <th scope="col" >조회수</th>
-				        <th scope="col" >작성일</th>
+				        <th scope="col" >${msgs.no}</th>
+				        <th scope="col" >${msgs.title}</th>
+				        <th scope="col" >${msgs.view}</th>
+				        <th scope="col" >${msgs.regDt}</th>
 			        </tr>
 			    </thead>
 			     <tbody class="list">
@@ -247,20 +282,6 @@ span {
 			<%
                 out.print(pageHtml);
             %>
-			<!-- 기존 페이징 디자인 -->
-<!-- 			     <nav aria-label="...">
-			         <ul class="pagination justify-content-end mb-0">
-			             <li class="page-item disabled"> 
-			                 <a class="page-link" href="#" tabindex="-1"><i class="fas fa-angle-left"></i> 
-			                 <span class="sr-only">Previous</span></a>
-			             </li>
-			             <li class="page-item active"><a class="page-link" href="#">1</a></li>
-			             <li class="page-item"><a class="page-link" href="#">2 <span class="sr-only">(current)</span></a></li>
-			             <li class="page-item"><a class="page-link" href="#">3</a></li>
-			             <li class="page-item"><a class="page-link" href="#"><i class="fas fa-angle-right"></i> 
-			             <span class="sr-only">Next</span></a></li>
-			          </ul>
-			       </nav> -->
 			 </div>
 			<!-- //카드 푸터 -->
 		    </div>
@@ -269,16 +290,5 @@ span {
 </div>
 <!--// table 영역 -->
 </div>
-<script>
-  // 예시로 3초 후에 로딩 숨기기 (실제 로딩 완료 이벤트에 맞게 조절하세요)
-  $(document).ready(function() {
-    setTimeout(function() {
-      $('.loading, .overlay').css('opacity', 0);
-      setTimeout(function() {
-        $('.loading, .overlay').hide();
-      }, 400); // transition 시간과 맞춤
-    }, 2000);
-  });
-</script>
 </body>
 </html>
