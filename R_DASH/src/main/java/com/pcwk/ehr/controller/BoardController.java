@@ -94,6 +94,7 @@ public class BoardController {
 	    msgs.put("no", messageSource.getMessage("message.board.no", null, locale));
 	    msgs.put("regDt", messageSource.getMessage("message.board.regDt", null, locale));
 	    msgs.put("view", messageSource.getMessage("message.board.view", null, locale));
+	    msgs.put("noBoard", messageSource.getMessage("message.board.noBoard", null, locale));
 	    return msgs;
 	}
 	
@@ -248,10 +249,13 @@ public class BoardController {
 	        totalCnt = list.get(0).getTotalCnt(); // 첫 번째 row에서 가져오기
 	    }
 	    //lang이 값이 없으면 기본값(한국어)
-	    Locale locale = (lang != null && !lang.isEmpty()) ? new Locale(lang) : Locale.KOREAN;
-
+	    String resolvedLang = (lang != null && !lang.isEmpty()) ? lang : "ko";
+	    Locale locale = new Locale(resolvedLang);
+	    
+	    //언어 설정
 	    model.addAttribute("msgs", getBoardMessages(locale));
-		
+	    model.addAttribute("lang", lang);
+	    
 		model.addAttribute("list",list);
 		model.addAttribute("search", param);
 		model.addAttribute("totalCnt", totalCnt);
