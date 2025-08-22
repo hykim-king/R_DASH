@@ -149,22 +149,19 @@
     
      <!-- 시/군/구 기준 소방서 개수 조회 -->
     <select id="firestationCount" resultType="map">
-        SELECT 
-		    CASE
-		        WHEN REGEXP_LIKE(AREA, '군') THEN REGEXP_SUBSTR(AREA, '.*군')
-		        WHEN REGEXP_LIKE(AREA, '구') THEN REGEXP_SUBSTR(AREA, '.*구')
-		        WHEN REGEXP_LIKE(AREA, '시') THEN REGEXP_SUBSTR(AREA, '.*시')
-		        ELSE AREA
-		    END AS REGION,
+        SELECT
+		    REGION,
 		    COUNT(*) AS FIRE_STATION_CNT
-		FROM FIRE_STATION
-		GROUP BY 
-		    CASE
-		        WHEN REGEXP_LIKE(AREA, '군') THEN REGEXP_SUBSTR(AREA, '.*군')
-		        WHEN REGEXP_LIKE(AREA, '구') THEN REGEXP_SUBSTR(AREA, '.*구')
-		        WHEN REGEXP_LIKE(AREA, '시') THEN REGEXP_SUBSTR(AREA, '.*시')
-		        ELSE AREA
-		    END
+		FROM (
+		    SELECT DISTINCT
+		        COALESCE(
+		            REGEXP_SUBSTR(AREA, '[^ ]+ [^ ]+[시구군]'), 
+		            REGEXP_SUBSTR(AREA, '^[^ ]+[시구군]')
+		        ) AS REGION,
+		        AREA
+		    FROM FIRE_STATION
+		) t
+		GROUP BY REGION
 		ORDER BY REGION ASC
     </select>
 
