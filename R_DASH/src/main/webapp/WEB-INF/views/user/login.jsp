@@ -16,11 +16,7 @@
 	 const emailInput = document.querySelector("#email");
 	 //비밀번호 input
 	 const passwordInput = document.querySelector("#password");
-	 //이메일 형식 체크
-	 const valid_email = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
-	 //비밀번호 형식 체크 (영문 대/소문자 하나이상 포함, 특수문자 하나이상 포함)
-	 const valid_password = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+~`=\-{}\[\]:;"'<>,.?\/\\])\S{8,16}$/;
-	 
+
 	 loginForm.addEventListener("submit",function(event){
 		 event.preventDefault(); // 실제 폼 제출 막음
 		 
@@ -28,33 +24,7 @@
 			 alert('이메일을 입력하세요');
 			 emailInput.focus();
 			 return;
-		 }
-
-		 
-		 
-		 if(passwordInput.value === ''){
-			 alert('비밀번호를 입력하세요');
-			 passwordInput.focus();
-			 return;
-		 }
-		 //관리자일경우 pass
-		 if(emailInput.value !== 'admin'){
-			 
-			 if(valid_email.test(emailInput.value)===false){
-				 alert('이메일 형식이 올바르지 않습니다.');
-				 emailInput.focus();
-				 
-				 return;
-			 }
-			 
-			 if(valid_password.test(passwordInput.value)===false){
-				 alert('비밀번호 형식이 올바르지 않습니다.\n(영문 대/소문자 하나이상 포함, 특수문자 하나이상 포함)\n(8자 이상 16자 이하)');
-				 passwordInput.focus();
-				 return;
-			 }
-		 
-		 }
-		 
+		 } 
 		 
 		 
 		 $.ajax({

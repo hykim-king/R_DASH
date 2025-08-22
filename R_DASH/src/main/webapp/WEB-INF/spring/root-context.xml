@@ -160,9 +160,10 @@
 	    <props>
 	      <prop key="mail.smtp.auth">true</prop>
 	      <prop key="mail.smtp.starttls.enable">true</prop>
-	      <prop key="mail.smtp.connectiontimeout">10000</prop>
-	      <prop key="mail.smtp.timeout">10000</prop>
-	      <prop key="mail.smtp.writetimeout">10000</prop>
+	      <prop key="mail.smtp.connectiontimeout">5000</prop>
+	      <prop key="mail.smtp.timeout">5000</prop>
+	      <prop key="mail.smtp.writetimeout">5000</prop>
+	      <prop key="mail.smtp.quitwait">false</prop>
 	    </props>
 	  </property>
 	</bean>
