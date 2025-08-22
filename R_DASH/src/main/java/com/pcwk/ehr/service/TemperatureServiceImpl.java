@@ -240,7 +240,7 @@ public class TemperatureServiceImpl implements TemperatureService {
 		String region = row.getRegi();
 		int year = Integer.parseInt(row.getBas_yy());
 		int total = parseIntSafe(row.getTot());
-		int outdoor = parseIntSafe(row.getOutdoor_subtot());
+		int outdoor = parseIntSafe(row.getOtdoor_subtot());
 		int indoor = parseIntSafe(row.getIndoor_subtot());
 
 		PatientsDTO patientsDTO = new PatientsDTO(null, region, year, total, outdoor, indoor);
@@ -484,6 +484,5 @@ public class TemperatureServiceImpl implements TemperatureService {
 	public List<NowcastDTO> getTopREH() {
 		return temperatureMapper.selectTopREH();
 	}
-	
 	
 }

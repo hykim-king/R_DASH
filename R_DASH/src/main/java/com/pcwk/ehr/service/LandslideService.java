@@ -19,4 +19,12 @@ public interface LandslideService {
 
     /** 단건 상세 */
     LandslideDTO getDetail(Long landslideNo);
+
+	List<Map<String, Object>> getByYear();
+
+	List<Map<String, Object>> getByRegion();
+
+	List<Map<String, Object>> getByMonth();
+
+	List<Map<String, Object>> getByStatus();
 }

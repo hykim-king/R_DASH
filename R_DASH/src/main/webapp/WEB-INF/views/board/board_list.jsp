@@ -8,6 +8,37 @@
 <c:set var="CP" value="${pageContext.request.contextPath }" />
 <c:set var="now" value="<%=new java.util.Date()%>" />
 <c:set var="sysDate"><fmt:formatDate value="${now}" pattern="yyyy-MM-dd_HH:mm:ss" /></c:set>
+<%
+    int bottomCount = 5;
+    int pageSize    = 0;//페이지 사이즈
+    int pageNo      = 0;//페이지 번호
+    int maxNum      = 0;//총글수
+    
+    String url      = "";//호출URL
+    String scriptName="";//자바스크립트 이름
+    
+    
+    //request: 요청 처리를 할수 있는 jsp 내장 객체
+    String totalCntString = request.getAttribute("totalCnt").toString();
+    //out.print("totalCntString:"+totalCntString);
+    maxNum = Integer.parseInt(totalCntString);  
+    
+    SearchDTO  paramVO = (SearchDTO)request.getAttribute("search");   
+    pageSize = paramVO.getPageSize();
+    pageNo   = paramVO.getPageNo();
+    
+    String cp = request.getContextPath();
+       //out.print("cp:"+cp);
+       
+       url = cp+"/board/doRetireve.do";
+       //out.print("url:"+url);
+       
+       scriptName = "pagerDoRetrieve";
+       
+       String pageHtml=PcwkString.bootstrapRenderingPager(maxNum, pageNo, pageSize, bottomCount, url, scriptName);
+       
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -33,7 +64,54 @@ document.addEventListener('DOMContentLoaded', function(){
     
     	window.location.href = '/ehr/board/doSaveView.do';
  });
+    
+    if('${search.searchDiv}'===''){
+        searchWord.disabled = false;
+    }else{
+        document.querySelector('#selectDivButton').value = '${search.searchDiv}';
+    }
+    
+    if('${search.searchWord}'!==''){
+        document.querySelector('#searchWord').value = '${search.searchWord}';
+    }
 });
+//페이징 
+function pagerDoRetrieve(url, pageNo){   
+    //button
+    const searchButton = document.querySelector('#searchButton');
+    
+    document.querySelector('#pageNo').value= pageNo;
+    
+    searchButton.click();     
+    
+}
+//공지사항 검색
+function search(){
+    const selectDivButton = document.querySelector('#selectDivButton');
+    const searchWord = document.querySelector('#searchWord');
+    const pageNo = document.querySelector('#pageNo')
+    window.location.href = '/ehr/board/doRetrieve.do?searchDiv=' + selectDivButton.value + '&searchWord=' + searchWord.value + '&pageNo=' + pageNo.value;
+}
+//searchDiv 설정
+function selectDiv(div){
+    const selectDivButton = document.querySelector('#selectDivButton');
+    const searchWord = document.querySelector('#searchWord');
+    
+    if(div===10){
+        selectDivButton.innerText = '제목';
+        selectDivButton.value=div;
+        searchWord.disabled = false;
+    }else if(div === 20){
+        selectDivButton.innerText = '내용';
+        selectDivButton.value=div;
+        searchWord.disabled = false;
+    }else{
+        selectDivButton.innerText = '전체';
+        selectDivButton.value='';
+        searchWord.disabled = false;  
+    }
+    
+}
 </script>
 <style type="text/css">
 span {
@@ -60,7 +138,7 @@ span {
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/common/loading.jsp"></jsp:include>
-<div class=main-content>
+<div class="main-content">
 	
 	<!-- header2 -->
 	<div class="header bg-warning pb-6 header bg-gradient-warning py-5 py-lg-6 pt-lg-6">
@@ -85,33 +163,36 @@ span {
 	<!-- Page content -->
 	<div class="container-fluid mt--6" style="min-height: 700px; max-width:1700px; margin:0 auto;">
 		<div class="row">
+	 <!-- Light table -->
 		<div class="col">
   		    <div class="card"> 
+  		    <!-- Card header -->
 		        <div class="card-header border-0 d-flex align-items-center">
-		            <h3 class="mb-0">공지사항</h3>
+		            <h3 class="mb-0">공지사항 <span>(${ totalCnt} 건)</span></h3>
 		            <!-- 검색란 -->
-		            <div class="ml-auto d-flex flex-row align-items-center" ><!-- 오른쪽 끝으로 밀기 -->
-		            <select name="searchDiv" class="btn btn-secondary dropdown-toggle">    
-		                <option class="dropdown-item" >전체</option>
-                        <option class="dropdown-item" value="10" <c:if test="${search.searchDiv == 10 }">selected</c:if>>제목</option> 
-                        <option class="dropdown-item" value="20" <c:if test="${search.searchDiv == 20 }">selected</c:if>>내용</option> 
-                        <option class="dropdown-item" value="30" <c:if test="${search.searchDiv == 30 }">selected</c:if>>번호</option>  
-                        <option class="dropdown-item" value="40" <c:if test="${search.searchDiv == 40 }">selected</c:if>>제목+내용</option>    
-		              
-		            </select>		   
-			            <div class="form-group mb-0 d-flex flex-row align-items-center ">       
-				            <div class="input-group input-group-alternative input-group-merge me-2">
-					            <div class="input-group-prepend">
-					               <span class="input-group-text"><i class="fas fa-search"></i></span>
-					            </div>
-					            <input class="form-control" placeholder="Search" type="text">
-				            </div>
-				            <button type="button" class="ml-md-n-2 btn btn-sm btn-default" style="width: 70px; height:40px;">검색</button>
-				            <button type="button" id="moveToReg" class="btn btn-sm btn-default wide-btn" style="width: 70px; height:40px;">등록</button>
-				        </div>
-		            </div>   
-		            <!-- //검색란 -->
-		        </div>
+		            <div class="ml-auto d-flex align-items-center" ><!-- 오른쪽 끝으로 밀기 -->
+		            <!-- 드롭다운 -->
+		             <div class="dropdown">
+                  <button class="btn btn-secondary dropdown-toggle" type="button" value="" id="selectDivButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <c:choose>
+                        <c:when test="${search.searchDiv == '10' }">제목</c:when>
+                        <c:when test="${search.searchDiv == '20' }">내용</c:when>
+                        <c:otherwise>전체</c:otherwise>
+                    </c:choose>
+                  </button>
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" onclick="javascript:selectDiv('')">전체</a>
+                    <a class="dropdown-item" onclick="javascript:selectDiv(10)">제목</a>
+                    <a class="dropdown-item" onclick="javascript:selectDiv(20)">내용</a>
+                  </div>
+                </div>
+                <!-- //드롭다운 -->
+		         <input type="text" class="form-control" id="searchWord" name="searchWord">
+                <input type="hidden"id="pageNo" name="pageNo" value="${search.pageNo != 0 ? search.pageNo : 1}">  
+                <button type="button" id="searchButton" onclick="javascript:search()" class="btn btn-default text-nowrap" style="margin-left:10px">검색</button>
+                <button type="button" id="moveToReg" class="btn btn-default text-nowrap" style="margin-left:3px">등록</button>
+              </div>
+            </div>   
     <!-- //Page content -->
 		<!-- Light table -->
 		<div class="table-responsive">
@@ -163,7 +244,11 @@ span {
 			<!-- //Light table -->
 			<!-- 카드 푸터 -->
 			<div class="card-footer py-4">
-			     <nav aria-label="...">
+			<%
+                out.print(pageHtml);
+            %>
+			<!-- 기존 페이징 디자인 -->
+<!-- 			     <nav aria-label="...">
 			         <ul class="pagination justify-content-end mb-0">
 			             <li class="page-item disabled"> 
 			                 <a class="page-link" href="#" tabindex="-1"><i class="fas fa-angle-left"></i> 
@@ -175,7 +260,7 @@ span {
 			             <li class="page-item"><a class="page-link" href="#"><i class="fas fa-angle-right"></i> 
 			             <span class="sr-only">Next</span></a></li>
 			          </ul>
-			       </nav>
+			       </nav> -->
 			 </div>
 			<!-- //카드 푸터 -->
 		    </div>

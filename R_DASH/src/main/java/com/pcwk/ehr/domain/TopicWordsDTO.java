@@ -8,19 +8,22 @@ public class TopicWordsDTO {
 	private int prevFreq;
 	private String regDt;
 	
+	private double changeRate; //증감률 계산용 열
+	
 	
 	public TopicWordsDTO() {
 		super();
 	}
 
 
-	public TopicWordsDTO(int wordNo, String word, int freq, int prevFreq, String regDt) {
+	public TopicWordsDTO(int wordNo, String word, int freq, int prevFreq, String regDt, double changeRate) {
 		super();
 		this.wordNo = wordNo;
 		this.word = word;
 		this.freq = freq;
 		this.prevFreq = prevFreq;
 		this.regDt = regDt;
+		this.changeRate = changeRate;
 	}
 
 
@@ -74,12 +77,20 @@ public class TopicWordsDTO {
 	}
 
 
+	public double getChangeRate() {
+		return changeRate;
+	}
+
+
+	public void setChangeRate(double changeRate) {
+		this.changeRate = changeRate;
+	}
+
+
 	@Override
 	public String toString() {
 		return "TopicWordsDTO [wordNo=" + wordNo + ", word=" + word + ", freq=" + freq + ", prevFreq=" + prevFreq
-				+ ", regDt=" + regDt + ", toString()=" + super.toString() + "]";
+				+ ", regDt=" + regDt + ", changeRate=" + changeRate + "]";
 	}
-	
-
 	
 }

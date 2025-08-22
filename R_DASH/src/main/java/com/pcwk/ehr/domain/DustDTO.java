@@ -8,7 +8,7 @@ public class DustDTO extends DTO {
 	private String 	stnNm  ;	//지점명
 	private double 	lat    ;	//위도
 	private double 	lon    ;	//경도
-	private String 	org    ;	//관측기관
+	private String 	org    ;	//관측기관 ("교외대기" / "도로변대기" / "도시대기" )
 	private int 	pm10   ;	//PM10 관측값
 	private int 	avg    ;	//PM10 시간평균값
 	private int 	max    ;	//PM10 시간최대값

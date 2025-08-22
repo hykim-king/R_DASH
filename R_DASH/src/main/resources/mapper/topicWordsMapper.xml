@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pcwk.ehr.mapper.TopicWordsMapper">
 	<select id="top100" resultType="TopicWordsDTO">
-	        SELECT * 
+	        SELECT WORD_NO,WORD, FREQ, PREV_FREQ,TO_CHAR(REG_DT,'YYYY/MM/DD') as regDt
 			FROM TOPIC_WORDS
 			WHERE TRUNC(REG_DT) = TRUNC(SYSDATE)
 			ORDER BY FREQ DESC
@@ -10,7 +10,7 @@
     </select>
     
     <select id="top10" resultType="TopicWordsDTO">
-        SELECT * 
+        SELECT WORD_NO,WORD, FREQ, PREV_FREQ,TO_CHAR(REG_DT,'YYYY/MM/DD') as regDt
 		FROM TOPIC_WORDS
 		WHERE TRUNC(REG_DT) = TRUNC(SYSDATE)
 		ORDER BY FREQ DESC
@@ -38,7 +38,7 @@
 		    END AS WORD,
 		    TRUNC(DBMS_RANDOM.VALUE(1, 1000)) AS freq,
 		    TRUNC(DBMS_RANDOM.VALUE(1, 1000)) AS prevFreg,
-		    sysdate AS regDt
+		    SYSDATE AS regDt
 		FROM dual 
 		CONNECT BY LEVEL <= 100 ]]>
     </insert>
