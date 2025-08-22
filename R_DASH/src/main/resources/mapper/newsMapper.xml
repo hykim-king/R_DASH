@@ -7,6 +7,7 @@
 	        FROM (
 	            SELECT news_no, keyword, title, company, url, pub_dt AS pubDt, reg_dt AS regDt
 	            FROM news
+	            WHERE TRUNC(reg_dt)=TRUNC(SYSDATE)
 	            ORDER BY reg_dt DESC
 	        ) t
 	 <![CDATA[  WHERE ROWNUM <= #{pageSize} * #{pageNo}
