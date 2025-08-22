@@ -36,21 +36,34 @@
     });
   }
 
-  function registerLayer(name, handlers) {
-    AppMap._layers[name] = handlers || {};
+function registerLayer(name, handlers) {
+  AppMap._layers[name] = handlers || {};
+
+  // 만약 activate 대기중인 레이어가 지금 막 등록됐다면 바로 실행
+  if (AppMap._pending && AppMap._pending.name === name && AppMap.map) {
+    var p = AppMap._pending; 
+    AppMap._pending = null;
+    activate(name, p.opts || {});
+  }
+}
+
+function activate(name, opts) {
+  if (!AppMap.map) { 
+    AppMap._pending = { name: name, opts: opts || {} }; 
+    return; 
+  }
+  if (!AppMap._layers[name]) {
+    // 아직 등록되지 않은 레이어면 pending으로 남겨둔다
+    AppMap._pending = { name: name, opts: opts || {} };
+    return;
   }
 
-  function activate(name, opts) {
-    if (!AppMap.map) { AppMap._pending = { name: name, opts: opts || {} }; return; }
-
-    if (AppMap._active && AppMap._active !== name) {
-      try { AppMap._layers[AppMap._active].deactivate && AppMap._layers[AppMap._active].deactivate(); } catch(e){}
-    }
-    if (AppMap._layers[name]) {
-      try { AppMap._layers[name].activate && AppMap._layers[name].activate(opts || {}); } catch(e){}
-      AppMap._active = name;
-    }
+  if (AppMap._active && AppMap._active !== name) {
+    try { AppMap._layers[AppMap._active].deactivate && AppMap._layers[AppMap._active].deactivate(); } catch(e){}
   }
+  try { AppMap._layers[name].activate && AppMap._layers[name].activate(opts || {}); } catch(e){}
+  AppMap._active = name;
+}
 
   function deactivate(name) {
     var n = name || AppMap._active;

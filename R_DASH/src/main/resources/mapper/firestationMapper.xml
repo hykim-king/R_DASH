@@ -5,164 +5,184 @@
 
 <mapper namespace="com.pcwk.ehr.mapper.FirestationMapper">
 
-    <!-- ResultMap -->
-    <resultMap id="FirestationMap" type="com.pcwk.ehr.domain.FirestationDTO">
-        <id     property="stationNo" column="STATION_NO"/>
-        <result property="stationNm" column="STATION_NM"/>
-        <result property="area"      column="AREA"/>
-        <result property="fireNead"  column="FIRE_HEAD"/>
-        <result property="tel"       column="TEL"/>
-        <result property="lat"       column="LAT"/>
-        <result property="lon"       column="LON"/>
-        <!-- 주소 컬럼 있으면 추가 -->
-        <!-- <result property="addr"     column="ADDR"/> -->
-    </resultMap>
+  <!-- ResultMap -->
+  <resultMap id="FirestationMap" type="com.pcwk.ehr.domain.FirestationDTO">
+    <id     property="stationNo" column="STATION_NO"/>
+    <result property="stationNm" column="STATION_NM"/>
+    <result property="area"      column="AREA"/>
+    <result property="fireNead"  column="FIRE_HEAD"/>
+    <result property="tel"       column="TEL"/>
+    <result property="lat"       column="LAT"/>
+    <result property="lon"       column="LON"/>
+    <!-- 주소 컬럼이 있으면 아래 주석 해제
+    <result property="addr"      column="ADDR"/> -->
+  </resultMap>
 
-    <!-- 공통 컬럼 -->
-    <sql id="cols">
-        STATION_NO, STATION_NM, AREA, FIRE_HEAD, TEL, LAT, LON
-    </sql>
+  <!-- 공통 컬럼 -->
+  <sql id="cols">
+    STATION_NO, STATION_NM, AREA, FIRE_HEAD, TEL, LAT, LON
+  </sql>
 
-    <!-- 1) BBox + 키워드 검색 -->
-    <select id="selectByBBox" resultMap="FirestationMap">
-        SELECT <include refid="cols"/>
-        FROM FIRE_STATION
-        WHERE LAT BETWEEN #{minLat} AND #{maxLat}
-          AND LON BETWEEN #{minLon} AND #{maxLon}
-        <if test="q != null and q != ''">
-          AND ( STATION_NM LIKE '%' || #{q} || '%'
-             OR AREA LIKE '%' || #{q} || '%'
-             OR FIRE_HEAD LIKE '%' || #{q} || '%' )
-        </if>
-        ORDER BY STATION_NM
-        FETCH FIRST
-          <choose>
-            <when test="limit != null"> #{limit} </when>
-            <otherwise> 500 </otherwise>
-          </choose>
-        ROWS ONLY
-    </select>
+  <!-- ✅ 메인 소방서만: '소방서' 포함 & '안전센터'/'119' 미포함 -->
+  <sql id="onlyMainStations">
+    STATION_NM LIKE '%소방서%'
+    AND STATION_NM NOT LIKE '%안전센터%'
+    AND STATION_NM NOT LIKE '%119%'
+  </sql>
 
-    <!-- 2) 검색 (지역/BBox/정렬/페이징) -->
-    <select id="search" resultMap="FirestationMap">
-        SELECT <include refid="cols"/>
-        FROM FIRE_STATION
-        <where>
-            <if test="q != null and q != ''">
-                ( STATION_NM LIKE '%' || #{q} || '%'
-                  OR AREA LIKE '%' || #{q} || '%'
-                  OR FIRE_HEAD LIKE '%' || #{q} || '%' )
-            </if>
-            <if test="area != null and area != ''">
-                AND AREA = #{area}
-            </if>
-            <if test="minLat != null and maxLat != null">
-                AND LAT BETWEEN #{minLat} AND #{maxLat}
-            </if>
-            <if test="minLon != null and maxLon != null">
-                AND LON BETWEEN #{minLon} AND #{maxLon}
-            </if>
-        </where>
-        <choose>
-            <when test="orderBy == 'recent'">
-                ORDER BY STATION_NO DESC
-            </when>
-            <otherwise>
-                ORDER BY STATION_NM ASC
-            </otherwise>
-        </choose>
-        <if test="limit != null and offset != null">
-            OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
-        </if>
-        <if test="limit != null and offset == null">
-            FETCH FIRST #{limit} ROWS ONLY
-        </if>
-    </select>
+  <!-- 1) BBox + 키워드 검색 -->
+  <select id="selectByBBox" resultMap="FirestationMap">
+    SELECT <include refid="cols"/>
+    FROM FIRE_STATION
+    WHERE <include refid="onlyMainStations"/>
+      AND LAT BETWEEN #{minLat} AND #{maxLat}
+      AND LON BETWEEN #{minLon} AND #{maxLon}
+      <if test="q != null and q != ''">
+        AND (
+          STATION_NM LIKE '%' || #{q} || '%'
+          OR AREA       LIKE '%' || #{q} || '%'
+          OR FIRE_HEAD  LIKE '%' || #{q} || '%'
+        )
+      </if>
+    ORDER BY STATION_NM
+    FETCH FIRST
+      <choose>
+        <when test="limit != null"> #{limit} </when>
+        <otherwise> 500 </otherwise>
+      </choose>
+    ROWS ONLY
+  </select>
 
-    <!-- 3) countSearch -->
-    <select id="countSearch" resultType="int">
-        SELECT COUNT(1)
-        FROM FIRE_STATION
-        <where>
-            <if test="q != null and q != ''">
-                ( STATION_NM LIKE '%' || #{q} || '%'
-                  OR AREA LIKE '%' || #{q} || '%'
-                  OR FIRE_HEAD LIKE '%' || #{q} || '%' )
-            </if>
-            <if test="area != null and area != ''">
-                AND AREA = #{area}
-            </if>
-            <if test="minLat != null and maxLat != null">
-                AND LAT BETWEEN #{minLat} AND #{maxLat}
-            </if>
-            <if test="minLon != null and maxLon != null">
-                AND LON BETWEEN #{minLon} AND #{maxLon}
-            </if>
-        </where>
-    </select>
+  <!-- 2) 검색 (지역/BBox/정렬/페이징) -->
+  <select id="search" resultMap="FirestationMap">
+    SELECT <include refid="cols"/>
+    FROM FIRE_STATION
+    <where>
+      <include refid="onlyMainStations"/>
+      <if test="q != null and q != ''">
+        AND (
+          STATION_NM LIKE '%' || #{q} || '%'
+          OR AREA       LIKE '%' || #{q} || '%'
+          OR FIRE_HEAD  LIKE '%' || #{q} || '%'
+        )
+      </if>
+      <if test="area != null and area != ''">
+        AND AREA = #{area}
+      </if>
+      <if test="minLat != null and maxLat != null">
+        AND LAT BETWEEN #{minLat} AND #{maxLat}
+      </if>
+      <if test="minLon != null and maxLon != null">
+        AND LON BETWEEN #{minLon} AND #{maxLon}
+      </if>
+    </where>
+    <choose>
+      <when test="orderBy == 'recent'">
+        ORDER BY STATION_NO DESC
+      </when>
+      <otherwise>
+        ORDER BY STATION_NM ASC
+      </otherwise>
+    </choose>
+    <if test="limit != null and offset != null">
+      OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
+    </if>
+    <if test="limit != null and offset == null">
+      FETCH FIRST #{limit} ROWS ONLY
+    </if>
+  </select>
 
-    <!-- 4) 단건 상세 -->
-    <select id="selectOne" parameterType="int" resultMap="FirestationMap">
-        SELECT <include refid="cols"/>
-        FROM FIRE_STATION
-        WHERE STATION_NO = #{stationNo}
-    </select>
+  <!-- 3) countSearch -->
+  <select id="countSearch" resultType="int">
+    SELECT COUNT(1)
+    FROM FIRE_STATION
+    <where>
+      <include refid="onlyMainStations"/>
+      <if test="q != null and q != ''">
+        AND (
+          STATION_NM LIKE '%' || #{q} || '%'
+          OR AREA       LIKE '%' || #{q} || '%'
+          OR FIRE_HEAD  LIKE '%' || #{q} || '%'
+        )
+      </if>
+      <if test="area != null and area != ''">
+        AND AREA = #{area}
+      </if>
+      <if test="minLat != null and maxLat != null">
+        AND LAT BETWEEN #{minLat} AND #{maxLat}
+      </if>
+      <if test="minLon != null and maxLon != null">
+        AND LON BETWEEN #{minLon} AND #{maxLon}
+      </if>
+    </where>
+  </select>
 
-    <!-- 5) 자동완성 - 지역 -->
-    <select id="autocompleteArea" resultType="string">
-        SELECT DISTINCT AREA
-        FROM FIRE_STATION
-        <where>
-            <if test="prefix != null and prefix != ''">
-                AREA LIKE #{prefix} || '%'
-            </if>
-        </where>
-        ORDER BY AREA
-        FETCH FIRST
-          <choose>
-            <when test="limit != null"> #{limit} </when>
-            <otherwise> 10 </otherwise>
-          </choose>
-        ROWS ONLY
-    </select>
+  <!-- 4) 단건 상세 (원하면 메인 소방서만 허용) -->
+  <select id="selectOne" parameterType="int" resultMap="FirestationMap">
+    SELECT <include refid="cols"/>
+    FROM FIRE_STATION
+    WHERE STATION_NO = #{stationNo}
+      AND <include refid="onlyMainStations"/>
+  </select>
 
-    <!-- 6) 자동완성 - 소방서명 -->
-    <select id="autocompleteStation" resultType="string">
-        SELECT DISTINCT STATION_NM
-        FROM FIRE_STATION
-        <where>
-            <if test="prefix != null and prefix != ''">
-                STATION_NM LIKE #{prefix} || '%'
-            </if>
-            <if test="area != null and area != ''">
-                AND AREA = #{area}
-            </if>
-        </where>
-        ORDER BY STATION_NM
-        FETCH FIRST
-          <choose>
-            <when test="limit != null"> #{limit} </when>
-            <otherwise> 10 </otherwise>
-          </choose>
-        ROWS ONLY
-    </select>
-    
-     <!-- 시/군/구 기준 소방서 개수 조회 -->
-    <select id="firestationCount" resultType="map">
-        SELECT
-		    REGION,
-		    COUNT(*) AS FIRE_STATION_CNT
-		FROM (
-		    SELECT DISTINCT
-		        COALESCE(
-		            REGEXP_SUBSTR(AREA, '[^ ]+ [^ ]+[시구군]'), 
-		            REGEXP_SUBSTR(AREA, '^[^ ]+[시구군]')
-		        ) AS REGION,
-		        AREA
-		    FROM FIRE_STATION
-		) t
-		GROUP BY REGION
-		ORDER BY REGION ASC
-    </select>
+  <!-- 5) 자동완성 - 지역 -->
+  <select id="autocompleteArea" resultType="string">
+    SELECT DISTINCT AREA
+    FROM FIRE_STATION
+    <where>
+      <include refid="onlyMainStations"/>
+      <if test="prefix != null and prefix != ''">
+        AND AREA LIKE #{prefix} || '%'
+      </if>
+    </where>
+    ORDER BY AREA
+    FETCH FIRST
+      <choose>
+        <when test="limit != null"> #{limit} </when>
+        <otherwise> 10 </otherwise>
+      </choose>
+    ROWS ONLY
+  </select>
+
+  <!-- 6) 자동완성 - 소방서명 -->
+  <select id="autocompleteStation" resultType="string">
+    SELECT DISTINCT STATION_NM
+    FROM FIRE_STATION
+    <where>
+      <include refid="onlyMainStations"/>
+      <if test="prefix != null and prefix != ''">
+        AND STATION_NM LIKE #{prefix} || '%'
+      </if>
+      <if test="area != null and area != ''">
+        AND AREA = #{area}
+      </if>
+    </where>
+    ORDER BY STATION_NM
+    FETCH FIRST
+      <choose>
+        <when test="limit != null"> #{limit} </when>
+        <otherwise> 10 </otherwise>
+      </choose>
+    ROWS ONLY
+  </select>
+
+  <!-- 7) 시/군/구 기준 소방서 개수 (메인 소방서만 카운트) -->
+  <select id="firestationCount" resultType="map">
+    SELECT
+      REGION,
+      COUNT(*) AS FIRE_STATION_CNT
+    FROM (
+      SELECT DISTINCT
+        COALESCE(
+          REGEXP_SUBSTR(AREA, '[^ ]+ [^ ]+[시구군]'),
+          REGEXP_SUBSTR(AREA, '^[^ ]+[시구군]')
+        ) AS REGION,
+        AREA
+      FROM FIRE_STATION
+      WHERE <include refid="onlyMainStations"/>
+    ) t
+    GROUP BY REGION
+    ORDER BY REGION ASC
+  </select>
 
 </mapper>
