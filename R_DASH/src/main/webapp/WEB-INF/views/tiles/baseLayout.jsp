@@ -20,6 +20,8 @@
 
 </head>
 <body>
+<jsp:include page="/WEB-INF/views/common/loading.jsp"></jsp:include>
+
 <tiles:insertAttribute name="header"/>
 <tiles:insertAttribute name="body"/>
 <tiles:insertAttribute name="footer"/>

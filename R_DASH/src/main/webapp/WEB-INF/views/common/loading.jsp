@@ -1,7 +1,8 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
-<title>Image Spinner</title>
+<title>R-DASH</title>
 <style>
   .overlay {
     position: fixed;
@@ -9,8 +10,8 @@
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.5); /* 검정 반투명 */
-    z-index: 9998; /* 로딩 스피너보다 아래 */
+    background: rgba(0, 0, 0, 0.5); 
+    z-index: 9998;
     opacity: 1;
     transition: opacity 0.5s ease;
   }
@@ -34,7 +35,7 @@
     margin: 0 6px;
     z-index: 9999; 
 
-    /* 이미지 크기 맞춤 */
+    /* ì´ë¯¸ì§ í¬ê¸° ë§ì¶¤ */
     object-fit: cover;
 
     transform-origin: center bottom;
@@ -58,10 +59,22 @@
     }
   }
 </style>
+<link rel="icon" href="/ehr/resources/image/Jaemini_face.ico" type="image/x-icon"/> <!-- 아이콘 -->
 </head>
 <body>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	 console.log("로딩 DOMContentLoaded 실행됨");
+      // 브라우저가 렌더링을 완료한 다음에 숨기기
+      requestAnimationFrame(function() {
+        $('.loading, .overlay').css('opacity', 0);
+        requestAnimationFrame(function() {
+          $('.loading, .overlay').hide();
+        }); // CSS transition 시간과 맞춤
+      });
+    });
+</script>
 <div class="overlay"></div>
-
   <div class="loading">
     <div class="loading_spinner">
       <img src="/ehr/resources/image/Jaemini_face (1).png" alt="droplet1" class="droplet" />
