@@ -12,6 +12,7 @@ message.board.contents=내용
 message.board.no=번호
 message.board.regDt=작성일
 message.board.view=조회수
+message.board.noBoard=등록된 게시글이 없습니다.
 
 
 message.board.saveBoardTitle=Disaster safety notice
