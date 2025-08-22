@@ -86,6 +86,41 @@
 		    margin: 0 auto; /* 좌우 가운데 정렬 */
 		}
 		
+		
+		.groupselect select {
+		    padding: 7px 14px;
+		    border-radius: 5px;
+		    border: 2px solid #a3a3a3;
+		    font-size: 14px;
+		    background-color: #ffffff;
+		    margin-right: 10px; 
+		    margin-bottom: 15px; 
+		}
+		
+		/* 드롭다운 영역 (Show entries) */
+		.dataTables_length {
+		  font-size: 14px;
+		  margin-bottom: 10px;
+		  padding-left: 0px !important;
+		}
+		
+		/* 드롭다운 select 기본 스타일 */
+		.dataTables_length select {
+		  border: 2px solid #ccc;
+		  border-radius: 5px !important;
+          border-color: coral !important;
+          background-color: #fff !important;
+		  padding: 4px 8px;
+		  font-size: 14px;
+		}
+		
+		/* 검색창 */
+		.dataTables_filter input {
+		  border: 1px solid #ccc;
+		  border-radius: 5px;
+		  padding: 4px;
+		}
+		
     </style>
 </head>
 <body>
@@ -97,27 +132,29 @@
 <div class="main-container">
 <c:choose>
     <c:when test="${type == 'weather'}">
-		<!-- 그룹 타입 선택 -->
-		<select id="groupType">
-		    <option value="region">지역별</option>
-		    <option value="year">년도별</option>
-		</select>
-		
-		<!-- 년도 선택 (항상 DOM에 존재) -->
-		<select id="yearSelect">
-		    <option value="">전체년도</option>
-		    <c:forEach var="year" items="${yearList}">
-		        <option value="${year}">${year}</option>
-		    </c:forEach>
-		</select>
-		
-		<!-- 지역 선택 (항상 DOM에 존재) -->
-		<select id="sidoSelect">
-		    <option value="">전체지역</option>
-		    <c:forEach var="sido" items="${sidoList}">
-		        <option value="${sido}">${sido}</option>
-		    </c:forEach>
-		</select>
+        <div class = "groupselect">
+			<!-- 그룹 타입 선택 -->
+			<select id="groupType">
+			    <option value="region">지역별</option>
+			    <option value="year">년도별</option>
+			</select>
+			
+			<!-- 년도 선택 (항상 DOM에 존재) -->
+			<select id="yearSelect">
+			    <option value="">전체년도</option>
+			    <c:forEach var="year" items="${yearList}">
+			        <option value="${year}">${year}</option>
+			    </c:forEach>
+			</select>
+			
+			<!-- 지역 선택 (항상 DOM에 존재) -->
+			<select id="sidoSelect">
+			    <option value="">전체지역</option>
+			    <c:forEach var="sido" items="${sidoList}">
+			        <option value="${sido}">${sido}</option>
+			    </c:forEach>
+			</select>
+		</div>
 		<!-- 환자 전체 합계 -->
 		<h1>온열질환자</h1>
 		<div class="row mb-2">
