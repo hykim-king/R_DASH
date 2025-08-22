@@ -145,6 +145,12 @@
           </ul>
         </div>
       </div>
+            <div class="sidenav-footer mt-auto" style="position: absolute; bottom: 10px; right: 5px; width: 50px; text-align: center;"> <!-- mt-auto로 아래로 밀기 -->
+			    <select id="lang" name="lang" class="form-control" style="width: 100%; padding:2px;">
+			       <option value="ko" ${lang eq 'ko' ? 'selected' : ''}>KO</option>
+			       <option value="en" ${lang eq 'en' ? 'selected' : ''}>EN</option>
+			    </select>
+			</div>
     </div>
   </nav>
     <!-- Main content -->
