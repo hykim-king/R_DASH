@@ -1,0 +1,198 @@
+
+
+/* ===== 기본 레이아웃 ===== */
+#shelterHud[style*="display: block"]  {
+  position: fixed !important;
+  right: 12px !important;
+  top: 68px !important;
+  z-index: 10 !important;
+  display: block !important;
+  width: 260px !important;
+}
+
+#shelterHud > div {
+  background: #fff !important;
+  border: 1px solid #ddd !important;
+  border-radius: 10px !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,.08) !important;
+  overflow: hidden !important;
+}
+
+/* 헤더(검색 영역) */
+#shelterHud > div > div:first-child {
+  padding: 10px !important;
+  border-bottom: 1px solid #eee !important;
+}
+
+#shelterSearch {
+  width: 100% !important;
+  padding: 8px 10px !important;
+  border: 1px solid #e5e5e5 !important;
+  border-radius: 6px !important;
+  font-size: 13px !important;
+  outline: none !important;
+}
+
+/* 자동완성 제안 목록 */
+#shelterSuggest {
+  display: none;
+  list-style: none !important;
+  margin: 6px 0 0 !important;
+  padding: 0 !important;
+  border: 1px solid #eee !important;
+  border-radius: 6px !important;
+  max-height: 180px !important;
+  overflow: auto !important;
+}
+
+#shelterSuggest .sg {
+  padding: 6px 8px !important;
+  border-bottom: 1px solid #f4f4f4 !important;
+  cursor: pointer !important;
+  font-size: 12px !important;
+}
+#shelterSuggest .sg:hover {
+  background: #f6f8fb !important;
+}
+
+/* 리스트 영역 */
+#shelterList {
+  max-height: 320px !important;
+  overflow: auto !important;
+  padding: 6px 6px 10px !important;
+}
+
+/* 리스트 아이템 */
+#shelterList .s-item {
+  display: flex !important;
+  gap: 8px !important;
+  align-items: flex-start !important;
+  padding: 8px !important;
+  border-bottom: 1px solid #f2f2f2 !important;
+  cursor: pointer !important;
+  border-radius: 8px !important; /* hover 시 자연스럽게 */
+}
+#shelterList .s-item:hover {
+  background: #f6f8fb !important;
+}
+
+/* 번호 뱃지 (s-item의 첫 번째 자식 div) */
+#shelterList .s-item > div:first-child {
+  flex: 0 0 auto !important;
+  background: #ff6b00 !important;
+  color: #fff !important;
+  width: 22px !important;
+  height: 22px !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+}
+
+/* 메타(이름/주소) 컨테이너 (s-item의 두 번째 자식 div) */
+#shelterList .s-item > div:last-child {
+  flex: 1 1 auto !important;
+}
+#shelterList .s-item > div:last-child .title {
+  font-weight: 700 !important;
+  font-size: 13px !important;
+  margin-bottom: 2px !important;
+}
+#shelterList .s-item > div:last-child .addr {
+  font-size: 12px !important;
+  color: #666 !important;
+}
+
+/* ===== 인포윈도우(알림판) ===== */
+/* infoHTML()이 주입하는 버튼 클래스 */
+.goto-shelter {
+  padding: 6px 10px !important;
+  border: 1px solid #e5e5e5 !important;
+  border-radius: 6px !important;
+  background: #fff !important;
+  cursor: pointer !important;
+  font-size: 12px !important;
+}
+.goto-shelter:hover {
+  background: #f6f8fb !important;
+}
+
+/* 인포윈도우 안 텍스트(제목/주소) 기본값을 조금 다듬고 싶다면 */
+.kakao-infowindow .title,
+.info-window .title {
+  font-weight: 700 !important;
+}
+.kakao-infowindow .addr,
+.info-window .addr {
+  color: #333 !important;
+  font-size: 12px !important;
+}
+
+/* ===== 스크롤바(옵션) ===== */
+#shelterList::-webkit-scrollbar,
+#shelterSuggest::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+#shelterList::-webkit-scrollbar-thumb,
+#shelterSuggest::-webkit-scrollbar-thumb {
+  background: #d6dbe6;
+  border-radius: 8px;
+}
+
+/* =========================
+   [추가 CSS] — 새 기능/보완 (기존과 충돌 없게)
+   ========================= */
+
+/* 카테고리 버튼 영역 */
+#shelterCats.cats {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* 카테고리 버튼 */
+#shelterCats .btn.cat {
+  padding: 6px 10px;
+  border: 1px solid #e5e5e5;
+  border-radius: 999px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1;
+}
+#shelterCats .btn.cat:hover {
+  background: #f6f8fb;
+}
+#shelterCats .btn.cat.active {
+  border-color: #4f7cff;
+  background: #ecf1ff;
+  color: #2b57d0;
+  font-weight: 700;
+}
+
+/* 리스트 하단 "더 있음" 안내 */
+#shelterList .more {
+  margin: 8px 6px 0;
+  padding: 8px 10px;
+  background: #f9fbff;
+  border: 1px dashed #d6dbe6;
+  border-radius: 8px;
+  color: #2b57d0;
+  font-size: 12px;
+}
+
+/* (보완) 혹시 기존 JS가 nm/ad 클래스를 사용하던 경우를 위한 호환성 */
+#shelterList .s-item > div:last-child .nm { /* = .title */
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+#shelterList .s-item > div:last-child .ad { /* = .addr */
+  font-size: 12px;
+  color: #666;
+}
