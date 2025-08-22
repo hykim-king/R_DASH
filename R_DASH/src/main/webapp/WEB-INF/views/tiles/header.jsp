@@ -119,7 +119,7 @@
                 <ul class="nav nav-sm flex-column">
                   <li class="nav-item">
                     <a href="/ehr/news/newsPage.do" class="nav-link">
-                      <span class="sidenav-mini-icon"></span>
+                      <span class="sidenav-mini-icon">뉴스</span>
                       <span class="sidenav-normal"> 재난 뉴스 </span>
                     </a>
                   </li>
@@ -135,7 +135,7 @@
                 <ul class="nav nav-sm flex-column">
                   <li class="nav-item">
                     <a href="/ehr/board/doRetrieve.do" class="nav-link">
-                      <span class="sidenav-mini-icon"></span>
+                      <span class="sidenav-mini-icon">공지</span>
                       <span class="sidenav-normal"> 공지보기 </span>
                     </a>
                   </li>

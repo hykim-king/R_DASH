@@ -367,7 +367,6 @@ document.addEventListener('DOMContentLoaded', function(){
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/common/socket.jsp"></jsp:include>
-
 <% 
   LocalDate today = LocalDate.now();
   int year = today.getYear();

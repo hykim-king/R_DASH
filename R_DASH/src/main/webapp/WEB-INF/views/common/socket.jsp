@@ -2,6 +2,10 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<link href="/ehr/resources/template/dashboard/css/dashboard.css" rel="stylesheet" />
+<link href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo.css" rel="stylesheet" />
+<link href="/ehr/resources/template/dashboard/assets/vendor/nucleo/css/nucleo-svg.css" rel="stylesheet" />
+<link href="/ehr/resources/template/dashboard/assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
 <style>
 /* 모달 그림자 & 둥근 모서리 */
 .modal-content {
@@ -64,8 +68,6 @@
   padding: 10px 0;         /* 필요시 여백 조정 */
 }
 </style>
-</style>
-
 
 <div class="modal fade" id="noticeModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
@@ -80,7 +82,7 @@
         <div id="noticeContents" class="mb-0"></div>
       </div>
       <div class="moveBtn">
-       <input  class="moveToboard" type="button" value="공지사항 더보기 >">
+       <button type="button" id="moveNoticeBtn" class="btn btn-default">공지사항 더보기 ✨</button>
       </div>
     </div>
   </div>
@@ -111,13 +113,14 @@
        let noticeModal = new bootstrap.Modal(document.getElementById("noticeModal"));
        noticeModal.show();
    });
-	$("#moveToboard").on('click',function(){
-		console.log("moveToboard click");
+	  //공지로 이동하기
+	$("#moveNoticeBtn").on('click',function(){
+		console.log("moveNoticeBtn click");
 		
-		alret("공지사항으로 이동합니다.");
+		alert("공지사항으로 이동합니다.");
 		
 		// 새 탭에서 열기
-	    window.open('/ehr/board/doRetrieve.do', '_blank');
+	    window.open('/ehr/board/doRetrieve.do','_self');
 		
 	})
 });
