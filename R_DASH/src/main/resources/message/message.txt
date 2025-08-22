@@ -1,0 +1,30 @@
+message.board.saveBoardTitle=재난 공지사항 안내
+message.board.saveBoardComment1=이 페이지에서는 최신 재난 소식과 안전 관련 안내를 확인하실 수 있습니다.
+message.board.saveBoardComment2=태풍, 폭우, 화재 등 각종 재난 상황에 대한 정보를 신속하게 제공하여
+message.board.saveBoardComment3=시민 여러분의 안전한 생활을 돕습니다.
+message.board.noticeBoard=공지사항
+message.board.gun=건
+message.board.all=전체
+message.board.search=검색
+message.board.reg=등록
+message.board.title=제목
+message.board.contents=내용
+message.board.no=번호
+message.board.regDt=작성일
+message.board.view=조회수
+
+
+message.board.saveBoardTitle=Disaster safety notice
+message.board.saveBoardComment1=This page provides the latest disaster news and safety guidance.
+message.board.saveBoardComment2=By providing information on various disaster situations such as typhoons, heavy rains, and fires quickly
+message.board.saveBoardComment3=It helps citizens live a safe life.
+message.board.noticeBoard=Notice
+message.board.gun=
+message.board.all=all
+message.board.search=search
+message.board.reg=reg
+message.board.title=title
+message.board.contents=contents
+message.board.no=no
+message.board.regDt=date
+message.board.view=hits
