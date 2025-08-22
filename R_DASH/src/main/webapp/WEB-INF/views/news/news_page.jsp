@@ -294,28 +294,34 @@ document.addEventListener('DOMContentLoaded', function(){
        window.open(url,"_blank",options);
     });
    // 더보기 버튼
-    let pageNo = 1;
+    let pageNo = 1; // 현재 페이지
     const pageSize = 10;
 
+    // 뉴스 로딩 함수 (기본 + 더보기)
     function loadNews(pageNo) {
         $.ajax({
-            url: "<c:url value='/news/doRetrieve.do'/>",  // 정확히 매핑된 URL
+            url: "<c:url value='/news/doRetrieve.do'/>",
             type: 'GET',
-            data: { pageNo: pageNo, pageSize: 10 },
+            data: { pageNo: pageNo, pageSize: pageSize },
             dataType: 'json',
             success: function(data) {
+                const tbody = $("#newsList"); // tbody id와 일치
                 if (!data || data.length === 0) {
-                    $('#loadMore').hide();
+                    if (pageNo === 0) { // 첫 페이지도 데이터 없으면
+                        tbody.html("<tr><td colspan='3'>데이터 없음</td></tr>");
+                    }
+                    $('#newsLoadMore').hide(); // 더보기 숨기기
                     return;
                 }
+
+                // 데이터가 있으면 tbody에 추가
                 data.forEach(function(vo) {
-                	 $('#newsList').append(
-                		        `<tr>
-                		            <td class="budget"><c:out value="${vo.company }"/></td>
-                                    <td class="budget"><a href="${vo.url}" target ="_blank"><c:out value="${vo.title }"/></a></td>
-                                    <td class="budget"><c:out value="${vo.pubDt }"/></td> 
-                		        </tr>`
-                		    );
+                    const row = "<tr>" +
+                        "<td class='budget'>" + vo.company + "</td>" +
+                        "<td class='budget'><a href='" + vo.url + "' target='_blank'>" + vo.title + "</a></td>" +
+                        "<td class='budget'>" + vo.pubDt + "</td>" +
+                        "</tr>";
+                    tbody.append(row);
                 });
             },
             error: function(err) {
@@ -325,14 +331,37 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     // 초기 로딩
-    loadNews(pageNo);
-
-    // 더보기 버튼
-    $('#newsLoadMore').click(function() {
-        pageNo++;
+    $(document).ready(function() {
         loadNews(pageNo);
+
+        // 더보기 버튼 클릭
+        $('#newsLoadMore').click(function() {
+            pageNo++;
+            loadNews(pageNo);
+        });
+    });
+    //재민이 마우스 오버
+    const clickMeWrapper = document.querySelector("#clickMe");
+    const clickMeDefaultImage = document.querySelector("#clickMeDefault");
+    const clickMeOverImage = document.querySelector("#clickMeOver");
+    
+    // 초기 상태: 기본 이미지만 보이게
+    clickMeDefaultImage.style.display = "block";
+    clickMeOverImage.style.display = "none";
+    
+    console.log(clickMeDefault);
+    console.log(clickMeOverImage);
+    
+    clickMeWrapper.addEventListener('mouseover',function(){
+    	clickMeDefaultImage.style.display = "none";
+        clickMeOverImage.style.display = "block";
+    });
+    clickMeWrapper.addEventListener('mouseout',function(){
+        clickMeDefaultImage.style.display = "block";
+        clickMeOverImage.style.display = "none";
     });
 });
+
 
 </script>
 </head>
@@ -422,7 +451,8 @@ document.addEventListener('DOMContentLoaded', function(){
 	       </div>
 	       <!-- 오늘의 키워드 보여줄 click me -->
 	       <div id="clickMe" class="clickMeWrapper">
-		        <img class="clickMeImg" src="/ehr/resources/image/news_Jeamin.png" alt="나를 클릭해봐">
+		        <img id="clickMeDefault" class="clickMeImg" src="/ehr/resources/image/news_Jeamin.png" alt="나를 클릭해봐">
+		        <img id="clickMeOver" class="clickMeImg" src="/ehr/resources/image/hello_jm.png" alt="안녕!">
 		        <div class="clickMeIcon">
 		           <!--  <i class="ni ni-chat-round"></i> -->
 		            <span class="chatText"> 나를 클릭해 봐 ! 📊</span>
@@ -489,21 +519,6 @@ document.addEventListener('DOMContentLoaded', function(){
 	                       <th>발행일자</th>
 	                   </tr>
 	               </thead>
-	               <tbody class="list" id="newsList">
-				    <c:choose>
-				        <c:when test="${newsList.size() > 0 }">
-						    <c:forEach var="vo" items="${newsList }">
-	                            <tr>
-		                            <td class="budget"><c:out value="${vo.company }"/></td>
-		                            <td class="budget"><a href="${vo.url}" target ="_blank"><c:out value="${vo.title }"/></a></td>
-		                            <td class="budget"><c:out value="${vo.pubDt }"/></td>   
-					           </tr>
-					        </c:forEach>
-				        </c:when>
-				        <c:otherwise>
-				        </c:otherwise>
-				    </c:choose>
-				    </tbody> 
 				    <tbody class="list" id="newsList"></tbody>
 				    </table>
 				 </div>  <!-- //전체 조회 테이블 -->
