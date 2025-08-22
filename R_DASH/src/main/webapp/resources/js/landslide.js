@@ -23,7 +23,18 @@ $(document).ready(function() {
                         backgroundColor: 'rgba(75, 192, 192, 0.6)'
                     }]
                 },
-                options: { responsive: true }
+                options: { 
+                    responsive: true,
+                    scales: {
+                        x: { 
+                            grid: {
+                                drawTicks: false,   // 눈금선 제거
+                                drawBorder: false,  // 축선 제거
+                                color: 'transparent' // 격자선 색상 투명
+                                }  
+                            }
+                    }
+                 }
             });
         }
     });
@@ -46,7 +57,17 @@ $(document).ready(function() {
                         backgroundColor: 'rgba(255, 99, 132, 0.6)'
                     }]
                 },
-                options: { responsive: true }
+                options: { responsive: true,
+                    scales: {
+                        x: { 
+                            grid: {
+                                drawTicks: false,
+                                drawBorder: false,
+                                color: 'transparent'
+                                }  
+                            }
+                    }
+                 }
             });
         }
     });
@@ -56,7 +77,7 @@ $(document).ready(function() {
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-            const labels = data.map(row => row.MONTH);
+            const labels = data.map(row => row.MONTH+"월");
             const counts = data.map(row => row.TOTAL_COUNT);
 
             new Chart($('#monthChart'), {
@@ -73,10 +94,10 @@ $(document).ready(function() {
                   responsive: true,
                   scales: {
                         x: {
-                            ticks: {
-                                autoSkip: false,
-                                maxRotation: 45,    
-                                minRotation: 45
+                            grid: {
+                                drawTicks: false,
+                                drawBorder: false,
+                                color: 'transparent'
                             }
                         }
                     }
@@ -105,7 +126,16 @@ $(document).ready(function() {
                 },
                 options: { 
                   indexAxis: 'y',
-                  responsive: true }
+                  responsive: true,
+                  scales: {
+                      y: {
+                          grid: {
+                              drawTicks: false,
+                              drawBorder: false,
+                              color: 'transparent'
+                          }
+                      }
+                  }}
             });
         }
     });

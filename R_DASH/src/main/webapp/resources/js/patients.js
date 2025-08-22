@@ -67,7 +67,13 @@ $(document).ready(function() {
                         responsive: true,
                         scales: {
                             y: { beginAtZero: true, title: { display: true, text: '환자 수' } },
-                            x: { title: { display: true, text: groupType === 'region' ? '지역' : '년도' } }
+                            x: { title: { display: true, text: groupType === 'region' ? '지역' : '년도' },
+                                grid: {
+                                    drawTicks: false,   // 눈금선 제거
+                                    drawBorder: false,  // 축선 제거
+                                    color: 'transparent' // 격자선 색상 투명
+                                    }  
+                                }
                         }
                     }
                 });
@@ -85,8 +91,18 @@ $(document).ready(function() {
                     options: {
                         responsive: true,
                         scales: {
-                            y: { beginAtZero: true, title: { display: true, text: '환자 수' } },
-                            x: { title: { display: true, text: groupType === 'region' ? '지역' : '년도' } }
+                            y: { 
+                                beginAtZero: true, 
+                                title: { display: true, text: '환자 수' } 
+                                },
+                            x: { 
+                                title: { display: true, text: groupType === 'region' ? '지역' : '년도' },
+                                grid: {
+                                    drawTicks: false,   // 눈금선 제거
+                                    drawBorder: false,  // 축선 제거
+                                    color: 'transparent' // 격자선 색상 투명
+                                    }  
+                                }
                         }
                     }
                 });

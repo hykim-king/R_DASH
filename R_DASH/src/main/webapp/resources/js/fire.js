@@ -26,7 +26,20 @@ jq36(document).ready(function() {
                 pageLength: 10,
                 searching: true,
                 ordering: true,
-                destroy: true
+                destroy: true,
+                language: {
+                    lengthMenu: "_MENU_ 개씩 보기",     // "Show 10 entries" → "10개씩 보기"
+                    search: "검색:",                    // "Search:" → "검색:"
+                    info: "총 _TOTAL_개 중 _START_ ~ _END_",
+                    infoEmpty: "데이터 없음",
+                    infoFiltered: "(전체 _MAX_개 중 검색됨)",
+                    paginate: {
+                        first: "처음",
+                        last: "마지막",
+                        next: "다음",
+                        previous: "이전"
+                    }
+                }
             });
         },
         error: function(xhr, status, error) {
@@ -87,7 +100,14 @@ jq36(document).ready(function() {
                             position: 'right',
                             title: { display: true, text: '복구금액 (원)' },
                             grid: { drawOnChartArea: false }
-                        }
+                        },
+                        x: { 
+                            grid: {
+                                drawTicks: false,   // 눈금선 제거
+                                drawBorder: false,  // 축선 제거
+                                color: 'transparent' // 격자선 색상 투명
+                                }  
+                            }
                     }
                 }
             });
@@ -159,7 +179,11 @@ jq36(document).ready(function() {
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-            const labels = data.map(row => row.FIRE_TYPE);
+            const typeMap = {
+                '임야': '산지/숲'
+            };
+
+            const labels = data.map(row => typeMap[row.FIRE_TYPE] || row.FIRE_TYPE);
             const damage = data.map(row => row.TOTAL_DAMAGE);
 
             const ctxDamage = document.getElementById('damageChart').getContext('2d');
@@ -183,7 +207,19 @@ jq36(document).ready(function() {
                         legend: { display: true }
                     },
                     scales: {
-                        y: { beginAtZero: true, title: { display: true, text: '재산피해 (원)' } }
+                        y: { beginAtZero: true, title: { display: true, text: '재산피해 (천원)' } },
+                        x: { 
+                            ticks:{
+                                autoSkip: false,
+                                maxRotation: 0,    
+                                minRotation: 0
+                            },
+                            grid: {
+                                drawTicks: false,   // 눈금선 제거
+                                drawBorder: false,  // 축선 제거
+                                color: 'transparent' // 격자선 색상 투명
+                                }  
+                            }
                     }
                 }
             });
@@ -221,7 +257,14 @@ jq36(document).ready(function() {
                         title: { display: true, text: '호선별 소화기 개수' }
                     },
                     scales: {
-                        y: { beginAtZero: true }
+                        y: { beginAtZero: true },
+                        x: { 
+                            grid: {
+                                drawTicks: false,   // 눈금선 제거
+                                drawBorder: false,  // 축선 제거
+                                color: 'transparent' // 격자선 색상 투명
+                                }  
+                            }
                     }
                 }
             });

@@ -155,11 +155,11 @@
     <!-- 월별 통계 -->
     <select id="selectByMonth" resultType="map">
         SELECT 
-            TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM') AS month,
-            COUNT(*) AS total_count
-        FROM LANDSLIDE
-        GROUP BY TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM')
-        ORDER BY month
+		    TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM') AS month,
+		    COUNT(*) AS total_count
+		FROM LANDSLIDE
+		GROUP BY TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM')
+		ORDER BY month
     </select>
 
     <!-- 주의보/경보 등 예보 상태별 통계 -->
