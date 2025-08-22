@@ -186,6 +186,32 @@ img.card-img-top {
 	justify-content: space-between
 }
 
+.chat-head-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.chat-min-btn {
+	width: 28px;
+	height: 28px;
+	border: 0;
+	border-radius: 6px;
+	background: rgba(255, 255, 255, .25);
+	color: #fff;
+	font-weight: 900;
+	line-height: 28px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: background .12s;
+}
+
+.chat-min-btn:hover {
+	background: rgba(255, 255, 255, .35);
+}
+
 .chat-body {
 	flex: 1;
 	min-height: 0;
@@ -252,7 +278,6 @@ img.card-img-top {
 }
 
 /* ===== 내 대화방 패널 ===== */
-/* 기본: 모달 헤더 위쪽(거의 보이지 않게 숨김) */
 .history-dock {
 	position: absolute;
 	left: 0;
@@ -275,7 +300,6 @@ img.card-img-top {
 	max-height: 46px
 }
 
-/* “아래 모드” */
 .history-dock.below {
 	left: 12px;
 	right: 12px;
@@ -283,7 +307,7 @@ img.card-img-top {
 	transform: none;
 	width: auto;
 	border-radius: 0 0 12px 12px;
-	z-index: 2; /* 헤더(z=3) 아래 */
+	z-index: 2;
 }
 
 .history-head {
@@ -325,7 +349,9 @@ img.card-img-top {
 	cursor: pointer;
 	border-radius: 10px;
 	padding: 8px 10px;
-	transition: background .12s
+	transition: background .12s;
+	position: relative;
+	padding-right: 42px; /* delete 버튼 공간 */
 }
 
 .history-item:hover {
@@ -368,6 +394,32 @@ img.card-img-top {
 	background: #0d6efd;
 	color: #fff;
 	cursor: pointer
+}
+/* 삭제 버튼 */
+.history-del {
+	position: absolute;
+	right: 8px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 28px;
+	height: 28px;
+	border: 0;
+	border-radius: 6px;
+	background: #374151;
+	color: #fff;
+	font-weight: 900;
+	line-height: 28px;
+	cursor: pointer;
+	opacity: .0;
+	transition: opacity .12s, background .12s;
+}
+
+.history-item:hover .history-del {
+	opacity: .9
+}
+
+.history-del:hover {
+	background: #ef4444
 }
 
 @media ( max-width :576px) {
@@ -493,7 +545,7 @@ img.card-img-top {
 					<div id="historyHead" class="history-head">
 						<span>내 대화방</span>
 						<div style="display: flex; gap: 6px; align-items: center">
-							<button id="historyToggle" class="history-toggle" title="펼치기/접기"
+							<button id="historyToggle" class="history-toggle" title="내기록"
 								aria-expanded="false" aria-controls="historyBody">▾</button>
 						</div>
 					</div>
@@ -505,11 +557,11 @@ img.card-img-top {
 
 				<div class="chat-header">
 					<strong>재민이 채팅</strong>
-					<button id="chatClose" type="button"
-						class="btn-close btn-close-white" data-bs-dismiss="modal"
-						aria-label="Close"></button>
+					<div class="chat-head-actions">
+						<button id="chatMin" type="button" class="chat-min-btn"
+							title="out" aria-label="Minimize">–</button>
+					</div>
 				</div>
-
 				<div id="chatBody" class="chat-body">
 					<div class="chat-bubble bot">
 						안녕하세요! 재난 알림 도우미 <b>재민이</b>입니다. 무엇을 도와드릴까요? <span
@@ -545,9 +597,11 @@ img.card-img-top {
 
     /* refs */
     var chatModalEl=document.getElementById('chatModal');
-    var chatModal=new bootstrap.Modal(chatModalEl,{backdrop:'static',keyboard:true});
+    // ▼ 변경: backdrop true 로
+    var chatModal=new bootstrap.Modal(chatModalEl,{backdrop:true,keyboard:true});
     var chatBody=document.getElementById('chatBody');
     var chatInput=document.getElementById('chatInput');
+    var chatMinBtn=document.getElementById('chatMin');
 
     /* login */
     var LOGIN_USER_NO_RAW=(document.body.dataset.loginUserNo||'').trim();
@@ -603,16 +657,12 @@ img.card-img-top {
       [dockEl,dockBody,dockTgl,dockNew].forEach(function(el){ if(!el)return; events.forEach(function(ev){ el.addEventListener(ev,stopAll,false); }); });
     })();
 
-    /* ▼ 변경 1: 토글 시 아래로 펼치기 */
+    /* 토글: 아래로 펼치기 */
     function toggleDock(){
       if(!dockEl)return;
       var collapsed=dockEl.classList.toggle('collapsed');
       if(dockTgl){ dockTgl.setAttribute('aria-expanded', String(!collapsed)); }
-      if(!collapsed){
-        setDockBelow(true);   // 펼칠 때 아래 모드
-      }else{
-        setDockBelow(false);  // 접힐 때 원복
-      }
+      if(!collapsed){ setDockBelow(true); } else { setDockBelow(false); }
     }
     if(dockHead){
       dockHead.addEventListener('click',function(e){ e.stopPropagation(); toggleDock(); });
@@ -637,30 +687,85 @@ img.card-img-top {
       if(!win){ location.href=url; }
     }
 
+    /* ===== 삭제 관련 유틸/동작 ===== */
+    function removeLocalSession(sid){
+      if(!sid) return;
+      var list=getLocalSessions().filter(function(x){ return x!==sid; });
+      setLocalSessions(list);
+      localStorage.removeItem(_msgsKey(sid));
+    }
+
+    async function deleteSession(sid){
+      if(!sid) return;
+
+      if(LOGIN_USER_NO!=null){
+        try{
+          const res = await fetch(CP+'/api/chat/sessions/'+encodeURIComponent(sid), {
+            method:'DELETE',
+            headers:{ 'X-User-No': LOGIN_USER_NO }
+          });
+          if(!res.ok){ console.warn('delete api failed', res.status); }
+        }catch(e){ console.warn('delete api error', e); }
+      }
+
+      removeLocalSession(sid);
+
+      if(SESSION_ID===sid){
+        const rest=getLocalSessions();
+        SESSION_ID = rest[0] || null;
+        if(SESSION_ID){
+          localStorage.setItem('X-Session-Id', SESSION_ID);
+          await openDockRoom(SESSION_ID);
+        }else{
+          localStorage.removeItem('X-Session-Id');
+          chatBody.innerHTML='';
+        }
+      }
+      await loadDockSessions();
+      applyBodyPadding();
+    }
+
     function renderDock(list){
       dockBody.innerHTML='';
       if(!list||!list.length){
-        var emp=document.createElement('div'); emp.style.cssText='padding:10px;color:#cfd6e3;font-size:.86rem;'; emp.textContent='저장된 대화가 없습니다.'; dockBody.appendChild(emp);
+        var emp=document.createElement('div');
+        emp.style.cssText='padding:10px;color:#cfd6e3;font-size:.86rem;';
+        emp.textContent='저장된 대화가 없습니다.';
+        dockBody.appendChild(emp);
         applyBodyPadding(); return;
       }
       list.forEach(function(s){
         var cached=getLocalMsgs(s.sessionId);
         if((!s.lastMsg||s.lastMsg==='')&&cached.length){ s.lastMsg=previewOf(cached[cached.length-1].text); }
+
         var it=document.createElement('div');
         it.className='history-item'+(s.sessionId===SESSION_ID?' active':'');
         it.dataset.sid=s.sessionId;
-        it.innerHTML='<div class="history-title">'+escapeHtml(s.title||'새 대화')+'</div>'
-                    +'<div class="history-sub">'+escapeHtml(s.lastMsg||'')+'</div>'
-                    +'<div class="history-time">'+escapeHtml(s.updatedAt||'')+'</div>';
+
+        it.innerHTML =
+          '<div class="history-title">'+escapeHtml(s.title||'새 대화')+'</div>'
+         +'<div class="history-sub">'+escapeHtml(s.lastMsg||'')+'</div>'
+         +'<div class="history-time">'+escapeHtml(s.updatedAt||'')+'</div>'
+         +'<button class="history-del" title="삭제" aria-label="대화 삭제" data-del="'+s.sessionId+'">×</button>';
+
         it.addEventListener('click',function(e){
+          if(e.target && e.target.classList.contains('history-del')) return;
           e.stopPropagation();
           SESSION_ID=s.sessionId; localStorage.setItem('X-Session-Id',SESSION_ID);
           openDockRoom(SESSION_ID).then(function(){
-            Array.prototype.forEach.call(document.querySelectorAll('.history-item'),function(x){ x.classList.toggle('active',x.dataset.sid===SESSION_ID); });
-            dockEl.classList.add('collapsed'); /* ▼ 변경 3: 방향 원복 코드 제거 */
-            // setDockBelow(false);  // ← 삭제하여 아래 모드 유지 가능
+            Array.prototype.forEach.call(document.querySelectorAll('.history-item'),function(x){
+              x.classList.toggle('active',x.dataset.sid===SESSION_ID);
+            });
+            dockEl.classList.add('collapsed');
           });
         });
+
+        it.querySelector('.history-del').addEventListener('click', function(e){
+          e.stopPropagation();
+          var sid=e.currentTarget.getAttribute('data-del');
+          if(confirm('이 대화를 삭제할까요?')){ deleteSession(sid); }
+        });
+
         dockBody.appendChild(it);
       });
       applyBodyPadding();
@@ -673,7 +778,9 @@ img.card-img-top {
           var res=await fetch(CP+'/api/chat/sessions?limit=100',{headers:{'X-User-No':LOGIN_USER_NO}});
           if(res.ok){
             var list=await res.json();
-            renderDock(Array.isArray(list)?list.map(function(s){return {sessionId:s.sessionId,title:s.title||'새 대화',lastMsg:s.lastMsg||'',updatedAt:s.updatedAt||''};}):[]);
+            renderDock(Array.isArray(list)?list.map(function(s){
+              return {sessionId:s.sessionId,title:s.title||'새 대화',lastMsg:s.lastMsg||'',updatedAt:s.updatedAt||''};
+            }):[]);
             return;
           }
         }catch(e){ console.warn('sessions api fallback(local)',e); }
@@ -686,9 +793,22 @@ img.card-img-top {
       if(!Array.isArray(rows)||!rows.length) return false;
       chatBody.innerHTML=''; var fresh=[];
       rows.forEach(function(m){
-        if(m.question && String(m.question).trim()!==''){ var q=String(m.question); appendBubble(escapeHtml(q).replace(/\n/g,'<br>'),'user'); fresh.push({role:'user',text:q,ts:Date.now()}); }
-        if(m.answer && String(m.answer).trim()!==''){ var a=String(m.answer); appendBubble(escapeHtml(a).replace(/\n/g,'<br>'),'bot'); fresh.push({role:'bot',text:a,ts:Date.now()}); }
-        if(!m.question && !m.answer && m.text){ var role=(m.role==='bot'||m.role==='assistant')?'bot':'user'; var t=String(m.text); appendBubble(escapeHtml(t).replace(/\n/g,'<br>'),role); fresh.push({role:role,text:t,ts:Date.now()}); }
+        if(m.question && String(m.question).trim()!==''){
+          var q=String(m.question);
+          appendBubble(escapeHtml(q).replace(/\n/g,'<br>'),'user');
+          fresh.push({role:'user',text:q,ts:Date.now()});
+        }
+        if(m.answer && String(m.answer).trim()!==''){
+          var a=String(m.answer);
+          appendBubble(escapeHtml(a).replace(/\n/g,'<br>'),'bot');
+          fresh.push({role:'bot',text:a,ts:Date.now()});
+        }
+        if(!m.question && !m.answer && m.text){
+          var role=(m.role==='bot'||m.role==='assistant')?'bot':'user';
+          var t=String(m.text);
+          appendBubble(escapeHtml(t).replace(/\n/g,'<br>'),role);
+          fresh.push({role:role,text:t,ts:Date.now()});
+        }
       });
       chatBody.scrollTop=chatBody.scrollHeight; setLocalMsgs(sid,fresh); return true;
     }
@@ -696,7 +816,12 @@ img.card-img-top {
     async function openDockRoom(sid){
       if(!sid) return; chatBody.innerHTML='';
       var cached=getLocalMsgs(sid);
-      if(cached.length){ cached.forEach(function(m){ appendBubble(escapeHtml(m.text).replace(/\n/g,'<br>'), m.role==='bot'?'bot':'user'); }); chatBody.scrollTop=chatBody.scrollHeight; }
+      if(cached.length){
+        cached.forEach(function(m){
+          appendBubble(escapeHtml(m.text).replace(/\n/g,'<br>'), m.role==='bot'?'bot':'user');
+        });
+        chatBody.scrollTop=chatBody.scrollHeight;
+      }
       var replaced=false;
       if(LOGIN_USER_NO!=null){
         try{
@@ -707,13 +832,13 @@ img.card-img-top {
       if(!replaced){
         try{
           var res2=await fetch(CP+'/api/chat/history?limit=200',{headers:{'X-Session-Id':sid}});
-          if(res2.ok){ var rows2=await res2.json(); renderRowsAndCache(sid,rows2); }
+          if(res2.ok){ var rows2=await res2.json(); renderRowsAndCache(sid,rows2); }  // ▼ 오타 수정(res2.json)
         }catch(err){ console.error(err); }
       }
       applyBodyPadding();
     }
 
-    /* + 새 대화: 기본=현재창, Alt/중클릭=팝업 */
+    /* + 새 대화 */
     if(dockNew){
       dockNew.addEventListener('click', async function(e){
         e.stopPropagation();
@@ -723,7 +848,7 @@ img.card-img-top {
           var sid=(await res.text())||crypto.randomUUID();
           SESSION_ID=sid; localStorage.setItem('X-Session-Id',sid); addLocalSession(sid);
           await loadDockSessions(); await openDockRoom(sid);
-          dockEl.classList.remove('collapsed'); setDockBelow(true); // 아래 모드로
+          dockEl.classList.remove('collapsed'); setDockBelow(true);
         }catch(e){
           var sid2=crypto.randomUUID(); SESSION_ID=sid2; localStorage.setItem('X-Session-Id',sid2); addLocalSession(sid2);
           await loadDockSessions(); await openDockRoom(sid2);
@@ -744,31 +869,61 @@ img.card-img-top {
       }
       appendBubble(escapeHtml(text).replace(/\n/g,'<br>'),'user'); pushLocalMsg(SESSION_ID,'user',text); document.getElementById('chatInput').value='';
       try{
-        var headers={'Content-Type':'application/json'}; if(SESSION_ID) headers['X-Session-Id']=SESSION_ID; if(LOGIN_USER_NO!=null) headers['X-User-No']=LOGIN_USER_NO;
+        var headers={'Content-Type':'application/json'};
+        if(SESSION_ID) headers['X-Session-Id']=SESSION_ID;
+        if(LOGIN_USER_NO!=null) headers['X-User-No']=LOGIN_USER_NO;
         var prevSid=SESSION_ID;
         var res=await fetch(CP+'/api/chat/send',{method:'POST',headers:headers,body:JSON.stringify({question:text,userNo:LOGIN_USER_NO||undefined})});
         var sid=res.headers.get('X-Session-Id');
-        if(sid){ if(sid!==SESSION_ID){ migrateCache(prevSid,sid); SESSION_ID=sid; } localStorage.setItem('X-Session-Id',SESSION_ID); addLocalSession(SESSION_ID); }
+        if(sid){
+          if(sid!==SESSION_ID){ migrateCache(prevSid,sid); SESSION_ID=sid; }
+          localStorage.setItem('X-Session-Id',SESSION_ID); addLocalSession(SESSION_ID);
+        }
         var raw=await res.text(); var data=null; try{ data=JSON.parse(raw);}catch(e){}
-        if(!res.ok){ var err='AI 호출 실패('+res.status+') '+(raw||''); appendBubble(escapeHtml(err),'bot'); pushLocalMsg(SESSION_ID,'bot',err); console.error('chat/send error',res.status,raw); return; }
-        var answer=(data&&data.answer)?String(data.answer):'응답을 불러오지 못했어요.'; appendBubble(escapeHtml(answer).replace(/\n/g,'<br>'),'bot'); pushLocalMsg(SESSION_ID,'bot',answer);
+        if(!res.ok){
+          var err='AI 호출 실패('+res.status+') '+(raw||'');
+          appendBubble(escapeHtml(err),'bot'); pushLocalMsg(SESSION_ID,'bot',err); console.error('chat/send error',res.status,raw); return;
+        }
+        var answer=(data&&data.answer)?String(data.answer):'응답을 불러오지 못했어요.';
+        appendBubble(escapeHtml(answer).replace(/\n/g,'<br>'),'bot'); pushLocalMsg(SESSION_ID,'bot',answer);
         loadDockSessions();
-      }catch(e){ var net='네트워크 오류가 발생했어요. 연결 상태를 확인해 주세요.'; appendBubble(escapeHtml(net),'bot'); pushLocalMsg(SESSION_ID,'bot',net); console.error(e); }
+      }catch(e){
+        var net='네트워크 오류가 발생했어요. 연결 상태를 확인해 주세요.';
+        appendBubble(escapeHtml(net),'bot'); pushLocalMsg(SESSION_ID,'bot',net); console.error(e);
+      }
     }
     document.getElementById('chatSend').addEventListener('click',sendMessage);
     document.getElementById('chatInput').addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } });
 
-    /* ▼ 변경 2: 모달 열릴 때 기본을 '아래 모드'로 */
+    /* 모달 열릴 때 기본을 '아래 모드'로 */
     chatModalEl.addEventListener('shown.bs.modal', async function(){
       chatBody.scrollTop=chatBody.scrollHeight;
       await loadDockSessions();
       if(SESSION_ID) await openDockRoom(SESSION_ID);
-      setDockBelow(true); // 기본은 아래 모드
+      setDockBelow(true);
     });
+
+    /* – 버튼으로 모달 숨기기 */
+    if(chatMinBtn){
+      chatMinBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        chatModal.hide();
+      });
+    }
+
+    /* ▼ 안전망: 모달 밖(메인화면) 클릭 시 닫기 */
+    document.addEventListener('click', function(e){
+      if(!chatModalEl.classList.contains('show')) return;                 // 모달 열렸을 때만
+      if(e.target.closest('#chatModal .modal-content')) return;           // 모달 내부 클릭은 무시
+      if(e.target.closest('.floating-icon')) return;                      // 런처 클릭은 무시
+      chatModal.hide();
+    }, true); // 캡처 단계
 
     /* launcher */
     var iconEl=document.querySelector('.floating-icon');
-    if(iconEl) iconEl.addEventListener('click',function(e){ e.preventDefault(); chatModal.show(); setTimeout(function(){ chatInput && chatInput.focus(); },200); });
+    if(iconEl) iconEl.addEventListener('click',function(e){
+      e.preventDefault(); chatModal.show(); setTimeout(function(){ chatInput && chatInput.focus(); },200);
+    });
 
     /* popup (?popup=1&sid=...) */
     (async function initPopupIfNeeded(){
@@ -778,14 +933,19 @@ img.card-img-top {
       if(!isPopup) return;
       chatModal.show();
       setTimeout(function(){ chatInput && chatInput.focus(); },200);
-      if(sidParam){ SESSION_ID=sidParam; localStorage.setItem('X-Session-Id',SESSION_ID); addLocalSession(SESSION_ID); try{ await openDockRoom(SESSION_ID); }catch(_){ } }
-      else{
-        const sid=await (async()=>{ try{ const r=await fetch(CP+'/api/chat/sessions/new',{method:'POST'}); return (await r.text()) || (crypto.randomUUID?crypto.randomUUID():String(Date.now())); }catch(_){ return (crypto.randomUUID?crypto.randomUUID():String(Date.now())); }})();
+      if(sidParam){
+        SESSION_ID=sidParam; localStorage.setItem('X-Session-Id',SESSION_ID); addLocalSession(SESSION_ID);
+        try{ await openDockRoom(SESSION_ID); }catch(_){}
+      }else{
+        const sid=await (async()=>{
+          try{ const r=await fetch(CP+'/api/chat/sessions/new',{method:'POST'}); return (await r.text()) || (crypto.randomUUID?crypto.randomUUID():String(Date.now())); }
+          catch(_){ return (crypto.randomUUID?crypto.randomUUID():String(Date.now())); }
+        })();
         SESSION_ID=sid; localStorage.setItem('X-Session-Id',sid); addLocalSession(sid); await openDockRoom(sid);
       }
-      setDockBelow(true); // 팝업은 바로 아래 모드
+      setDockBelow(true);
     })();
   });
-    </script>
+</script>
 </body>
 </html>
