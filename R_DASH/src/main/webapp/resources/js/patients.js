@@ -58,8 +58,8 @@ $(document).ready(function() {
                         datasets: [{
                             label: '환자 수',
                             data: totalValues,
-                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(38, 142, 190, 0.6)',
+                            borderColor: 'rgba(56, 151, 151, 1)',
                             borderWidth: 1
                         }]
                     },

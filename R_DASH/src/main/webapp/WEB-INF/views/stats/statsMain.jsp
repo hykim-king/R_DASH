@@ -161,7 +161,7 @@
 			</select>
 		</div>
 		<!-- 환자 전체 합계 -->
-		<h1>온열질환자</h1>
+		<h1>온열질환자  (2016년 ~ 2024년)</h1>
 		<div class="row mb-2">
             <div class="col-md-6 canvasContainer">
 	            <canvas id="patientsChart"></canvas>
@@ -305,6 +305,7 @@
     <script src="${pageContext.request.contextPath}/resources/js/sinkhole.js"></script>
     </c:when>
     <c:when test="${type == 'landslide'}">
+    <h1>산사태</h1>
     <div class="row mb-6">
         <div class="col-md-6 canvasContainer">
             <canvas id="yearChart"></canvas>
