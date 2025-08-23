@@ -52,7 +52,7 @@ $(document).ready(function() {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: '지역별 산사태 건수',
+                        label: '지역별 산사태 건수 (2019년 ~ 2024년)',
                         data: counts,
                         backgroundColor: 'rgba(255, 99, 132, 0.6)'
                     }]
@@ -119,7 +119,7 @@ $(document).ready(function() {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: '예보상태별 산사태 건수',
+                        label: '예보상태별 산사태 건수 (2019년 ~ 2024년)',
                         data: counts,
                         backgroundColor: 'rgba(255, 206, 86, 0.6)'
                     }]
