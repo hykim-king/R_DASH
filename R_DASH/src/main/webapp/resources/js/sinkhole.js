@@ -17,6 +17,15 @@ $.getJSON("/ehr/sinkholes/year", function(data) {
             responsive: true,
             plugins: {
                 title: { display: true, text: "년도별 발생횟수" }
+            },
+            scales:{
+                x:{
+                    grid: {
+                        drawTicks: false,   // 눈금선 제거
+                        drawBorder: false,  // 축선 제거
+                        color: 'transparent' // 격자선 색상 투명
+                    } 
+                }
             }
         }
     });
