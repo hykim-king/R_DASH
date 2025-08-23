@@ -61,7 +61,7 @@ public class FireController {
 	@GetMapping("/fire-stations.do")
 	@ResponseBody
 	public List<Map<String, Object>> getFireStation() throws SQLException {
-	    return fireStationService.getfirestationCounts();
+	    return fireStationService.getSigunguFireCounts();
 	}
 	
 	@GetMapping("/statsPage")
