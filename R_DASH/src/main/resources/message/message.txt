@@ -14,18 +14,46 @@ message.board.regDt=작성일
 message.board.view=조회수
 message.board.noBoard=등록된 게시글이 없습니다.
 
+message.board.no=번호
+message.board.title=제목
+message.board.reg=등록
+# news_page 
+message.news.topicCount=관련 뉴스 건수
+message.news.summrTitle=재민이AI의 오늘의 토픽 요약
+message.news.total=재난 종합
+message.news.fire=화재
+message.news.sinkhole=싱크홀
+message.news.heat=폭염
+message.news.dust=황사
+message.news.typhoon=태풍
+message.news.landslide=산사태
+message.news.flood=홍수
+message.news.cold =한파
+message.news.mod=수정
+message.news.click=나를 클릭해봐
+message.news.more=더보기
+message.news.today={0}년 {1}월 {2}일({3})
+message.news.updateDay=최종 업데이트 일자
 
-message.board.saveBoardTitle=Disaster safety notice
-message.board.saveBoardComment1=This page provides the latest disaster news and safety guidance.
-message.board.saveBoardComment2=By providing information on various disaster situations such as typhoons, heavy rains, and fires quickly
-message.board.saveBoardComment3=It helps citizens live a safe life.
-message.board.noticeBoard=Notice
-message.board.gun=
-message.board.all=all
-message.board.search=search
-message.board.reg=reg
-message.board.title=title
-message.board.contents=contents
-message.board.no=no
-message.board.regDt=date
-message.board.view=hits
+message.news.topicCount=ratio
+message.news.summrTitle=Jaemin AI's Summary of Today's Topics
+message.news.total=Total
+message.news.fire=Fire
+message.news.sinkhole=Sinkhole
+message.news.heat=Heat wave
+message.news.dust=Yellow dust
+message.news.typhoon=Typhoon
+message.news.landslide=Landslide
+message.news.flood=Flood
+message.news.cold=cold wave
+message.news.mod=mod
+message.news.click=Click Me
+message.news.more=more
+message.news.today=Today is {1} {2},{0} ({3})
+message.news.updateDay=Last Update Date
+
+
+
+
+
+

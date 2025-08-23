@@ -360,6 +360,19 @@ document.addEventListener('DOMContentLoaded', function(){
         clickMeDefaultImage.style.display = "block";
         clickMeOverImage.style.display = "none";
     });
+    
+     //언어 선택
+    const langSelect = document.querySelector("#lang");
+    const currentLang = "${empty lang ? 'ko' : lang}";
+    langSelect.value = currentLang;  // selected 반영
+    
+    // 언어 변경 이벤트
+    langSelect.addEventListener("change", function(){
+        const selectLang = langSelect.value;
+
+        window.location.href = '/ehr/news/newsPage.do?lang='+selectLang;
+    });
+    
 });
 
 
@@ -422,9 +435,9 @@ document.addEventListener('DOMContentLoaded', function(){
 	                    </colgroup>
 	                   <thead class="thead-light">
 	                       <tr>
-	                           <th>no</th>
-	                           <th>제목</th>
-	                           <th>관련 뉴스 건수</th>
+	                           <th>${msgs.no}</th>
+	                           <th>${msgs.title}</th>
+	                           <th>${msgs.topicCount}</th>
 	                       </tr>
 	                   </thead>
 	                   <tbody class="list">
@@ -454,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function(){
 		        <img id="clickMeOver" class="clickMeImg" src="/ehr/resources/image/hello_jm.png" alt="안녕!">
 		        <div class="clickMeIcon">
 		           <!--  <i class="ni ni-chat-round"></i> -->
-		            <span class="chatText"> 나를 클릭해 봐 ! 📊</span>
+		            <span class="chatText"> ${msgs.click} ! 📊</span>
 		        </div>
 		    </div>
 	       <!-- 오른쪽 : 토픽 상세 -->
@@ -466,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function(){
 				        </button>
 	                   <div class="row align-items-center">
 	                   <div class="col align-content-center">
-	                       <h5 id="heihlight" class="h3 mb-0">✨재민이AI의 오늘의 토픽 요약✨</h5>
+	                       <h5 id="heihlight" class="h3 mb-0">✨${msgs.summrTitle}✨</h5>
 	                   </div>
 	                   </div>
 	                   <button class="arrow right">
@@ -493,15 +506,15 @@ document.addEventListener('DOMContentLoaded', function(){
 	       <div class="card">
 	           <!-- news header -->
 	           <div class="card-header border-0">
-	                <input type="button" id="allBtn" class="btn btn-warning" data-keyword="" value="재난 종합">
-			        <input type="button" class="btn btn-warning" data-keyword="화재" value="화재">
-			        <input type="button" class="btn btn-warning" data-keyword="싱크홀" value="싱크홀">
-			        <input type="button" class="btn btn-warning" data-keyword="폭염" value="폭염">
-			        <input type="button" class="btn btn-warning" data-keyword="황사" value="황사">
-			        <input type="button" class="btn btn-warning" data-keyword="태풍" value="태풍">
-			        <input type="button" class="btn btn-warning" data-keyword="산사태" value="산사태">
-			        <input type="button" class="btn btn-warning" data-keyword="홍수" value="홍수">
-			        <input type="button" class="btn btn-warning" data-keyword="한파" value="한파">
+	                <input type="button" id="allBtn" class="btn btn-warning" data-keyword="" value="${msgs.total}">
+			        <input type="button" class="btn btn-warning" data-keyword="화재" value="${msgs.fire}">
+			        <input type="button" class="btn btn-warning" data-keyword="싱크홀" value="${msgs.sinkhole}">
+			        <input type="button" class="btn btn-warning" data-keyword="폭염" value="${msgs.heat}">
+			        <input type="button" class="btn btn-warning" data-keyword="황사" value="${msgs.dust}">
+			        <input type="button" class="btn btn-warning" data-keyword="태풍" value="${msgs.typhoon}">
+			        <input type="button" class="btn btn-warning" data-keyword="산사태" value="${msgs.landslide}">
+			        <input type="button" class="btn btn-warning" data-keyword="홍수" value="${msgs.flood}">
+			        <input type="button" class="btn btn-warning" data-keyword="한파" value="${msgs.cold}">
 	           </div>
 	           <!-- news table -->
 	           <div id="allNewsTable" class="table-responsive">
@@ -544,11 +557,11 @@ document.addEventListener('DOMContentLoaded', function(){
 	           <!-- news footer -->
 	           <div class="card-footer py-4">
 	               <div id="newsLoadMore" data-page="1">
-	                <span>+더보기</span>
+	                <span>+${msgs.more}</span>
 	               </div>
 	           </div>
 	          </div>
-                 <div>최종 업데이트 일자 : <c:out value="${latestRegDt}"/></div>
+                 <div>${msgs.updateDay} : <c:out value="${latestRegDt}"/></div>
 	          </div>
 	          </div>
 			      

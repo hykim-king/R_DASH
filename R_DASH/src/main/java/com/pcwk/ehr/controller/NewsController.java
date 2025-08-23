@@ -2,7 +2,10 @@ package com.pcwk.ehr.controller;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -10,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +37,9 @@ public class NewsController {
 	Logger log = LogManager.getLogger(getClass());
 	
 	@Autowired
+	private MessageSource messageSource;
+	
+	@Autowired
 	NewsService service;
 	
 	public NewsController() {
@@ -48,6 +55,33 @@ public class NewsController {
 	//5. 토픽 단건 조회 Get0
 	//6. 뉴스 키워드 조회 Get0
 	//7. 뉴스 전체 조회 Get0
+	
+	//다국어 소스 담기
+	private Map<String, String> getBoardMessages(Locale locale) {
+		Map<String, String> msgs = new HashMap<>();
+		
+		msgs.put("no", messageSource.getMessage("message.board.no", null, locale));
+		msgs.put("title", messageSource.getMessage("message.board.title", null, locale));
+		msgs.put("reg", messageSource.getMessage("message.board.reg", null, locale));
+		msgs.put("topicCount", messageSource.getMessage("message.news.topicCount", null, locale));
+		msgs.put("summrTitle", messageSource.getMessage("message.news.summrTitle", null, locale));
+		msgs.put("total", messageSource.getMessage("message.news.total", null, locale));
+		msgs.put("fire", messageSource.getMessage("message.news.fire", null, locale));
+		msgs.put("sinkhole", messageSource.getMessage("message.news.sinkhole", null, locale));
+		msgs.put("heat", messageSource.getMessage("message.news.heat", null, locale));
+		msgs.put("dust", messageSource.getMessage("message.news.dust", null, locale));
+		msgs.put("typhoon", messageSource.getMessage("message.news.typhoon", null, locale));
+		msgs.put("landslide", messageSource.getMessage("message.news.landslide", null, locale));
+		msgs.put("flood", messageSource.getMessage("message.news.flood", null, locale));   // 홍수
+		msgs.put("cold", messageSource.getMessage("message.news.cold", null, locale));     // 한파
+		msgs.put("mod", messageSource.getMessage("message.news.mod", null, locale));
+		msgs.put("click", messageSource.getMessage("message.news.click", null, locale));
+		msgs.put("more", messageSource.getMessage("message.news.more", null, locale));
+		msgs.put("today", messageSource.getMessage("message.news.today", null, locale));
+		msgs.put("updateDay", messageSource.getMessage("message.news.updateDay", null, locale));
+		
+		return msgs;
+	}
 	
 	
 	@GetMapping("/doUpdateView.do")
@@ -127,7 +161,11 @@ public class NewsController {
 	}
 	
 	@GetMapping(value="/newsPage.do", produces = "text/plain;charset=UTF-8")
-	public String newsPage(SearchDTO search,NewsDTO news,TopicDTO topic,Model model) {
+	public String newsPage(SearchDTO search,
+			NewsDTO news,
+			TopicDTO topic,
+			Model model,
+			@RequestParam(name="lang", required=false) String lang) {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *newsPage()*              │");
 		log.debug("└───────────────────────────┘");
@@ -173,6 +211,13 @@ public class NewsController {
 	        }
 	        model.addAttribute("topicDetails",topicDetails);
 	    }
+	    //lang이 값이 없으면 기본값(한국어)
+	    String resolvedLang = (lang != null && !lang.isEmpty()) ? lang : "ko";
+	    Locale locale = new Locale(resolvedLang);
+	    
+	    //언어 설정
+	    model.addAttribute("msgs", getBoardMessages(locale));
+	    model.addAttribute("lang", lang);
 	    
 		return viewName;
 	}
