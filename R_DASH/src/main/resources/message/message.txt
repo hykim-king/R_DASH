@@ -35,6 +35,13 @@ message.news.more=더보기
 message.news.today={0}년 {1}월 {2}일({3})
 message.news.updateDay=최종 업데이트 일자
 
+message.news.noTopic=등록된 토픽이 없습니다.
+message.news.newspaper=신문사
+message.news.pub=발행일자
+Date of publication=발행일자
+
+
+
 message.news.topicCount=ratio
 message.news.summrTitle=Jaemin AI's Summary of Today's Topics
 message.news.total=Total
@@ -51,6 +58,25 @@ message.news.click=Click Me
 message.news.more=more
 message.news.today=Today is {1} {2},{0} ({3})
 message.news.updateDay=Last Update Date
+message.news.noTopic=There are no registered topics.
+message.news.newspaper=Press
+message.news.pub=Date of publication
+
+#topic_word
+message.word.keyword=오늘의 키워드
+message.word.descript1=매일 100건의 재난 뉴스를 분석해 일일 단어 통계를 제공합니다.
+message.word.descript1=최신 재난 정보와 트렌드를 쉽게 확인해 보세요.
+message.word.count=빈도
+message.word.rate=증감율
+
+#topic_word
+message.word.keyword=Today's keyword
+message.word.descript1=It analyzes 100 disaster news every day to provide daily word statistics.
+message.word.descript1=Check out the latest disaster information and trends easily.
+message.word.count=freq
+message.word.rate=Change rate
+
+
 
 
 
