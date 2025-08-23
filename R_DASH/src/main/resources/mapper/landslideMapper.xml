@@ -145,10 +145,11 @@
 
     <!-- 지역별 통계 -->
     <select id="selectByRegion" resultType="map">
-        SELECT SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1) AS region,
-		       COUNT(*) AS total_count
+        SELECT 
+		    NVL(SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1), LND_INST_NM) AS region,
+		    COUNT(*) AS total_count
 		FROM LANDSLIDE
-		GROUP BY SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1)
+		GROUP BY NVL(SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1), LND_INST_NM)
 		ORDER BY total_count DESC
     </select>
 
