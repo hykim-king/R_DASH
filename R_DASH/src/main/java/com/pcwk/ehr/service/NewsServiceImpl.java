@@ -51,6 +51,10 @@ public class NewsServiceImpl implements NewsService {
 	public List<NewsDTO> doRetrieve(SearchDTO param){
 		return newsMapper.doRetrieve(param);
 	}
+	@Override
+	public int newsDelete(NewsDTO param) {
+		return newsMapper.newsDelete(param);
+	}
 
 	@Override
 	public List<TopicDTO> getTodayTopicsList(TopicDTO param) {
@@ -65,7 +69,7 @@ public class NewsServiceImpl implements NewsService {
 	@Override
 	public int doSave(TopicDTO param) {
 		//컨트롤러에서 세션 설정되면 변경하기.
-		UserDTO user = (UserDTO) session.getAttribute("user"); 
+		UserDTO user = (UserDTO) session.getAttribute("loginUser"); 
 		if(user==null) {
 			throw new NullPointerException("로그인 필요");
 		}else if(user.getRole() != 1) {
@@ -77,7 +81,7 @@ public class NewsServiceImpl implements NewsService {
 
 	@Override
 	public int doUpdate(TopicDTO param) {
-		UserDTO user = (UserDTO) session.getAttribute("user"); 
+		UserDTO user = (UserDTO) session.getAttribute("loginUser"); 
 
 		if(user==null) {
 			throw new NullPointerException("로그인 필요");
@@ -92,5 +96,6 @@ public class NewsServiceImpl implements NewsService {
 	public int doDelete(TopicDTO param) {
 		return topicMapper.doDelete(param);
 	}
+
 
 }

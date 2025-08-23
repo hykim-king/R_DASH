@@ -8,7 +8,7 @@
 	            SELECT news_no, keyword, title, company, url, pub_dt AS pubDt, reg_dt AS regDt
 	            FROM news
 	            WHERE TRUNC(reg_dt)=TRUNC(SYSDATE)
-	            ORDER BY reg_dt DESC
+	            ORDER BY pub_dt DESC
 	        ) t
 	 <![CDATA[  WHERE ROWNUM <= #{pageSize} * #{pageNo}
 	    )
@@ -53,7 +53,7 @@
 		    news
 		WHERE (TRUNC(reg_dt) = TRUNC(SYSDATE))
 		AND keyword=#{keyword}
-		ORDER BY reg_dt DESC
+		ORDER BY pub_dt DESC
     </select>
     <select id="doSelectOne" parameterType="NewsDTO" resultType="NewsDTO">
         SELECT
@@ -112,4 +112,8 @@
 		           #{pubDt},
 		           SYSDATE )
     </insert>
+    <delete id="newsDelete" parameterType="NewsDTO">
+        DELETE FROM NEWS
+        WHERE news_no = #{newsNo}
+    </delete>
 </mapper>
