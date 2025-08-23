@@ -168,6 +168,11 @@ document.addEventListener('DOMContentLoaded', function(){
         $("#keywordNewsTable").hide();
     	
     });
+    
+    //언어 선택
+    const langSelect = document.querySelector("#lang");
+    const currentLang = "${empty lang ? 'ko' : lang}";
+    
     $(".btn[data-keyword]").not("#allBtn").on('click',function(){
     	var keyword = $(this).data("keyword");
     	
@@ -253,6 +258,7 @@ document.addEventListener('DOMContentLoaded', function(){
        let options = `width=600,height=600, top=${top}, left=${left}, resizable=no, scrollbars=no`;
        window.open(url,"_blank",options);
     });
+    
     //수정 모달
     const moveToTopicModBtn = document.querySelector("#moveToTopicMod");
     moveToTopicModBtn.addEventListener("click",function(e){
@@ -278,10 +284,23 @@ document.addEventListener('DOMContentLoaded', function(){
        window.open(url,"_blank",options);
     });
     
+    // 등록 모달 받기
+    function receiveDataFromChild(title, contents) {
+        console.log("자식창에서 받은 데이터:", title, contents);
+    
+        // 예시: 부모창의 입력창에 값 넣기
+        document.getElementById("detailTitle").textContent = title;
+        document.getElementById("detailContents").textContent = contents;
+    
+       
+    }
+    let keywordWindow = null;
     //오늘의 키워드 모달
     const clickMeDiv = document.querySelector("#clickMe");
     clickMeDiv.addEventListener("click",function(e){
+    	    	 
     	let url = "/ehr/freq/topic/words.do";
+    	
         const screenWidth = window.screen.width;
         const screenHeight = window.screen.height;
         console.log('screenWidth: '+screenWidth);
@@ -361,16 +380,19 @@ document.addEventListener('DOMContentLoaded', function(){
         clickMeOverImage.style.display = "none";
     });
     
-     //언어 선택
-    const langSelect = document.querySelector("#lang");
-    const currentLang = "${empty lang ? 'ko' : lang}";
+    
     langSelect.value = currentLang;  // selected 반영
     
     // 언어 변경 이벤트
     langSelect.addEventListener("change", function(){
-        const selectLang = langSelect.value;
+        selectLang = langSelect.value;
 
         window.location.href = '/ehr/news/newsPage.do?lang='+selectLang;
+        
+        /* // 이미 열린 모달이 있다면, 그 창도 리로드
+        if (keywordWindow && !keywordWindow.closed) {
+            keywordWindow.location.href = "/ehr/freq/topic/words.do?lang=" + selectLang;
+        } */
     });
     
 });
@@ -380,22 +402,6 @@ document.addEventListener('DOMContentLoaded', function(){
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/common/socket.jsp"></jsp:include>
-<% 
-  LocalDate today = LocalDate.now();
-  int year = today.getYear();
-  int month = today.getMonthValue();
-  int day = today.getDayOfMonth();
-  DayOfWeek dayOfWeek = today.getDayOfWeek();
-  String aaa = "";
-  String[] korWeek = {"월","화","수","목","금","토","일"};
-  
-  if(dayOfWeek != null) {
-      int idx = dayOfWeek.getValue() - 1; // 1(월)~7(일) → 배열 0~6
-      if(idx >= 0 && idx < korWeek.length) {
-          aaa = korWeek[idx];
-      }
-  }
-%>
 <div class="main-content" id="panel">
 	<div class="header bg-warning pb-6">
 		<div class="container-fluid">
@@ -405,8 +411,8 @@ document.addEventListener('DOMContentLoaded', function(){
 				</div>
 			    <!--  버튼 -->
 				<div class="col-lg-6 col-5 text-right">
-				    <input type="button" id="moveToTopicReg" class="btn btn-white" value="등록">
-				    <input type="button" id="moveToTopicMod" class="btn btn-white" value="수정">
+				    <input type="button" id="moveToTopicReg" class="btn btn-white" value="${msgs.reg}">
+				    <input type="button" id="moveToTopicMod" class="btn btn-white" value="${msgs.modi}">
 				</div>
 				 <!-- //버튼 -->
 		      </div>
@@ -422,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function(){
                        <div class="row align-items-center">
                        <div class="col align-content-center">
                             <h5 class="h3 mb-0">
-                            <%=year %>년 <%=month %>월 <%=day %>일(<%=aaa %>)</h5>
+                            ${msgs.today}</h5>
                        </div>
                        </div>
 	               </div>
@@ -443,9 +449,9 @@ document.addEventListener('DOMContentLoaded', function(){
 	                   <tbody class="list">
 	                    <c:choose>
 				            <c:when test="${not empty todayTopics}">
-				                    <c:forEach var="vo" items="${todayTopics}">
+				                    <c:forEach var="vo" items="${todayTopics}" varStatus="status">
 				                     <tr>
-	                                    <td class="budget"><c:out value="${vo.no}"/></td>
+	                                    <td class="budget"><c:out value="${status.index + 1}"/></td>
 	                                    <td class="budget"><c:out value="${vo.title }"/></td>
 	                                    <td class="budget"><c:out value="${vo.topicRatio}"/></td>   
 	                                    <td style="display: none;"><c:out value="${vo.topicNo}"/></td>   
@@ -453,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function(){
 				                    </c:forEach>
 				            </c:when>
 				            <c:otherwise>
-				                <p>등록된 토픽이 없습니다.</p>
+				                <p>${msgs.noTopic}</p>
 				            </c:otherwise>
 				        </c:choose>
 				        </tbody>
@@ -526,9 +532,10 @@ document.addEventListener('DOMContentLoaded', function(){
 		            </colgroup>
 	               <thead style="display: none;">
 	                   <tr>
-	                       <th>신문사</th>
-	                       <th>제목</th>
-	                       <th>발행일자</th>
+	                       <th>${msgs.newspaper}</th>
+	                       <th>${msgs.reg}</th>
+	                       <th>${msgs.pub}</th>
+	                       
 	                   </tr>
 	               </thead>
 				    <tbody class="list" id="newsList"></tbody>
@@ -544,9 +551,9 @@ document.addEventListener('DOMContentLoaded', function(){
                     </colgroup>
                    <thead style="display: none;">
                        <tr>
-                           <th>신문사</th>
-                           <th>제목</th>
-                           <th>발행일자</th>
+                           <th>${msgs.newspaper}</th>
+                           <th>${msgs.reg}</th>
+                           <th>${msgs.pub}</th>
                        </tr>
                    </thead>
                    <tbody class="list">
