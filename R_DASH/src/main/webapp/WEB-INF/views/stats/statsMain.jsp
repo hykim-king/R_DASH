@@ -17,10 +17,14 @@
     <style>
         .canvasContainer {
             width: 700px; 
-            height: 500px;
+            height: 400px;
             margin-top: 20px;
         }
-		
+        
+		canvas {
+		  aspect-ratio: auto !important;
+		}
+        
 		.topTable {
 		    width: 100%;
 		    min-width: 300px;
@@ -52,6 +56,7 @@
 		    display: flex;
 		    flex-direction: column;
 		    min-height: 100vh; /* 화면 전체 높이 확보 */
+		    background-color: #fff !important;
 		}
 		
 		.body-container {
@@ -203,10 +208,10 @@
 	</c:when>
 	<c:when test="${type == 'fire'}">
         <div class="row mb-6">
-		    <div class="col-md-6">
+		    <div class="col-md-6 canvasContainer">
 		      <canvas id="fireSafeChart"></canvas>
 		    </div>
-		    <div class="col-md-6 mt-n5 d-flex justify-content-end"> 
+		    <div class="col-md-6 mt-n5 d-flex justify-content-end canvasContainer"> 
 			    <div style="width: 80%; height: 450px;">
 			      <canvas id="yearlyChart"></canvas>
 			    </div>
@@ -214,10 +219,10 @@
 		  </div>
 		
 		  <div class="row mb-6">
-		    <div class="col-md-6">
+		    <div class="col-md-6 canvasContainer">
 		      <canvas id="damageChart"></canvas>
 		    </div>
-		    <div class="col-md-6">
+		    <div class="col-md-6 canvasContainer">
 		      <canvas id="subwayChart"></canvas>
 		    </div>
 		  </div>
@@ -276,19 +281,19 @@
     </c:when>
     <c:when test="${type == 'sinkhole'}">
     <div class="row mb-7">
-        <div class="col-md-6">
+        <div class="col-md-6 canvasContainer">
 		    <canvas id="yearlyChart"></canvas>
 		</div>
-		<div class="col-md-6">
+		<div class="col-md-6 canvasContainer">
             <canvas id="signguChart"></canvas>
         </div>
         
 	</div>
 	<div class="row mb-7">
-	    <div class="col-md-6">
+	    <div class="col-md-6 canvasContainer">
             <canvas id="monthlyChart"></canvas>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 canvasContainer">
             <canvas id="damageChart"></canvas>
         </div>
     </div>
@@ -301,19 +306,19 @@
     </c:when>
     <c:when test="${type == 'landslide'}">
     <div class="row mb-6">
-        <div class="col-md-6">
+        <div class="col-md-6 canvasContainer">
             <canvas id="yearChart"></canvas>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 canvasContainer">
             <canvas id="monthChart"></canvas>
         </div>
         
     </div>
     <div class="row mb-6">
-        <div class="col-md-6">
+        <div class="col-md-6 canvasContainer">
             <canvas id="regionChart"></canvas>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 canvasContainer">
             <canvas id="statusChart"></canvas>
         </div>
     </div>

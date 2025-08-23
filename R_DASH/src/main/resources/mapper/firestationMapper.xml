@@ -184,5 +184,22 @@
     GROUP BY REGION
     ORDER BY REGION ASC
   </select>
+  
+  <select id="sigunguFireCount" resultType="map">
+    SELECT
+	    REGION,
+	    COUNT(*) AS FIRE_STATION_CNT
+	FROM (
+	    SELECT DISTINCT
+	        COALESCE(
+	            REGEXP_SUBSTR(AREA, '[^ ]+ [^ ]+[시구군]'), 
+	            REGEXP_SUBSTR(AREA, '^[^ ]+[시구군]')
+	        ) AS REGION,
+	        AREA
+	    FROM FIRE_STATION
+	) t
+	GROUP BY REGION
+	ORDER BY REGION
+  </select>
 
 </mapper>
