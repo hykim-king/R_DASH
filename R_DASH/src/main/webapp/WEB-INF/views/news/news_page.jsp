@@ -196,6 +196,7 @@ document.addEventListener('DOMContentLoaded', function(){
     });
     function renderKeywordNews(data){
         var tbody = $("#keywordNewsTable tbody");
+        $('#newsLoadMore').hide();
         tbody.empty();
         if(data && data.length > 0){
             $.each(data, function(i, vo){
@@ -203,11 +204,12 @@ document.addEventListener('DOMContentLoaded', function(){
                     "<td class='budget'>" + vo.company + "</td>" +
                     "<td class='budget'><a href='" + vo.url + "' target='_blank'>" + vo.title + "</a></td>" +
                     "<td class='budget'>" + vo.pubDt + "</td>" +
+                    "<td class='budget'><button class='btn btn-danger newsDeleteBtn' data-news-no="+vo.newsNo+">뉴스 삭제</button></td>" +
                     "</tr>";
                 tbody.append(row);
             });
         } else {
-            tbody.append("<tr><td colspan='3'>데이터 없음</td></tr>");
+            tbody.append("<tr><td colspan='99'>데이터 없음</td></tr>"); 
         }
     }
     //토픽 상세 보기 (버튼 클릭)
@@ -394,6 +396,37 @@ document.addEventListener('DOMContentLoaded', function(){
             keywordWindow.location.href = "/ehr/freq/topic/words.do?lang=" + selectLang;
         } */
     });
+    //뉴스 삭제
+    $(document).on("click", ".newsDeleteBtn", function() {
+    	 const btn = $(this);
+    	 const newsNo = btn.data("news-no"); // 여기서 읽음
+
+        if (!newsNo) {
+            alert("삭제할 뉴스 번호가 없습니다.");
+            return;
+        }
+
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+
+        $.ajax({
+            type: "POST",
+            url: "/ehr/news/newsDelete.do",
+            dataType: "json",
+            data: { newsNo: newsNo },
+            success: function(response) {
+                if (response.messageId === 1) {
+                    alert("삭제 완료!");
+                    // 삭제 성공 시 해당 row 제거
+                    $(this).closest("tr").remove();
+                } else {
+                    alert("삭제 실패: " + response.message);
+                }
+            }.bind(this), // this를 Ajax success 내부에서도 유지
+            error: function() {
+                alert("삭제 중 오류 발생");
+            }
+        });
+    });
     
 });
 
@@ -546,19 +579,19 @@ document.addEventListener('DOMContentLoaded', function(){
                    <table class="table align-items-center table-flush">
                    <colgroup>
                         <col style="width: 15%;"> <!-- 2 -->
-                        <col style="width: 65%;" class="left-col"> <!-- 6 -->
+                        <col style="width: 55%;" class="left-col"> <!-- 6 -->
                         <col style="width: 20%;"> <!-- 2 -->
+                        <col style="width: 10%;"> <!-- 2 -->
                     </colgroup>
                    <thead style="display: none;">
                        <tr>
                            <th>${msgs.newspaper}</th>
                            <th>${msgs.reg}</th>
                            <th>${msgs.pub}</th>
+                           <th></th>
                        </tr>
                    </thead>
-                   <tbody class="list">
-               
-                    </tbody>
+                   <tbody class="list"></tbody>
                     </table>
 	           </div>
 	           <!-- news footer -->
@@ -573,10 +606,5 @@ document.addEventListener('DOMContentLoaded', function(){
 	          </div>
 			      
 	   </div><!-- //main -->
-
-
-    
-
-
 </body>
 </html>
