@@ -237,26 +237,15 @@ public class NewsController {
 	    
 		return viewName;
 	}
-	@PostMapping(value = "/newsDelete.do", produces = "text/plain;charset=UTF-8")
+	@PostMapping(value = "/newsDelete.do", produces = "application/json;charset=UTF-8")
 	@ResponseBody
-	public String newsDelete(NewsDTO param, HttpServletRequest req) {
-		log.debug("┌───────────────────────────┐");
-		log.debug("│ *doDelete()*              │");
-		log.debug("└───────────────────────────┘");
-		log.debug("1. param:{}", param);
-		String jsonString = "";
-		int flag = service.newsDelete(param);
-		
-		String message = "";
-		if (1 == flag) {
-			message = "삭제 되었습니다.";
-		} else {
-			message = "삭제 실패!";
-		}
+	public MessageDTO newsDelete(NewsDTO param, HttpServletRequest req) {
+	    log.debug("1. param:{}", param);
 
-		jsonString = new Gson().toJson(new MessageDTO(flag, message));
-		log.debug("2.jsonString:{}", jsonString);
-		return jsonString;
+	    int flag = service.newsDelete(param);  // 삭제 성공 시 1, 실패 시 0
+	    String message = (flag == 1) ? "삭제 되었습니다." : "삭제 실패!";
+
+	    return new MessageDTO(flag, message); // MessageDTO { int messageId, String message }
 	}
 	
 	@PostMapping(value = "/doDelete.do", produces = "text/plain;charset=UTF-8")

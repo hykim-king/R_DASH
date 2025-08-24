@@ -114,6 +114,6 @@
     </insert>
     <delete id="newsDelete" parameterType="NewsDTO">
         DELETE FROM NEWS
-        WHERE news_no = #{newsNo}
+        WHERE news_no = #{newsNo, jdbcType=INTEGER}
     </delete>
 </mapper>
