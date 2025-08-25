@@ -23,7 +23,7 @@
 		    topic_no,
 		    title,
 		    contents,
-		    TO_CHAR(reg_dt, 'YYYY-MM-DD') AS reg_dt,
+		    TO_CHAR(reg_dt, 'YYYY-MM-DD') AS regDt,
             reg_id,
 		    TO_CHAR(mod_dt,'YYYY-MM-DD') as modDt,
 		    mod_id,
