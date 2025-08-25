@@ -76,6 +76,7 @@
                         <label for="summernote"></label>
                         <textarea class="form-control w-100" id="summernote" name="contents" class="contents" style="white-space: pre-wrap; overflow-wrap: break-word; resize: vertical;"></textarea>
                     </div>
+                    <input type="hidden" id="regId" name="regId" value="${user.email}" />
                  </form>
                  </div>
               </div>
@@ -218,6 +219,9 @@ $(document).ready(function() {
         formData.append("title", $('#title').val());
         formData.append("contents", summernoteContent);
         formData.append("isNotice", is_notice);
+        formData.append("regId", $('#regId').val());
+        console.log("regId:", $('#regId').val());  // 값 찍어보기
+
         console.log("is_notice: ",is_notice)
 
         $.ajax({

@@ -169,9 +169,6 @@ document.addEventListener('DOMContentLoaded', function(){
     	
     });
     
-    //언어 선택
-    const langSelect = document.querySelector("#lang");
-    const currentLang = "${empty lang ? 'ko' : lang}";
     
     $(".btn[data-keyword]").not("#allBtn").on('click',function(){
     	var keyword = $(this).data("keyword");
@@ -209,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function(){
                     if(role === '1'){  // 관리자면 버튼 추가
                         row += "<td class='budget'><button class='btn btn-danger newsDeleteBtn' data-news-no='"+vo.newsNo+"'>뉴스 삭제</button></td>";
                     }
-                    row +"</tr>";
+                    row +="</tr>";
                 tbody.append(row);
             });
         } else {
@@ -304,27 +301,11 @@ document.addEventListener('DOMContentLoaded', function(){
     
        
     }
-    let keywordWindow = null;
-    //오늘의 키워드 모달
-    const clickMeDiv = document.querySelector("#clickMe");
-    clickMeDiv.addEventListener("click",function(e){
-    	    	 
-    	let url = "/ehr/freq/topic/words.do";
-    	
-        const screenWidth = window.screen.width;
-        const screenHeight = window.screen.height;
-        console.log('screenWidth: '+screenWidth);
-        console.log('screenHeight: '+screenHeight);
-
-       const left = (screenWidth - 900)/2;
-       const top = (screenHeight - 800)/2;
-
-       let options = `width=800,height=800, top=${top}, left=${left}, resizable=no, scrollbars=no`;
-       window.open(url,"_blank",options);
-    });
+    
    // 더보기 버튼
     let pageNo = 1; // 현재 페이지
     const pageSize = 10;
+    const role = "${sessionScope.loginUser.role}";
 
     // 뉴스 로딩 함수 (기본 + 더보기)
     function loadNews(pageNo) {
@@ -336,6 +317,7 @@ document.addEventListener('DOMContentLoaded', function(){
             dataType: 'json',
             success: function(data) {
                 const tbody = $("#newsList"); // tbody id와 일치
+                tbody.empty();
                 if (!data || data.length === 0) {
                     if (pageNo === 0) { // 첫 페이지도 데이터 없으면
                         tbody.html("<tr><td colspan='3'>데이터 없음</td></tr>");
@@ -346,14 +328,14 @@ document.addEventListener('DOMContentLoaded', function(){
 
                 // 데이터가 있으면 tbody에 추가
                 data.forEach(function(vo) {
-                    const row = "<tr>" +
+                	let row = "<tr>" +
                         "<td class='budget'>" + vo.company + "</td>" +
                         "<td class='budget'><a href='" + vo.url + "' target='_blank'>" + vo.title + "</a></td>" +
                         "<td class='budget'>" + vo.pubDt + "</td>";
                         if(role === '1'){  // 관리자면 버튼 추가
                             row += "<td class='budget'><button class='btn btn-danger newsDeleteBtn' data-news-no='"+vo.newsNo+"'>뉴스 삭제</button></td>";
                         }
-                        row + "</tr>";
+                        row += "</tr>";
                     tbody.append(row);
                     
                 });
@@ -401,19 +383,40 @@ document.addEventListener('DOMContentLoaded', function(){
         clickMeOverImage.style.display = "none";
     });
     
-    
+    //언어 선택
+    const langSelect = document.querySelector("#lang");
+    const currentLang = "${empty lang ? 'ko' : lang}";
+    // 언어 선택 select
     langSelect.value = currentLang;  // selected 반영
     
     // 언어 변경 이벤트
     langSelect.addEventListener("change", function(){
         selectLang = langSelect.value;
 
-        window.location.href = '/ehr/news/newsPage.do?lang='+selectLang;
+        window.location.href = '/ehr/news/newsPage.do?lang='+selectLang;      
         
-        /* // 이미 열린 모달이 있다면, 그 창도 리로드
         if (keywordWindow && !keywordWindow.closed) {
             keywordWindow.location.href = "/ehr/freq/topic/words.do?lang=" + selectLang;
-        } */
+        } 
+    });
+    let keywordWindow = null;
+    //오늘의 키워드 모달
+    const clickMeDiv = document.querySelector("#clickMe");
+    clickMeDiv.addEventListener("click",function(e){
+    	selectLang = langSelect.value;
+                 
+        let url = "/ehr/freq/topic/words.do?lang="+ selectLang;
+        
+        const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
+        console.log('screenWidth: '+screenWidth);
+        console.log('screenHeight: '+screenHeight);
+
+       const left = (screenWidth - 900)/2;
+       const top = (screenHeight - 800)/2;
+
+       let options = `width=800,height=800, top=${top}, left=${left}, resizable=no, scrollbars=no`;
+       window.open(url,"_blank",options);
     });
     //뉴스 삭제
     $(document).on("click", ".newsDeleteBtn", function() {
@@ -454,7 +457,6 @@ document.addEventListener('DOMContentLoaded', function(){
             }
         });
     });
-    
 });
 
 
