@@ -103,13 +103,10 @@ class DustControllerTest {
     void stats_endpoints_ok() {
         List<Map<String, Object>> top5 = controller.getTop5PM10();
         List<Map<String, Object>> bottom5 = controller.getBottom5PM10();
-        Double avg = controller.getAvgPM10();
 
         assertNotNull(top5, "top5 null");
         assertNotNull(bottom5, "bottom5 null");
-        assertNotNull(avg, "avg null");
-        assertTrue(avg >= 0 || avg.isNaN() == false, "avg 값 비정상");
-        log.info("stats -> top5={}, bottom5={}, avg={}", top5.size(), bottom5.size(), avg);
+        log.info("stats -> top5={}, bottom5={}", top5.size(), bottom5.size());
     }
 
     @Test

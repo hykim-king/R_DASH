@@ -1,21 +1,25 @@
 package com.pcwk.ehr.controller;
 
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pcwk.ehr.domain.DustDTO;
 import com.pcwk.ehr.service.DustService;
 
@@ -28,22 +32,21 @@ import com.pcwk.ehr.service.DustService;
 @RequestMapping("/dust")
 public class DustController {
     private final DustService dustService;
+    private final String KAKAO_REST_API_KEY = "27dac2cfbdc8ac4034782eae59ebfeee";
+    
+    public DustController(DustService svc){ this.dustService = svc; }
 
-    @Autowired
-    public DustController(DustService svc) {
-        this.dustService = svc;
-    }
+//    // 페이지: /ehr/dust  (map.jsp 불필요)
+//    @GetMapping("/ehr/dust")
+//    public String dustPage(
+//            @RequestParam(defaultValue = "ALL") String airType,
+//            org.springframework.ui.Model model
+//    ) {
+//        model.addAttribute("airType", airType);
+//        return "ehr/dust"; // → /WEB-INF/views/ehr/dust.jsp
+//    }
 
-    // /dust → /map?layer=dust&airType=ALL (혹은 전달된 값)로 리다이렉트
-    @GetMapping({"", "/"})
-    public String dustEntry(@RequestParam(required = false, defaultValue = "ALL") String airType) {
-        String type = airType != null ? airType.trim() : "ALL";
-        if (type.isEmpty()) type = "ALL";
-        String enc  = UriUtils.encode(type, StandardCharsets.UTF_8);
-        return "redirect:/map?layer=dust&airType=" + enc;
-    }
-
-    // 데이터 API: 단일 타입 최신 (BBox 있으면 BBox, 없으면 전국)
+    // 데이터 API: /dust/latest
     @GetMapping("/latest")
     @ResponseBody
     public List<DustDTO> latest(
@@ -59,13 +62,39 @@ public class DustController {
         if (hasBBox && minLat > maxLat) { double t = minLat; minLat = maxLat; maxLat = t; }
         if (hasBBox && minLon > maxLon) { double t = minLon; minLon = maxLon; maxLon = t; }
 
-        String type   = (airType == null || airType.trim().isEmpty()) ? null : airType.trim();
         String dayStr = (day == null || day.trim().isEmpty()) ? null : day.trim();
-        int lim       = (limit == null || limit <= 0) ? 500 : limit;
+        int lim = (limit == null || limit <= 0) ? 500 : limit;
 
+        String raw = airType == null ? "" : airType.trim();
+        String key = raw.replaceAll("\\s+", "").toLowerCase();
+
+        String typeCanon;
+        if ("all".equals(key) || "전체".equals(raw)) typeCanon = "ALL";
+        else if ("교외대기".equals(key))           typeCanon = "교외대기";
+        else if ("도로변대기".equals(key))          typeCanon = "도로변 대기"; // DB 표준에 맞춰 변경
+        else if ("도시대기".equals(key))           typeCanon = "도시대기";
+        else                                       typeCanon = raw;
+
+        if ("ALL".equals(typeCanon)) {
+            String road = "도로변 대기";
+            String[] TYPES = { "교외대기", road, "도시대기" };
+            int per = Math.max(1, lim / TYPES.length);
+            List<DustDTO> out = new ArrayList<>();
+            for (String t : TYPES) {
+                List<DustDTO> part = hasBBox
+                        ? dustService.getLatestByTypeBBox(t, dayStr, minLat, maxLat, minLon, maxLon, per)
+                        : dustService.getLatestByTypeAll(t,  dayStr, per);
+                if (part != null && !part.isEmpty()) out.addAll(part);
+            }
+            return out;
+        }
+
+        String type = typeCanon.isEmpty() ? null : typeCanon;
         return hasBBox
                 ? dustService.getLatestByTypeBBox(type, dayStr, minLat, maxLat, minLon, maxLon, lim)
-                : dustService.getLatestByTypeAll(type, dayStr, lim);
+                : dustService.getLatestByTypeAll(type,  dayStr, lim);
+                
+                
     }
 
     
@@ -86,12 +115,77 @@ public class DustController {
         return dustService.getBottom5PM10();
     }
 
-    @GetMapping("/dust-avg")
+    
+    @GetMapping("/geocode")
     @ResponseBody
-    public Double getAvgPM10() {
-        return dustService.getAvgPM10();
+    public Map<String, Object> geocode(@RequestParam("address") String address) {
+        Map<String, Object> result = new HashMap<>();
+        HttpURLConnection con = null;
+        
+        try {
+            String urlStr = "https://dapi.kakao.com/v2/local/search/address.json?query=" 
+                            + URLEncoder.encode(address, "UTF-8");
+            URL url = new URL(urlStr);
+            con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Authorization", "KakaoAK " + KAKAO_REST_API_KEY);
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            // JSON 파싱
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.toString());
+            JsonNode documents = root.path("documents");
+
+            if (documents.size() > 0) {
+                JsonNode doc = documents.get(0);
+                double lat = doc.path("y").asDouble();
+                double lon = doc.path("x").asDouble();
+                result.put("lat", lat);
+                result.put("lon", lon);
+            } else {
+                result.put("lat", null);
+                result.put("lon", null);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("lat", null);
+            result.put("lon", null);
+        }
+        return result;
     }
     
+    @GetMapping("/dust-avg")
+    @ResponseBody
+    public Map<String, Object> getAvgPM10(
+    		@RequestParam(value="userLat", required=false) String userLatStr,
+            @RequestParam(value="userLon", required=false) String userLonStr) {
+
+    	Map<String, Object> result = new HashMap<>();
+        
+    	Double userLat = (userLatStr != null && !userLatStr.isEmpty()) ? Double.valueOf(userLatStr) : null;
+    	Double userLon = (userLonStr != null && !userLonStr.isEmpty()) ? Double.valueOf(userLonStr) : null;
+    	    
+        if (userLat == null || userLon == null) {
+            result.put("region", "전국");
+            result.put("value", dustService.getAvgPM10(null));
+        } else {
+            DustDTO nearestDust = dustService.findNearestDust(userLat, userLon);
+            Double avg = dustService.getAvgPM10(nearestDust.getStnNm());
+            result.put("region", nearestDust.getStnNm());
+            result.put("value", avg);
+        }
+        
+        return result;
+	}
+
     @GetMapping("/statsPage")
 	public String statsPage(Model model) throws SQLException {
 		model.addAttribute("pageType", "dust");

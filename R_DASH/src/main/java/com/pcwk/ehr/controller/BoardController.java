@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,6 +40,7 @@ import com.pcwk.ehr.cmn.MessageDTO;
 import com.pcwk.ehr.cmn.PcwkString;
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.BoardDTO;
+import com.pcwk.ehr.domain.UserDTO;
 import com.pcwk.ehr.service.BoardService;
 import com.pcwk.ehr.service.MarkdownService;
 
@@ -45,6 +48,9 @@ import com.pcwk.ehr.service.MarkdownService;
 @RequestMapping("/board")
 public class BoardController {
 	Logger log = LogManager.getLogger(getClass());
+	
+	@Autowired
+	private MessageSource messageSource;
 	
 	@Autowired
 	BoardService service;
@@ -70,6 +76,28 @@ public class BoardController {
 //	목록 조회	/board/doRetrieve.do	GET 0
 //	등록 화면	/board/doSaveView.do	GET 0
 //	수정 화면	/board/doUpdateView.do	GET 0
+	
+	//다국어 소스 담기
+	private Map<String, String> getBoardMessages(Locale locale) {
+				
+	    Map<String, String> msgs = new HashMap<>();
+	    msgs.put("saveBoardTitle", messageSource.getMessage("message.board.saveBoardTitle", null, locale));
+	    msgs.put("saveBoardComment1", messageSource.getMessage("message.board.saveBoardComment1", null, locale));
+	    msgs.put("saveBoardComment2", messageSource.getMessage("message.board.saveBoardComment2", null, locale));
+	    msgs.put("saveBoardComment3", messageSource.getMessage("message.board.saveBoardComment3", null, locale));
+	    msgs.put("noticeBoard", messageSource.getMessage("message.board.noticeBoard", null, locale));
+	    msgs.put("gun", messageSource.getMessage("message.board.gun", null, locale));
+	    msgs.put("all", messageSource.getMessage("message.board.all", null, locale));
+	    msgs.put("search", messageSource.getMessage("message.board.search", null, locale));
+	    msgs.put("reg", messageSource.getMessage("message.board.reg", null, locale));
+	    msgs.put("title", messageSource.getMessage("message.board.title", null, locale));
+	    msgs.put("contents", messageSource.getMessage("message.board.contents", null, locale));
+	    msgs.put("no", messageSource.getMessage("message.board.no", null, locale));
+	    msgs.put("regDt", messageSource.getMessage("message.board.regDt", null, locale));
+	    msgs.put("view", messageSource.getMessage("message.board.view", null, locale));
+	    msgs.put("noBoard", messageSource.getMessage("message.board.noBoard", null, locale));
+	    return msgs;
+	}
 	
     /**
      * 마크다운을 HTML로 변환하는 API
@@ -185,7 +213,8 @@ public class BoardController {
 	}
 	
 	@GetMapping(value="/doRetrieve.do", produces = "text/plain;charset=UTF-8")
-	public String doRetrieve(SearchDTO param, Model model) {
+	public String doRetrieve(SearchDTO param, Model model,
+			@RequestParam(name="lang", required=false) String lang) {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *doRetrieve()*            │");
 		log.debug("└───────────────────────────┘");
@@ -220,7 +249,14 @@ public class BoardController {
 	    if (!list.isEmpty()) {
 	        totalCnt = list.get(0).getTotalCnt(); // 첫 번째 row에서 가져오기
 	    }
-		
+	    //lang이 값이 없으면 기본값(한국어)
+	    String resolvedLang = (lang != null && !lang.isEmpty()) ? lang : "ko";
+	    Locale locale = new Locale(resolvedLang);
+	    
+	    //언어 설정
+	    model.addAttribute("msgs", getBoardMessages(locale));
+	    model.addAttribute("lang", lang);
+	    
 		model.addAttribute("list",list);
 		model.addAttribute("search", param);
 		model.addAttribute("totalCnt", totalCnt);
@@ -271,15 +307,46 @@ public class BoardController {
 	
 	@PostMapping(value = "/doUpdate.do", produces = "text/plain;charset=UTF-8")
 	@ResponseBody
-	public String doUpdate(BoardDTO param, HttpServletRequest req) {
+	public String doUpdate(BoardDTO param, HttpSession session,Model model) {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *doUpdate()*              │");
 		log.debug("└───────────────────────────┘");
 		
+		
+		
 		log.debug("1. param:{}", param);
 		String jsonString = "";
 		
+		UserDTO user = (UserDTO) session.getAttribute("loginUser");
+		model.addAttribute("user",user);
+		if(user != null && user.getRole()==1) {
+			param.setModId(user.getEmail());
+		}else {
+		    throw new RuntimeException("로그인 필요");
+		}
+		
 		int flag = service.doUpdate(param);
+		log.debug("isNotice: {}", param.getIsNotice());
+		
+		// 공지 글이면 websocket 알림 
+	    if("Y".equals(param.getIsNotice())) {
+	    	
+	    	 // 수정된 데이터 다시 조회
+	        BoardDTO updatedVO = service.doSelectOne(param);
+	        log.debug("2. updatedVO:{}", updatedVO);
+	        
+	    	Map<String,String> noticeMsg = new HashMap<>();
+	    	noticeMsg.put("boardNo", String.valueOf(param.getBoardNo()));
+	    	noticeMsg.put("title", param.getTitle());
+	    	
+	    	String contents = param.getContents();
+	    	if(contents != null && contents.length() > 300) {
+	    		contents = contents.substring(0,300)+"...";
+	    	}
+	    	noticeMsg.put("contents", contents);
+	    	
+	    	simpMessagingTemplate.convertAndSend("/topic/notice",noticeMsg);
+	    }
 		
 		String message = "";
 		if (1 == flag) {
@@ -296,31 +363,43 @@ public class BoardController {
 	//UUID 새로 만들지 말고, Summernote 업로드 시 반환된 URL 그대로 사용
 	@PostMapping(value = "doSave.do", produces = "application/json;charset=UTF-8")
 	@ResponseBody
-	public String doSave(BoardDTO param) {
+	public String doSave(BoardDTO param,HttpSession session,Model model) {
 	    log.debug("param:{}", param);
 	    log.debug("isNotice: {}", param.getIsNotice());
 	    int flag = 0;
 	    
 	    try {
+	        UserDTO user = (UserDTO) session.getAttribute("loginUser");
+	        log.debug("user: {}",user);
+			model.addAttribute("user",user);
+			if(user != null && user.getRole()==1) {
+				param.setRegId(user.getEmail());
+				param.setModId(user.getEmail());
+			}else {
+			    throw new RuntimeException("로그인 필요");
+			}
+	    	
 	        flag = service.doSave(param);
 	    } catch (Exception e) {
 	        log.error("DB 저장 오류", e);
 	    }
 	    //param = service.doSelectOne(param);
 	    
-	    // 공지 글이면 websocket 알림 
-	    if("Y".equals(param.getIsNotice())) {
-	    	Map<String,String> noticeMsg = new HashMap<>();
-	    	noticeMsg.put("boardNo", String.valueOf(param.getBoardNo()));
-	    	noticeMsg.put("title", param.getTitle());
-	    	
-	    	String contents = param.getContents();
-	    	if(contents != null && contents.length() > 20) {
-	    		contents = contents.substring(0,20)+"...";
-	    	}
-	    	noticeMsg.put("contents", contents);
-	    	
-	    	simpMessagingTemplate.convertAndSend("/topic/notice",noticeMsg);
+	    if(flag == 1) {
+		    // 공지 글이면 websocket 알림 
+		    if("Y".equals(param.getIsNotice())) {
+		    	Map<String,String> noticeMsg = new HashMap<>();
+		    	noticeMsg.put("boardNo", String.valueOf(param.getBoardNo()));
+		    	noticeMsg.put("title", param.getTitle());
+		    	
+		    	String contents = param.getContents();
+		    	if(contents != null && contents.length() > 300) {
+		    		contents = contents.substring(0,300)+"...";
+		    	}
+		    	noticeMsg.put("contents", contents);
+		    	
+		    	simpMessagingTemplate.convertAndSend("/topic/notice",noticeMsg);
+		    }
 	    }
 	    
 	    log.debug("boardNo: {}", param.getBoardNo());

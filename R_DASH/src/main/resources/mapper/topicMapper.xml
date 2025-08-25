@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pcwk.ehr.mapper.TopicMapper">
-    <select id="getTodayTopicsList" parameterType="TopicDTO" resultType="TopicDTO">
-        SELECT t1.*
+    <select id="getTodayTopicsList" resultType="TopicDTO">
+        SELECT ROWNUM as no,t1.*
 		FROM(         SELECT
-	                   	ROWNUM as no,
 		                topic_no,
 		                title,
 		                TO_CHAR(reg_dt, 'YYYY-MM-DD') AS reg_dt,
-		                topic_ratio
+		                NVL(topic_ratio, 0) as topic_ratio
 		            FROM
 		                topic
 		            WHERE
 		                TRUNC(reg_dt) = TRUNC(SYSDATE)
 		            
 		            ORDER BY
-		                topic_no DESC
+		                topic_ratio DESC NULLS LAST 
 		                 ) t1
     </select>
     
@@ -24,7 +23,7 @@
 		    topic_no,
 		    title,
 		    contents,
-		    TO_CHAR(reg_dt, 'YYYY-MM-DD') AS reg_dt,
+		    TO_CHAR(reg_dt, 'YYYY-MM-DD') AS regDt,
             reg_id,
 		    TO_CHAR(mod_dt,'YYYY-MM-DD') as modDt,
 		    mod_id,

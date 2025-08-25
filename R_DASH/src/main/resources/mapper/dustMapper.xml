@@ -7,97 +7,112 @@
     
 	<!-- 최고 PM10 TOP5 -->
 	<select id="selectTop5PM10" resultType="map">
-	    SELECT STN_NM, LAT, LON, PM10
-	    FROM DUST
-	    ORDER BY PM10 DESC
-	    FETCH FIRST 5 ROWS ONLY
+		SELECT RNK, STN_NM, LAT, LON, PM10
+		FROM (
+		    SELECT STN_NM, LAT, LON, PM10,
+		           DENSE_RANK() OVER (ORDER BY PM10 DESC) AS RNK
+		    FROM DUST
+		)
+		<![CDATA[WHERE RNK <= 5]]>
+		ORDER BY RNK, STN_NM
 	</select>
 	
 	<!-- 최저 PM10 BOTTOM5 -->
 	<select id="selectBottom5PM10" resultType="map">
-	    SELECT STN_NM, LAT, LON, PM10
-	    FROM DUST
-	    ORDER BY PM10 ASC
-	    FETCH FIRST 5 ROWS ONLY
+		SELECT RNK, STN_NM, LAT, LON, PM10
+		FROM (
+		    SELECT STN_NM, LAT, LON, PM10,
+		           DENSE_RANK() OVER (ORDER BY PM10 ASC) AS RNK
+		    FROM DUST
+		)
+		<![CDATA[WHERE RNK <= 5]]>
+		ORDER BY RNK, STN_NM
 	</select>
 	
 	<!-- 평균 PM10 -->
-	<select id="selectAvgPM10" resultType="double">
+	<select id="selectAvgPM10" parameterType="string" resultType="double">
 	    SELECT ROUND(AVG(PM10), 2) AS avg_pm10
 	    FROM DUST
+	    <where>
+	        <if test="stnNm != null">
+	            STN_NM LIKE #{stnNm} || '%'
+	        </if>
+	    </where>
 	</select>
     
-  <resultMap id="DustMap" type="com.pcwk.ehr.domain.DustDTO">
-    <id     property="dustNo" column="DUST_NO"/>
-    <result property="tm"     column="TM"/>
-    <result property="stnNm"  column="STN_NM"/>
-    <result property="lat"    column="LAT"/>
-    <result property="lon"    column="LON"/>
-    <result property="org"    column="ORG"/>
-    <result property="pm10"   column="PM10"/>
-    <result property="avg"    column="AVG"/>
-  </resultMap>
+    <select id="findNearestDust" resultType="DustDTO">
+	    SELECT *
+	    FROM (
+	        SELECT STN_NM, LAT, LON, PM10,
+	               SQRT(POWER(LAT - #{userLat}, 2) + POWER(LON - #{userLon}, 2)) AS dist
+	        FROM DUST
+	    )
+	    ORDER BY dist
+	    FETCH FIRST 1 ROWS ONLY
+	</select>
+    
 
-  <sql id="dustColumns">
-    DUST_NO, TM, STN_NM, LAT, LON, ORG, PM10, AVG
-  </sql>
-
- <!-- BBox 쿼리 -->
-<select id="selectLatestByTypeBBox" resultType="com.pcwk.ehr.domain.DustDTO">
+  <!-- BBox + 유형 최신 (관측소별 최신 1건) -->
+<select id="selectLatestByTypeBBox" resultType="DustDTO">
   SELECT
     d.DUST_NO AS dustNo,
     TO_CHAR(d.TM_DATE, 'YYYY-MM-DD HH24:MI:SS') AS tm,
     d.STN_NM AS stnNm,
-    d.LAT AS lat,
-    d.LON AS lon,
+    d.LAT    AS lat,
+    d.LON    AS lon,
     TRIM(d.ORG) AS org,
-    d.PM10 AS pm10,
-    d.AVG AS avg,
-    d.MAX AS max,
-    d.CNT AS cnt
+    d.PM10   AS pm10,
+    d.AVG    AS avg,
+    d.MAX    AS max,
+    d.CNT    AS cnt
   FROM (
-    SELECT d.*, ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
+    SELECT d.*,
+           ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
     FROM DUST d
     WHERE d.LAT BETWEEN #{minLat} AND #{maxLat}
       AND d.LON BETWEEN #{minLon} AND #{maxLon}
-      AND TRIM(d.ORG) = TRIM(#{airType})
+      <if test="airType != null and airType != '' and airType != 'ALL' and airType != '전체'">
+        AND REPLACE(TRIM(d.ORG),' ','') = REPLACE(TRIM(#{airType}),' ','')
+      </if>
       <if test="day != null and day != ''">
         AND TRUNC(d.TM_DATE) = TO_DATE(#{day}, 'YYYY-MM-DD')
       </if>
   ) d
   WHERE d.rn = 1
-<!-- ✅ 수정 후 (권장) -->
-<if test="limit != null">
-  AND ROWNUM &lt;= #{limit}
-</if>
+  <if test="limit != null">
+    AND ROWNUM &lt;= #{limit}
+  </if>
 </select>
 
-<!-- 전국 쿼리 -->
-<select id="selectLatestByTypeAll" resultType="com.pcwk.ehr.domain.DustDTO">
+<select id="selectLatestByTypeAll" resultType="DustDTO">
   SELECT
     d.DUST_NO AS dustNo,
     TO_CHAR(d.TM_DATE, 'YYYY-MM-DD HH24:MI:SS') AS tm,
     d.STN_NM AS stnNm,
-    d.LAT AS lat,
-    d.LON AS lon,
+    d.LAT    AS lat,
+    d.LON    AS lon,
     TRIM(d.ORG) AS org,
-    d.PM10 AS pm10,
-    d.AVG AS avg,
-    d.MAX AS max,
-    d.CNT AS cnt
+    d.PM10   AS pm10,
+    d.AVG    AS avg,
+    d.MAX    AS max,
+    d.CNT    AS cnt
   FROM (
-    SELECT d.*, ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
+    SELECT d.*,
+           ROW_NUMBER() OVER (PARTITION BY d.STN_NM ORDER BY d.TM_DATE DESC) rn
     FROM DUST d
-    WHERE TRIM(d.ORG) = TRIM(#{airType})
-      <if test="day != null and day != ''">
-        AND TRUNC(d.TM_DATE) = TO_DATE(#{day}, 'YYYY-MM-DD')
+    <where>
+      <if test="airType != null and airType != '' and airType != 'ALL' and airType != '전체'">
+        REPLACE(TRIM(d.ORG),' ','') = REPLACE(TRIM(#{airType}),' ','')
       </if>
+      <if test="day != null and day != ''">
+        TRUNC(d.TM_DATE) = TO_DATE(#{day}, 'YYYY-MM-DD')
+      </if>
+    </where>
   ) d
   WHERE d.rn = 1
-<!-- ✅ 수정 후 (권장) -->
-<if test="limit != null">
-  AND ROWNUM &lt;= #{limit}
-</if>
+  <if test="limit != null">
+    AND ROWNUM &lt;= #{limit}
+  </if>
 </select>
 
 

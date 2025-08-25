@@ -116,6 +116,19 @@ p {
     </c:forEach>   
   ];
   console.log(top10Data);
+document.addEventListener('DOMContentLoaded', function(){
+
+  langSelect.value = currentLang;  // selected 반영
+  
+  // 언어 변경 이벤트
+  langSelect.addEventListener("change", function(){
+      selectLang = langSelect.value;
+
+      keywordWindow.location.href = "/ehr/freq/topic/words.do?lang=" + selectLang;
+      
+  });
+});
+  
 </script>
 <script src="${pageContext.request.contextPath}/resources/js/wordcloud.js"></script> 
 <script src="${pageContext.request.contextPath}/resources/js/top10.js"></script> 
@@ -125,10 +138,10 @@ p {
         <div class="col-xl-12">
             <div class="card">
                 <div class="card-header">
-                    <h3>오늘의 키워드</h3>
+                    <h3>${msgs.keyword}</h3>
                 <div>
-                    <p>매일 100건의 재난 뉴스를 분석해 일일 단어 통계를 제공합니다.<br/>
-                                                     최신 재난 정보와 트렌드를 쉽게 확인해 보세요.</p>
+                    <p>${msgs.des1}<br/>
+                       ${msgs.des2}</p>
                 </div>
                 </div>
 
@@ -146,8 +159,8 @@ p {
                                <tr>
                                   <th scope="col"></th>
                                   <th scope="col"></th>
-                                  <th scope="col">빈도</th>
-                                  <th scope="col">증감률(%)</th>
+                                  <th scope="col">${msgs.count}</th>
+                                  <th scope="col">${msgs.rate}(%)</th>
                                </tr>
                             </thead>
                             <c:forEach var="word" items="${rate}" varStatus="status">

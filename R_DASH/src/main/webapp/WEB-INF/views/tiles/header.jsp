@@ -50,19 +50,19 @@
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a id="nav-dust" href="${pageContext.request.contextPath}/dust" class="nav-link">
-                      <span class="sidenav-mini-icon"> 황사 </span>
-                      <span class="sidenav-normal"> 황사 </span>
-                    </a>
+                  <a href="${pageContext.request.contextPath}/map/dust" class="nav-link">
+					  <span class="sidenav-mini-icon"> 황사 </span>
+					  <span class="sidenav-normal"> 황사 </span>
+					</a>
                   </li>
                   <li class="nav-item">
-                    <a href="#" class="nav-link">
+                   <a href="${pageContext.request.contextPath}/map/firestation" class="nav-link">
                       <span class="sidenav-mini-icon"> 소방서 </span>
                       <span class="sidenav-normal"> 소방서 </span>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="#" class="nav-link">
+                     <a href="${pageContext.request.contextPath}/map/shelter" class="nav-link">
                       <span class="sidenav-mini-icon"> 대피소 </span>
                       <span class="sidenav-normal"> 대피소 </span>
                     </a>
@@ -119,7 +119,7 @@
                 <ul class="nav nav-sm flex-column">
                   <li class="nav-item">
                     <a href="/ehr/news/newsPage.do" class="nav-link">
-                      <span class="sidenav-mini-icon"></span>
+                      <span class="sidenav-mini-icon">뉴스</span>
                       <span class="sidenav-normal"> 재난 뉴스 </span>
                     </a>
                   </li>
@@ -135,7 +135,7 @@
                 <ul class="nav nav-sm flex-column">
                   <li class="nav-item">
                     <a href="/ehr/board/doRetrieve.do" class="nav-link">
-                      <span class="sidenav-mini-icon"></span>
+                      <span class="sidenav-mini-icon">공지</span>
                       <span class="sidenav-normal"> 공지보기 </span>
                     </a>
                   </li>
@@ -145,6 +145,12 @@
           </ul>
         </div>
       </div>
+            <div class="sidenav-footer mt-auto" style="position: absolute; bottom: 10px; right: 5px; width: 50px; text-align: center;"> <!-- mt-auto로 아래로 밀기 -->
+			    <select id="lang" name="lang" class="form-control" style="width: 100%; padding:2px;">
+			       <option value="ko" ${lang eq 'ko' ? 'selected' : ''}>KO</option>
+			       <option value="en" ${lang eq 'en' ? 'selected' : ''}>EN</option>
+			    </select>
+			</div>
     </div>
   </nav>
     <!-- Main content -->

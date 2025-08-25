@@ -58,16 +58,33 @@ $(document).ready(function() {
                         datasets: [{
                             label: '환자 수',
                             data: totalValues,
-                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(38, 142, 190, 0.6)',
+                            borderColor: 'rgba(56, 151, 151, 1)',
                             borderWidth: 1
                         }]
                     },
                     options: {
                         responsive: true,
+                        plugins: {
+                            title: {
+                                display: true,         // 제목 보이기
+                                text: '지역별 온열질환자 수 (2016~2024)', // 제목 내용
+                                font: {
+                                    size: 18,          // 폰트 크기
+                                    weight: 'bold'
+                                },
+                                color: '#333'          // 글자 색
+                            }
+                        },
                         scales: {
                             y: { beginAtZero: true, title: { display: true, text: '환자 수' } },
-                            x: { title: { display: true, text: groupType === 'region' ? '지역' : '년도' } }
+                            x: { title: { display: true, text: groupType === 'region' ? '지역' : '년도' },
+                                grid: {
+                                    drawTicks: false,   // 눈금선 제거
+                                    drawBorder: false,  // 축선 제거
+                                    color: 'transparent' // 격자선 색상 투명
+                                    }  
+                                }
                         }
                     }
                 });
@@ -84,9 +101,30 @@ $(document).ready(function() {
                     },
                     options: {
                         responsive: true,
+                        plugins: {
+                            title: {
+                                display: true, 
+                                text: '실내외별 온열질환자 수 (2016~2024)',
+                                font: {
+                                    size: 18,
+                                    weight: 'bold'
+                                },
+                                color: '#333' 
+                            }
+                        },
                         scales: {
-                            y: { beginAtZero: true, title: { display: true, text: '환자 수' } },
-                            x: { title: { display: true, text: groupType === 'region' ? '지역' : '년도' } }
+                            y: { 
+                                beginAtZero: true, 
+                                title: { display: true, text: '환자 수' } 
+                                },
+                            x: { 
+                                title: { display: true, text: groupType === 'region' ? '지역' : '년도' },
+                                grid: {
+                                    drawTicks: false,   // 눈금선 제거
+                                    drawBorder: false,  // 축선 제거
+                                    color: 'transparent' // 격자선 색상 투명
+                                    }  
+                                }
                         }
                     }
                 });
