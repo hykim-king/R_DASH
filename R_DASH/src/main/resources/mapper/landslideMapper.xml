@@ -145,21 +145,22 @@
 
     <!-- 지역별 통계 -->
     <select id="selectByRegion" resultType="map">
-        SELECT SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1) AS region,
-		       COUNT(*) AS total_count
+        SELECT 
+		    NVL(SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1), LND_INST_NM) AS region,
+		    COUNT(*) AS total_count
 		FROM LANDSLIDE
-		GROUP BY SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1)
+		GROUP BY NVL(SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1), LND_INST_NM)
 		ORDER BY total_count DESC
     </select>
 
     <!-- 월별 통계 -->
     <select id="selectByMonth" resultType="map">
         SELECT 
-            TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM') AS month,
-            COUNT(*) AS total_count
-        FROM LANDSLIDE
-        GROUP BY TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY-MM')
-        ORDER BY month
+		    TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM') AS month,
+		    COUNT(*) AS total_count
+		FROM LANDSLIDE
+		GROUP BY TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM')
+		ORDER BY month
     </select>
 
     <!-- 주의보/경보 등 예보 상태별 통계 -->

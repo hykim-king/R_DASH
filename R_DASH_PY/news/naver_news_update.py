@@ -8,8 +8,8 @@ from news_insert import save_news_to_db
 from news_insert import update_news_to_db
 
 load_dotenv()
-client_id = os.getenv('client_id')
-client_secret = os.getenv('client_secret')
+client_id = os.getenv('CLIENT_ID')
+client_secret = os.getenv('CLIENT_SECRET')
 
 PRESS_MAP = {
         '서울신문': '081',

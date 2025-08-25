@@ -1,0 +1,151 @@
+/* /resources/map_css/firestation-layer.css */
+
+/* ===== HUD ===== */
+.fs-hud {
+	position: fixed;
+	right: 14px;
+	top: 74px; /* 공통 헤더 높이에 맞춰 조절 */
+	width: 320px;
+	z-index: 1300;
+	display: none;
+	pointer-events: none; /* 내부 요소만 클릭 가능 */
+}
+
+.fs-hud * {
+	box-sizing: border-box;
+}
+
+.fs-search {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	pointer-events: auto;
+}
+
+.fs-input {
+	flex: 1;
+	height: 36px;
+	padding: 0 12px;
+	border: 1px solid #dfe3ea;
+	border-radius: 10px;
+	background: #ffffff;
+	outline: none;
+	font-size: 14px;
+}
+
+.fs-input:focus {
+	border-color: #5a8cff;
+	box-shadow: 0 0 0 3px rgba(90, 140, 255, .15);
+}
+
+.fs-clear {
+	width: 36px;
+	height: 36px;
+	border: 0;
+	border-radius: 10px;
+	background: #f1f3f7;
+	cursor: pointer;
+	font-size: 18px;
+	line-height: 1;
+}
+
+.fs-list {
+	margin-top: 8px;
+	max-height: 360px;
+	overflow: auto;
+	padding: 6px;
+	border-radius: 12px;
+	background: rgba(255, 255, 255, .96);
+	border: 1px solid #e7ebf2;
+	pointer-events: auto;
+}
+
+.fs-item {
+	padding: 8px 10px;
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+.fs-item:hover {
+	background: #f4f7ff;
+}
+
+.fs-item-title {
+	font-weight: 700;
+	font-size: 14px;
+	color: #111827;
+}
+
+.fs-item-sub {
+	margin-top: 2px;
+	font-size: 12px;
+	color: #6b7280;
+}
+
+.fs-empty {
+	padding: 10px;
+	font-size: 13px;
+	color: #6b7280;
+}
+
+/* ===== 버블 마커 ===== */
+/* 기본은 점만 보이게 */
+.fs-bubble {
+	position: relative;
+	transform: translate(-50%, -100%);
+}
+
+.fs-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: #e74c3c;
+	border: 2px solid #fff;
+	box-shadow: 0 0 4px rgba(0, 0, 0, .2);
+}
+
+.fs-card {
+	display: none;
+	position: absolute;
+	top: -10px;
+	left: 12px;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .15);
+	padding: 10px 12px;
+	min-width: 220px;
+}
+
+.fs-title {
+	font-weight: 700;
+	margin-bottom: 4px;
+}
+
+.fs-area {
+	font-size: 12px;
+	color: #666;
+}
+
+.fs-tel {
+	margin-top: 6px;
+	font-size: 12px;
+	color: #357edd;
+}
+
+
+/* 활성화 시 카드 보이기 */
+.fs-bubble.active .fs-card { display:block; }
+/* 겹칠 때 위로 오도록 */
+.kakao_customoverlay { z-index: 3; }
+
+
+/* 유형별 컬러 변형 (선택) */
+.fs-bubble.안전센터 .fs-dot {
+	background: #22c55e;
+} /* 예: FIRE_TP=안전센터 */
+.fs-bubble.소방서 .fs-dot {
+	background: #ef4444;
+} /* 예: FIRE_TP=소방서 */
+.fs-bubble.기타 .fs-dot {
+	background: #a78bfa;
+}

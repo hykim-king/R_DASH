@@ -40,13 +40,14 @@
 				    <div class="row">
 				         <div class="col-12 mt-4">
 					        <div class="form-group">
-					            <label id="title" class="form-label text-dark">주제</label>
+					            <label for="title" class="form-label text-dark">주제</label>
 					            <input type="text" class="form-control" id="title" name="title" autocomplete="title" maxlength="50" required placeholder="제목을 입력하세요." >
 					        </div>
 					        <div class="form-group">
-					            <label id="contents" class="form-label text-dark">주제 상세</label>
+					            <label for="contents" class="form-label text-dark">주제 상세</label>
 					            <textarea style="height:200px;" class="form-control" id="contents" name="contents" maxlength="50" maxlength="300" required placeholder="내용을 입력하세요." ></textarea>
 					        </div>
+					     <input type="hidden" id="regId" name="regId" value="${user.email}" />            
 				        </div>
 				        </div>
 				    </form>
@@ -60,17 +61,61 @@
 	</div>
 </div>
 <script>
-  const moveToNewsPageBtn = document.querySelector("#moveToNewsPage");
+document.addEventListener('DOMContentLoaded', function() {
+	
+    console.log('DOMContentLoaded');
   
-  moveToNewsPageBtn.addEventListener("click",function(event){
-	  if(window.opener && !window.opener.closed){
-	          //window.opener.receiveDataFromChild(msg);
-	  }else{
-	      alert('부모창을 찾을 수 없어요.');
-	  }
-
+	function isEmpty(value) {
+        return value == null || value.trim() === '';
+    }
+  const doSaveBtn = document.querySelector("#doSave");
+  const titleInput = document.querySelector("#title");
+  const contentsInput = document.querySelector("#contents");
+  
+  doSaveBtn.addEventListener("click",function(event){
+	  console.log("doSaveBtn click");
+	  
+	  
+		  
+		  if (isEmpty(titleInput.value)) {
+	          alert('제목을 입력 하세요');
+	          titleInput.focus();
+	          return;
+	      }
+	      if (isEmpty(contentsInput.value)) {
+	          alert('내용을 입력 하세요');
+	          contentsInput.focus();
+	          return;
+	      }
+	      $.ajax({
+	          type: "POST",
+	          url: "/ehr/news/doSave.do",
+	          async : "true", //비동기
+	          dataType : "json",
+	          data: {
+	              "title": titleInput.value,
+	              "contents": contentsInput.value,
+	              "regId": document.getElementById("regId").value
+	          },
+	          success: function(response) {
+	              if(response.messageId === 1) {
+	                  // 부모창 DOM 업데이트
+	                  if(window.opener && !window.opener.closed) {
+	                      window.opener.document.getElementById("detailTitle").textContent = titleInput.value;
+	                      window.opener.document.getElementById("detailContents").textContent = contentsInput.value;
+	                  }
+	                  alert("저장 완료!");
+	                  window.close(); // 자식창 닫기
+	              } else {
+	                  alert("저장 실패: " + response.message);
+	              }
+	          },
+	          error: function() {
+	              alert("관리자 권한(저장 실패)");
+	          }
+	      });
 });
-  
+});
 </script>
 
 

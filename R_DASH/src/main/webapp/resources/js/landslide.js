@@ -18,12 +18,34 @@ $(document).ready(function() {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: '년도별 산사태 건수',
+                        label: '산사태 수',
                         data: counts,
                         backgroundColor: 'rgba(75, 192, 192, 0.6)'
                     }]
                 },
-                options: { responsive: true }
+                options: { 
+                    responsive: true,
+                    plugins: {
+                            title: {
+                                display: true, 
+                                text: '연도별 산사태 건 수 (2019~2024)',
+                                font: {
+                                    size: 18,
+                                    weight: 'bold'
+                                },
+                                color: '#333' 
+                            }
+                        },
+                    scales: {
+                        x: { 
+                            grid: {
+                                drawTicks: false,   // 눈금선 제거
+                                drawBorder: false,  // 축선 제거
+                                color: 'transparent' // 격자선 색상 투명
+                                }  
+                            }
+                    }
+                 }
             });
         }
     });
@@ -41,12 +63,34 @@ $(document).ready(function() {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: '지역별 산사태 건수',
+                        label: '산사태 수',
                         data: counts,
                         backgroundColor: 'rgba(255, 99, 132, 0.6)'
                     }]
                 },
-                options: { responsive: true }
+                options: { 
+                    responsive: true,
+                    plugins: {
+                            title: {
+                                display: true, 
+                                text: '지역별 산사태 건수 (2019년 ~ 2024년)',
+                                font: {
+                                    size: 18,
+                                    weight: 'bold'
+                                },
+                                color: '#333' 
+                            }
+                        },
+                    scales: {
+                        x: { 
+                            grid: {
+                                drawTicks: false,
+                                drawBorder: false,
+                                color: 'transparent'
+                                }  
+                            }
+                    }
+                 }
             });
         }
     });
@@ -56,7 +100,7 @@ $(document).ready(function() {
         type: 'GET',
         dataType: 'json',
         success: function(data) {
-            const labels = data.map(row => row.MONTH);
+            const labels = data.map(row => row.MONTH+"월");
             const counts = data.map(row => row.TOTAL_COUNT);
 
             new Chart($('#monthChart'), {
@@ -64,19 +108,30 @@ $(document).ready(function() {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: '월별 산사태 건수',
+                        label: '산사태 수',
                         data: counts,
                         backgroundColor: 'rgba(54, 162, 235, 0.6)'
                     }]
                 },
                 options: { 
                   responsive: true,
+                  plugins: {
+                            title: {
+                                display: true, 
+                                text: '월별 산사태 건수 (2019년 ~ 2024년)',
+                                font: {
+                                    size: 18,
+                                    weight: 'bold'
+                                },
+                                color: '#333' 
+                            }
+                        },
                   scales: {
                         x: {
-                            ticks: {
-                                autoSkip: false,
-                                maxRotation: 45,    
-                                minRotation: 45
+                            grid: {
+                                drawTicks: false,
+                                drawBorder: false,
+                                color: 'transparent'
                             }
                         }
                     }
@@ -98,14 +153,34 @@ $(document).ready(function() {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: '예보상태별 산사태 건수',
+                        label: '산사태 수',
                         data: counts,
                         backgroundColor: 'rgba(255, 206, 86, 0.6)'
                     }]
                 },
                 options: { 
                   indexAxis: 'y',
-                  responsive: true }
+                  responsive: true,
+                  plugins: {
+                            title: {
+                                display: true, 
+                                text: '예보상태별 산사태 건수 (2019년 ~ 2024년)',
+                                font: {
+                                    size: 18,
+                                    weight: 'bold'
+                                },
+                                color: '#333' 
+                            }
+                        },
+                  scales: {
+                      y: {
+                          grid: {
+                              drawTicks: false,
+                              drawBorder: false,
+                              color: 'transparent'
+                          }
+                      }
+                  }}
             });
         }
     });

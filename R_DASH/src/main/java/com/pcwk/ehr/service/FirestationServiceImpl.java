@@ -16,9 +16,6 @@ public class FirestationServiceImpl implements FirestationService {
     @Autowired
     private FirestationMapper mapper;
     
-    @Autowired
-	private FireSafeMapper fireSafeMapper;
-
     @Override
     public List<FirestationDTO> selectByBBox(double minLat, double maxLat,
                                              double minLon, double maxLon,
@@ -59,6 +56,11 @@ public class FirestationServiceImpl implements FirestationService {
     @Override
 	public List<Map<String, Object>> getfirestationCounts() {
 	    return mapper.firestationCount();
+	}
+
+	@Override
+	public List<Map<String, Object>> getSigunguFireCounts() {
+		return mapper.sigunguFireCount();
 	}
 	
 }

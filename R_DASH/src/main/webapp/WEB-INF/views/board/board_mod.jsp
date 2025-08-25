@@ -29,15 +29,12 @@
     <span class="mask bg-gradient-default opacity-4"></span>
     <div class="container-fluid d-flex align-items-center">
         <div class="row">
-            <div class="col-lg-7 col-md-10">
-                <div>
-                    <span>🏠   홈</span><span> > </span><span>공지사항</span><span> > </span><span>수정</span>
-                </div>
+                <div class="col-lg-7 col-md-10">
                 <h1 class="display-2 text-white">공지사항 수정 안내문</h1>
                 <p class="text-white mt-0 mb-5">기존에 등록된 공지 내용을 확인하고 필요 시 수정해 주세요.       
 												수정한 내용도 시민분들께 명확하게 전달될 수 있도록 신중히 작성해 주시기 바랍니다.
 												알림 버튼을 누르면 변경된 공지가 사이트를 방문하는 모든 회원에게 다시 전달됩니다.</p>
-            <!--    <input type="button" id="moveTolist" class="btn btn-neutral" value="목록으로 "> -->
+                </div>
             </div>
         </div>
     </div>
@@ -81,6 +78,7 @@
                         <label for="summernote"></label>
                         <textarea class="form-control w-100" id="summernote" name="contents" class="contents" style="white-space: pre-wrap; overflow-wrap: break-word; resize: vertical;">${vo.contents }</textarea>
                     </div>
+                  <input type="hidden" id="regId" name="regId" value="${user.email}" />      
                  </form>
                  </div>
               </div>
@@ -208,10 +206,17 @@ $(document).ready(function() {
             alert('내용을 입력하세요');
             return;
         }
+        // 클릭 시점 체크박스 상태 읽기
+        const is_notice = $('#checkbox').is(':checked') ? 'Y' : 'N';
+    	
         const formData = new FormData();
         formData.append("title", $('#title').val());
         formData.append("contents", summernoteContent);
         formData.append("boardNo", $('#boardNo').val());
+        formData.append("isNotice", is_notice);
+        console.log("is_notice: ",is_notice)
+        formData.append("regId", $('#regId').val());
+        console.log("regId:", $('#regId').val());  // 값 찍어보기
         
         $.ajax({
         	type: "POST",
