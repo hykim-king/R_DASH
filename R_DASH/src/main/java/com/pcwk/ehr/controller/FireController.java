@@ -1,6 +1,8 @@
 package com.pcwk.ehr.controller;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -61,7 +63,7 @@ public class FireController {
 	@GetMapping("/fire-stations.do")
 	@ResponseBody
 	public List<Map<String, Object>> getFireStation() throws SQLException {
-	    return fireStationService.getSigunguFireCounts();
+		return fireStationService.getSigunguFireCounts();
 	}
 	
 	@GetMapping("/statsPage")
