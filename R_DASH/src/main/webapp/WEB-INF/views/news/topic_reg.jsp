@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	              }
 	          },
 	          error: function() {
-	              alert("저장 중 오류 발생");
+	              alert("관리자 권한(저장 실패)");
 	          }
 	      });
 });
