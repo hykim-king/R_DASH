@@ -97,7 +97,7 @@
 
 .clickMeWrapper {
     position: absolute;  /* 왼쪽 카드 안에서 절대 위치 */
-    top: 14.6px;          /* 카드 위쪽으로 띄움 */
+    top: -70px;          /* 카드 위쪽으로 띄움 */
     left: 20px;          /* 카드 왼쪽 안쪽 */
     display: flex;
     align-items: center;
@@ -110,6 +110,7 @@
     height: auto;
 }
 
+
 .clickMeIcon {
     display: flex;
     align-items: center;
@@ -118,7 +119,6 @@
     padding: 5px 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
-
 .clickMeIcon i {
     font-size: 24px;
     color: orange;
@@ -194,7 +194,9 @@ document.addEventListener('DOMContentLoaded', function(){
 
     	})
     });
+    
     function renderKeywordNews(data){
+    	var role = "${sessionScope.loginUser.role}";
         var tbody = $("#keywordNewsTable tbody");
         $('#newsLoadMore').hide();
         tbody.empty();
@@ -203,9 +205,11 @@ document.addEventListener('DOMContentLoaded', function(){
                 var row = "<tr>" +
                     "<td class='budget'>" + vo.company + "</td>" +
                     "<td class='budget'><a href='" + vo.url + "' target='_blank'>" + vo.title + "</a></td>" +
-                    "<td class='budget'>" + vo.pubDt + "</td>" +
-                    "<td class='budget'><button class='btn btn-danger newsDeleteBtn' data-news-no="+vo.newsNo+">뉴스 삭제</button></td>" +
-                    "</tr>";
+                    "<td class='budget'>" + vo.pubDt + "</td>";
+                    if(role === '1'){  // 관리자면 버튼 추가
+                        row += "<td class='budget'><button class='btn btn-danger newsDeleteBtn' data-news-no='"+vo.newsNo+"'>뉴스 삭제</button></td>";
+                    }
+                    row +"</tr>";
                 tbody.append(row);
             });
         } else {
@@ -245,46 +249,50 @@ document.addEventListener('DOMContentLoaded', function(){
         showTopic(currentIndex);
     });
     
+	const moveToTopicRegBtn = document.querySelector("#moveToTopicReg");
     //등록 모달
-    const moveToTopicRegBtn = document.querySelector("#moveToTopicReg");
-    moveToTopicRegBtn.addEventListener("click",function(e){
-    	let url = "doSaveView.do";
-    	const screenWidth = window.screen.width;
-        const screenHeight = window.screen.height;
-        console.log('screenWidth: '+screenWidth);
-        console.log('screenHeight: '+screenHeight);
-
-       const left = (screenWidth - 600)/2;
-       const top = (screenHeight - 400)/2;
-
-       let options = `width=600,height=600, top=${top}, left=${left}, resizable=no, scrollbars=no`;
-       window.open(url,"_blank",options);
-    });
+    if(moveToTopicRegBtn){
+	    moveToTopicRegBtn.addEventListener("click",function(e){
+	    	let url = "doSaveView.do";
+	    	const screenWidth = window.screen.width;
+	        const screenHeight = window.screen.height;
+	        console.log('screenWidth: '+screenWidth);
+	        console.log('screenHeight: '+screenHeight);
+	
+	       const left = (screenWidth - 600)/2;
+	       const top = (screenHeight - 400)/2;
+	
+	       let options = `width=600,height=600, top=${top}, left=${left}, resizable=no, scrollbars=no`;
+	       window.open(url,"_blank",options);
+	    });
+    }
     
+	const moveToTopicModBtn = document.querySelector("#moveToTopicMod");
     //수정 모달
-    const moveToTopicModBtn = document.querySelector("#moveToTopicMod");
-    moveToTopicModBtn.addEventListener("click",function(e){
-    	if(topicDetails.length === 0) {
-            alert("수정할 토픽이 없습니다.");
-            return;
-        }
-    	let topicNo = topicDetails[currentIndex].topicNo; // 현재 상세보기 토픽 번호
-        if(!topicNo){
-            alert("토픽 번호를 확인할 수 없습니다.");
-            return;
-        }
-        let url = "doUpdateView.do?topicNo=" + topicNo;
-        const screenWidth = window.screen.width;
-        const screenHeight = window.screen.height;
-        console.log('screenWidth: '+screenWidth);
-        console.log('screenHeight: '+screenHeight);
-
-       const left = (screenWidth - 600)/2;
-       const top = (screenHeight - 400)/2;
-
-       let options = `width=600,height=600, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
-       window.open(url,"_blank",options);
-    });
+    if(moveToTopicModBtn){
+	    moveToTopicModBtn.addEventListener("click",function(e){
+	    	if(topicDetails.length === 0) {
+	            alert("수정할 토픽이 없습니다.");
+	            return;
+	        }
+	    	let topicNo = topicDetails[currentIndex].topicNo; // 현재 상세보기 토픽 번호
+	        if(!topicNo){
+	            alert("토픽 번호를 확인할 수 없습니다.");
+	            return;
+	        }
+	        let url = "doUpdateView.do?topicNo=" + topicNo;
+	        const screenWidth = window.screen.width;
+	        const screenHeight = window.screen.height;
+	        console.log('screenWidth: '+screenWidth);
+	        console.log('screenHeight: '+screenHeight);
+	
+	       const left = (screenWidth - 600)/2;
+	       const top = (screenHeight - 400)/2;
+	
+	       let options = `width=600,height=600, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+	       window.open(url,"_blank",options);
+	    });
+    }
     
     // 등록 모달 받기
     function receiveDataFromChild(title, contents) {
@@ -311,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function(){
        const left = (screenWidth - 900)/2;
        const top = (screenHeight - 800)/2;
 
-       let options = `width=900,height=800, top=${top}, left=${left}, resizable=no, scrollbars=no`;
+       let options = `width=800,height=800, top=${top}, left=${left}, resizable=no, scrollbars=no`;
        window.open(url,"_blank",options);
     });
    // 더보기 버튼
@@ -320,6 +328,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
     // 뉴스 로딩 함수 (기본 + 더보기)
     function loadNews(pageNo) {
+    	var role = "${sessionScope.loginUser.role}";
         $.ajax({
             url: "<c:url value='/news/doRetrieve.do'/>",
             type: 'GET',
@@ -340,10 +349,20 @@ document.addEventListener('DOMContentLoaded', function(){
                     const row = "<tr>" +
                         "<td class='budget'>" + vo.company + "</td>" +
                         "<td class='budget'><a href='" + vo.url + "' target='_blank'>" + vo.title + "</a></td>" +
-                        "<td class='budget'>" + vo.pubDt + "</td>" +
-                        "</tr>";
+                        "<td class='budget'>" + vo.pubDt + "</td>";
+                        if(role === '1'){  // 관리자면 버튼 추가
+                            row += "<td class='budget'><button class='btn btn-danger newsDeleteBtn' data-news-no='"+vo.newsNo+"'>뉴스 삭제</button></td>";
+                        }
+                        row + "</tr>";
                     tbody.append(row);
+                    
                 });
+             // 남은 데이터가 적으면 더보기 버튼 숨김
+                if (data.length < pageSize) {
+                    $('#newsLoadMore').hide();
+                } else {
+                    $('#newsLoadMore').show();
+                }
             },
             error: function(err) {
                 console.error("AJAX Error:", err);
@@ -362,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function(){
         });
     });
     //재민이 마우스 오버
-    const clickMeWrapper = document.querySelector("#clickMe");
+    const clickMeWrappers = document.querySelector("#clickMe");
     const clickMeDefaultImage = document.querySelector("#clickMeDefault");
     const clickMeOverImage = document.querySelector("#clickMeOver");
     
@@ -370,14 +389,14 @@ document.addEventListener('DOMContentLoaded', function(){
     clickMeDefaultImage.style.display = "block";
     clickMeOverImage.style.display = "none";
     
-    console.log(clickMeDefault);
+    console.log(clickMeDefaultImage);
     console.log(clickMeOverImage);
     
-    clickMeWrapper.addEventListener('mouseover',function(){
+    clickMeWrappers.addEventListener('mouseover',function(){
     	clickMeDefaultImage.style.display = "none";
         clickMeOverImage.style.display = "block";
     });
-    clickMeWrapper.addEventListener('mouseout',function(){
+    clickMeWrappers.addEventListener('mouseout',function(){
         clickMeDefaultImage.style.display = "block";
         clickMeOverImage.style.display = "none";
     });
@@ -418,6 +437,14 @@ document.addEventListener('DOMContentLoaded', function(){
                     alert("삭제 완료!");
                     // 삭제 성공 시 해당 row 제거
                     $(this).closest("tr").remove();
+                    
+                     // tbody에 남은 row 개수 확인
+                    const remainingRows = $("#newsList tr").length;
+                    if (remainingRows < pageSize) {
+                        $('#newsLoadMore').hide(); // 남은 데이터 없으면 숨김
+                    } else {
+                        $('#newsLoadMore').show(); // 남은 데이터 있으면 표시
+                    }
                 } else {
                     alert("삭제 실패: " + response.message);
                 }
@@ -441,12 +468,32 @@ document.addEventListener('DOMContentLoaded', function(){
 			<div class="header-body">
 			<div class="row align-items-center py-4">
 				<div class="col-lg-6 col-7">
-				</div>
+				    <!-- 오늘의 키워드 보여줄 click me -->
+				   <div id="clickMe">
+		           <div id="clickMeDefault" class="clickMeWrapper">
+		                <img  class="clickMeImg" src="/ehr/resources/image/news_Jeamin.png" alt="나를 클릭해봐">
+		                <div class="clickMeIcon">
+		                   <!--  <i class="ni ni-chat-round"></i> -->
+		                    <span class="chatText"> ${msgs.click} ! 📊</span>
+		                </div>
+		            </div>
+                    <!-- 오늘의 키워드 보여줄 click me -->
+                   <div id="clickMeOver" class="clickMeWrapper">
+                    <img  class="clickMeImg" src="/ehr/resources/image/hello_jm.png" alt="안녕!">
+                        <div class="clickMeIcon">
+                           <!--  <i class="ni ni-chat-round"></i> -->
+                            <span class="chatText"> ${msgs.click} ! 📊</span>
+                        </div>
+                    </div>
+                </div>
+                </div>
 			    <!--  버튼 -->
-				<div class="col-lg-6 col-5 text-right">
-				    <input type="button" id="moveToTopicReg" class="btn btn-white" value="${msgs.reg}">
-				    <input type="button" id="moveToTopicMod" class="btn btn-white" value="${msgs.modi}">
-				</div>
+ 			      <c:if test="${sessionScope.loginUser.role =='1'  }">
+				   	<div class="col-lg-6 col-5 text-right">
+					    <input type="button" id="moveToTopicReg" class="btn btn-white" value="${msgs.reg}">
+					    <input type="button" id="moveToTopicMod" class="btn btn-white" value="${msgs.modi}">
+					</div>
+ 		    		</c:if>
 				 <!-- //버튼 -->
 		      </div>
 		   </div>
@@ -500,15 +547,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	               </div>
 	           </div>
 	       </div>
-	       <!-- 오늘의 키워드 보여줄 click me -->
-	       <div id="clickMe" class="clickMeWrapper">
-		        <img id="clickMeDefault" class="clickMeImg" src="/ehr/resources/image/news_Jeamin.png" alt="나를 클릭해봐">
-		        <img id="clickMeOver" class="clickMeImg" src="/ehr/resources/image/hello_jm.png" alt="안녕!">
-		        <div class="clickMeIcon">
-		           <!--  <i class="ni ni-chat-round"></i> -->
-		            <span class="chatText"> ${msgs.click} ! 📊</span>
-		        </div>
-		    </div>
+	       
 	       <!-- 오른쪽 : 토픽 상세 -->
 	       <div class="col-xl-7 d-flex my-topic-card">
 	           <div class="card flex-fill topic-card">
@@ -579,16 +618,14 @@ document.addEventListener('DOMContentLoaded', function(){
                    <table class="table align-items-center table-flush">
                    <colgroup>
                         <col style="width: 15%;"> <!-- 2 -->
-                        <col style="width: 55%;" class="left-col"> <!-- 6 -->
+                        <col style="width: 65%;" class="left-col"> <!-- 6 -->
                         <col style="width: 20%;"> <!-- 2 -->
-                        <col style="width: 10%;"> <!-- 2 -->
                     </colgroup>
                    <thead style="display: none;">
                        <tr>
                            <th>${msgs.newspaper}</th>
                            <th>${msgs.reg}</th>
                            <th>${msgs.pub}</th>
-                           <th></th>
                        </tr>
                    </thead>
                    <tbody class="list"></tbody>

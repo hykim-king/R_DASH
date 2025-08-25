@@ -98,14 +98,14 @@ document.addEventListener('DOMContentLoaded', function() {
                   if(window.opener && !window.opener.closed) {
                       
                   }
-                  alert("저장 완료!");
+                  alert("삭제 완료!");
                   window.close(); // 자식창 닫기
               } else {
-                  alert("저장 실패: " + response.message);
+                  alert("삭제 실패: " + response.message);
               }
           },
           error: function() {
-              alert("저장 중 오류 발생");
+              alert("관리자 권한(삭제 실패)");
           }
       });
   });
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   }
               },
               error: function() {
-                  alert("수정 중 오류 발생");
+                  alert("관리자 권한(수정 실패)");
               }
           });
 });
