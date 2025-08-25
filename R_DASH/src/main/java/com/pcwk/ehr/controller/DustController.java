@@ -1,22 +1,25 @@
 package com.pcwk.ehr.controller;
 
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriUtils;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pcwk.ehr.domain.DustDTO;
 import com.pcwk.ehr.service.DustService;
 
@@ -29,6 +32,8 @@ import com.pcwk.ehr.service.DustService;
 @RequestMapping("/dust")
 public class DustController {
     private final DustService dustService;
+    private final String KAKAO_REST_API_KEY = "27dac2cfbdc8ac4034782eae59ebfeee";
+    
     public DustController(DustService svc){ this.dustService = svc; }
 
 //    // 페이지: /ehr/dust  (map.jsp 불필요)
@@ -110,12 +115,77 @@ public class DustController {
         return dustService.getBottom5PM10();
     }
 
-    @GetMapping("/dust-avg")
+    
+    @GetMapping("/geocode")
     @ResponseBody
-    public Double getAvgPM10() {
-        return dustService.getAvgPM10();
+    public Map<String, Object> geocode(@RequestParam("address") String address) {
+        Map<String, Object> result = new HashMap<>();
+        HttpURLConnection con = null;
+        
+        try {
+            String urlStr = "https://dapi.kakao.com/v2/local/search/address.json?query=" 
+                            + URLEncoder.encode(address, "UTF-8");
+            URL url = new URL(urlStr);
+            con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setRequestProperty("Authorization", "KakaoAK " + KAKAO_REST_API_KEY);
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
+            StringBuilder response = new StringBuilder();
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+            in.close();
+
+            // JSON 파싱
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(response.toString());
+            JsonNode documents = root.path("documents");
+
+            if (documents.size() > 0) {
+                JsonNode doc = documents.get(0);
+                double lat = doc.path("y").asDouble();
+                double lon = doc.path("x").asDouble();
+                result.put("lat", lat);
+                result.put("lon", lon);
+            } else {
+                result.put("lat", null);
+                result.put("lon", null);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.put("lat", null);
+            result.put("lon", null);
+        }
+        return result;
     }
     
+    @GetMapping("/dust-avg")
+    @ResponseBody
+    public Map<String, Object> getAvgPM10(
+    		@RequestParam(value="userLat", required=false) String userLatStr,
+            @RequestParam(value="userLon", required=false) String userLonStr) {
+
+    	Map<String, Object> result = new HashMap<>();
+        
+    	Double userLat = (userLatStr != null && !userLatStr.isEmpty()) ? Double.valueOf(userLatStr) : null;
+    	Double userLon = (userLonStr != null && !userLonStr.isEmpty()) ? Double.valueOf(userLonStr) : null;
+    	    
+        if (userLat == null || userLon == null) {
+            result.put("region", "전국");
+            result.put("value", dustService.getAvgPM10(null));
+        } else {
+            DustDTO nearestDust = dustService.findNearestDust(userLat, userLon);
+            Double avg = dustService.getAvgPM10(nearestDust.getStnNm());
+            result.put("region", nearestDust.getStnNm());
+            result.put("value", avg);
+        }
+        
+        return result;
+	}
+
     @GetMapping("/statsPage")
 	public String statsPage(Model model) throws SQLException {
 		model.addAttribute("pageType", "dust");

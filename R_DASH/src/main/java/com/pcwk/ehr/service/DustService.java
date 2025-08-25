@@ -24,5 +24,7 @@ public interface DustService {
 
 	List<Map<String, Object>> getBottom5PM10();
 
-	Double getAvgPM10();
+	Double getAvgPM10(String region);
+	
+	 DustDTO findNearestDust(double userLat, double userLon);
 }
