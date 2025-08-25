@@ -116,7 +116,18 @@ p {
     </c:forEach>   
   ];
   console.log(top10Data);
+document.addEventListener('DOMContentLoaded', function(){
 
+  langSelect.value = currentLang;  // selected 반영
+  
+  // 언어 변경 이벤트
+  langSelect.addEventListener("change", function(){
+      selectLang = langSelect.value;
+
+      keywordWindow.location.href = "/ehr/freq/topic/words.do?lang=" + selectLang;
+      
+  });
+});
   
 </script>
 <script src="${pageContext.request.contextPath}/resources/js/wordcloud.js"></script> 

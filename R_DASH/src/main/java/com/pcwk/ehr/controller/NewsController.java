@@ -316,8 +316,8 @@ public class NewsController {
 		UserDTO user = (UserDTO) session.getAttribute("loginUser");
 		model.addAttribute("user",user);
 		if(user != null && user.getRole()==1) {
-			param.setRegId(user.getEmail());
-			param.setModId(user.getEmail());
+			param.setRegId(param.getRegId());
+			param.setModId(param.getRegId());
 		}else {
 		    throw new RuntimeException("로그인 필요");
 		}
