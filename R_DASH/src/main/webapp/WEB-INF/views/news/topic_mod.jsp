@@ -46,14 +46,15 @@
 					            autocomplete="title" maxlength="50" value="<c:out value='${vo.title}'/>" >
 					        </div>
 					        <div class="form-group">
-                                <label for="regId" class="form-label text-dark">등록자</label>
-                                <input type="text" class="form-control" id="regId" name="regId" 
-                                autocomplete="title"  value="<c:out value='${vo.regId}'/>" disabled="disabled">
+                                <label for="modId" class="form-label text-dark">등록자</label>
+                                <input type="text" class="form-control" id="modId" name="modId" 
+                                autocomplete="title"  value="<c:out value='${vo.modId}'/>" disabled="disabled">
                             </div>
 					        <div class="form-group">
 					            <label for="contents" class="form-label text-dark">주제 상세</label>
 					            <textarea style="height:200px;" class="form-control" id="contents" name="contents" maxlength="300" required placeholder="내용을 입력하세요." >${vo.contents }</textarea>
 					        </div>
+					        <input type="hidden" id="modId" name="modId" value="${user.email}" />            
 				        </div>
 				        </div>
 				    </form>
@@ -91,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
           dataType : "json",
           data: {
               "topicNo" : topicNoInput.value,
+              "modId": document.getElementById("modId").value
           },
           success: function(response) {
               if(response.messageId === 1) {

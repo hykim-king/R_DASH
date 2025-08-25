@@ -47,6 +47,7 @@
 					            <label for="contents" class="form-label text-dark">주제 상세</label>
 					            <textarea style="height:200px;" class="form-control" id="contents" name="contents" maxlength="50" maxlength="300" required placeholder="내용을 입력하세요." ></textarea>
 					        </div>
+					     <input type="hidden" id="regId" name="regId" value="${user.email}" />            
 				        </div>
 				        </div>
 				    </form>
@@ -93,7 +94,8 @@ document.addEventListener('DOMContentLoaded', function() {
 	          dataType : "json",
 	          data: {
 	              "title": titleInput.value,
-	              "contents": contentsInput.value
+	              "contents": contentsInput.value,
+	              "regId": document.getElementById("regId").value
 	          },
 	          success: function(response) {
 	              if(response.messageId === 1) {

@@ -370,9 +370,11 @@ public class BoardController {
 	    
 	    try {
 	        UserDTO user = (UserDTO) session.getAttribute("loginUser");
+	        log.debug("user: {}",user);
 			model.addAttribute("user",user);
 			if(user != null && user.getRole()==1) {
 				param.setRegId(user.getEmail());
+				param.setModId(user.getEmail());
 			}else {
 			    throw new RuntimeException("로그인 필요");
 			}
