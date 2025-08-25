@@ -15,7 +15,7 @@ import topicWordCloud
 
 def main():
     # 1) 크롤링: 뉴스 데이터 가져오기
-    c = crawler(query='재난', max_link=10)  # 인스턴스 생성하면서 인자 전달
+    c = crawler(query='재난', max_link=100)  # 인스턴스 생성하면서 인자 전달
     df = asyncio.run(c.naver_crawler())  # 인스턴스 메서드 호출
 
     # 2) 명사 추출: df에 'nouns' 컬럼 추가

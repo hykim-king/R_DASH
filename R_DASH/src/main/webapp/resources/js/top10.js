@@ -1,5 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
 
+    // 데이터에서 최대값 계산
+    const maxFreq = Math.max(...top10Data.map(item => item.freq));
+
+    // round up 
+    const roundedMax = Math.ceil((maxFreq) / 100) * 100;
+
     //차트 로드
     const ctx = document.getElementById("top10Chart").getContext("2d");
     //차트 영역
@@ -24,17 +30,15 @@ document.addEventListener('DOMContentLoaded', function() {
         scales: {
                x: {
                 beginAtZero: true,  // x축 0부터 시작
-                max: 1000,
+                max: roundedMax,
                 barPercentage: 0.8,      // 막대 자체 너비
-                categoryPercentage: 0.9,  // 카테고리 간격
-                ticks: {
-                    stepSkip : 10
-                }
+                categoryPercentage: 0.9  // 카테고리 간격
+                
             },
             y: {
                 ticks: {
-                    autoSkip: false  // y축 레이블 자동 생략 방지
-
+                    autoSkip: false,  // y축 레이블 자동 생략 방지
+                    stepSize : 50
                 }
               }
           }

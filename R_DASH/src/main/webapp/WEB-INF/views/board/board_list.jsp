@@ -212,7 +212,10 @@ span {
 		        <input type="text" class="form-control" id="searchWord" name="searchWord">
                 <input type="hidden"id="pageNo" name="pageNo" value="${search.pageNo != 0 ? search.pageNo : 1}">  
                 <button type="button" id="searchButton" onclick="javascript:search()" class="btn btn-default text-nowrap" style="margin-left:10px">${msgs.search}</button>
-                <button type="button" id="moveToReg" class="btn btn-default text-nowrap" style="margin-left:3px">${msgs.reg}</button>
+                <!-- 관리자일 경우에만 등록 가능 -->
+                <c:if test="${sessionScope.loginUser.role =='1'  }">
+                  <button type="button" id="moveToReg" class="btn btn-default text-nowrap" style="margin-left:3px">${msgs.reg}</button>
+                </c:if>
               </div>
             </div>   
     <!-- //Page content -->
