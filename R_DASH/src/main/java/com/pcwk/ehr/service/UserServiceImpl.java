@@ -159,7 +159,7 @@ public class UserServiceImpl implements UserService {
 		if (file != null && !file.isEmpty()) {
 			// 기존 이미지 파일 삭제
 			UserDTO user = mapper.selectUser(param.getUserNo());
-			if (user.getImage() != null && user.getImage() != "defaultProfile.jpg") {
+			if (user.getImage() != null && !user.getImage().equals("defaultProfile.jpg")) {
 
 				String existingFilePath = "C:/Users/user/R_DASH/R_DASH/src/main/webapp/resources/image/profile/"
 						+ user.getImage();
