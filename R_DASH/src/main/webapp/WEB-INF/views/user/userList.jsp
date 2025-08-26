@@ -43,11 +43,6 @@
 </head>
 <script>
 document.addEventListener('DOMContentLoaded',function(){
-	if('${sessionScope.loginUser.role}'!=='1'){
-        alert('관리자만 접근 가능합니다.');
-        
-        window.location.href='/ehr/home';
-    }
 	
 	if('${search.searchDiv}'===''){
 		searchWord.disabled = true;
@@ -112,8 +107,7 @@ function changeRole(userNo){
                     
             },
             error:function(result){//요청 실패
-                console.log("error:"+result)
-                alert(result);
+            	alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
             }
             
             
@@ -242,7 +236,9 @@ function pagerDoRetrieve(url, pageNo){
 			                      </span>
 			                    </td>
 			                    <td>
-			                      <button class="btn btn-success" onclick="changeRole(${vo.userNo})">권한 변경</button>
+			                      <c:if test="${vo.email != sessionScope.loginUser.email }">
+			                        <button class="btn btn-success" onclick="changeRole(${vo.userNo})">권한 변경</button>
+			                      </c:if>
 			                    </td>
 			                  </tr>
                     	</c:forEach>
