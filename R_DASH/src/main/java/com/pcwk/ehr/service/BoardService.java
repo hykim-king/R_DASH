@@ -17,5 +17,7 @@ public interface BoardService {
 	int doUpdate(BoardDTO param);
 	
 	int doDelete(BoardDTO param);
+	
+	List<BoardDTO> boardMainList();
 
 }
