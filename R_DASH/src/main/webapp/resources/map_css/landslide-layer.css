@@ -1,0 +1,59 @@
+/* 차트 레이아웃 */
+.charts {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 12px;
+}
+
+/* 카드 스타일 */
+.chart-card {
+  grid-column: span 6; /* 2열 */
+  background: #0f172a;        /* 다크 배경이라면 */
+  border: 1px solid #1f2937;
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  min-height: 220px;
+}
+.chart-card h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* 캔버스는 부모 높이에 맞춰 늘어나도록 */
+.chart-wrap {
+  position: relative;
+  height: 280px;   /* 필요 시 조절 */
+}
+
+/* 모바일 1열 */
+@media (max-width: 768px) {
+  .chart-card { grid-column: span 12; }
+  .chart-wrap { height: 240px; }
+}
+
+/* getGrade()에서 주는 className과 매칭 */
+.badge {
+  display: inline-block;
+  border-radius: 8px;
+  padding: 2px 8px;
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 600;
+}
+.badge.warning {
+  background: rgba(220, 38, 38, 0.15);
+  color: #fecaca;
+  border: 1px solid rgba(220, 38, 38, 0.35);
+}
+.badge.caution {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fde68a;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+/* 축/그리드 없앨 때 미세 보정(선택) */
+.chart-no-grid .chartjs-render-monitor {
+  filter: none;
+}

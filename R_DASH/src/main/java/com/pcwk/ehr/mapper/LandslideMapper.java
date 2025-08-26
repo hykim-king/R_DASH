@@ -14,37 +14,32 @@ import com.pcwk.ehr.domain.LandslideDTO;
 public interface LandslideMapper extends WorkDiv<LandslideDTO> {
 
 	
-	//BBOX 내 산사태 목록(포인트)
-    List<LandslideDTO> selectByBBox(
-        @Param("minLat") double minLat,
-        @Param("maxLat") double maxLat,
-        @Param("minLon") double minLon,
-        @Param("maxLon") double maxLon,
-        @Param("q") String q
-    );
+	 List<Integer> selectYears();
 
-    
-    // 단건 조회 ( 상세 ) 
-    LandslideDTO findById(@Param("landslideNo") Long landslideNo);
+	    List<LandslideDTO> selectByBBox(
+	        @Param("minLat") double minLat, @Param("maxLat") double maxLat,
+	        @Param("minLon") double minLon, @Param("maxLon") double maxLon,
+	        @Param("q") String q, @Param("year") String year
+	    );
 
-    
-    //BBOX 내 시군구 단위 집계( 버븐맵에 사용 ) 
-    List<Map<String, Object>> countByRegionInBBox(
-        @Param("minLat") double minLat,
-        @Param("maxLat") double maxLat,
-        @Param("minLon") double minLon,
-        @Param("maxLon") double maxLon,
-        @Param("q") String q
-    );
+	    List<Map<String,Object>> countByRegionInBBox(
+	        @Param("minLat") double minLat, @Param("maxLat") double maxLat,
+	        @Param("minLon") double minLon, @Param("maxLon") double maxLon,
+	        @Param("q") String q, @Param("year") String year
+	    );
 
-    // 선택: 시/도 단위 집계
-    List<Map<String,Object>> countBySidoInBBox(
-        @Param("minLat") double minLat,
-        @Param("maxLat") double maxLat,
-        @Param("minLon") double minLon,
-        @Param("maxLon") double maxLon,
-        @Param("q") String q
-    );
+	    List<Map<String,Object>> countBySidoInBBox(
+	        @Param("minLat") double minLat, @Param("maxLat") double maxLat,
+	        @Param("minLon") double minLon, @Param("maxLon") double maxLon,
+	        @Param("q") String q, @Param("year") String year
+	    );
+
+	    LandslideDTO findById(@Param("landslideNo") Long landslideNo);
+	    
+	    
+	    
+	    
+	    
     
     List<Map<String,Object>> selectByYear();
     
