@@ -42,8 +42,10 @@ html, body { height: 100%; }
 </head>
 
 <body data-context-path="${pageContext.request.contextPath}"
-      data-layer="${param.layer}"
-      data-nowcast-geo="${pageContext.request.contextPath}/resources/geo/sgg.geojson,${pageContext.request.contextPath}/resources/geo/TL_SCCO_SIG.json">
+      data-layer="${empty param.layer ? 'landslide' : param.layer}"
+      data-nowcast-geo="${pageContext.request.contextPath}/resources/geo/sgg.geojson,
+                       ${pageContext.request.contextPath}/resources/geo/TL_SCCO_SIG.json">
+
 
   <!-- ✅ 로딩/오버레이 -->
   <div class="overlay"></div>
@@ -57,17 +59,21 @@ html, body { height: 100%; }
   <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=b442e080c0a64cb3d347d6158376d1da&libraries=clusterer,services&autoload=false"></script>
 
   <!-- 히트맵 -->
+  <script src="${pageContext.request.contextPath}/resources/lib/heatmap.min.js"></script>
+  
+  <!-- 황사 simpleheat.js -->
   <script src="https://unpkg.com/simpleheat@0.4.0/simpleheat.js"></script>
 
   <!-- 지도 코어 -->
   <script src="${pageContext.request.contextPath}/resources/map_js/app-map.js"></script>
 
   <!-- 레이어들 -->
-  <script src="${pageContext.request.contextPath}/resources/map_js/dust-layer.js"></script>
-  <script src="${pageContext.request.contextPath}/resources/map_js/shelter-layer.js"></script>
-  <script src="${pageContext.request.contextPath}/resources/map_js/firestation-layer.js"></script>
-  <script src="${pageContext.request.contextPath}/resources/map_js/nowcast-layer.js"></script>
-  <script src="${pageContext.request.contextPath}/resources/map_js/landslide-layer.js"></script>
+<script src="${pageContext.request.contextPath}/resources/map_js/dust-layer.js"></script>
+<script src="${pageContext.request.contextPath}/resources/map_js/shelter-layer.js"></script>
+<script src="${pageContext.request.contextPath}/resources/map_js/firestation-layer.js"></script>
+<script src="${pageContext.request.contextPath}/resources/map_js/nowcast-layer.js"></script>
+<script src="${pageContext.request.contextPath}/resources/map_js/landslide-layer.js"></script>
+  
 
   <!-- GeoJSON 로드 및 부팅 -->
   <script>
