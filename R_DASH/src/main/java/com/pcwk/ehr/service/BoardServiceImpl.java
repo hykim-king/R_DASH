@@ -60,5 +60,9 @@ public class BoardServiceImpl implements BoardService {
 	public int doDelete(BoardDTO param) {
 		return boardMapper.doDelete(param);
 	}
+	@Override
+	public List<BoardDTO> boardMainList() {
+		return boardMapper.boardMainList();
+	}
 
 }

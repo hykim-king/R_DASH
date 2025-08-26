@@ -57,9 +57,17 @@ public class NewsServiceImpl implements NewsService {
 	}
 
 	@Override
+	public List<NewsDTO> newsMainList(NewsDTO param) {
+		// TODO Auto-generated method stub
+		return newsMapper.newsMainList(param);
+	}
+	
+	// 토픽 -----------------------------------------------------------------
+	@Override
 	public List<TopicDTO> getTodayTopicsList(TopicDTO param) {
 		return topicMapper.getTodayTopicsList(param);
 	}
+	
 
 	@Override
 	public TopicDTO doSelectOne(TopicDTO param) {

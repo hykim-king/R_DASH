@@ -48,9 +48,8 @@
 	                } 
 	                	
 	            },
-	            error:function(result){//요청 실패
-	                console.log("error:"+result)
-	                alert(result);
+	            error:function(){//요청 실패
+	                alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
 	            }
 	            
 	            
@@ -109,7 +108,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
-                    <input class="form-control" placeholder="이메일" id="email" name="email">
+                    <input class="form-control" placeholder="이메일" id="email" name="email" maxlength="30">
                   </div>
                 </div>
                 <div class="form-group">
@@ -117,7 +116,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input class="form-control" placeholder="비밀번호" id="password" type="password" name="password">
+                    <input class="form-control" placeholder="비밀번호" id="password" type="password" name="password" maxlength="20">
                   </div>
                 </div>
                 <div class="text-center">

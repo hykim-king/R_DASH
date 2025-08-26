@@ -27,6 +27,8 @@ public interface NewsService {
 	
 	int newsDelete(NewsDTO param);
 	
+	List<NewsDTO>newsMainList(NewsDTO param);
+	
 	/**
 	 * Topic Table
 	 * @param param
