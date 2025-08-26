@@ -2,57 +2,61 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>지도</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>지도</title>
 
-  <style>
-    #map{
-      position: fixed;
-      top: 56px;
-      bottom: 40px;
-      left: 0; right: 0;
-      width: 100%;
-      height: calc(100vh - 56px - 40px);
-      z-index: 5;
-    }
-    
-    html, body { height: 100%; }
-    
-    /* 로딩 / 오버레이 스타일 */
-    .loading, .overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 99999;
-      transition: opacity 4s ease; /* 부드럽게 사라짐 */
-    }
-    .overlay {
-      background: rgba(0, 0, 0, 0.5);
-    }
-    .loading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 20px;
-      color: #fff;
-    }
-  </style>
+<style>
+#map {
+  position: fixed;
+  top: 56px;
+  bottom: 40px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: calc(100vh - 56px - 40px);
+  z-index: 5;
+}
 
-  <!-- 레이어 별 스타일 -->
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/map_css/shelter-layer.css">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/map_css/firestation-layer.css">
-  
+html, body { height: 100%; }
+
+/* 로딩 / 오버레이 */
+.loading, .overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  transition: opacity .9s ease;
+}
+.overlay { background: rgba(0, 0, 0, .5); }
+.loading {
+  display: flex; justify-content: center; align-items: center;
+  font-size: 20px; color: #fff;
+}
+</style>
+
+<!-- 레이어별 스타일 -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/map_css/shelter-layer.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/map_css/firestation-layer.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/map_css/nowcast-layer.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/map_css/landslide-layer.css">
 </head>
 
-<body data-context-path="${pageContext.request.contextPath}">
-   <!-- ✅ 로딩/오버레이 요소 -->
+<body data-context-path="${pageContext.request.contextPath}"
+      data-layer="${param.layer}"
+      data-nowcast-geo="${pageContext.request.contextPath}/resources/geo/sgg.geojson,${pageContext.request.contextPath}/resources/geo/TL_SCCO_SIG.json">
+
+  <!-- ✅ 로딩/오버레이 -->
   <div class="overlay"></div>
+  <div class="loading">Loading…</div> <!-- ← fade-out에서 .loading을 참조하므로 추가 -->
   <div id="map"></div>
 
-  <!-- Kakao SDK (autoload=false면 app-map.js에서 kakao.maps.load로 초기화) -->
-  <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=b442e080c0a64cb3d347d6158376d1da&libraries=clusterer&autoload=false"></script>
+  <!-- ✅ jQuery 먼저 -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-  <!-- 히트맵 라이브러리: dust-layer가 쓰므로 먼저 로드 -->
+  <!-- Kakao SDK: services 포함, autoload=false -->
+  <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=b442e080c0a64cb3d347d6158376d1da&libraries=clusterer,services&autoload=false"></script>
+
+  <!-- 히트맵 -->
   <script src="https://unpkg.com/simpleheat@0.4.0/simpleheat.js"></script>
 
   <!-- 지도 코어 -->
@@ -62,43 +66,88 @@
   <script src="${pageContext.request.contextPath}/resources/map_js/dust-layer.js"></script>
   <script src="${pageContext.request.contextPath}/resources/map_js/shelter-layer.js"></script>
   <script src="${pageContext.request.contextPath}/resources/map_js/firestation-layer.js"></script>
+  <script src="${pageContext.request.contextPath}/resources/map_js/nowcast-layer.js"></script>
+  <script src="${pageContext.request.contextPath}/resources/map_js/landslide-layer.js"></script>
 
-
-
-  <!-- 초기 진입 시 URL/경로 읽어서 레이어 자동 활성화 -->
-<script>
-(function waitApp(){
-  if (window.AppMap && window.AppMap.map) boot();
-  else window.addEventListener('appmap:ready', boot, { once:true });
-})();
-function boot(){
-  const q = new URLSearchParams(location.search);
-  const layer = (q.get('layer') || '').toLowerCase();
-
-  if (layer === 'dust') {
-    AppMap.activate('dust', { airType: q.get('airType') || 'ALL' });
-  } else if (layer === 'shelter') {
-    AppMap.activate('shelter');     // 등록이 늦어도 A안에서 자동 켜짐
-  } else if (layer === 'fire' || layer === 'firestation' || layer === 'firestations') {
-    AppMap.activate('firestation');
-  }
-}
-
-</script>
-
-  <!-- ✅ 로딩 fade-out 스크립트 -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- GeoJSON 로드 및 부팅 -->
   <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // 브라우저 렌더 완료 후 서서히 숨기기
-    requestAnimationFrame(function() {
-      $('.loading, .overlay').css('opacity', 0);
-      setTimeout(function() {
-        $('.loading, .overlay').hide();
-      }, 4000); // CSS transition 시간과 동일
-    });
-  });
+    // 🔸 특정 레이어가 등록될 때까지 대기 후 boot 실행
+    function waitLayerThenBoot(name, cb) {
+      const deadline = Date.now() + 3000; // 최대 3초
+      (function tick() {
+        if (window.AppMap && AppMap.layers && AppMap.layers[name]) { cb(); return; }
+        if (Date.now() > deadline) { console.warn('[map.jsp] timed out waiting layer:', name, '; continue anyway'); cb(); return; }
+        setTimeout(tick, 50);
+      })();
+    }
+
+    // 🔸 URL 파라미터 기반 자동 활성화
+    function boot() {
+      const q = new URLSearchParams(location.search);
+      const layer = (q.get('layer') || '').toLowerCase();
+
+      if (layer === 'dust') {
+        AppMap.activate('dust', { airType: q.get('airType') || 'ALL' });
+
+      } else if (layer === 'shelter') {
+        AppMap.activate('shelter');
+
+      } else if (['fire','firestation','firestations'].includes(layer)) {
+        AppMap.activate('firestation');
+
+      } else if (layer === 'nowcast') {
+        AppMap.activate('nowcast', {
+          category: (q.get('category') || 'T1H').toUpperCase(),
+          view: (q.get('view') || 'nation').toLowerCase(),
+          sidoNm: q.get('sidoNm') || null,
+          signguNm: q.get('signguNm') || null
+        });
+
+      } else if (layer === 'landslide') {
+        // nowcast 잔상 제거
+        if (window.AppMap && AppMap.layers && AppMap.layers.nowcast && AppMap.layers.nowcast.deactivate) {
+          AppMap.layers.nowcast.deactivate();
+        }
+        const hud = document.getElementById('nowcastHud');
+        if (hud) hud.remove();
+
+        AppMap.activate('landslide', {
+          sido: q.get('sido') || null,
+          sgg: q.get('sgg') || null,
+          stts: q.get('stts') || null,
+          apntNm: q.get('apntNm') || null,
+          cluster: (q.get('cluster') || 'on').toLowerCase() !== 'off'
+        });
+      }
+    }
+
+    // 🔸 AppMap 준비되면 자동 부팅
+    window.addEventListener('appmap:ready', function () {
+      const q = new URLSearchParams(location.search);
+      const layer = (q.get('layer') || '').toLowerCase();
+
+      // ✅ nowcast 페이지 표시 플래그 (스타일 등에서 활용 가능)
+      if (layer === 'nowcast') {
+        document.body.setAttribute('data-nowcast', 'true');
+        /* ❌ 기존 코드에 있던 NowcastLayer.loadGeoJSON 호출 삭제
+           nowcast-layer.js가 body의 data-nowcast-geo 속성을 읽어 스스로 로드함 */
+      }
+
+      if (layer) waitLayerThenBoot(layer, boot);
+      else boot();
+    }, { once: true });
   </script>
 
+  <!-- ✅ 로딩 fade-out -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      requestAnimationFrame(function () {
+        $('.loading, .overlay').css('opacity', 0);
+        setTimeout(function () {
+          $('.loading, .overlay').hide();
+        }, 400); // 전환시간과 맞춤 (4초가 아니라 0.4초 권장)
+      });
+    });
+  </script>
 </body>
 </html>

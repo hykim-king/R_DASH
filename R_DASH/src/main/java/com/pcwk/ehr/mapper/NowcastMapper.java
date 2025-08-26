@@ -1,32 +1,23 @@
+// /src/main/java/com/pcwk/ehr/mapper/NowcastMapper.java
 package com.pcwk.ehr.mapper;
 
 import java.util.List;
 import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
-
 import org.apache.ibatis.annotations.Param;
 
-import com.pcwk.ehr.cmn.WorkDiv;
 import com.pcwk.ehr.domain.NowcastDTO;
 
 @Mapper
-public interface NowcastMapper extends WorkDiv<NowcastDTO> {
+public interface NowcastMapper {
+	  // 1) 지도 색칠용(단일 카테고리 전국 최신)
+    List<Map<String, Object>> selectNationLatest(@Param("category") String category);
 
-// 최신 “공통 시각” (T1H/RN1/WSD/REH 모두 존재하는 가장 최근 시각 1건)
-// @return BASE_DATE, BASE_TIME가 key인 Map
+    // 2) 전국: 모든 시군구 × 4카테고리 최신(지역당 4행)
+    List<NowcastDTO> selectLatest4All();
 
-	Map<String, String> selectLatestCommonBase();
-
-//특정 (BASE_DATE, BASE_TIME)의 전국 데이터
-
-	List<NowcastDTO> selectNowcastByBase(@Param("baseDate") String baseDate, 
-			@Param("baseTime") String baseTime);
-
-//특정 시도/시군구 데이터 (해당 시각의 4행: T1H, RN1, WSD, REH)
-
-	List<NowcastDTO> selectNowcastByRegion(@Param("baseDate") String baseDate, 
-			@Param("baseTime") String baseTime,
-			@Param("sidoNm") String sidoNm, @Param("signguNm") String signguNm);
-
+    // 3) 특정 시군구 × 4카테고리 최신(항상 4행)
+    List<NowcastDTO> selectLatest4ByRegion(@Param("sidoNm") String sidoNm,
+                                           @Param("signguNm") String signguNm);
 }

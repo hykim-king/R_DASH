@@ -29,34 +29,52 @@
     <result property="lon"         column="LON"/>
   </resultMap>
 
+
+    <!-- 문자열/DATE 모두 대응: YEAR/ MONTH 추출 -->
+<sql id="yearExpr">
+  <!-- DATE면 TO_CHAR, 문자면 SUBSTR -->
+  CASE
+    WHEN REGEXP_LIKE(TO_CHAR(LND_APNT_DT), '^[0-9]{4}-') THEN SUBSTR(TO_CHAR(LND_APNT_DT),1,4)
+    ELSE SUBSTR(LND_APNT_DT,1,4)
+  END
+</sql>
+
+<sql id="yearFilter">
+  <if test="year != null and year != ''">
+    AND (<include refid="yearExpr"/> = #{year})
+  </if>
+</sql>
+
   <!-- =========================================================
        1) BBox 내 포인트(단건) 목록 조회
        파라미터: minLat, maxLat, minLon, maxLon, q
        정렬: 발생일시 최신순 -> PK 역순
        ========================================================= -->
   <select id="selectByBBox" resultMap="LandslideResultMap">
-    SELECT
-           L.LANDSLIDE_NO,
-           L.LND_APNT_CD,
-           L.LND_APNT_NM,
-           L.LND_APNT_STTS,
-           L.LND_APNT_DT,
-           L.LND_INST_NM,
-           L.LAT,
-           L.LON
-      FROM LANDSLIDE L
-     WHERE L.LAT BETWEEN #{minLat} AND #{maxLat}
-       AND L.LON BETWEEN #{minLon} AND #{maxLon}
-    <if test="q != null and q != ''">
-       AND (
-            L.LND_INST_NM   LIKE '%' || #{q} || '%'
-         OR L.LND_APNT_NM   LIKE '%' || #{q} || '%'
-         OR L.LND_APNT_STTS LIKE '%' || #{q} || '%'
-       )
-    </if>
-     ORDER BY L.LND_APNT_DT DESC NULLS LAST,
-              L.LANDSLIDE_NO DESC
-  </select>
+  SELECT
+         L.LANDSLIDE_NO,
+         L.LND_APNT_CD,
+         L.LND_APNT_NM,
+         L.LND_APNT_STTS,
+         L.LND_APNT_DT,
+         L.LND_INST_NM,
+         L.LAT,
+         L.LON
+    FROM LANDSLIDE L
+   WHERE L.LAT BETWEEN #{minLat} AND #{maxLat}
+     AND L.LON BETWEEN #{minLon} AND #{maxLon}
+  <include refid="yearFilter"/>
+  <if test="q != null and q != ''">
+     AND (
+          L.LND_INST_NM   LIKE '%' || #{q} || '%'
+       OR L.LND_APNT_NM   LIKE '%' || #{q} || '%'
+       OR L.LND_APNT_STTS LIKE '%' || #{q} || '%'
+     )
+  </if>
+   ORDER BY L.LND_APNT_DT DESC NULLS LAST,
+            L.LANDSLIDE_NO DESC
+</select>
+
 
   <!-- =========================================================
        2) 단건 상세
@@ -83,25 +101,26 @@
        반환 키(따옴표 alias로 Map 키 고정):
          "regionName", "lat", "lon", "cnt"
        ========================================================= -->
-  <select id="countByRegionInBBox" resultType="map">
-    SELECT
-           L.LND_INST_NM        AS "regionName",
-           AVG(L.LAT)           AS "lat",
-           AVG(L.LON)           AS "lon",
-           COUNT(*)             AS "cnt"
-      FROM LANDSLIDE L
-     WHERE L.LAT BETWEEN #{minLat} AND #{maxLat}
-       AND L.LON BETWEEN #{minLon} AND #{maxLon}
-    <if test="q != null and q != ''">
-       AND (
-            L.LND_INST_NM   LIKE '%' || #{q} || '%'
-         OR L.LND_APNT_NM   LIKE '%' || #{q} || '%'
-         OR L.LND_APNT_STTS LIKE '%' || #{q} || '%'
-       )
-    </if>
-     GROUP BY L.LND_INST_NM
-     ORDER BY "cnt" DESC, "regionName"
-  </select>
+<select id="countByRegionInBBox" resultType="map">
+  SELECT
+         L.LND_INST_NM  AS "regionName",
+         AVG(L.LAT)     AS "lat",
+         AVG(L.LON)     AS "lon",
+         COUNT(*)       AS "cnt"
+    FROM LANDSLIDE L
+   WHERE L.LAT BETWEEN #{minLat} AND #{maxLat}
+     AND L.LON BETWEEN #{minLon} AND #{maxLon}
+  <include refid="yearFilter"/>
+  <if test="q != null and q != ''">
+     AND (
+          L.LND_INST_NM   LIKE '%' || #{q} || '%'
+       OR L.LND_APNT_NM   LIKE '%' || #{q} || '%'
+       OR L.LND_APNT_STTS LIKE '%' || #{q} || '%'
+     )
+  </if>
+   GROUP BY L.LND_INST_NM
+   ORDER BY "cnt" DESC, "regionName"
+</select>
 
   <!-- =========================================================
        4) BBox 내 "시/도" 집계 (줌아웃 버블)
@@ -111,27 +130,27 @@
        반환 키:
          "sidoNm", "lat", "lon", "cnt"
        ========================================================= -->
-  <select id="countBySidoInBBox" resultType="map">
-    SELECT
-           /* 👇 실제 명명 규칙에 맞게 교체 권장 */
-           SUBSTR(L.LND_INST_NM, 1, 2) AS "sidoNm",
-           AVG(L.LAT)                  AS "lat",
-           AVG(L.LON)                  AS "lon",
-           COUNT(*)                    AS "cnt"
-      FROM LANDSLIDE L
-     WHERE L.LAT BETWEEN #{minLat} AND #{maxLat}
-       AND L.LON BETWEEN #{minLon} AND #{maxLon}
-    <if test="q != null and q != ''">
-       AND (
-            L.LND_INST_NM   LIKE '%' || #{q} || '%'
-         OR L.LND_APNT_NM   LIKE '%' || #{q} || '%'
-         OR L.LND_APNT_STTS LIKE '%' || #{q} || '%'
-       )
-    </if>
-     GROUP BY SUBSTR(L.LND_INST_NM, 1, 2)
-     ORDER BY "cnt" DESC, "sidoNm"
-  </select>
-
+ <select id="countBySidoInBBox" resultType="map">
+  SELECT
+         SUBSTR(L.LND_INST_NM, 1, 2) AS "sidoNm",
+         AVG(L.LAT)                  AS "lat",
+         AVG(L.LON)                  AS "lon",
+         COUNT(*)                    AS "cnt"
+    FROM LANDSLIDE L
+   WHERE L.LAT BETWEEN #{minLat} AND #{maxLat}
+     AND L.LON BETWEEN #{minLon} AND #{maxLon}
+  <include refid="yearFilter"/>
+  <if test="q != null and q != ''">
+     AND (
+          L.LND_INST_NM   LIKE '%' || #{q} || '%'
+       OR L.LND_APNT_NM   LIKE '%' || #{q} || '%'
+       OR L.LND_APNT_STTS LIKE '%' || #{q} || '%'
+     )
+  </if>
+   GROUP BY SUBSTR(L.LND_INST_NM, 1, 2)
+   ORDER BY "cnt" DESC, "sidoNm"
+</select>
+    
     
      <!-- 년도별 통계 -->
     <select id="selectByYear" resultType="map">
@@ -146,20 +165,20 @@
     <!-- 지역별 통계 -->
     <select id="selectByRegion" resultType="map">
         SELECT SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1) AS region,
-		       COUNT(*) AS total_count
-		FROM LANDSLIDE
-		GROUP BY SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1)
-		ORDER BY total_count DESC
+               COUNT(*) AS total_count
+        FROM LANDSLIDE
+        GROUP BY SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1)
+        ORDER BY total_count DESC
     </select>
 
     <!-- 월별 통계 -->
     <select id="selectByMonth" resultType="map">
         SELECT 
-		    TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM') AS month,
-		    COUNT(*) AS total_count
-		FROM LANDSLIDE
-		GROUP BY TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM')
-		ORDER BY month
+            TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM') AS month,
+            COUNT(*) AS total_count
+        FROM LANDSLIDE
+        GROUP BY TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM')
+        ORDER BY month
     </select>
 
     <!-- 주의보/경보 등 예보 상태별 통계 -->
