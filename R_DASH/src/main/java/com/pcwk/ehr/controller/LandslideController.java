@@ -31,32 +31,32 @@ public class LandslideController {
 	@Autowired
 	LandslideService service;
 
-	/**
-	 * 버블 집계 - level=sgg(기본): 시군구 단위 - level=sido : 시/도 단위(줌 아웃) - bbox + 선택 검색 q
-	 */
-	@GetMapping("/bubbles")
-	@ResponseBody
-	public List<Map<String, Object>> bubbles(@RequestParam double minLat, @RequestParam double maxLat,
-			@RequestParam double minLon, @RequestParam double maxLon, @RequestParam(defaultValue = "sgg") String level,
-			@RequestParam(required = false) String q, @RequestParam(required = false) String year // ← 추가
-	) {
-		return "sido".equalsIgnoreCase(level) ? mapper.countBySidoInBBox(minLat, maxLat, minLon, maxLon, q, year)
-				: mapper.countByRegionInBBox(minLat, maxLat, minLon, maxLon, q, year);
-	}
+	 @GetMapping("/heatmap")
+	 @ResponseBody
+	  public List<Map<String,Object>> heatmap(
+	      @RequestParam double minLat, @RequestParam double maxLat,
+	      @RequestParam double minLon, @RequestParam double maxLon,
+	      @RequestParam(required=false) String q,
+	      @RequestParam(required=false) String year
+	  ) {
+	    return mapper.countByRegionInBBox(minLat,maxLat,minLon,maxLon,q,year);
+	  }
 
-	/**
-	 * BBox 내 포인트(개별 이벤트) 목록 - 최신순 (Mapper 정렬 기준) - 선택 검색 q
-	 */
+	 
+	  @GetMapping("/points")
+	  @ResponseBody
+	  public List<LandslideDTO> points(
+	      @RequestParam double minLat, @RequestParam double maxLat,
+	      @RequestParam double minLon, @RequestParam double maxLon,
+	      @RequestParam(required=false) String q,
+	      @RequestParam(required=false) String year
+	  ) {
+	    return mapper.selectByBBox(minLat,maxLat,minLon,maxLon,q,year);
+	  }
 
-	@GetMapping("/points")
-	@ResponseBody
-	public List<LandslideDTO> points(@RequestParam double minLat, @RequestParam double maxLat,
-			@RequestParam double minLon, @RequestParam double maxLon, @RequestParam(required = false) String q,
-			@RequestParam(required = false) String year // ← 추가
-	) {
-		return mapper.selectByBBox(minLat, maxLat, minLon, maxLon, q, year);
-	}
-
+	  
+	  
+	  
 	/** 단건 상세 (PK 기반) */
 	@GetMapping("/{id}")
 	@ResponseBody
