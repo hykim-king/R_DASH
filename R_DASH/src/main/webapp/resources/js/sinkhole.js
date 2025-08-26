@@ -145,9 +145,47 @@ $.getJSON("/ehr/sinkholes/state", function(data) {
                         weight: 'bold'
                     },
                     color: '#333' 
+                },
+                datalabels: {
+                    color: 'black',
+                    font: (context) => {
+                        const dataArr = context.chart.data.datasets[0].data;
+                        const total = dataArr.reduce((a, b) => a + b, 0);
+                        const percentage = (context.dataset.data[context.dataIndex] / total) * 100;
+
+                        // 퍼센트 5% 미만이면 작은 글씨
+                        if (percentage < 5) {
+                            return {
+                                size: 11,
+                                weight: 'bold'
+                            };
+                        }
+
+                        // 기본 글꼴
+                        return {
+                            size: 20,
+                            weight: 'bold'
+                        };
+                    },
+                    formatter: (value, context) => {
+                        // 전체 합계
+                        const dataArr = context.chart.data.datasets[0].data;
+                        const total = dataArr.reduce((a, b) => a + b, 0);
+
+                        // 퍼센트 계산
+                        const percentage = ((value / total) * 100).toFixed(1);
+
+                        // 라벨(년도)
+                        const label = context.chart.data.labels[context.dataIndex];
+
+                        return `${label}\n${percentage}%`;
+                    },
+                    anchor: 'center',
+                    align: 'end'
                 }
             }
-        }
+        },
+        plugins: [ChartDataLabels]
     });
 });
 
