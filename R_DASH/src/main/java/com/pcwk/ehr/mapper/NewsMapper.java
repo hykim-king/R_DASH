@@ -16,4 +16,7 @@ public interface NewsMapper extends WorkDiv<NewsDTO> {
 	List<NewsDTO> searchByKeyword(NewsDTO param);
 	
 	public int newsDelete(NewsDTO param);
+	
+	//newsMainList
+	List<NewsDTO> newsMainList(NewsDTO param);
 }
