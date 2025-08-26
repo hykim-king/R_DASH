@@ -76,6 +76,55 @@ html, body {
 	z-index: 0
 }
 
+.hero-text {
+	position: relative; /* 비디오 위 */
+	z-index: 1;
+	color: #fff;
+	text-align: center;
+	padding: 0 20px;
+	max-width: 920px;
+}
+
+.hero-text h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+}
+
+.hero-text .white-text {
+  color: #fff; /* 흰색 */
+}
+
+.hero-text p {
+	font-size: clamp(1rem, 2vw, 1.2rem);
+	line-height: 1.6;
+	margin: 0;
+	text-shadow: 0 2px 8px rgba(0, 0, 0, .5);
+}
+
+.hero-text .accent {
+  color: #ff4d4d; /* R-DASH 강조 색상 */
+}
+
+/* 버튼 쓰실 거면 함께 */
+.hero-btn {
+	display: inline-block;
+	margin-top: 18px;
+	padding: 12px 28px;
+	border-radius: 28px;
+	background: #ff6b6b;
+	color: #fff;
+	text-decoration: none;
+	font-weight: 600;
+	transition: .25s;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .25);
+}
+
+.hero-btn:hover {
+	background: #ff4757;
+	transform: translateY(-2px);
+}
+
 /* ===== News / FAQ ===== */
 .news-section {
 	padding: 60px 0
@@ -445,6 +494,111 @@ img.card-img-top {
 		top: 52px
 	}
 }
+
+/* ===== 제목 옆(내부) 화살표: 지금은 사용 안 하므로 숨김 ===== */
+.news-title-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.news-title-row.right-nav {
+	justify-content: space-between;
+}
+
+.news-title-row.left-nav {
+	justify-content: flex-start;
+}
+
+.news-title-row .card-title {
+	margin: 0;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.news-title-row .news-navs {
+	display: none;
+} /* 내부 버튼 숨김 */
+
+/* ===== 카드 바깥 화살표 버튼 (세로 알약 스타일) ===== */
+.news-rotator-wrap {
+	position: relative;
+	overflow: visible;
+}
+
+.nav-outer {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 18px;
+	height: 72px;
+	padding: 0;
+	border: 1px solid rgba(0, 0, 0, .08); /* 경계선 살짝(가독성↑) */
+	border-radius: 12px;
+	background: rgba(255, 255, 255, .96); /* ← 배경 흰색 */
+	color: #111; /* ← 화살표(문자) 색 어두운 회색 */
+	font-size: 20px;
+	font-weight: 900;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	z-index: 9;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .22);
+	transition: transform .12s, box-shadow .12s, background .12s, opacity
+		.12s;
+	opacity: .95;
+	/* 브라우저 기본 버튼 외형 제거 */
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	color: #111;
+}
+
+.nav-outer.prev {
+	left: -28px;
+	padding-right: 2px;
+}
+
+.nav-outer.next {
+	right: -28px;
+	padding-left: 2px;
+}
+
+.nav-outer:hover {
+	background: #fff; /* 호버 시 더 하얗게 */
+	transform: translateY(-50%) scale(1.04);
+	box-shadow: 0 10px 24px rgba(0, 0, 0, .28);
+}
+
+.nav-outer:focus {
+	outline: 2px solid #94a3b8;
+	outline-offset: 2px;
+}
+
+/* 모바일에서는 조금 짧고, 너무 바깥으로 나가지 않게 */
+@media ( max-width :576px) {
+	.nav-outer {
+		height: 60px;
+	}
+	.nav-outer.prev {
+		left: 6px;
+	}
+	.nav-outer.next {
+		right: 6px;
+	}
+}
+
+/* 전환 페이드 */
+.news-rotator .card-img-top {
+	transition: opacity .18s;
+}
+
+.news-rotator.switching .card-img-top {
+	opacity: .35;
+}
+}
 </style>
 </head>
 
@@ -454,8 +608,17 @@ img.card-img-top {
 		<video id="bg-video" autoplay muted loop preload="auto"
 			poster="${CP}/resources/image/mainboard.png">
 			<source src="${CP}/resources/video/jaemini.mp4" type="video/mp4" />
-			동영상을 재생할 수 없습니다.
 		</video>
+		<!-- 소개 문구 -->
+		<div class="hero-text">
+			<h1>
+				<span class="white-text">재난 알림 플랫폼</span> <span style="color: #ff6b6b;">R-DASH</span>
+			</h1>
+			<p>
+				재민이가 재난 정보를 알려주고<br /> 상황별 행동 요령을 안내해 드립니다.<br /> 여러분의 안전을 지키는
+				든든한 파트너가 되겠습니다.
+			</p>
+		</div>
 	</div>
 
 	<!-- News -->
@@ -464,33 +627,55 @@ img.card-img-top {
 			<div class="news-title">주요 뉴스</div>
 			<div class="row">
 				<div class="col-md-4 mb-3">
-					<div class="card h-100">
-						<img src="${CP}/resources/image/earth.jpg" class="card-img-top"
-							alt="지진 이미지" />
-						<div class="card-body">
-							<h5 class="card-title">[속보] 강진 발생</h5>
-							<p class="card-text">해당 지역 주민은 안전한 곳으로 대피 바랍니다.</p>
+					<div class="news-rotator-wrap">
+						<!-- 위치 기준 -->
+						<button class="nav-outer prev" aria-label="이전">‹</button>
+
+						<div class="card h-100 news-rotator" data-feed="breaking"
+							data-idx="0">
+							<img src="${CP}/resources/image/earth.jpg" class="card-img-top"
+								alt="지진 이미지">
+							<div class="card-body">
+								<h5 class="card-title">
+									<span class="title-text">[속보] 강진 발생</span>
+								</h5>
+								<p class="card-text">해당 지역 주민은 안전한 곳으로 대피 바랍니다.</p>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div class="col-md-4 mb-3">
-					<div class="card h-100">
-						<img src="${CP}/resources/image/dis.jpg" class="card-img-top"
-							alt="화재 이미지" />
-						<div class="card-body">
-							<h5 class="card-title">화재 시 행동요령 안내</h5>
-							<p class="card-text">119 긴급 행동요령 숙지로 생명을 지키세요.</p>
+					<div class="news-rotator-wrap">
+						<!-- 화살표는 없지만 래퍼는 유지해도 OK -->
+						<div class="card h-100 news-rotator" data-feed="safety"
+							data-idx="0">
+							<img src="${CP}/resources/image/dis.jpg" class="card-img-top"
+								alt="화재 이미지" />
+							<div class="card-body">
+								<h5 class="card-title">
+									<span class="title-text">화재 시 행동요령 안내</span>
+								</h5>
+								<p class="card-text">119 긴급 행동요령 숙지로 생명을 지키세요.</p>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div class="col-md-4 mb-3">
-					<div class="card h-100">
-						<img src="${CP}/resources/image/med.jpg" class="card-img-top"
-							alt="응급 이미지" />
-						<div class="card-body">
-							<h5 class="card-title">응급상황 대응 시스템 강화</h5>
-							<p class="card-text">최근 대응 시간 단축을 위한 시스템 개편 발표.</p>
+					<div class="news-rotator-wrap">
+						<!-- 위치 기준 -->
+						<div class="card h-100 news-rotator" data-feed="emergency"
+							data-idx="0">
+							<img src="${CP}/resources/image/med.jpg" class="card-img-top"
+								alt="응급 이미지">
+							<div class="card-body">
+								<h5 class="card-title">
+									<span class="title-text">응급상황 대응 시스템 강화</span>
+								</h5>
+								<p class="card-text">최근 대응 시간 단축을 위한 시스템 개편 발표.</p>
+							</div>
 						</div>
+
+						<button class="nav-outer next" aria-label="다음">›</button>
 					</div>
 				</div>
 			</div>
@@ -585,6 +770,80 @@ img.card-img-top {
 	<script>
 document.addEventListener("DOMContentLoaded", function(){
   var CP='${CP}';
+  
+  /* === 뉴스 데이터(예시) === */
+  const newsData = {
+    breaking: [
+      { title:'[속보] 강진 발생',    text:'해당 지역 주민은 안전한 곳으로 대피 바랍니다.', img: CP+'/resources/image/earth.jpg', href:'#' },
+      { title:'[속보] 기록적 폭우',  text:'하천 접근 금지 및 산사태 주의 바랍니다.',       img: CP+'/resources/image/rain.jpg',  href:'#' },
+      { title:'[속보] 해상 풍랑 경보', text:'해안가·방파제 접근을 자제해 주세요.',          img: CP+'/resources/image/wave.jpg',  href:'#' }
+    ],
+
+    /* ← 가운데 카드용 */
+    safety: [
+      { title:'화재 시 행동요령 안내', text:'119 긴급 행동요령 숙지로 생명을 지키세요.', img: CP+'/resources/image/dis.jpg', href:'#' },
+      { title:'피난 계단 확보',         text:'계단·복도 물건 보관 금지, 출입구 확보.',    img: CP+'/resources/image/dis.jpg', href:'#' },
+      { title:'소화기 사용 3단계',      text:'안전핀 뽑고 · 노즐 겨냥 · 손잡이 압착.',     img: CP+'/resources/image/dis.jpg', href:'#' }
+    ],
+    /* 세번째 카드용*/
+    emergency: [
+      { title:'응급상황 대응 시스템 강화', text:'최근 대응 시간 단축을 위한 시스템 개편 발표.', img: CP+'/resources/image/med.jpg',    href:'#' },
+      { title:'AED 설치 확대',           text:'지하철 역사 및 공공시설에 추가 설치됩니다.',    img: CP+'/resources/image/aed.jpg',    href:'#' },
+      { title:'119 문자신고 고도화',      text:'위치 자동전송 기능 시범 적용.',               img: CP+'/resources/image/119sms.jpg', href:'#' }
+    ]
+  };
+  function normIndex(i,len){ i%=len; return i<0? i+len : i; }
+
+  function renderNewsCard(card){
+    const feed = card.dataset.feed;
+    const list = newsData[feed] || [];
+    if(!list.length) return;
+    const idx = normIndex(parseInt(card.dataset.idx||'0',10), list.length);
+    card.dataset.idx = idx;
+
+    const item = list[idx];
+    const img  = card.querySelector('.card-img-top');
+    const titleSpan = card.querySelector('.title-text');
+    const desc = card.querySelector('.card-text');
+
+    if(img){ img.src = item.img; img.alt = item.title; }
+    if(titleSpan){ titleSpan.textContent = item.title; }
+    if(desc){ desc.textContent = item.text; }
+
+    // 카드 전체 클릭(화살표 클릭 제외) → 링크
+    card.onclick = (e)=>{
+      if(e.target.closest('.news-nav')) return;
+      if(item.href) location.href = item.href;
+    };
+  }
+
+  function stepCard(card, delta){
+    const feed = card.dataset.feed;
+    const len  = (newsData[feed]||[]).length;
+    if(!len) return;
+    const next = normIndex((parseInt(card.dataset.idx||'0',10) + delta), len);
+    card.dataset.idx = next;
+    card.classList.add('switching');
+    setTimeout(()=>{ renderNewsCard(card); card.classList.remove('switching'); }, 80);
+  }
+  
+  function stepAll(delta){
+	  document.querySelectorAll('.news-rotator').forEach((c)=>{
+	    stepCard(c, delta);   // 기존 stepCard 재사용
+	  });
+	}
+
+//초기화: prev/next가 있는 카드 → 클릭 시 전체 전환
+document.querySelectorAll('.news-rotator').forEach((card) => {
+  const wrap = card.closest('.news-rotator-wrap') || card.closest('.news-col') || card.parentElement;
+  const prev = (wrap && wrap.querySelector('.nav-outer.prev')) || card.querySelector('.news-nav.prev');
+  const next = (wrap && wrap.querySelector('.nav-outer.next')) || card.querySelector('.news-nav.next');
+
+  if (prev) prev.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); stepAll(-1); });
+  if (next) next.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); stepAll(+1); });
+
+  renderNewsCard(card);
+});
 
   /* animate */
   try{
@@ -607,16 +866,21 @@ document.addEventListener("DOMContentLoaded", function(){
   var LOGIN_USER_NO=LOGIN_USER_NO_RAW===''?null:parseInt(LOGIN_USER_NO_RAW,10);
   var NS = (LOGIN_USER_NO!=null) ? ('U:'+LOGIN_USER_NO) : 'GUEST';
 
-  /* ===== 공용 오너 태그 & NS 유틸 ===== */
+  /* 오너/NS 유틸 */
   function nsKey(k){ return NS+'::'+k; }
   function ownerKey(sid){ return 'JM_OWNER_'+sid; }
   function setOwner(sid, owner){ try{ localStorage.setItem(ownerKey(sid), owner); }catch(_){ } }
   function getOwner(sid){ try{ return localStorage.getItem(ownerKey(sid)); }catch(_){ return null; } }
 
-  // 계정 전환 감지 → 내 NS의 활성 세션 초기화
+  /* === 세션ID 런타임 변수 (중요) === */
+  var SESSION_ID = null;
+
+  /* 계정 전환 시 활성 세션 초기화 (로컬+런타임 모두) */
   var LAST_NS = localStorage.getItem('JM_LAST_NS');
   if(LAST_NS !== NS){
-    localStorage.removeItem(nsKey('X-Session-Id'));
+    localStorage.removeItem(nsKey('X-Session-Id')); // 다른 NS의 저장값 제거
+    SESSION_ID = null;                               // ★ 런타임까지 즉시 무효화
+    chatBody.innerHTML='';
   }
   localStorage.setItem('JM_LAST_NS', NS);
 
@@ -631,16 +895,18 @@ document.addEventListener("DOMContentLoaded", function(){
   }
   function previewOf(t){ t=(String(t||'')).replace(/\s+/g,' ').trim(); return t.length>40?t.slice(0,40)+'…':t; }
 
-  /* session & cache — NS별로 완전 분리 */
-  var SESSION_ID=localStorage.getItem(nsKey('X-Session-Id'))||null;
-
+  /* session & cache — NS 분리 */
+  // (계정 전환 클린업 이후 로드)
+  if(SESSION_ID===null){
+    SESSION_ID = localStorage.getItem(nsKey('X-Session-Id'))||null;
+  }
   function getLocalSessions(){ try{ return JSON.parse(localStorage.getItem(nsKey('JM_SESSIONS'))||'[]'); }catch(e){ return []; } }
   function setLocalSessions(arr){ localStorage.setItem(nsKey('JM_SESSIONS'), JSON.stringify((arr||[]).slice(0,50))); }
   function addLocalSession(sid){
     if(!sid) return;
     var owner=getOwner(sid);
-    if(owner && owner!==NS) return;          // 다른 NS 소유 세션은 추가 금지
-    if(!owner) setOwner(sid, NS);            // 오너 미지정이면 내 것으로 태깅
+    if(owner && owner!==NS) return;
+    if(!owner) setOwner(sid, NS);
     var list=getLocalSessions().filter(function(x){ return x!==sid; });
     list.unshift(sid);
     setLocalSessions(list);
@@ -657,7 +923,7 @@ document.addEventListener("DOMContentLoaded", function(){
     setOwner(newSid, NS);
   }
 
-  // 예전 섞인 목록 정리
+  /* 섞인 목록 정리 */
   (function cleanupStrays(){
     try{
       var list=getLocalSessions();
@@ -666,6 +932,8 @@ document.addEventListener("DOMContentLoaded", function(){
       var cur=localStorage.getItem(nsKey('X-Session-Id'));
       if(cur && getOwner(cur)!==NS){
         localStorage.removeItem(nsKey('X-Session-Id'));
+        SESSION_ID=null;                           // ★ 런타임까지 무효화
+        chatBody.innerHTML='';
       }
     }catch(_){}
   })();
@@ -781,7 +1049,6 @@ document.addEventListener("DOMContentLoaded", function(){
         if(e.target && e.target.classList.contains('history-del')) return;
         e.stopPropagation();
         SESSION_ID=s.sessionId; localStorage.setItem(nsKey('X-Session-Id'),SESSION_ID);
-        // 오너 자동 세팅 제거(섞임 방지)
         openDockRoom(SESSION_ID).then(function(){
           Array.prototype.forEach.call(document.querySelectorAll('.history-item'),function(x){
             x.classList.toggle('active',x.dataset.sid===SESSION_ID);
@@ -801,6 +1068,7 @@ document.addEventListener("DOMContentLoaded", function(){
     applyBodyPadding();
   }
 
+  /* 서버 세션은 현재 NS(owner)만 표시 */
   async function loadDockSessions(){
     if(!dockBody)return;
 
@@ -808,10 +1076,10 @@ document.addEventListener("DOMContentLoaded", function(){
       try{
         var res=await fetch(CP+'/api/chat/sessions?limit=100',{headers:{'X-User-No':LOGIN_USER_NO}});
         if(res.ok){
-          var list=await res.json();
-          list = Array.isArray(list) ? list : [];
-          // 서버 목록은 필터 없이 모두 표시 + 로컬 오너 미지정이면 현재 NS로 태깅
-          list.forEach(function(s){ if(!getOwner(s.sessionId)) setOwner(s.sessionId, NS); });
+          var all=await res.json();
+          all = Array.isArray(all) ? all : [];
+          all.forEach(function(s){ if(!getOwner(s.sessionId)) setOwner(s.sessionId, NS); });
+          var list = all.filter(function(s){ return getOwner(s.sessionId) === NS; });
           renderDock(list.map(function(s){
             return {sessionId:s.sessionId,title:s.title||'새 대화',lastMsg:s.lastMsg||'',updatedAt:s.updatedAt||''};
           }));
@@ -819,14 +1087,14 @@ document.addEventListener("DOMContentLoaded", function(){
         }
       }catch(e){ console.warn('sessions api fallback(local)',e); }
     }
-    // 비회원(또는 서버 실패) → 로컬(NS) 목록
     var ids=getLocalSessions();
     renderDock(ids.map(function(id){ return {sessionId:id,title:'내 대화',lastMsg:'',updatedAt:''}; }));
   }
 
   function renderRowsAndCache(sid,rows){
     if(!Array.isArray(rows)||!rows.length) return false;
-    chatBody.innerHTML=''; var fresh=[];
+    chatBody.innerHTML='';
+    var fresh=[];
     rows.forEach(function(m){
       if(m.question && String(m.question).trim()!==''){
         var q=String(m.question);
@@ -845,35 +1113,45 @@ document.addEventListener("DOMContentLoaded", function(){
         fresh.push({role:role,text:t,ts:Date.now()});
       }
     });
-    chatBody.scrollTop=chatBody.scrollHeight; setLocalMsgs(sid,fresh); return true;
+    chatBody.scrollTop=chatBody.scrollHeight;
+    setLocalMsgs(sid,fresh);
+    return true;
   }
 
+  /* 열기: 로그인은 서버만, 그리고 내 소유 아닌 sid는 열지 않음 */
   async function openDockRoom(sid){
-    if(!sid) return; chatBody.innerHTML='';
-    var cached=getLocalMsgs(sid);
-    if(cached.length){
-      cached.forEach(function(m){
-        appendBubble(escapeHtml(m.text).replace(/\n/g,'<br>'), m.role==='bot'?'bot':'user');
-      });
-      chatBody.scrollTop=chatBody.scrollHeight;
+    if(!sid) return;
+
+    if (LOGIN_USER_NO != null) {
+      var o = getOwner(sid);
+      if (o && o !== NS) { chatBody.innerHTML=''; return; }
     }
-    var replaced=false;
+
+    chatBody.innerHTML='';
     if(LOGIN_USER_NO!=null){
       try{
-        var res=await fetch(CP+'/api/chat/sessions/'+encodeURIComponent(sid)+'/messages?limit=200',{headers:{'X-User-No':LOGIN_USER_NO}});
-        if(res.ok){ var rows=await res.json(); replaced=renderRowsAndCache(sid,rows); }
+        var res=await fetch(CP+'/api/chat/sessions/'+encodeURIComponent(sid)+'/messages?limit=200',
+                            {headers:{'X-User-No':LOGIN_USER_NO}});
+        if(res.ok){ var rows=await res.json(); renderRowsAndCache(sid,rows); }
       }catch(e){ console.warn('member history load failed',e); }
-    }
-    if(!replaced){
+    }else{
+      var cached=getLocalMsgs(sid);
+      if(cached.length){
+        cached.forEach(function(m){
+          appendBubble(escapeHtml(m.text).replace(/\n/g,'<br>'), m.role==='bot'?'bot':'user');
+        });
+        chatBody.scrollTop=chatBody.scrollHeight;
+      }
       try{
         var res2=await fetch(CP+'/api/chat/history?limit=200',{headers:{'X-Session-Id':sid}});
         if(res2.ok){ var rows2=await res2.json(); renderRowsAndCache(sid,rows2); }
       }catch(err){ console.error(err); }
     }
+
     applyBodyPadding();
   }
 
-  /* 현재 NS용 새 세션 확보(보내기 전에 보장) */
+  /* 새 세션 확보 */
   async function ensureNewSidForNS(){
     try{
       var r=await fetch(CP+'/api/chat/sessions/new',{method:'POST', headers: (LOGIN_USER_NO!=null?{'X-User-No':LOGIN_USER_NO}:{})});
@@ -889,27 +1167,19 @@ document.addEventListener("DOMContentLoaded", function(){
     }
   }
 
-  /* + 새 대화: 기본=현재창, Alt/중클릭=팝업 */
+  /* + 새 대화 */
   if (dockNew) {
     dockNew.addEventListener('click', async function (e) {
       e.stopPropagation();
-      if (e.altKey) {               // Alt+클릭 → 팝업
-        e.preventDefault();
-        return openInPopup();
-      }
-      await ensureNewSidForNS();    // 새 세션 발급
-      await loadDockSessions();     // 목록 갱신
-      await openDockRoom(SESSION_ID); // 새 방 열기
+      if (e.altKey) { e.preventDefault(); return openInPopup(); }
+      await ensureNewSidForNS();
+      await loadDockSessions();
+      await openDockRoom(SESSION_ID);
       dockEl.classList.remove('collapsed');
       setDockBelow(true);
     });
-    // 중클릭 → 팝업
     dockNew.addEventListener('mouseup', function (e) {
-      if (e.button === 1) {
-        e.preventDefault();
-        e.stopPropagation();
-        openInPopup();
-      }
+      if (e.button === 1) { e.preventDefault(); e.stopPropagation(); openInPopup(); }
     });
   }
 
@@ -917,7 +1187,7 @@ document.addEventListener("DOMContentLoaded", function(){
   async function sendMessage(){
     var text=document.getElementById('chatInput').value.trim(); if(!text) return;
 
-    // 현재 세션이 없거나 남의 NS 소유면 → 내 NS용 새 세션부터 생성
+    // 현재 세션이 없거나 현재 NS 소유가 아니면 새로 생성
     if(!SESSION_ID || (getOwner(SESSION_ID) && getOwner(SESSION_ID)!==NS)){
       await ensureNewSidForNS();
     }
@@ -928,7 +1198,11 @@ document.addEventListener("DOMContentLoaded", function(){
 
     try{
       var headers={'Content-Type':'application/json'};
-      if(SESSION_ID) headers['X-Session-Id']=SESSION_ID;
+
+      // ★ 핵심가드: 내 NS 소유인 경우에만 세션ID를 헤더에 실음
+      if(SESSION_ID && getOwner(SESSION_ID)===NS){
+        headers['X-Session-Id']=SESSION_ID;
+      }
       if(LOGIN_USER_NO!=null) headers['X-User-No']=LOGIN_USER_NO;
 
       var prevSid=SESSION_ID;
@@ -936,12 +1210,11 @@ document.addEventListener("DOMContentLoaded", function(){
         method:'POST', headers:headers, body:JSON.stringify({question:text,userNo:LOGIN_USER_NO||undefined})
       });
 
-      // 서버가 다른 sid를 내려줘도, 오너가 내 NS가 아니면 무시
       var sid=res.headers.get('X-Session-Id');
       if(sid){
         var owner=getOwner(sid);
         if(owner && owner!==NS){
-          // 추가하지 않음
+          // 다른 NS 소유 sid는 무시
         }else{
           if(!owner) setOwner(sid, NS);
           if(sid!==SESSION_ID){ migrateCache(prevSid,sid); SESSION_ID=sid; }
