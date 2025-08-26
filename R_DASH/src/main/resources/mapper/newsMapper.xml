@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pcwk.ehr.mapper.NewsMapper">
+    <!-- 메인 화면 용 -->
+    <select id="newsMainList" parameterType="NewsDTO" resultType="NewsDTO">
+        SELECT 
+		  news_no,
+		  keyword,
+		  company,
+		  url,
+		  pub_dt AS pubDt,
+		  reg_dt AS regDt
+		FROM news
+		WHERE keyword=#{keyword}
+		AND TRUNC(reg_dt) = TRUNC(SYSDATE)
+		ORDER BY pub_dt DESC
+		FETCH FIRST 3 ROWS ONLY
+    </select>
     <select id="doRetrieve" parameterType="SearchDTO" resultType="NewsDTO">
        SELECT * FROM (
 	        SELECT ROWNUM AS rnum, t.*
@@ -90,7 +105,7 @@
 	        #{title}, 
 	        #{company}, 
 	        #{url}, 
-	        #{pubDt}, 
+	        TO_DATE(#{pubDt}, 'YYYY-MM-DD'), 
 	        SYSDATE)
 	</update>
 
@@ -109,7 +124,7 @@
 		           #{title},
 		           #{company},
 		           #{url},
-		           #{pubDt},
+		           TO_DATE(#{pubDt}, 'YYYY-MM-DD'),
 		           SYSDATE )
     </insert>
     <delete id="newsDelete" parameterType="NewsDTO">
