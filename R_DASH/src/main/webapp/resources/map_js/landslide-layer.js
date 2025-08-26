@@ -1,440 +1,306 @@
-// /resources/map_js/landslide-layer.js
-(function (global) {
-  'use strict';
-
-  // AppMap 준비되면 등록
-  if (global.AppMap) register(); else global.addEventListener('appmap:ready', register, { once: true });
-
-  function register() {
-    var App = glo// /resources/map_js/landslide-layer.js
+/* /resources/map_js/landslide-layer.js */
 /* eslint-disable */
 (function (global) {
   'use strict';
 
-  // --- 레이어 가드: landslide 페이지에서만 동작 ---
-  var qs = new URLSearchParams((typeof location !== 'undefined' && location.search) ? location.search : '');
+  // ---- "산사태" 페이지만 동작 ----
+  var qs = new URLSearchParams((location && location.search) || '');
   var LAYER = (qs.get('layer') || '').toLowerCase();
-  var BODY_LAYER = (document.body && (document.body.getAttribute('data-layer') || '')).toLowerCase();
-  var IS_LANDSLIDE = (LAYER === 'landslide') || (BODY_LAYER === 'landslide');
-  if (!IS_LANDSLIDE) { console.log('[LandslideLayer] layer != landslide → skip'); return; }
+  var BODY_LAYER = ((document.body && document.body.getAttribute('data-layer')) || '').toLowerCase();
+  if (!((LAYER === 'landslide') || (BODY_LAYER === 'landslide'))) { return; }
 
-  // AppMap 준비되면 등록
-  if (global.AppMap) register(); else global.addEventListener('appmap:ready', register, { once: true });
+  if (global.AppMap) init(); else global.addEventListener('appmap:ready', init, { once: true });
 
-  function register(global) {
+  function init () {
     var App = global.AppMap || {};
     var map = App.map;
-    if (!map || !global.kakao || !kakao.maps) {
-      console.error('[LandslideLayer] kakao map not found'); return;
-    }
+    if (!map || !global.kakao || !kakao.maps) { console.error('[Landslide] kakao map not found'); return; }
 
-    // === 설정 / API ===
-    var BASE = (document.body && document.body.getAttribute('data-context-path')) || ''; // ex) "/ehr"
-    var API  = { bbox: BASE + '/landslide/bbox' };
+    var BASE = document.body.getAttribute('data-context-path') || ''; // ex) "/ehr"
+    var API = { points: BASE + '/landslide/points.do' };
 
-    // === 내부 상태 ===
-    var clusterer = (kakao.maps.MarkerClusterer)
-      ? new kakao.maps.MarkerClusterer({ map: map, averageCenter: true, minLevel: 12 })
-      : null;
+    // ---------- 상태 ----------
+    var state = { recentDays: 30, from: null, to: null, level: 'ALL' };
+    var overlays = [];           // CustomOverlay[]
+    var clusterGhostMarkers = []; // 클러스터 계산용 Marker (화면에 표시 X)
 
-    var markerById = Object.create(null);
-    var dataCache  = Object.create(null);
-    var inflight   = null;
-    var debounceTimer = null;
+    // 줌 기준: 이 레벨 이하로 들어오면 개별 오버레이(파란/빨강/회색) 표시
+    var DETAIL_LEVEL = 6;
 
-    var MAX_MARKER_LEVEL = 12; // 숫자 클수록 줌 아웃
-    var LAYER_ON = false;
-
-    // === AppMap 레이어 등록(자동 enable 금지) ===
-    if (typeof App.register === 'function') {
-      App.register('landslide', { on: enable, off: disable });
-      console.log('[LandslideLayer] registered');
-    } else {
-      console.warn('[LandslideLayer] App.register not found; waiting for explicit enable (no auto-start)');
-      // 자동 활성화하지 않음
-    }
-
-    // ---- enable / disable ----
-    function enable() {
-      if (LAYER_ON) return;
-      LAYER_ON = true;
-
-      kakao.maps.event.addListener(map, 'idle', onIdle); // bounds+zoom 모두 커버
-      applyVisibilityByZoom();
-      refresh();
-      console.log('[LandslideLayer] enabled');
-    }
-
-    function disable() {
-      if (!LAYER_ON) return;
-      LAYER_ON = false;
-
-      kakao.maps.event.removeListener(map, 'idle', onIdle);
-
-      // 마커 정리
-      var ids = Object.keys(markerById);
-      for (var i = 0; i < ids.length; i++) {
-        var mk = markerById[ids[i]];
-        if (clusterer) clusterer.removeMarker(mk);
-        if (mk && mk.setMap) mk.setMap(null);
-      }
-      markerById = Object.create(null);
-      dataCache  = Object.create(null);
-
-      if (inflight && inflight.abort) inflight.abort();
-      inflight = null;
-      clearTimeout(debounceTimer);
-
-      console.log('[LandslideLayer] disabled');
-    }
-
-    function onIdle() {
-      if (!LAYER_ON) return;
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(function () {
-        applyVisibilityByZoom();
-        refresh();
-      }, 150);
-    }
-
-    // ---- 데이터 로드/반영 ----
-    function refresh() {
-      if (!LAYER_ON) return;
-
-      var bounds = map.getBounds();
-      if (!bounds) return;
-
-      var pad = getPaddedBounds(bounds, 0.05);
-      var sw = pad.getSouthWest(), ne = pad.getNorthEast();
-
-      var params = {
-        minLat: sw.getLat(), minLon: sw.getLng(),
-        maxLat: ne.getLat(), maxLon: ne.getLng(),
-        level: map.getLevel()
+    // ---------- 클러스터러 ----------
+    var clusterer = new kakao.maps.MarkerClusterer({
+      map: map,
+      averageCenter: true,
+      minLevel: DETAIL_LEVEL,       // level <= 6 에서는 클러스터 해제
+      calculator: [20, 50, 100],
+      styles: [
+        clusterStyle('#60a5fa'), // small
+        clusterStyle('#f59e0b'), // medium
+        clusterStyle('#ef4444')  // large
+      ]
+    });
+    function clusterStyle(bg){
+      return {
+        width: '40px', height: '40px',
+        background: bg, color: '#fff', borderRadius: '999px',
+        lineHeight: '40px', textAlign: 'center', fontWeight: '800',
+        boxShadow: '0 8px 18px rgba(0,0,0,.18)'
       };
-
-      if (inflight && inflight.abort) { inflight.abort(); inflight = null; }
-
-      inflight = $.ajax({
-        url: API.bbox,
-        method: 'GET',
-        data: params,
-        dataType: 'json',
-        timeout: 15000
-      })
-      .done(function (rows) {
-        if (!Array.isArray(rows)) rows = [];
-        mergeCache(rows);
-        if (!clusterer) syncMarkersWithin(bounds);
-        applyVisibilityByZoom();
-      })
-      .fail(function (xhr, status) {
-        if (status !== 'abort') {
-          console.error('[LandslideLayer] bbox load failed:', xhr && xhr.status, xhr && xhr.responseText);
-        }
-      })
-      .always(function () { inflight = null; });
     }
 
-    function mergeCache(rows) {
-      for (var i = 0; i < rows.length; i++) {
-        var r = rows[i];
-        if (!r || r.id == null) continue;
-        dataCache[r.id] = r;
-        if (!markerById[r.id]) {
-          var mk = createMarker(r);
-          markerById[r.id] = mk;
-          if (clusterer) clusterer.addMarker(mk); else mk.setMap(map);
-        }
-      }
-    }
+    // ---------- UI ----------
+    ensureFilterUI();
+    ensureHUD();
 
-    function syncMarkersWithin(bounds) {
-      var ids = Object.keys(markerById);
-      for (var i = 0; i < ids.length; i++) {
-        var id = ids[i], mk = markerById[id];
-        var inside = bounds.contain(mk.getPosition());
-        mk.setMap(inside ? map : null);
-      }
-    }
+    // ---------- 유틸 ----------
+// ---------- 유틸 ----------
+function normalizeDate(s){
+  if (s == null) return '';
+  // 숫자(YYYYMMDD)로 오는 경우도 대비
+  s = String(s).trim();
+  // 'YYYY-MM-DD', 'YYYY/MM/DD', 'YYYYMMDD', 'YYYY-MM-DD HH:mm:ss' 대응
+  var m = s.match(/^(\d{4})[-\/]?(\d{2})[-\/]?(\d{2})/);
+  return m ? (m[1] + '-' + m[2] + '-' + m[3]) : '';
+}
 
-    function applyVisibilityByZoom() {
-      var level = map.getLevel();
-      var showIndividual = (level <= MAX_MARKER_LEVEL);
-      var ids = Object.keys(markerById);
-      for (var i = 0; i < ids.length; i++) {
-        var mk = markerById[ids[i]];
-        if (clusterer) {
-          mk.setMap(showIndividual ? map : null);
-        } else {
-          mk.setMap(showIndividual ? (mk.getMap() || map) : null);
-        }
-      }
-    }
+function levelOf(row){
+  var v = (row && (row.level || row.LEVEL || row.alert || row.ALERT || row.status || row.STATUS)) || '';
+  return String(v).trim();
+}
 
-    function createMarker(row) {
-      var lat = Number(row.lat), lon = Number(row.lon);
-      if (isNaN(lat) || isNaN(lon)) { lat = 36.5; lon = 127.8; }
-      var pos = new kakao.maps.LatLng(lat, lon);
+// ES5 호환: ?? 대신 (x != null ? x : y)
+function latOf(r){
+  if (!r) return NaN;
+  var v = (r.lat != null ? r.lat : r.LAT);
+  var n = Number(v);
+  return isNaN(n) ? NaN : n;
+}
 
-      var marker = new kakao.maps.Marker({ position: pos, title: row.title || String(row.id) });
+function lonOf(r){
+  if (!r) return NaN;
+  var v = (r.lon != null ? r.lon : r.LON);
+  var n = Number(v);
+  return isNaN(n) ? NaN : n;
+}
 
-      var info = new kakao.maps.InfoWindow({ removable: true, content: infoHTML(row) });
-      kakao.maps.event.addListener(marker, 'click', function () { info.open(map, marker); });
-
-      return marker;
-    }
-
-    function infoHTML(r) {
-      var date = (r.date || '').toString();
-      var dmg  = (r.damage != null ? r.damage : '-');
-      var ttl  = r.title || '산사태';
-      return [
-        '<div style="padding:8px 10px;min-width:180px">',
-        ' <div style="font-weight:700;margin-bottom:6px">', escapeHTML(ttl), '</div>',
-        ' <div><b>발생일:</b> ', escapeHTML(date), '</div>',
-        ' <div><b>피해:</b> ', escapeHTML(String(dmg)), '</div>',
-        '</div>'
-      ].join('');
-    }
-
-    function getPaddedBounds(bounds, rate) {
-      rate = rate || 0.05;
-      var sw = bounds.getSouthWest(), ne = bounds.getNorthEast();
-      var dLat = (ne.getLat() - sw.getLat()) * rate;
-      var dLon = (ne.getLng() - sw.getLng()) * rate;
-      return new kakao.maps.LatLngBounds(
-        new kakao.maps.LatLng(sw.getLat() - dLat, sw.getLng() - dLon),
-        new kakao.maps.LatLng(ne.getLat() + dLat, ne.getLng() + dLon)
-      );
-    }
-
-    function escapeHTML(s) {
-      return String(s)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-  }
-})(window);
-bal.AppMap || {};
-    var map = App.map;
-    if (!map || !global.kakao || !kakao.maps) {
-      console.error('[LandslideLayer] kakao map not found');
-      return;
-    }
-
-    // === 설정 / API ===
-    var BASE = (document.body && document.body.getAttribute('data-context-path')) || ''; // ex) "/ehr"
-    var API  = {
-      bbox: BASE + '/landslide/bbox'
+    // 색상 규칙: 요청대로 "주의보=파란색"
+    var COLORS = {
+      WATCH:  '#3b82f6', // 주의보
+      WARNING:'#ef4444', // 경보
+      ETC:    '#6b7280'  // 기타
     };
 
-    // === 내부 상태 ===
-    var clusterer = (kakao.maps.MarkerClusterer)
-      ? new kakao.maps.MarkerClusterer({ map: map, averageCenter: true, minLevel: 12 })
-      : null;
+    function colorFor(level){
+      if (level.indexOf('주의')>-1)  return COLORS.WATCH;
+      if (level.indexOf('경보')>-1)  return COLORS.WARNING;
+      return COLORS.ETC;
+    }
 
-    var markerById = Object.create(null);
-    var dataCache  = Object.create(null);
-    var inflight   = null;
-    var debounceTimer = null;
-
-    var MAX_MARKER_LEVEL = 12; // 숫자 클수록 줌 아웃
-    var LAYER_ON = false;
-
-    // === AppMap 레이어 등록 ===
-    // FIX #2: landslide 레이어를 공식 등록해야 AppMap.activate('landslide') 가 동작합니다.
-    if (typeof App.register === 'function') {
-      App.register('landslide', {
-        on: enable,
-        off: disable
+    function fetchJSON(url){
+      return fetch(url, { headers:{'Accept':'application/json'} })
+        .then(r => { if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
+    }
+    function getBBoxParams() {
+      var b = map.getBounds(), sw=b.getSouthWest(), ne=b.getNorthEast();
+      var p = new URLSearchParams({
+        minLat: sw.getLat(), maxLat: ne.getLat(),
+        minLon: sw.getLng(), maxLon: ne.getLng()
       });
-      console.log('[LandslideLayer] registered');
-    } else {
-      console.warn('[LandslideLayer] App.register not found; fallback to auto-enable');
-      enable(); // 레지스트리 없는 환경에서는 즉시 활성
+      if (state.level && state.level!=='ALL') p.set('level', state.level);
+      if (state.from||state.to) { if(state.from) p.set('from', state.from); if(state.to) p.set('to', state.to); }
+      else if (state.recentDays!=null) p.set('recentDays', String(state.recentDays));
+      return p.toString();
     }
 
-    // ---- enable / disable ----
-    function enable() {
-      if (LAYER_ON) return;
-      LAYER_ON = true;
-
-      kakao.maps.event.addListener(map, 'bounds_changed', onBounds);
-      kakao.maps.event.addListener(map, 'zoom_changed', onZoom);
-
-      applyVisibilityByZoom();
-      refresh();
-      console.log('[LandslideLayer] enabled');
-    }
-
-    function disable() {
-      if (!LAYER_ON) return;
-      LAYER_ON = false;
-
-      kakao.maps.event.removeListener(map, 'bounds_changed', onBounds);
-      kakao.maps.event.removeListener(map, 'zoom_changed', onZoom);
-
-      // 마커 정리(파괴)
-      var ids = Object.keys(markerById);
-      for (var i = 0; i < ids.length; i++) {
-        var mk = markerById[ids[i]];
-        if (clusterer) clusterer.removeMarker(mk);
-        mk.setMap && mk.setMap(null);
-      }
-      markerById = Object.create(null);
-      dataCache  = Object.create(null);
-
-      if (inflight && inflight.abort) inflight.abort();
-      inflight = null;
-      clearTimeout(debounceTimer);
-
-      console.log('[LandslideLayer] disabled');
-    }
-
-    function onBounds() {
-      if (!LAYER_ON) return;
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(refresh, 180);
-    }
-
-    function onZoom() {
-      if (!LAYER_ON) return;
-      applyVisibilityByZoom();
-      clearTimeout(debounceTimer);
-      debounceTimer = setTimeout(refresh, 80);
-    }
-
-    // ---- 데이터 로드/반영 ----
-    function refresh() {
-      if (!LAYER_ON) return;
-
-      var bounds = map.getBounds();
-      if (!bounds) return;
-
-      var pad = getPaddedBounds(bounds, 0.05);
-      var sw = pad.getSouthWest(), ne = pad.getNorthEast();
-
-      var minLat = sw.getLat(), minLon = sw.getLng();
-      var maxLat = ne.getLat(), maxLon = ne.getLng();
-
-      if (inflight && inflight.abort) { inflight.abort(); inflight = null; }
-
-      inflight = $.getJSON(API.bbox, {
-        // 서버 파라미터명에 맞게 수정하세요.
-        minLat: minLat, maxLat: maxLat,
-        minLon: minLon, maxLon: maxLon,
-        level: map.getLevel()
-      }).done(function (rows) {
-        if (!Array.isArray(rows)) rows = [];
-        mergeCache(rows);
-        syncMarkersWithin(bounds);
-        applyVisibilityByZoom();
-      }).fail(function (xhr, status) {
-        if (status !== 'abort') console.error('[LandslideLayer] bbox load failed:', status);
-      }).always(function () { inflight = null; });
-    }
-
-    function mergeCache(rows) {
-      for (var i = 0; i < rows.length; i++) {
-        var r = rows[i];
-        if (!r || r.id == null) continue;
-        dataCache[r.id] = r;
-        if (!markerById[r.id]) {
-          var mk = createMarker(r);
-          markerById[r.id] = mk;
-          if (clusterer) clusterer.addMarker(mk); else mk.setMap(map);
-        }
-      }
-    }
-
-    function syncMarkersWithin(bounds) {
-      if (clusterer) return; // 클러스터러가 알아서 관리
-      var ids = Object.keys(markerById);
-      for (var i = 0; i < ids.length; i++) {
-        var id = ids[i], mk = markerById[id];
-        var inside = bounds.contain(mk.getPosition());
-        mk.setMap(inside ? map : null);
-      }
-    }
-
-    function applyVisibilityByZoom() {
-      var level = map.getLevel();
-
-      // FIX #1: 줌 레벨 비교 방향 실수 방지
-      var showIndividual = (level <= MAX_MARKER_LEVEL);
-
-      var ids = Object.keys(markerById);
-      for (var i = 0; i < ids.length; i++) {
-        var mk = markerById[ids[i]];
-        if (clusterer) {
-          // 클러스터러 사용 시: 멀리서는 원본 마커를 map에서 내리고(클러스터만 보이게), 가까이서는 보이게
-          mk.setMap(showIndividual ? map : null);
-        } else {
-          mk.setMap(showIndividual ? mk.getMap() || map : null);
-        }
-      }
-    }
-
-    function createMarker(row) {
-      // FIX: lat/lon 뒤바뀜 방지
-      var lat = Number(row.lat), lon = Number(row.lon);
-      if (isNaN(lat) || isNaN(lon)) { lat = 36.5; lon = 127.8; }
+    // ---------- 오버레이 생성 (줌 인용) ----------
+    function makeOverlay(row){
+      var lat = latOf(row), lon = lonOf(row);
+      if (isNaN(lat)||isNaN(lon)) return null;
       var pos = new kakao.maps.LatLng(lat, lon);
+      var level = levelOf(row);
+      var date  = normalizeDate(row.date || row.DATE || row.occurYmd || row.OCCUR_YMD || row.occur_dt || row.OCCUR_DT);
+      var name  = row.name || row.NAME || row.addr || row.ADDR || '';
 
-      var marker = new kakao.maps.Marker({
-        position: pos,
-        title: row.title || String(row.id)
+      var levelColor = colorFor(level);
+
+      // 타입별 마커 DOM
+      var el = document.createElement('div');
+      el.style.pointerEvents = 'auto';
+      el.title = (date?('발생일: '+date+'\n'):'') + (level?('등급: '+level+'\n'):'') + (name?('위치: '+name):'');
+
+      if (level.indexOf('주의')>-1) {
+        // 주의보: 파란 "배지" (요청사항)
+        el.style.cssText = [
+          'background:'+COLORS.WATCH+'; color:#fff; border-radius:999px;',
+          'padding:6px 9px; font:600 12px/1 system-ui,Apple SD Gothic Neo,Malgun Gothic,sans-serif;',
+          'box-shadow:0 10px 20px rgba(0,0,0,.25); white-space:nowrap;'
+        ].join('');
+        el.innerHTML = (date?('<b>'+date+'</b> '):'') + '주의보';
+      } else if (level.indexOf('경보')>-1) {
+        // 경보: 빨간 "다이아(회전 사각형)" + 안쪽 점
+        var size = 16;
+        el.style.cssText = [
+          'position:relative;width:'+size+'px;height:'+size+'px;',
+          'transform:rotate(45deg); background:'+COLORS.WARNING+';',
+          'margin-left:' + (-size/2) + 'px;',
+          'margin-top:'  + (-size/2) + 'px;',
+          'box-shadow:0 0 14px '+COLORS.WARNING+', 0 0 20px '+COLORS.WARNING
+        ].join('');
+        var dot = document.createElement('div');
+        dot.style.cssText = 'position:absolute;left:50%;top:50%;width:6px;height:6px;margin-left:-3px;margin-top:-3px;background:#fff;border-radius:999px;transform:rotate(-45deg);';
+        el.appendChild(dot);
+      } else {
+        // 기타: 작은 회색 점
+        var s = 10;
+        el.style.cssText = [
+          'width:'+s+'px;height:'+s+'px;border-radius:999px;',
+          'background:'+COLORS.ETC+';opacity:.9;',
+          'margin-left:-'+(s/2)+'px;margin-top:-'+(s/2)+'px;',
+          'box-shadow:0 0 8px rgba(0,0,0,.25)'
+        ].join('');
+      }
+
+      return new kakao.maps.CustomOverlay({
+        position: pos, content: el, xAnchor: 0.5, yAnchor: 1, zIndex: 1000
       });
+    }
 
-      var info = new kakao.maps.InfoWindow({
-        removable: true,
-        content: infoHTML(row)
+    // ---------- 클러스터용 고스트 마커 (화면표시 X) ----------
+    function makeGhostMarker(row){
+      var lat = latOf(row), lon = lonOf(row);
+      if (isNaN(lat)||isNaN(lon)) return null;
+      return new kakao.maps.Marker({
+        position: new kakao.maps.LatLng(lat, lon),
+        map: null // ✅ 화면에는 보이지 않게 (보라색 중복 제거)
       });
+    }
 
-      kakao.maps.event.addListener(marker, 'click', function () {
-        info.open(map, marker);
+    function clearOverlays(){
+      overlays.forEach(o => o.setMap(null));
+      overlays.length = 0;
+    }
+    function clearGhosts(){
+      clusterer.clear();
+      clusterGhostMarkers.forEach(m => m.setMap && m.setMap(null));
+      clusterGhostMarkers.length = 0;
+    }
+
+    // ---------- 렌더 ----------
+    function render(rows){
+      clearOverlays();
+      clearGhosts();
+
+      var zoom = map.getLevel();
+
+      // 1) 클러스터 (항상 계산은 함)
+      var ghosts = [];
+      for (var i=0;i<(rows||[]).length;i++){
+        var g = makeGhostMarker(rows[i]);
+        if (g) ghosts.push(g);
+      }
+      clusterGhostMarkers = ghosts;
+      clusterer.addMarkers(ghosts); // 지도 표시 없이 클러스터 숫자만
+
+      // 2) 줌 인일 때만 개별 오버레이 표시
+      if (zoom <= DETAIL_LEVEL){
+        for (var j=0;j<(rows||[]).length;j++){
+          var ov = makeOverlay(rows[j]);
+          if (!ov) continue;
+          ov.setMap(map);
+          overlays.push(ov);
+        }
+      }
+
+      updateHUD(rows||[]);
+    }
+
+    // ---------- HUD ----------
+    function updateHUD(rows){
+      var warn=0, watch=0, etc=0, recent=null;
+      rows.forEach(r=>{
+        var d = normalizeDate(r.date || r.DATE || r.occurYmd || r.OCCUR_YMD || r.occur_dt || r.OCCUR_DT);
+        if (d && (!recent || d>recent)) recent = d;
+        var lv = levelOf(r);
+        if (lv.indexOf('경보')>-1) warn++;
+        else if (lv.indexOf('주의')>-1) watch++;
+        else etc++;
       });
+      setText('ls-hud-total', '표시 건수: '+(rows.length||0));
+      setText('ls-hud-split', '경보 '+warn+' · 주의보 '+watch+' · 기타 '+etc);
+      setText('ls-hud-recent', '최근 발생일: '+(recent||'-'));
+    }
+    function setText(id, txt){ var el=document.getElementById(id); if(el) el.textContent = txt; }
 
-      return marker;
+    // ---------- 데이터 로드 ----------
+    function refresh(){
+      fetchJSON(API.points + '?' + getBBoxParams())
+        .then(render)
+        .catch(err=>{ console.error('[Landslide] points error:', err); render([]); });
     }
 
-    function infoHTML(r) {
-      var date = (r.date || '').toString();
-      var dmg  = (r.damage != null ? r.damage : '-');
-      var ttl  = r.title || '산사태';
-      return [
-        '<div style="padding:8px 10px;min-width:180px">',
-        ' <div style="font-weight:700;margin-bottom:6px">', escapeHTML(ttl), '</div>',
-        ' <div><b>발생일:</b> ', escapeHTML(date), '</div>',
-        ' <div><b>피해:</b> ', escapeHTML(String(dmg)), '</div>',
-        '</div>'
-      ].join('');
+    // 지도가 멈췄을 때만 리로드 + 줌 변경 시 오버레이 갱신
+    var idleTimer=null;
+    kakao.maps.event.addListener(map, 'idle', function(){
+      clearTimeout(idleTimer); idleTimer = setTimeout(refresh, 200);
+    });
+    kakao.maps.event.addListener(map, 'zoom_changed', function(){
+      // 줌만 바뀌어도 렌더 다시 (오버레이 on/off 전환)
+      refresh();
+    });
+
+    // ---------- 필터 UI ----------
+    function ensureFilterUI(){
+      if (document.getElementById('ls-filter')) return;
+      var el = document.createElement('div');
+      el.id = 'ls-filter';
+      el.style.cssText = 'position:absolute;right:12px;top:12px;z-index:31;background:rgba(255,255,255,.96);border-radius:12px;padding:10px;box-shadow:0 10px 22px rgba(0,0,0,.12);font:12px/1.4 system-ui,Apple SD Gothic Neo,Malgun Gothic;color:#111827;min-width:230px';
+      el.innerHTML =
+        '<div style="font-weight:800;margin-bottom:6px">산사태 필터</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px">'+
+          '<label style="display:flex;flex-direction:column;gap:4px"><span>From</span><input id="ls-from" type="date" style="padding:6px;border:1px solid #e5e7eb;border-radius:8px"/></label>'+
+          '<label style="display:flex;flex-direction:column;gap:4px"><span>To</span><input id="ls-to" type="date" style="padding:6px;border:1px solid #e5e7eb;border-radius:8px"/></label>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:8px;justify-content:space-between;margin-bottom:6px">'+
+          '<label>최근 N일</label>'+
+          '<select id="ls-days" style="padding:6px;border:1px solid #e5e7eb;border-radius:8px"><option value="7">7</option><option value="14">14</option><option value="30" selected>30</option><option value="90">90</option></select>'+
+        '</div>'+
+        '<div style="display:flex;align-items:center;gap:8px;justify-content:space-between;margin-bottom:8px">'+
+          '<label>등급</label>'+
+          '<select id="ls-level" style="padding:6px;border:1px solid #e5e7eb;border-radius:8px"><option value="ALL" selected>전체</option><option value="경보">경보</option><option value="주의보">주의보</option></select>'+
+        '</div>'+
+        '<div style="display:flex;gap:8px;justify-content:flex-end"><button id="ls-apply" style="padding:8px 10px;border-radius:10px;background:#111827;color:#fff;font-weight:700;border:none;cursor:pointer">적용</button><button id="ls-reset" style="padding:8px 10px;border-radius:10px;background:#e5e7eb;color:#111827;font-weight:700;border:none;cursor:pointer">초기화</button></div>';
+      (document.querySelector('#map')||document.body).appendChild(el);
+
+      el.querySelector('#ls-apply').addEventListener('click', function(){
+        var from = el.querySelector('#ls-from').value || null;
+        var to   = el.querySelector('#ls-to').value   || null;
+        var days = Number(el.querySelector('#ls-days').value || '30');
+        var lvl  = el.querySelector('#ls-level').value || 'ALL';
+        state.level = lvl;
+        if (from||to){ state.from=from; state.to=to; state.recentDays=null; }
+        else { state.from=null; state.to=null; state.recentDays=days; }
+        refresh();
+      });
+      el.querySelector('#ls-reset').addEventListener('click', function(){
+        el.querySelector('#ls-from').value='';
+        el.querySelector('#ls-to').value='';
+        el.querySelector('#ls-days').value='30';
+        el.querySelector('#ls-level').value='ALL';
+        state = { recentDays:30, from:null, to:null, level:'ALL' };
+        refresh();
+      });
     }
 
-    function getPaddedBounds(bounds, rate) {
-      rate = rate || 0.05;
-      var sw = bounds.getSouthWest(), ne = bounds.getNorthEast();
-      var dLat = (ne.getLat() - sw.getLat()) * rate;
-      var dLon = (ne.getLng() - sw.getLng()) * rate;
-      return new kakao.maps.LatLngBounds(
-        new kakao.maps.LatLng(sw.getLat() - dLat, sw.getLng() - dLon),
-        new kakao.maps.LatLng(ne.getLat() + dLat, ne.getLng() + dLon)
-      );
+    function ensureHUD(){
+      if (document.getElementById('ls-hud')) return;
+      var hud = document.createElement('div');
+      hud.id = 'ls-hud';
+      hud.style.cssText = 'position:absolute;left:12px;bottom:12px;z-index:30;background:rgba(255,255,255,.94);border-radius:12px;padding:10px 12px;box-shadow:0 10px 22px rgba(0,0,0,.14);color:#111827;font:600 12px/1.5 system-ui,Apple SD Gothic Neo,Malgun Gothic;';
+      hud.innerHTML = '<div style="font-weight:800;margin-bottom:6px">산사태 요약(현재 화면)</div><div id="ls-hud-total">표시 건수: -</div><div id="ls-hud-split">경보 0 · 주의보 0 · 기타 0</div><div id="ls-hud-recent">최근 발생일: -</div>';
+      (document.querySelector('#map')||document.body).appendChild(hud);
     }
 
-    function escapeHTML(s) {
-      return String(s)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
+    // 최초 로드
+    refresh();
   }
-
-// FIX #1: IIFE 에 window를 전달해야 global이 undefined가 아닙니다.
-})(window);
+})(this);

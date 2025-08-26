@@ -1,12 +1,14 @@
 package com.pcwk.ehr.controller;
 
 import java.sql.SQLException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,29 +33,51 @@ public class LandslideController {
 	@Autowired
 	LandslideService service;
 
-	 @GetMapping("/heatmap")
-	 @ResponseBody
-	  public List<Map<String,Object>> heatmap(
-	      @RequestParam double minLat, @RequestParam double maxLat,
-	      @RequestParam double minLon, @RequestParam double maxLon,
-	      @RequestParam(required=false) String q,
-	      @RequestParam(required=false) String year
-	  ) {
-	    return mapper.countByRegionInBBox(minLat,maxLat,minLon,maxLon,q,year);
+	@GetMapping(value={"/byRegionInBBox.do","/byRegionInBBox"}, produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public Object byRegionInBBox(
+	    @RequestParam double minLat, @RequestParam double maxLat,
+	    @RequestParam double minLon, @RequestParam double maxLon,
+	    @RequestParam(required=false) String q,
+	    @RequestParam(required=false) String year
+	){
+	  try {
+	    String qNorm = (q==null || q.trim().isEmpty()) ? null : q.trim();
+	    Integer yearNorm = (year==null || year.trim().isEmpty()) ? null : Integer.valueOf(year.trim());
+	    return service.countByRegionInBBox(minLat,maxLat,minLon,maxLon,qNorm,yearNorm);
+	  } catch (Exception e) {
+	    Map<String,Object> err = new LinkedHashMap<>();
+	    err.put("error", e.getClass().getSimpleName());
+	    err.put("message", e.getMessage());
+	    return err;
 	  }
+	}
 
-	 
-	  @GetMapping("/points")
-	  @ResponseBody
-	  public List<LandslideDTO> points(
-	      @RequestParam double minLat, @RequestParam double maxLat,
-	      @RequestParam double minLon, @RequestParam double maxLon,
-	      @RequestParam(required=false) String q,
-	      @RequestParam(required=false) String year
-	  ) {
-	    return mapper.selectByBBox(minLat,maxLat,minLon,maxLon,q,year);
-	  }
+	@GetMapping(value={"/points.do","/points"}, produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<LandslideDTO> points(
+	    @RequestParam double minLat, @RequestParam double maxLat,
+	    @RequestParam double minLon, @RequestParam double maxLon,
+	    @RequestParam(required=false) String q,
+	    @RequestParam(required=false) String year
+	){
+	  String qNorm = (q == null || q.trim().isEmpty()) ? null : q.trim();
+	  Integer yearNorm = (year == null || year.trim().isEmpty()) ? null : Integer.valueOf(year.trim());
+	  return service.selectByBBox(minLat,maxLat,minLon,maxLon,qNorm,yearNorm);
+	}
 
+	@GetMapping(value={"/countBySidoInBBox.do","/countBySidoInBBox"}, produces=MediaType.APPLICATION_JSON_VALUE)
+	@ResponseBody
+	public List<Map<String,Object>> countBySidoInBBox(
+	    @RequestParam double minLat, @RequestParam double maxLat,
+	    @RequestParam double minLon, @RequestParam double maxLon,
+	    @RequestParam(required=false) String q,
+	    @RequestParam(required=false) String year
+	){
+	  String qNorm = (q == null || q.trim().isEmpty()) ? null : q.trim();
+	  Integer yearNorm = (year == null || year.trim().isEmpty()) ? null : Integer.valueOf(year.trim());
+	  return service.countBySidoInBBox(minLat,maxLat,minLon,maxLon,qNorm,yearNorm);
+	}
 	  
 	  
 	  
@@ -66,6 +90,14 @@ public class LandslideController {
 		log.debug("detail found? {}", (dto != null));
 		return dto;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
 
 	@GetMapping("/year")
 	@ResponseBody

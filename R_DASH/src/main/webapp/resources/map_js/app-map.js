@@ -3,6 +3,7 @@
 (function (global) {
   'use strict';
 
+  // ---- appmap:ready 이벤트 발행 ----
   function dispatchReady() {
     try {
       global.dispatchEvent(new CustomEvent('appmap:ready'));
@@ -14,6 +15,7 @@
     console.log('[AppMap] appmap:ready fired');
   }
 
+  // ---- 지도 생성 ----
   function createMap() {
     var el = document.getElementById('map');
     if (!el) { console.error('[AppMap] #map not found'); return; }
@@ -61,6 +63,23 @@
       // 구버전 호환 별칭
       registerLayer: null,
 
+      // 유틸: 레이어 조회/상태
+      getLayer: function(name){ return (this.layers && this.layers[name]) ? this.layers[name].instance : null; },
+      getActiveName: function(){ return this._active; },
+      getNode: function(){ return this.map && this.map.getNode ? this.map.getNode() : null; },
+      getBounds: function(){ return this.map && this.map.getBounds ? this.map.getBounds() : null; },
+
+      // 비활성화(단건/전체)
+      deactivate: function(name){
+        var L = this.layers[name];
+        if (L && L.instance && typeof L.instance.deactivate === 'function') L.instance.deactivate();
+        if (this._active === name) this._active = null;
+      },
+      deactivateAll: function(){
+        var self = this;
+        Object.keys(this.layers).forEach(function(k){ self.deactivate(k); });
+      },
+
       // 레이어 활성화 (최대 6초 대기)
       activate: function (name, opts) {
         var self = this, tries = 0, MAX = 120; // 120 * 50ms = 6s
@@ -102,6 +121,11 @@
     // 구버전 호환
     AppMap.registerLayer = AppMap.register;
 
+    // 크기 변화 대응(선택)
+    global.addEventListener('resize', function () {
+      kakao.maps.event.trigger(map, 'resize');
+    });
+
     // 준비 이벤트
     dispatchReady();
 
@@ -118,10 +142,12 @@
     }
   }
 
+  // Kakao SDK 로딩 확인 후 지도 생성
   if (!global.kakao || !kakao.maps || !kakao.maps.load) {
     console.error('[AppMap] kakao maps not loaded');
     return;
   }
+
   kakao.maps.load(function () {
     console.log('[AppMap] kakao.maps.load ok');
     createMap();

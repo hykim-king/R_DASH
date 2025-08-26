@@ -20,31 +20,43 @@ public class LandslideServiceImpl implements LandslideService {
     private LandslideMapper mapper;
 
 
-    @Override
-    public List<LandslideDTO> selectByBBox(double minLat, double maxLat,
-                                           double minLon, double maxLon,
-                                           String q, String year) {
-        return mapper.selectByBBox(minLat, maxLat, minLon, maxLon, q, year);
-    }
+    private static double lo(double a, double b){ return Math.min(a,b); }
+    private static double hi(double a, double b){ return Math.max(a,b); }
 
     @Override
     public List<Map<String, Object>> countByRegionInBBox(double minLat, double maxLat,
-                                                         double minLon, double maxLon,
-                                                         String q, String year) {
-        return mapper.countByRegionInBBox(minLat, maxLat, minLon, maxLon, q, year);
+        double minLon, double maxLon, String q, Integer year) {
+      return mapper.countByRegionInBBox(lo(minLat,maxLat), hi(minLat,maxLat),
+                                        lo(minLon,maxLon), hi(minLon,maxLon),
+                                        q, year);
+    }
+
+    @Override
+    public List<LandslideDTO> selectByBBox(double minLat, double maxLat,
+        double minLon, double maxLon, String q, Integer year) {
+      return mapper.selectByBBox(lo(minLat,maxLat), hi(minLat,maxLat),
+                                 lo(minLon,maxLon), hi(minLon,maxLon),
+                                 q, year);
     }
 
     @Override
     public List<Map<String, Object>> countBySidoInBBox(double minLat, double maxLat,
-                                                       double minLon, double maxLon,
-                                                       String q, String year) {
-        return mapper.countBySidoInBBox(minLat, maxLat, minLon, maxLon, q, year);
+        double minLon, double maxLon, String q, Integer year) {
+      return mapper.countBySidoInBBox(lo(minLat,maxLat), hi(minLat,maxLat),
+                                      lo(minLon,maxLon), hi(minLon,maxLon),
+                                      q, year);
     }
-
     @Override
     public LandslideDTO findById(Long landslideNo) {
         return mapper.findById(landslideNo);
     }
+    
+    
+    
+    
+    
+    
+    
     @Override
     public List<Map<String,Object>> getByYear() {
     	return mapper.selectByYear();

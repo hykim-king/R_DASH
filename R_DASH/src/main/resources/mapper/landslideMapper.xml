@@ -29,57 +29,64 @@
     <result property="lon"         column="LON"/>
   </resultMap>
 
-
- <!-- LANDSLIDE.xml -->
-<select id="countByRegionInBBox" resultType="map">
-  SELECT
-    LND_INST_NM         AS name,
-    CAST(LAT AS NUMBER) AS lat,
-    CAST(LON AS NUMBER) AS lon,
-    COUNT(*)            AS cnt
-  FROM LANDSLIDE
-  WHERE LAT BETWEEN #{minLat} AND #{maxLat}
+  <!-- 공통 조건 -->
+  <sql id="bboxCond">
+    LAT BETWEEN #{minLat} AND #{maxLat}
     AND LON BETWEEN #{minLon} AND #{maxLon}
+  </sql>
+
+  <sql id="qCond">
     <if test="q != null and q != ''">
       AND (LND_INST_NM LIKE '%' || #{q} || '%')
     </if>
-    <if test="year != null and year != ''">
-      AND TO_CHAR(LND_APNT_DT, 'YYYY') = #{year}
-    </if>
-    -- 필요하면 상태 필터도: AND LND_APNT_STTS = '발령'
-  GROUP BY LND_INST_NM, LAT, LON
-</select>
+  </sql>
 
-<select id="selectByBBox" resultType="com.pcwk.ehr.domain.LandslideDTO">
-  SELECT /* 필요한 칼럼만 */
-    LND_APNT_CD, LND_APNT_NM, LND_APNT_STTS, LND_APNT_DT,
-    LND_INST_NM, LAT, LON
-  FROM LANDSLIDE
-  WHERE LAT BETWEEN #{minLat} AND #{maxLat}
-    AND LON BETWEEN #{minLon} AND #{maxLon}
-    <if test="q != null and q != ''">
-      AND (LND_INST_NM LIKE '%' || #{q} || '%')
+  <!-- LND_APNT_DT가 VARCHAR2(19)이므로 SUBSTR로 연도 매칭 -->
+  <sql id="yearCond">
+    <if test="year != null">
+      AND SUBSTR(LND_APNT_DT,1,4) = TO_CHAR(#{year,jdbcType=INTEGER})
     </if>
-    <if test="year != null and year != ''">
-      AND TO_CHAR(LND_APNT_DT, 'YYYY') = #{year}
-    </if>
-</select>
+  </sql>
 
-<select id="countBySidoInBBox" resultType="map">
-  SELECT
-    REGEXP_SUBSTR(LND_INST_NM, '^[^ ]+') AS sido,
-    COUNT(*) AS cnt
-  FROM LANDSLIDE
-  WHERE LAT BETWEEN #{minLat} AND #{maxLat}
-    AND LON BETWEEN #{minLon} AND #{maxLon}
-    <if test="q != null and q != ''">
-      AND (LND_INST_NM LIKE '%' || #{q} || '%')
-    </if>
-    <if test="year != null and year != ''">
-      AND TO_CHAR(LND_APNT_DT, 'YYYY') = #{year}
-    </if>
-  GROUP BY REGEXP_SUBSTR(LND_INST_NM, '^[^ ]+')
-</select>
+  <!-- 히트맵/버블용 집계 (기관 위치 단위) -->
+  <select id="countByRegionInBBox" resultType="map">
+    SELECT
+      LND_INST_NM AS name,
+      LAT         AS lat,
+      LON         AS lon,
+      COUNT(*)    AS cnt
+    FROM LANDSLIDE
+    WHERE <include refid="bboxCond"/>
+      <include refid="qCond"/>
+      <include refid="yearCond"/>
+    GROUP BY LND_INST_NM, LAT, LON
+  </select>
+
+  <!-- 원시 포인트(마커/클러스터) -->
+  <select id="selectByBBox" resultMap="LandslideResultMap">
+    SELECT
+      LANDSLIDE_NO,
+      LND_APNT_CD, LND_APNT_NM, LND_APNT_STTS, LND_APNT_DT,
+      LND_INST_NM, LAT, LON
+    FROM LANDSLIDE
+    WHERE <include refid="bboxCond"/>
+      <include refid="qCond"/>
+      <include refid="yearCond"/>
+  </select>
+
+  <!-- 시·도 집계 -->
+  <select id="countBySidoInBBox" resultType="map">
+    SELECT
+      REGEXP_SUBSTR(LND_INST_NM, '^[^ ]+') AS sido,
+      COUNT(*) AS cnt
+    FROM LANDSLIDE
+    WHERE <include refid="bboxCond"/>
+      <include refid="qCond"/>
+      <include refid="yearCond"/>
+    GROUP BY REGEXP_SUBSTR(LND_INST_NM, '^[^ ]+')
+  </select>
+
+
  
     
     
