@@ -220,14 +220,23 @@ jq36(document).ready(function() {
                     responsive: true,
                     plugins: {
                         title: { display: true,
-                                 text: '화재유형별 재산피해',
+                                 text: '화재유형별 재산피해(2019~2023)',
                                  font: {
                                      size: 18,          // 폰트 크기
                                      weight: 'bold'
                                      },
                                 color: '#333'
                              }, 
-                        legend: { display: true }
+                        legend: { display: true },
+                        datalabels: {
+                            anchor: "end",   // 데이터 레이블 위치
+                            align: "top",    // 막대 위쪽에 표시
+                            color: "black",  // 글자색
+                            font: {
+                            weight: "bold"
+                                },
+                            formatter: (value) => value.toLocaleString()
+                            }
                     },
                     scales: {
                         y: { beginAtZero: true,
@@ -248,7 +257,8 @@ jq36(document).ready(function() {
                                 }  //grid end
                             } //x end
                         } //scales end
-                    } 
+                    },
+                    plugins: [ChartDataLabels]
             });
         },
         error: function(xhr, status, error) {
@@ -287,7 +297,15 @@ jq36(document).ready(function() {
                                      size: 18,          // 폰트 크기
                                      weight: 'bold'
                                  },
-                                 color: '#333' }
+                                 color: '#333' },
+                        datalabels: {
+                            anchor: "end",   // 데이터 레이블 위치
+                            align: "top",    // 막대 위쪽에 표시
+                            color: "black",  // 글자색
+                            font: {
+                            weight: "bold"
+                                }
+                            }
                     },
                     scales: {
                         y: { beginAtZero: true },
@@ -299,7 +317,8 @@ jq36(document).ready(function() {
                                 }  
                             }
                     }
-                }
+                },
+                plugins: [ChartDataLabels]
             });
         },
         error: function() { console.error('호선별 소화기 AJAX 오류'); }
