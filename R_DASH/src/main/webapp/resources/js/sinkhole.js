@@ -1,6 +1,6 @@
 // 1. 년도별 발생횟수
 $.getJSON("/ehr/sinkholes/year", function(data) {
-    const labels = data.map(row => row.YEAR);
+    const labels = data.map(row => row.YEAR + "년");
     const counts = data.map(row => row.CNT);
 
     const yearlyChart = new Chart(document.getElementById("yearlyChart"), {
@@ -39,11 +39,11 @@ $.getJSON("/ehr/sinkholes/year", function(data) {
     });
 });
 
-$.getJSON("/ehr/sinkholes/signgu", function(data) {
-    const labels = data.map(row => row.SIGNGU_NM);
+$.getJSON("/ehr/sinkholes/sido", function(data) {
+    const labels = data.map(row => row.SIDO_NM);
     const counts = data.map(row => row.CNT);
 
-    const signguChart = new Chart(document.getElementById("signguChart"), { 
+    const sidoChart = new Chart(document.getElementById("sidoChart"), { 
         type: "bar",
         data: {
             labels: labels,
@@ -59,7 +59,7 @@ $.getJSON("/ehr/sinkholes/signgu", function(data) {
             plugins: {
                 title: {
                     display: true, 
-                    text: '시군구별 발생횟수 (2018년 ~ 2025년)',
+                    text: '시도별 발생횟수 (2018년 ~ 2025년)',
                     font: {
                         size: 18,
                         weight: 'bold'
@@ -73,7 +73,12 @@ $.getJSON("/ehr/sinkholes/signgu", function(data) {
                       autoSkip: false,
                       maxRotation: 45,    
                       minRotation: 45
-                  }
+                  },
+                  grid: {
+                        drawTicks: false,   // 눈금선 제거
+                        drawBorder: false,  // 축선 제거
+                        color: 'transparent' // 격자선 색상 투명
+                    } 
               }
           }
         }
@@ -82,7 +87,7 @@ $.getJSON("/ehr/sinkholes/signgu", function(data) {
 
 // 3. 월별 발생횟수
 $.getJSON("/ehr/sinkholes/month", function(data) {
-    const labels = data.map(row => row.MONTH);
+    const labels = data.map(row => row.MONTH + "월");
     const counts = data.map(row => row.CNT);
 
     const monthlyChart = new Chart(document.getElementById("monthlyChart"), {
@@ -108,6 +113,15 @@ $.getJSON("/ehr/sinkholes/month", function(data) {
                         weight: 'bold'
                     },
                     color: '#333' 
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        drawTicks: false,   // 눈금선 제거
+                        drawBorder: false,  // 축선 제거
+                        color: 'transparent' // 격자선 색상 투명
+                    } 
                 }
             }
         }
@@ -146,52 +160,38 @@ $.getJSON("/ehr/sinkholes/state", function(data) {
                     },
                     color: '#333' 
                 },
-                datalabels: {
-                    color: 'black',
-                    font: (context) => {
-                        const dataArr = context.chart.data.datasets[0].data;
-                        const total = dataArr.reduce((a, b) => a + b, 0);
-                        const percentage = (context.dataset.data[context.dataIndex] / total) * 100;
+                legend: {
+                    labels: {
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            if (data.labels.length && data.datasets.length) {
+                                const dataset = data.datasets[0];
+                                const total = dataset.data.reduce((a, b) => a + b, 0);
 
-                        // 퍼센트 5% 미만이면 작은 글씨
-                        if (percentage < 5) {
-                            return {
-                                size: 11,
-                                weight: 'bold'
-                            };
+                                return data.labels.map((label, i) => {
+                                    const value = dataset.data[i];
+                                    const percentage = ((value / total) * 100).toFixed(1);
+
+                                    return {
+                                        text: `${label} (${percentage}%)`, // ← 범례에 퍼센트 추가
+                                        fillStyle: dataset.backgroundColor[i],
+                                        hidden: isNaN(value) || chart.getDataVisibility(i) === false,
+                                        index: i
+                                    };
+                                });
+                            }
+                            return [];
                         }
-
-                        // 기본 글꼴
-                        return {
-                            size: 20,
-                            weight: 'bold'
-                        };
-                    },
-                    formatter: (value, context) => {
-                        // 전체 합계
-                        const dataArr = context.chart.data.datasets[0].data;
-                        const total = dataArr.reduce((a, b) => a + b, 0);
-
-                        // 퍼센트 계산
-                        const percentage = ((value / total) * 100).toFixed(1);
-
-                        // 라벨(년도)
-                        const label = context.chart.data.labels[context.dataIndex];
-
-                        return `${label}\n${percentage}%`;
-                    },
-                    anchor: 'center',
-                    align: 'end'
+                    }
                 }
             }
-        },
-        plugins: [ChartDataLabels]
+        }
     });
 });
 
 // 5. 년도별 피해 통계
 $.getJSON("/ehr/sinkholes/damage", function(data) {
-    const labels = data.map(row => row.YEAR);
+    const labels = data.map(row => row.YEAR + "년");
     const dprs = data.map(row => row.DPRS_TOT);
     const inj = data.map(row => row.INJ_TOT);
     const veh = data.map(row => row.VEH_TOT);
@@ -231,6 +231,15 @@ $.getJSON("/ehr/sinkholes/damage", function(data) {
                     color: '#333' 
                 }
             },
+            scales: {
+                x: {
+                    grid: {
+                        drawTicks: false,   // 눈금선 제거
+                        drawBorder: false,  // 축선 제거
+                        color: 'transparent' // 격자선 색상 투명
+                    } 
+                }
+            }
         }
     });
 });
