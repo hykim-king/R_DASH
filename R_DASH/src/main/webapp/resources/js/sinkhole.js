@@ -8,7 +8,7 @@ $.getJSON("/ehr/sinkholes/year", function(data) {
         data: {
             labels: labels,
             datasets: [{
-                label: "년도별 발생횟수",
+                label: "발생횟수",
                 data: counts,
                 backgroundColor: "rgba(54, 162, 235, 0.6)"
             }]
@@ -16,7 +16,24 @@ $.getJSON("/ehr/sinkholes/year", function(data) {
         options: {
             responsive: true,
             plugins: {
-                title: { display: true, text: "년도별 발생횟수" }
+                title: {
+                    display: true, 
+                    text: '연도별 발생횟수 (2018년 ~ 2025년)',
+                    font: {
+                        size: 18,
+                        weight: 'bold'
+                    },
+                    color: '#333' 
+                }
+            },
+            scales:{
+                x:{
+                    grid: {
+                        drawTicks: false,   // 눈금선 제거
+                        drawBorder: false,  // 축선 제거
+                        color: 'transparent' // 격자선 색상 투명
+                    } 
+                }
             }
         }
     });
@@ -31,7 +48,7 @@ $.getJSON("/ehr/sinkholes/signgu", function(data) {
         data: {
             labels: labels,
             datasets: [{
-                label: "시군구별 발생횟수",
+                label: "발생횟수",
                 data: counts,
                 backgroundColor: "rgba(255, 99, 132, 0.6)"
             }]
@@ -40,7 +57,15 @@ $.getJSON("/ehr/sinkholes/signgu", function(data) {
             indexAxis: 'x',
             responsive: true,
             plugins: {
-                title: { display: true, text: "시군구별 발생횟수" }
+                title: {
+                    display: true, 
+                    text: '시군구별 발생횟수 (2018년 ~ 2025년)',
+                    font: {
+                        size: 18,
+                        weight: 'bold'
+                    },
+                    color: '#333' 
+                }
             },
             scales: {
               x: {
@@ -65,7 +90,7 @@ $.getJSON("/ehr/sinkholes/month", function(data) {
         data: {
             labels: labels,
             datasets: [{
-                label: "월별 발생횟수",
+                label: "발생횟수",
                 data: counts,
                 borderColor: "rgba(75, 192, 192, 1)",
                 backgroundColor: "rgba(75, 192, 192, 0.2)",
@@ -75,7 +100,15 @@ $.getJSON("/ehr/sinkholes/month", function(data) {
         options: {
             responsive: true,
             plugins: {
-                title: { display: true, text: "월별 발생횟수" }
+                title: {
+                    display: true, 
+                    text: '월별 발생횟수 (2018년 ~ 2025년)',
+                    font: {
+                        size: 18,
+                        weight: 'bold'
+                    },
+                    color: '#333' 
+                }
             }
         }
     });
@@ -104,9 +137,55 @@ $.getJSON("/ehr/sinkholes/state", function(data) {
         options: {
             responsive: true,
             plugins: {
-                title: { display: true, text: "복구 상태 분포" }
+                title: {
+                    display: true, 
+                    text: '복구 상태 분포 (2018년 ~ 2025년)',
+                    font: {
+                        size: 18,
+                        weight: 'bold'
+                    },
+                    color: '#333' 
+                },
+                datalabels: {
+                    color: 'black',
+                    font: (context) => {
+                        const dataArr = context.chart.data.datasets[0].data;
+                        const total = dataArr.reduce((a, b) => a + b, 0);
+                        const percentage = (context.dataset.data[context.dataIndex] / total) * 100;
+
+                        // 퍼센트 5% 미만이면 작은 글씨
+                        if (percentage < 5) {
+                            return {
+                                size: 11,
+                                weight: 'bold'
+                            };
+                        }
+
+                        // 기본 글꼴
+                        return {
+                            size: 20,
+                            weight: 'bold'
+                        };
+                    },
+                    formatter: (value, context) => {
+                        // 전체 합계
+                        const dataArr = context.chart.data.datasets[0].data;
+                        const total = dataArr.reduce((a, b) => a + b, 0);
+
+                        // 퍼센트 계산
+                        const percentage = ((value / total) * 100).toFixed(1);
+
+                        // 라벨(년도)
+                        const label = context.chart.data.labels[context.dataIndex];
+
+                        return `${label}\n${percentage}%`;
+                    },
+                    anchor: 'center',
+                    align: 'end'
+                }
             }
-        }
+        },
+        plugins: [ChartDataLabels]
     });
 });
 
@@ -142,8 +221,16 @@ $.getJSON("/ehr/sinkholes/damage", function(data) {
         options: {
             responsive: true,
             plugins: {
-                title: { display: true, text: "년도별 피해 통계" }
-            }
+                title: {
+                    display: true, 
+                    text: '연도별 피해 통계 (2018년 ~ 2025년)',
+                    font: {
+                        size: 18,
+                        weight: 'bold'
+                    },
+                    color: '#333' 
+                }
+            },
         }
     });
 });

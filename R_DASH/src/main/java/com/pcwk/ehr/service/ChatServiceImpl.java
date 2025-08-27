@@ -73,4 +73,23 @@ public class ChatServiceImpl implements ChatService {
 	public List<ChatDTO> listMessagesBySession(String sessionId, Integer userNo, Long beforeLogNo, int limit) {
 		return chatMapper.listMessagesBySession(sessionId, userNo, beforeLogNo, Math.max(1, Math.min(limit, 200)));
 	}
+
+	@Override
+	public boolean existsSessionForUser(String sessionId, Integer userNo) {
+		if (sessionId == null || userNo == null)
+			return false;
+		return chatMapper.countBySessionAndUser(sessionId, userNo) > 0;
+	}
+
+	@Override
+	public boolean isGuestSession(String sessionId) {
+		if (sessionId == null)
+			return false;
+		return chatMapper.countGuestBySession(sessionId) > 0;
+	}
+
+	@Override
+	public boolean hasAnyUserLogs(String sessionId) {
+		return chatMapper.countUserBySession(sessionId) > 0;
+	}
 }

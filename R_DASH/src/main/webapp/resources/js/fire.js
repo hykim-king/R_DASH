@@ -13,11 +13,12 @@ jq36(document).ready(function() {
             data.forEach(function(row, index) {
                 var tr = jq36('<tr></tr>');
                 var region = row.REGION || row.region; 
-                var count = row.FIRE_STATION_CNT || row.fire_station_cnt;
+                var mainCount = row.MAIN_CNT || row.main_cnt || 0;
+                var safeCount = row.SAFE_CNT || row.safe_cnt || 0;
 
-                tr.append('<td>' + (index + 1) + '</td>');
                 tr.append('<td>' + region + '</td>');
-                tr.append('<td>' + count + '</td>');
+                tr.append('<td>' + mainCount + '</td>');
+                tr.append('<td>' + safeCount + '</td>');
                 tbody.append(tr);
             });
 
@@ -79,7 +80,7 @@ jq36(document).ready(function() {
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
                             tension: 0.4,
                             fill: false,
-                            yAxisID: 'y1'
+                            yAxisID: 'y'
                         }
                     ]
                 },
@@ -87,25 +88,25 @@ jq36(document).ready(function() {
                     responsive: true,
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
-                        title: { display: true, text: '년도별 화재 피해금액 및 복구금액' },
+                        title: { display: true,
+                                 text: '연도별 화재 피해금액 및 복구금액',
+                                 font: {
+                                     size: 18,          // 폰트 크기
+                                     weight: 'bold'
+                                 },
+                                 color: '#333'  },
                         tooltip: { mode: 'index' }
                     },
                     scales: {
                         y: {
                             beginAtZero: true,
-                            title: { display: true, text: '피해금액 (원)' }
-                        },
-                        y1: {
-                            beginAtZero: true,
-                            position: 'right',
-                            title: { display: true, text: '복구금액 (원)' },
-                            grid: { drawOnChartArea: false }
+                            title: { display: true, text: '금액 (원)' }
                         },
                         x: { 
                             grid: {
-                                drawTicks: false,   // 눈금선 제거
-                                drawBorder: false,  // 축선 제거
-                                color: 'transparent' // 격자선 색상 투명
+                                drawTicks: false, 
+                                drawBorder: false,  
+                                color: 'transparent'
                                 }  
                             }
                     }
@@ -129,16 +130,16 @@ jq36(document).ready(function() {
             const ctxYearly = document.getElementById('yearlyChart').getContext('2d');
 
             new Chart(ctxYearly, {
-                type: 'doughnut', // 순수 도넛 차트
+                type: 'doughnut',
                 data: {
                     labels: labels,
                     datasets: [{
                         label: '화재 건수',
                         data: counts,
                         backgroundColor: [
-                            '#FF6384','#36A2EB','#FFCE56','#4BC0C0','#9966FF','#FF9F40'
+                            '#ff951c','#ff9c45ff','#FFA94D','#FFB870','#FFD1A6','#FFE5CC'
                         ],
-                        borderColor: '#fff',
+                        borderColor: '#FFD1A6',
                         borderWidth: 2
                     }]
                 },
@@ -147,7 +148,12 @@ jq36(document).ready(function() {
                     plugins: {
                         title: {
                             display: true,
-                            text: '년도별 화재 통계'
+                            text: '연도별 화재 통계',
+                            font: {
+                                size: 18,          // 폰트 크기
+                                weight: 'bold'
+                            },
+                            color: '#333'
                         },
                         datalabels: {
                             color: 'black',
@@ -156,7 +162,17 @@ jq36(document).ready(function() {
                                 size: 14
                             },
                             formatter: (value, context) => {
-                                return value; 
+                                // 전체 합계
+                                const dataArr = context.chart.data.datasets[0].data;
+                                const total = dataArr.reduce((a, b) => a + b, 0);
+
+                                // 퍼센트 계산
+                                const percentage = ((value / total) * 100).toFixed(1);
+
+                                // 라벨(년도)
+                                const label = context.chart.data.labels[context.dataIndex];
+
+                                return `${label}년\n${percentage}%`;
                             },
                             anchor: 'center',
                             align: 'center'
@@ -169,7 +185,7 @@ jq36(document).ready(function() {
             });
         },
         error: function(xhr, status, error) {
-            console.error('년도별 화재 통계 AJAX 오류:', error);
+            console.error('연도별 화재 통계 AJAX 오류:', error);
         }
     });
 
@@ -195,19 +211,39 @@ jq36(document).ready(function() {
                     datasets: [{
                         label: '재산피해 합계',
                         data: damage,
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: '#FF9333',
+                        borderColor: '#FFD1A6',
                         borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
                     plugins: {
-                        title: { display: true, text: '화재유형별 재산피해' },
-                        legend: { display: true }
+                        title: { display: true,
+                                 text: '화재유형별 재산피해(2019~2023)',
+                                 font: {
+                                     size: 18,          // 폰트 크기
+                                     weight: 'bold'
+                                     },
+                                color: '#333'
+                             }, 
+                        legend: { display: true },
+                        datalabels: {
+                            anchor: "end",   // 데이터 레이블 위치
+                            align: "top",    // 막대 위쪽에 표시
+                            color: "black",  // 글자색
+                            font: {
+                            weight: "bold"
+                                },
+                            formatter: (value) => value.toLocaleString()
+                            }
                     },
                     scales: {
-                        y: { beginAtZero: true, title: { display: true, text: '재산피해 (천원)' } },
+                        y: { beginAtZero: true,
+                             title: { display: true,
+                                      text: '재산피해 (천원)'
+                                    },
+                            },
                         x: { 
                             ticks:{
                                 autoSkip: false,
@@ -218,10 +254,11 @@ jq36(document).ready(function() {
                                 drawTicks: false,   // 눈금선 제거
                                 drawBorder: false,  // 축선 제거
                                 color: 'transparent' // 격자선 색상 투명
-                                }  
-                            }
-                    }
-                }
+                                }  //grid end
+                            } //x end
+                        } //scales end
+                    },
+                    plugins: [ChartDataLabels]
             });
         },
         error: function(xhr, status, error) {
@@ -246,15 +283,29 @@ jq36(document).ready(function() {
                     datasets: [{
                         label: '소화기 개수',
                         data: counts,
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: '#FF9333',
+                        borderColor: '#FFD1A6',
                         borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
                     plugins: {
-                        title: { display: true, text: '호선별 소화기 개수' }
+                        title: { display: true,
+                                 text: '호선별 소화기 개수',
+                                 font: {
+                                     size: 18,          // 폰트 크기
+                                     weight: 'bold'
+                                 },
+                                 color: '#333' },
+                        datalabels: {
+                            anchor: "end",   // 데이터 레이블 위치
+                            align: "top",    // 막대 위쪽에 표시
+                            color: "black",  // 글자색
+                            font: {
+                            weight: "bold"
+                                }
+                            }
                     },
                     scales: {
                         y: { beginAtZero: true },
@@ -266,7 +317,8 @@ jq36(document).ready(function() {
                                 }  
                             }
                     }
-                }
+                },
+                plugins: [ChartDataLabels]
             });
         },
         error: function() { console.error('호선별 소화기 AJAX 오류'); }

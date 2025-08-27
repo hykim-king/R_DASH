@@ -25,6 +25,10 @@ public interface NewsService {
 	
 	List<NewsDTO> doRetrieve(SearchDTO param);
 	
+	int newsDelete(NewsDTO param);
+	
+	List<NewsDTO>newsMainList(NewsDTO param);
+	
 	/**
 	 * Topic Table
 	 * @param param

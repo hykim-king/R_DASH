@@ -47,6 +47,12 @@ public interface ChatService {
 	 */
 	int deleteChat(Long logNo); // ✅ Integer → Long
 
+	boolean existsSessionForUser(String sessionId, Integer userNo);
+
+	boolean isGuestSession(String sessionId);
+	
+	boolean hasAnyUserLogs(String sessionId);
+
 	/**
 	 * 전체 채팅 로그 삭제 (테스트용)
 	 * 

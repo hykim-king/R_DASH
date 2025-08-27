@@ -71,8 +71,7 @@
                     
             },
             error:function(result){//요청 실패
-                console.log("error:"+result)
-                alert(result);
+            	alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
             }
             
             
@@ -86,9 +85,7 @@
 <body>
     <!-- Header -->
     <!-- Header -->
-    <div class="header pb-6 d-flex align-items-center" style="min-height: 500px; background-image: url(/ehr/resources/template/dashboard/assets/img/theme/profile-cover.jpg); background-size: cover; background-position: center top;">
-      <!-- Mask -->
-      <span class="mask bg-gradient-default opacity-8"></span>
+    <div class="header bg-gradient-warning py-7 py-lg-6 pt-lg-6">
       <!-- Header container -->
       <div class="container-fluid d-flex align-items-center">
         <div class="row">
@@ -104,13 +101,16 @@
       <div class="row">
         <div class="col-xl-4 order-xl-2">
           <div class="card card-profile">
-            <img src="/ehr/resources/template/dashboard/assets/img/theme/img-1-1000x600.jpg" alt="Image placeholder" class="card-img-top">
+          <div class="card-header">
+             <div class="col-8">
+                <h3 class="mb-0">프로필 이미지 </h3>
+              </div>
+            </div>
+            <img src="/ehr/resources/template/dashboard/assets/img/theme/white.png" style="max-height: 100px;" alt="Image placeholder" class="card-img-top">
             <div class="row justify-content-center">
               <div class="col-lg-3 order-lg-2">
                 <div class="card-profile-image">
-	                  <a href="#">
-	                    <img id="profile" src="/ehr/resources/image/profile/${sessionScope.loginUser.image }" class="rounded-circle" style="object-fit: cover;">
-	                  </a>
+	               <img id="profile" src="/ehr/resources/image/profile/${sessionScope.loginUser.image }" class="rounded-circle" style="object-fit: cover;">
                 </div>
               </div>
             </div>

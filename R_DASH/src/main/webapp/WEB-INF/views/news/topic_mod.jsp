@@ -41,19 +41,20 @@
 				    <div class="row">
 				         <div class="col-12 mt-4">
 					        <div class="form-group">
-					            <label id="title" class="form-label text-dark">주제</label>
+					            <label for="title" class="form-label text-dark">주제</label>
 					            <input type="text" class="form-control" id="title" name="title" 
 					            autocomplete="title" maxlength="50" value="<c:out value='${vo.title}'/>" >
 					        </div>
 					        <div class="form-group">
-                                <label id="regId" class="form-label text-dark">등록자</label>
-                                <input type="text" class="form-control" id="regId" name="regId" 
-                                autocomplete="title"  value="<c:out value='${vo.regId}'/>" disabled="disabled">
+                                <label for="modId" class="form-label text-dark">등록자</label>
+                                <input type="text" class="form-control" id="modId" name="modId" 
+                                autocomplete="title"  value="<c:out value='${vo.modId}'/>" disabled="disabled">
                             </div>
 					        <div class="form-group">
-					            <label id="contents" class="form-label text-dark">주제 상세</label>
+					            <label for="contents" class="form-label text-dark">주제 상세</label>
 					            <textarea style="height:200px;" class="form-control" id="contents" name="contents" maxlength="300" required placeholder="내용을 입력하세요." >${vo.contents }</textarea>
 					        </div>
+					        <input type="hidden" id="modId" name="modId" value="${user.email}" />            
 				        </div>
 				        </div>
 				    </form>
@@ -68,17 +69,92 @@
 	</div>
 </div>
 <script>
-  const moveToNewsPageBtn = document.querySelector("#moveToNewsPage");
+document.addEventListener('DOMContentLoaded', function() {
+    
+    console.log('DOMContentLoaded');
   
-  moveToNewsPageBtn.addEventListener("click",function(event){
-	  if(window.opener && !window.opener.closed){
-	          //window.opener.receiveDataFromChild(msg);
-	  }else{
-	      alert('부모창을 찾을 수 없어요.');
-	  }
+    function isEmpty(value) {
+        return value == null || value.trim() === '';
+    }
+  const doUpdateBtn = document.querySelector("#doUpdate");
+  const doDeleteBtn = document.querySelector("#doDelete");
+  const titleInput = document.querySelector("#title");
+  const contentsInput = document.querySelector("#contents");
+  const topicNoInput = document.querySelector("#topicNo");
+  
+  doDeleteBtn.addEventListener("click",function(event){
+      console.log("doUpdateBtn click");
+      
+      $.ajax({
+          type: "POST",
+          url: "/ehr/news/doDelete.do",
+          async : "true", //비동기
+          dataType : "json",
+          data: {
+              "topicNo" : topicNoInput.value,
+              "modId": document.getElementById("modId").value
+          },
+          success: function(response) {
+              if(response.messageId === 1) {
+                  // 부모창 DOM 업데이트
+                  if(window.opener && !window.opener.closed) {
+                      
+                  }
+                  alert("삭제 완료!");
+                  window.close(); // 자식창 닫기
+              } else {
+                  alert("삭제 실패: " + response.message);
+              }
+          },
+          error: function() {
+              alert("관리자 권한(삭제 실패)");
+          }
+      });
+  });
+  
+  doUpdateBtn.addEventListener("click",function(event){
+      console.log("doUpdateBtn click");
 
+          
+          if (isEmpty(titleInput.value)) {
+              alert('제목을 입력 하세요');
+              titleInput.focus();
+              return;
+          }
+          if (isEmpty(contentsInput.value)) {
+              alert('내용을 입력 하세요');
+              contentsInput.focus();
+              return;
+          }
+          $.ajax({
+              type: "POST",
+              url: "/ehr/news/doUpdate.do",
+              async : "true", //비동기
+              dataType : "json",
+              data: {
+            	  "topicNo" : topicNoInput.value,
+                  "title": titleInput.value,
+                  "contents": contentsInput.value
+              },
+              success: function(response) {
+                  if(response.messageId === 1) {
+                      // 부모창 DOM 업데이트
+                      if(window.opener && !window.opener.closed) {
+                          window.opener.document.getElementById("detailTitle").textContent = titleInput.value;
+                          window.opener.document.getElementById("detailContents").textContent = contentsInput.value;
+                      }
+                      alert("수정 완료!");
+                      window.close(); // 자식창 닫기
+                  } else {
+                      alert("수정 실패: " + response.message);
+                  }
+              },
+              error: function() {
+                  alert("관리자 권한(수정 실패)");
+              }
+          });
 });
-  
+});
 </script>
 
 

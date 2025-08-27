@@ -122,6 +122,8 @@
             <if test="sidoNm != null and sidoNm != ''">
                  SIDO_NM = #{sidoNm}
             </if>
+            AND SIDO_NM != '합계'
+            AND SIDO_NM != '전국'
         </where>
         <choose>
             <when test="groupType == 'region'">

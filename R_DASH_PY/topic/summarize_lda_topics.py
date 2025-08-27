@@ -26,7 +26,7 @@ class smmr_topic:
 
         # 프롬프트 템플릿 정의
         #
-        system_template = "너는 일일 재난 리포터고 친절한 말투 부탁해, 다음 재난 관련 키워드를 바탕으로 뉴스를 200-300자 이내로 : 등 넣지말고 한 문단으로 요약해줘:{topic}"
+        system_template = "키워드를 바탕으로 뉴스를 200~300자 이내 한 문단으로 요약해줘,조건: 콜론이나 특수 구두점 없이 자연스럽고 부드러운 말투로 작성:{topic}"
         name_template = "다음 키워드들을 바탕으로 이 뉴스 주제에 어울리는 간단한 이름(5~15자 정도)을 지어줘:\n{topic}"
         summary_prompt = ChatPromptTemplate.from_messages([
             ('system', system_template),

@@ -97,7 +97,7 @@
 
 .clickMeWrapper {
     position: absolute;  /* 왼쪽 카드 안에서 절대 위치 */
-    top: 14.6px;          /* 카드 위쪽으로 띄움 */
+    top: -70px;          /* 카드 위쪽으로 띄움 */
     left: 20px;          /* 카드 왼쪽 안쪽 */
     display: flex;
     align-items: center;
@@ -110,6 +110,7 @@
     height: auto;
 }
 
+
 .clickMeIcon {
     display: flex;
     align-items: center;
@@ -118,7 +119,6 @@
     padding: 5px 10px;
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
-
 .clickMeIcon i {
     font-size: 24px;
     color: orange;
@@ -168,6 +168,8 @@ document.addEventListener('DOMContentLoaded', function(){
         $("#keywordNewsTable").hide();
     	
     });
+    
+    
     $(".btn[data-keyword]").not("#allBtn").on('click',function(){
     	var keyword = $(this).data("keyword");
     	
@@ -189,20 +191,26 @@ document.addEventListener('DOMContentLoaded', function(){
 
     	})
     });
+    
     function renderKeywordNews(data){
+    	var role = "${sessionScope.loginUser.role}";
         var tbody = $("#keywordNewsTable tbody");
+        $('#newsLoadMore').hide();
         tbody.empty();
         if(data && data.length > 0){
             $.each(data, function(i, vo){
                 var row = "<tr>" +
                     "<td class='budget'>" + vo.company + "</td>" +
                     "<td class='budget'><a href='" + vo.url + "' target='_blank'>" + vo.title + "</a></td>" +
-                    "<td class='budget'>" + vo.pubDt + "</td>" +
-                    "</tr>";
+                    "<td class='budget'>" + vo.pubDt + "</td>";
+                    if(role === '1'){  // 관리자면 버튼 추가
+                        row += "<td class='budget'><button class='btn btn-danger newsDeleteBtn' data-news-no='"+vo.newsNo+"'>뉴스 삭제</button></td>";
+                    }
+                    row +="</tr>";
                 tbody.append(row);
             });
         } else {
-            tbody.append("<tr><td colspan='3'>데이터 없음</td></tr>");
+            tbody.append("<tr><td colspan='99'>데이터 없음</td></tr>"); 
         }
     }
     //토픽 상세 보기 (버튼 클릭)
@@ -238,67 +246,70 @@ document.addEventListener('DOMContentLoaded', function(){
         showTopic(currentIndex);
     });
     
+	const moveToTopicRegBtn = document.querySelector("#moveToTopicReg");
     //등록 모달
-    const moveToTopicRegBtn = document.querySelector("#moveToTopicReg");
-    moveToTopicRegBtn.addEventListener("click",function(e){
-    	let url = "doSaveView.do";
-    	const screenWidth = window.screen.width;
-        const screenHeight = window.screen.height;
-        console.log('screenWidth: '+screenWidth);
-        console.log('screenHeight: '+screenHeight);
-
-       const left = (screenWidth - 600)/2;
-       const top = (screenHeight - 400)/2;
-
-       let options = `width=600,height=600, top=${top}, left=${left}, resizable=no, scrollbars=no`;
-       window.open(url,"_blank",options);
-    });
-    //수정 모달
-    const moveToTopicModBtn = document.querySelector("#moveToTopicMod");
-    moveToTopicModBtn.addEventListener("click",function(e){
-    	if(topicDetails.length === 0) {
-            alert("수정할 토픽이 없습니다.");
-            return;
-        }
-    	let topicNo = topicDetails[currentIndex].topicNo; // 현재 상세보기 토픽 번호
-        if(!topicNo){
-            alert("토픽 번호를 확인할 수 없습니다.");
-            return;
-        }
-        let url = "doUpdateView.do?topicNo=" + topicNo;
-        const screenWidth = window.screen.width;
-        const screenHeight = window.screen.height;
-        console.log('screenWidth: '+screenWidth);
-        console.log('screenHeight: '+screenHeight);
-
-       const left = (screenWidth - 600)/2;
-       const top = (screenHeight - 400)/2;
-
-       let options = `width=600,height=600, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
-       window.open(url,"_blank",options);
-    });
+    if(moveToTopicRegBtn){
+	    moveToTopicRegBtn.addEventListener("click",function(e){
+	    	let url = "doSaveView.do";
+	    	const screenWidth = window.screen.width;
+	        const screenHeight = window.screen.height;
+	        console.log('screenWidth: '+screenWidth);
+	        console.log('screenHeight: '+screenHeight);
+	
+	       const left = (screenWidth - 600)/2;
+	       const top = (screenHeight - 400)/2;
+	
+	       let options = `width=600,height=600, top=${top}, left=${left}, resizable=no, scrollbars=no`;
+	       window.open(url,"_blank",options);
+	    });
+    }
     
-    //오늘의 키워드 모달
-    const clickMeDiv = document.querySelector("#clickMe");
-    clickMeDiv.addEventListener("click",function(e){
-    	let url = "/ehr/freq/topic/words.do";
-        const screenWidth = window.screen.width;
-        const screenHeight = window.screen.height;
-        console.log('screenWidth: '+screenWidth);
-        console.log('screenHeight: '+screenHeight);
-
-       const left = (screenWidth - 900)/2;
-       const top = (screenHeight - 800)/2;
-
-       let options = `width=900,height=800, top=${top}, left=${left}, resizable=no, scrollbars=no`;
-       window.open(url,"_blank",options);
-    });
+	const moveToTopicModBtn = document.querySelector("#moveToTopicMod");
+    //수정 모달
+    if(moveToTopicModBtn){
+	    moveToTopicModBtn.addEventListener("click",function(e){
+	    	if(topicDetails.length === 0) {
+	            alert("수정할 토픽이 없습니다.");
+	            return;
+	        }
+	    	let topicNo = topicDetails[currentIndex].topicNo; // 현재 상세보기 토픽 번호
+	        if(!topicNo){
+	            alert("토픽 번호를 확인할 수 없습니다.");
+	            return;
+	        }
+	        let url = "doUpdateView.do?topicNo=" + topicNo;
+	        const screenWidth = window.screen.width;
+	        const screenHeight = window.screen.height;
+	        console.log('screenWidth: '+screenWidth);
+	        console.log('screenHeight: '+screenHeight);
+	
+	       const left = (screenWidth - 600)/2;
+	       const top = (screenHeight - 400)/2;
+	
+	       let options = `width=600,height=600, top=${top}, left=${left}, resizable=yes scrollbars=yes`;
+	       window.open(url,"_blank",options);
+	    });
+    }
+    
+    // 등록 모달 받기
+    function receiveDataFromChild(title, contents) {
+        console.log("자식창에서 받은 데이터:", title, contents);
+    
+        // 예시: 부모창의 입력창에 값 넣기
+        document.getElementById("detailTitle").textContent = title;
+        document.getElementById("detailContents").textContent = contents;
+    
+       
+    }
+    
    // 더보기 버튼
     let pageNo = 1; // 현재 페이지
     const pageSize = 10;
+    const role = "${sessionScope.loginUser.role}";
 
     // 뉴스 로딩 함수 (기본 + 더보기)
     function loadNews(pageNo) {
+    	var role = "${sessionScope.loginUser.role}";
         $.ajax({
             url: "<c:url value='/news/doRetrieve.do'/>",
             type: 'GET',
@@ -306,6 +317,7 @@ document.addEventListener('DOMContentLoaded', function(){
             dataType: 'json',
             success: function(data) {
                 const tbody = $("#newsList"); // tbody id와 일치
+                tbody.empty();
                 if (!data || data.length === 0) {
                     if (pageNo === 0) { // 첫 페이지도 데이터 없으면
                         tbody.html("<tr><td colspan='3'>데이터 없음</td></tr>");
@@ -316,13 +328,23 @@ document.addEventListener('DOMContentLoaded', function(){
 
                 // 데이터가 있으면 tbody에 추가
                 data.forEach(function(vo) {
-                    const row = "<tr>" +
+                	let row = "<tr>" +
                         "<td class='budget'>" + vo.company + "</td>" +
                         "<td class='budget'><a href='" + vo.url + "' target='_blank'>" + vo.title + "</a></td>" +
-                        "<td class='budget'>" + vo.pubDt + "</td>" +
-                        "</tr>";
+                        "<td class='budget'>" + vo.pubDt + "</td>";
+                        if(role === '1'){  // 관리자면 버튼 추가
+                            row += "<td class='budget'><button class='btn btn-danger newsDeleteBtn' data-news-no='"+vo.newsNo+"'>뉴스 삭제</button></td>";
+                        }
+                        row += "</tr>";
                     tbody.append(row);
+                    
                 });
+             // 남은 데이터가 적으면 더보기 버튼 숨김
+                if (data.length < pageSize) {
+                    $('#newsLoadMore').hide();
+                } else {
+                    $('#newsLoadMore').show();
+                }
             },
             error: function(err) {
                 console.error("AJAX Error:", err);
@@ -341,7 +363,7 @@ document.addEventListener('DOMContentLoaded', function(){
         });
     });
     //재민이 마우스 오버
-    const clickMeWrapper = document.querySelector("#clickMe");
+    const clickMeWrappers = document.querySelector("#clickMe");
     const clickMeDefaultImage = document.querySelector("#clickMeDefault");
     const clickMeOverImage = document.querySelector("#clickMeOver");
     
@@ -349,16 +371,91 @@ document.addEventListener('DOMContentLoaded', function(){
     clickMeDefaultImage.style.display = "block";
     clickMeOverImage.style.display = "none";
     
-    console.log(clickMeDefault);
+    console.log(clickMeDefaultImage);
     console.log(clickMeOverImage);
     
-    clickMeWrapper.addEventListener('mouseover',function(){
+    clickMeWrappers.addEventListener('mouseover',function(){
     	clickMeDefaultImage.style.display = "none";
         clickMeOverImage.style.display = "block";
     });
-    clickMeWrapper.addEventListener('mouseout',function(){
+    clickMeWrappers.addEventListener('mouseout',function(){
         clickMeDefaultImage.style.display = "block";
         clickMeOverImage.style.display = "none";
+    });
+    
+    //언어 선택
+    const langSelect = document.querySelector("#lang");
+    const currentLang = "${empty lang ? 'ko' : lang}";
+    // 언어 선택 select
+    langSelect.value = currentLang;  // selected 반영
+    
+    // 언어 변경 이벤트
+    langSelect.addEventListener("change", function(){
+        selectLang = langSelect.value;
+
+        window.location.href = '/ehr/news/newsPage.do?lang='+selectLang;      
+        
+        if (keywordWindow && !keywordWindow.closed) {
+            keywordWindow.location.href = "/ehr/freq/topic/words.do?lang=" + selectLang;
+        } 
+    });
+    let keywordWindow = null;
+    //오늘의 키워드 모달
+    const clickMeDiv = document.querySelector("#clickMe");
+    clickMeDiv.addEventListener("click",function(e){
+    	selectLang = langSelect.value;
+                 
+        let url = "/ehr/freq/topic/words.do?lang="+ selectLang;
+        
+        const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
+        console.log('screenWidth: '+screenWidth);
+        console.log('screenHeight: '+screenHeight);
+
+       const left = (screenWidth - 900)/2;
+       const top = (screenHeight - 800)/2;
+
+       let options = `width=800,height=800, top=${top}, left=${left}, resizable=no, scrollbars=no`;
+       window.open(url,"_blank",options);
+    });
+    //뉴스 삭제
+    $(document).on("click", ".newsDeleteBtn", function() {
+    	 const btn = $(this);
+    	 const newsNo = btn.data("news-no"); // 여기서 읽음
+
+        if (!newsNo) {
+            alert("삭제할 뉴스 번호가 없습니다.");
+            return;
+        }
+
+        if (!confirm("정말 삭제하시겠습니까?")) return;
+
+        $.ajax({
+            type: "POST",
+            url: "/ehr/news/newsDelete.do",
+            dataType: "json",
+            data: { newsNo: newsNo },
+            success: function(response) {
+                if (response.messageId === 1) {
+                    alert("삭제 완료!");
+                    // 삭제 성공 시 해당 row 제거
+                    $(this).closest("tr").remove();
+                    
+                     // tbody에 남은 row 개수 확인
+                    const remainingRows = $("#newsList tr").length;
+                    if (remainingRows < pageSize) {
+                        $('#newsLoadMore').hide(); // 남은 데이터 없으면 숨김
+                    } else {
+                        $('#newsLoadMore').show(); // 남은 데이터 있으면 표시
+                    }
+                } else {
+                    alert("삭제 실패: " + response.message);
+                }
+            }.bind(this), // this를 Ajax success 내부에서도 유지
+            error: function() {
+                alert("삭제 중 오류 발생");
+            }
+        });
     });
 });
 
@@ -367,34 +464,38 @@ document.addEventListener('DOMContentLoaded', function(){
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/common/socket.jsp"></jsp:include>
-<% 
-  LocalDate today = LocalDate.now();
-  int year = today.getYear();
-  int month = today.getMonthValue();
-  int day = today.getDayOfMonth();
-  DayOfWeek dayOfWeek = today.getDayOfWeek();
-  String aaa = "";
-  String[] korWeek = {"월","화","수","목","금","토","일"};
-  
-  if(dayOfWeek != null) {
-      int idx = dayOfWeek.getValue() - 1; // 1(월)~7(일) → 배열 0~6
-      if(idx >= 0 && idx < korWeek.length) {
-          aaa = korWeek[idx];
-      }
-  }
-%>
 <div class="main-content" id="panel">
 	<div class="header bg-warning pb-6">
 		<div class="container-fluid">
 			<div class="header-body">
 			<div class="row align-items-center py-4">
 				<div class="col-lg-6 col-7">
-				</div>
+				    <!-- 오늘의 키워드 보여줄 click me -->
+				   <div id="clickMe">
+		           <div id="clickMeDefault" class="clickMeWrapper">
+		                <img  class="clickMeImg" src="/ehr/resources/image/news_Jeamin.png" alt="나를 클릭해봐">
+		                <div class="clickMeIcon">
+		                   <!--  <i class="ni ni-chat-round"></i> -->
+		                    <span class="chatText"> ${msgs.click} ! 📊</span>
+		                </div>
+		            </div>
+                    <!-- 오늘의 키워드 보여줄 click me -->
+                   <div id="clickMeOver" class="clickMeWrapper">
+                    <img  class="clickMeImg" src="/ehr/resources/image/hello_jm.png" alt="안녕!">
+                        <div class="clickMeIcon">
+                           <!--  <i class="ni ni-chat-round"></i> -->
+                            <span class="chatText"> ${msgs.click} ! 📊</span>
+                        </div>
+                    </div>
+                </div>
+                </div>
 			    <!--  버튼 -->
-				<div class="col-lg-6 col-5 text-right">
-				    <input type="button" id="moveToTopicReg" class="btn btn-white" value="등록">
-				    <input type="button" id="moveToTopicMod" class="btn btn-white" value="수정">
-				</div>
+ 			      <c:if test="${sessionScope.loginUser.role =='1'  }">
+				   	<div class="col-lg-6 col-5 text-right">
+					    <input type="button" id="moveToTopicReg" class="btn btn-white" value="${msgs.reg}">
+					    <input type="button" id="moveToTopicMod" class="btn btn-white" value="${msgs.modi}">
+					</div>
+ 		    		</c:if>
 				 <!-- //버튼 -->
 		      </div>
 		   </div>
@@ -409,7 +510,7 @@ document.addEventListener('DOMContentLoaded', function(){
                        <div class="row align-items-center">
                        <div class="col align-content-center">
                             <h5 class="h3 mb-0">
-                            <%=year %>년 <%=month %>월 <%=day %>일(<%=aaa %>)</h5>
+                            ${msgs.today}</h5>
                        </div>
                        </div>
 	               </div>
@@ -422,17 +523,17 @@ document.addEventListener('DOMContentLoaded', function(){
 	                    </colgroup>
 	                   <thead class="thead-light">
 	                       <tr>
-	                           <th>no</th>
-	                           <th>제목</th>
-	                           <th>관련 뉴스 건수</th>
+	                           <th>${msgs.no}</th>
+	                           <th>${msgs.title}</th>
+	                           <th>${msgs.topicCount}</th>
 	                       </tr>
 	                   </thead>
 	                   <tbody class="list">
 	                    <c:choose>
 				            <c:when test="${not empty todayTopics}">
-				                    <c:forEach var="vo" items="${todayTopics}">
+				                    <c:forEach var="vo" items="${todayTopics}" varStatus="status">
 				                     <tr>
-	                                    <td class="budget"><c:out value="${vo.no}"/></td>
+	                                    <td class="budget"><c:out value="${status.index + 1}"/></td>
 	                                    <td class="budget"><c:out value="${vo.title }"/></td>
 	                                    <td class="budget"><c:out value="${vo.topicRatio}"/></td>   
 	                                    <td style="display: none;"><c:out value="${vo.topicNo}"/></td>   
@@ -440,7 +541,7 @@ document.addEventListener('DOMContentLoaded', function(){
 				                    </c:forEach>
 				            </c:when>
 				            <c:otherwise>
-				                <p>등록된 토픽이 없습니다.</p>
+				                <p>${msgs.noTopic}</p>
 				            </c:otherwise>
 				        </c:choose>
 				        </tbody>
@@ -448,15 +549,7 @@ document.addEventListener('DOMContentLoaded', function(){
 	               </div>
 	           </div>
 	       </div>
-	       <!-- 오늘의 키워드 보여줄 click me -->
-	       <div id="clickMe" class="clickMeWrapper">
-		        <img id="clickMeDefault" class="clickMeImg" src="/ehr/resources/image/news_Jeamin.png" alt="나를 클릭해봐">
-		        <img id="clickMeOver" class="clickMeImg" src="/ehr/resources/image/hello_jm.png" alt="안녕!">
-		        <div class="clickMeIcon">
-		           <!--  <i class="ni ni-chat-round"></i> -->
-		            <span class="chatText"> 나를 클릭해 봐 ! 📊</span>
-		        </div>
-		    </div>
+	       
 	       <!-- 오른쪽 : 토픽 상세 -->
 	       <div class="col-xl-7 d-flex my-topic-card">
 	           <div class="card flex-fill topic-card">
@@ -466,7 +559,7 @@ document.addEventListener('DOMContentLoaded', function(){
 				        </button>
 	                   <div class="row align-items-center">
 	                   <div class="col align-content-center">
-	                       <h5 id="heihlight" class="h3 mb-0">✨재민이AI의 오늘의 토픽 요약✨</h5>
+	                       <h5 id="heihlight" class="h3 mb-0">✨${msgs.summrTitle}✨</h5>
 	                   </div>
 	                   </div>
 	                   <button class="arrow right">
@@ -493,15 +586,15 @@ document.addEventListener('DOMContentLoaded', function(){
 	       <div class="card">
 	           <!-- news header -->
 	           <div class="card-header border-0">
-	                <input type="button" id="allBtn" class="btn btn-warning" data-keyword="" value="재난 종합">
-			        <input type="button" class="btn btn-warning" data-keyword="화재" value="화재">
-			        <input type="button" class="btn btn-warning" data-keyword="싱크홀" value="싱크홀">
-			        <input type="button" class="btn btn-warning" data-keyword="폭염" value="폭염">
-			        <input type="button" class="btn btn-warning" data-keyword="황사" value="황사">
-			        <input type="button" class="btn btn-warning" data-keyword="태풍" value="태풍">
-			        <input type="button" class="btn btn-warning" data-keyword="산사태" value="산사태">
-			        <input type="button" class="btn btn-warning" data-keyword="홍수" value="홍수">
-			        <input type="button" class="btn btn-warning" data-keyword="한파" value="한파">
+	                <input type="button" id="allBtn" class="btn btn-warning" data-keyword="" value="${msgs.total}">
+			        <input type="button" class="btn btn-warning" data-keyword="화재" value="${msgs.fire}">
+			        <input type="button" class="btn btn-warning" data-keyword="싱크홀" value="${msgs.sinkhole}">
+			        <input type="button" class="btn btn-warning" data-keyword="폭염" value="${msgs.heat}">
+			        <input type="button" class="btn btn-warning" data-keyword="황사" value="${msgs.dust}">
+			        <input type="button" class="btn btn-warning" data-keyword="태풍" value="${msgs.typhoon}">
+			        <input type="button" class="btn btn-warning" data-keyword="산사태" value="${msgs.landslide}">
+			        <input type="button" class="btn btn-warning" data-keyword="홍수" value="${msgs.flood}">
+			        <input type="button" class="btn btn-warning" data-keyword="한파" value="${msgs.cold}">
 	           </div>
 	           <!-- news table -->
 	           <div id="allNewsTable" class="table-responsive">
@@ -513,9 +606,10 @@ document.addEventListener('DOMContentLoaded', function(){
 		            </colgroup>
 	               <thead style="display: none;">
 	                   <tr>
-	                       <th>신문사</th>
-	                       <th>제목</th>
-	                       <th>발행일자</th>
+	                       <th>${msgs.newspaper}</th>
+	                       <th>${msgs.reg}</th>
+	                       <th>${msgs.pub}</th>
+	                       
 	                   </tr>
 	               </thead>
 				    <tbody class="list" id="newsList"></tbody>
@@ -531,32 +625,25 @@ document.addEventListener('DOMContentLoaded', function(){
                     </colgroup>
                    <thead style="display: none;">
                        <tr>
-                           <th>신문사</th>
-                           <th>제목</th>
-                           <th>발행일자</th>
+                           <th>${msgs.newspaper}</th>
+                           <th>${msgs.reg}</th>
+                           <th>${msgs.pub}</th>
                        </tr>
                    </thead>
-                   <tbody class="list">
-               
-                    </tbody>
+                   <tbody class="list"></tbody>
                     </table>
 	           </div>
 	           <!-- news footer -->
 	           <div class="card-footer py-4">
 	               <div id="newsLoadMore" data-page="1">
-	                <span>+더보기</span>
+	                <span>+${msgs.more}</span>
 	               </div>
 	           </div>
 	          </div>
-                 <div>최종 업데이트 일자 : <c:out value="${latestRegDt}"/></div>
+                 <div>${msgs.updateDay} : <c:out value="${latestRegDt}"/></div>
 	          </div>
 	          </div>
 			      
 	   </div><!-- //main -->
-
-
-    
-
-
 </body>
 </html>

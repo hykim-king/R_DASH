@@ -33,5 +33,8 @@ public interface DustMapper extends WorkDiv<DustDTO> {
 
     List<Map<String, Object>> selectBottom5PM10();
 
-    Double selectAvgPM10();
+    Double selectAvgPM10(@Param("stnNm") String stnNm);
+    
+    DustDTO findNearestDust(@Param("userLat") double userLat, 
+    						@Param("userLon") double userLon);
 }

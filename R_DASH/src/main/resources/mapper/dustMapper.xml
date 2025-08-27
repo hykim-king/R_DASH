@@ -7,30 +7,49 @@
     
 	<!-- 최고 PM10 TOP5 -->
 	<select id="selectTop5PM10" resultType="map">
-	    SELECT STN_NM, LAT, LON, PM10
-	    FROM DUST
-	    ORDER BY PM10 DESC
-	    FETCH FIRST 5 ROWS ONLY
+		SELECT RNK, STN_NM, LAT, LON, PM10
+		FROM (
+		    SELECT STN_NM, LAT, LON, PM10,
+		           DENSE_RANK() OVER (ORDER BY PM10 DESC) AS RNK
+		    FROM DUST
+		)
+		<![CDATA[WHERE RNK <= 5]]>
+		ORDER BY RNK, STN_NM
 	</select>
 	
 	<!-- 최저 PM10 BOTTOM5 -->
 	<select id="selectBottom5PM10" resultType="map">
-	    SELECT STN_NM, LAT, LON, PM10
-	    FROM DUST
-	    ORDER BY PM10 ASC
-	    FETCH FIRST 5 ROWS ONLY
+		SELECT RNK, STN_NM, LAT, LON, PM10
+		FROM (
+		    SELECT STN_NM, LAT, LON, PM10,
+		           DENSE_RANK() OVER (ORDER BY PM10 ASC) AS RNK
+		    FROM DUST
+		)
+		<![CDATA[WHERE RNK <= 5]]>
+		ORDER BY RNK, STN_NM
 	</select>
 	
 	<!-- 평균 PM10 -->
-	<select id="selectAvgPM10" resultType="double">
+	<select id="selectAvgPM10" parameterType="string" resultType="double">
 	    SELECT ROUND(AVG(PM10), 2) AS avg_pm10
 	    FROM DUST
+	    <where>
+	        <if test="stnNm != null">
+	            STN_NM LIKE #{stnNm} || '%'
+	        </if>
+	    </where>
 	</select>
     
-    
-    
-    
-    
+    <select id="findNearestDust" resultType="DustDTO">
+	    SELECT *
+	    FROM (
+	        SELECT STN_NM, LAT, LON, PM10,
+	               SQRT(POWER(LAT - #{userLat}, 2) + POWER(LON - #{userLon}, 2)) AS dist
+	        FROM DUST
+	    )
+	    ORDER BY dist
+	    FETCH FIRST 1 ROWS ONLY
+	</select>
     
 
   <!-- BBox + 유형 최신 (관측소별 최신 1건) -->

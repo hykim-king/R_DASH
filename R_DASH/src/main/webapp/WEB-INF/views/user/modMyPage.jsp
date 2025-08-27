@@ -60,8 +60,7 @@
                       
               },
               error:function(result){//요청 실패
-                  console.log("error:"+result)
-                  alert(result);
+            	  alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
               }
               
               
@@ -94,6 +93,14 @@
 	  // 파일 저장 버튼 클릭
 	  changeButton.addEventListener('click', function(){
 		  const file = image.files[0];
+		  pathpoint = image.value.lastIndexOf('.');
+		  filepoint = image.value.substring(pathpoint+1,image.length);
+		  filetype = filepoint.toLowerCase();
+		  
+		  if(filetype!='jpg'||filetype!='png'||filetype!='jpeg'||filetype!='gif'||filetype!='csv'){
+			  alert('jpg, gif, png, jpeg, csv 파일만 선택할 수 있습니다.');
+			  return
+		  }
 
 		  if (!file) {
 		      alert("파일을 선택하세요.");
@@ -126,8 +133,7 @@
                       
               },
               error:function(result){//요청 실패
-                  console.log("error:"+result)
-                  alert(result);
+            	  alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
               }
               
               
@@ -193,8 +199,7 @@ function submitPassword() {
                 
         },
         error:function(result){//요청 실패
-            console.log("error:"+result)
-            alert(result);
+        	alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
         }
         
         
@@ -206,9 +211,7 @@ function submitPassword() {
 <body>
     <!-- Header -->
     <!-- Header -->
-    <div class="header pb-6 d-flex align-items-center" style="min-height: 500px; background-image: url(/ehr/resources/template/dashboard/assets/img/theme/profile-cover.jpg); background-size: cover; background-position: center top;">
-      <!-- Mask -->
-      <span class="mask bg-gradient-default opacity-8"></span>
+    <div class="header bg-gradient-warning py-7 py-lg-6 pt-lg-6" >
       <!-- Header container -->
       <div class="container-fluid d-flex align-items-center">
         <div class="row">
@@ -223,7 +226,7 @@ function submitPassword() {
     <div class="container-fluid mt--6">
       <div id="passwordModal" class="card" style="display:none; width:350px; position:fixed; top:40%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; border:1px solid #ccc;">
 		    <p>비밀번호를 입력하세요:</p>
-		    <input class="form-control" type="password" id="passwordInput">
+		    <input class="form-control" type="password" id="passwordInput" maxlength="16">
 		    <div class="text-center" style="margin-top:15px;">
 			    <button class="btn btn-lg btn-default" onclick="javascript:submitPassword()">확인</button>
 			    <button class="btn btn-lg btn-default" onclick="javascript:closePasswordPrompt()">취소</button>
@@ -232,7 +235,12 @@ function submitPassword() {
       <div class="row">
         <div class="col-xl-4 order-xl-2">
           <div class="card card-profile">
-            <img src="/ehr/resources/template/dashboard/assets/img/theme/img-1-1000x600.jpg" alt="Image placeholder" class="card-img-top">
+          <div class="card-header">
+             <div class="col-8">
+                <h3 class="mb-0">프로필 이미지 </h3>
+              </div>
+            </div>
+            <img src="/ehr/resources/template/dashboard/assets/img/theme/white.png" style="max-height: 100px;" alt="Image placeholder" class="card-img-top">
             <div class="row justify-content-center">
               <div class="col-lg-3 order-lg-2">
                 <div class="card-profile-image">
@@ -240,7 +248,7 @@ function submitPassword() {
 	                  <a href="#" id="imageLink">
 	                    <img id="profile" src="/ehr/resources/image/profile/${sessionScope.loginUser.image }" class="rounded-circle" style="object-fit: cover;">
 	                  </a>
-	                  <input type="file" id="image" name="image" accept="image/*" style="display:none">
+	                  <input type="file" id="image" name="image" accept="image/jpg,image/png,image/jpeg,image/gif,image/csv" style="display:none">
                   </form>
                 </div>
               </div>
@@ -318,7 +326,7 @@ function submitPassword() {
                     <div class="col-lg-6">
                       <div class="form-group">
                         <label class="form-control-label" for="nickname">별명</label>
-                        <input type="text" id="nickname" class="form-control" placeholder="ex)부리부리" value="${sessionScope.loginUser.nickname }">
+                        <input type="text" id="nickname" class="form-control" placeholder="ex)부리부리" value="${sessionScope.loginUser.nickname }" maxlength="12">
                       </div>
                     </div>
                   </div>
@@ -331,7 +339,7 @@ function submitPassword() {
                     <div class="col-md-4">
                       <div class="form-group">
                         <label class="form-control-label" for="tel">전화번호 </label>
-                        <input id="tel" name="tel" class="form-control" placeholder="ex)010-1234-5678" value="${sessionScope.loginUser.tel }" type="tel">
+                        <input id="tel" name="tel" class="form-control" placeholder="ex)010-1234-5678" value="${sessionScope.loginUser.tel }" type="tel" maxlength="15">
                       </div>
                     </div>
                   </div>
@@ -361,7 +369,7 @@ function submitPassword() {
                     <div class="col-md-6">
                       <div class="form-group">
                         <label class="form-control-label" for="detailAddress">상세 주소</label>
-                        <input id="detailAddress" name="detailAddress" class="form-control" placeholder="ex)에이콘 마을 1004동 1004호" value="${sessionScope.loginUser.detailAddress }" type="text">
+                        <input id="detailAddress" name="detailAddress" class="form-control" placeholder="ex)에이콘 마을 1004동 1004호" value="${sessionScope.loginUser.detailAddress }" type="text" maxlength="50">
                       </div>
                     </div>
                   </div>
@@ -375,7 +383,7 @@ function submitPassword() {
         </div>
       </div>
     </div>
-  </div>
+
 </body>
 
 </html>
