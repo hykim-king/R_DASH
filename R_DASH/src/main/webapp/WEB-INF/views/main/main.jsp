@@ -4,6 +4,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
+
 <c:set var="CP" value="${pageContext.request.contextPath}" />
 <c:set var="now" value="<%=new java.util.Date()%>" />
 <c:set var="sysDate">
@@ -76,6 +77,55 @@ html, body {
 	z-index: 0
 }
 
+.hero-text {
+	position: relative; /* 비디오 위 */
+	z-index: 1;
+	color: #fff;
+	text-align: center;
+	padding: 0 20px;
+	max-width: 920px;
+}
+
+.hero-text h1 {
+	font-size: 2.5rem;
+	font-weight: 800;
+	text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.hero-text .white-text {
+	color: #fff; /* 흰색 */
+}
+
+.hero-text p {
+	font-size: clamp(1rem, 2vw, 1.2rem);
+	line-height: 1.6;
+	margin: 0;
+	text-shadow: 0 2px 8px rgba(0, 0, 0, .5);
+}
+
+.hero-text .accent {
+	color: #ff4d4d; /* R-DASH 강조 색상 */
+}
+
+/* 버튼 쓰실 거면 함께 */
+.hero-btn {
+	display: inline-block;
+	margin-top: 18px;
+	padding: 12px 28px;
+	border-radius: 28px;
+	background: #ff6b6b;
+	color: #fff;
+	text-decoration: none;
+	font-weight: 600;
+	transition: .25s;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .25);
+}
+
+.hero-btn:hover {
+	background: #ff4757;
+	transform: translateY(-2px);
+}
+
 /* ===== News / FAQ ===== */
 .news-section {
 	padding: 60px 0
@@ -99,6 +149,11 @@ html, body {
 	background: #212529;
 	color: #fff;
 	padding: 60px 20px
+}
+
+.faq-section h4, .faq-section h4 a {
+	color: #fff !important;
+	text-decoration: none;
 }
 
 .accordion-button {
@@ -445,7 +500,143 @@ img.card-img-top {
 		top: 52px
 	}
 }
+
+/* ===== 제목 옆(내부) 화살표: 지금은 사용 안 하므로 숨김 ===== */
+.news-title-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.news-title-row.right-nav {
+	justify-content: space-between;
+}
+
+.news-title-row.left-nav {
+	justify-content: flex-start;
+}
+
+.news-title-row .card-title {
+	margin: 0;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.news-title-row .news-navs {
+	display: none;
+} /* 내부 버튼 숨김 */
+
+/* ===== 카드 바깥 화살표 버튼 (세로 알약 스타일) ===== */
+.news-rotator-wrap {
+	position: relative;
+	overflow: visible;
+}
+
+.nav-outer {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 18px;
+	height: 72px;
+	padding: 0;
+	border: 1px solid rgba(0, 0, 0, .08); /* 경계선 살짝(가독성↑) */
+	border-radius: 12px;
+	background: rgba(255, 255, 255, .96); /* ← 배경 흰색 */
+	color: #111; /* ← 화살표(문자) 색 어두운 회색 */
+	font-size: 20px;
+	font-weight: 900;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	z-index: 9;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .22);
+	transition: transform .12s, box-shadow .12s, background .12s, opacity
+		.12s;
+	opacity: .95;
+	/* 브라우저 기본 버튼 외형 제거 */
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	color: #111;
+}
+
+.nav-outer.prev {
+	left: -28px;
+	padding-right: 2px;
+}
+
+.nav-outer.next {
+	right: -28px;
+	padding-left: 2px;
+}
+
+.nav-outer:hover {
+	background: #fff; /* 호버 시 더 하얗게 */
+	transform: translateY(-50%) scale(1.04);
+	box-shadow: 0 10px 24px rgba(0, 0, 0, .28);
+}
+
+.nav-outer:focus {
+	outline: 2px solid #94a3b8;
+	outline-offset: 2px;
+}
+
+/* 모바일에서는 조금 짧고, 너무 바깥으로 나가지 않게 */
+@media ( max-width :576px) {
+	.nav-outer {
+		height: 60px;
+	}
+	.nav-outer.prev {
+		left: 6px;
+	}
+	.nav-outer.next {
+		right: 6px;
+	}
+}
+/* 카드 제목 링크를 일반 제목처럼 */
+.card-title a.title-text {
+	color: inherit;
+	text-decoration: none;
+	outline: none;
+}
+
+.card-company {
+	pointer-events: none; /* 클릭/탭 무시 */
+	user-select: text; /* 텍스트 복사는 허용 */
+	color: #6b7280; /* 보기 좋은 회색 (선택) */
+}
+
+/* 전환 페이드 */
+.news-rotator .card-img-top {
+	transition: opacity .18s;
+}
+
+.news-rotator.switching .card-img-top {
+	opacity: .35;
+}
+
+@
+keyframes backInUp {from { opacity:0;
+	transform: translate3d(0, 60px, 0) scale(.98);
+}
+
+to {
+	opacity: 1;
+	transform: translate3d(0, 0, 0) scale(1);
+}
+
+}
+.backInUp {
+	animation: backInUp .75s both;
+	will-change: transform, opacity;
+}
 </style>
+<!-- 서버에서 내려준 JSON을 실행되지 않는 데이터 블록으로 주입 -->
+<script type="application/json" id="homeNewsJson">
+  <c:out value="${homeNewsJson}" default="[]" escapeXml="false"/>
+</script>
 </head>
 
 <body data-login-user-no="${empty loginUserNo ? '' : loginUserNo}">
@@ -454,8 +645,18 @@ img.card-img-top {
 		<video id="bg-video" autoplay muted loop preload="auto"
 			poster="${CP}/resources/image/mainboard.png">
 			<source src="${CP}/resources/video/jaemini.mp4" type="video/mp4" />
-			동영상을 재생할 수 없습니다.
 		</video>
+		<!-- 소개 문구 -->
+		<div class="hero-text">
+			<h1>
+				<span class="white-text">재난 알림 플랫폼</span> <span
+					style="color: #ff6b6b;">R-DASH</span>
+			</h1>
+			<p>
+				재민이가 재난 정보를 알려주고<br /> 상황별 행동 요령을 안내해 드립니다.<br /> 여러분의 안전을 지키는 든든한
+				파트너가 되겠습니다.
+			</p>
+		</div>
 	</div>
 
 	<!-- News -->
@@ -464,33 +665,55 @@ img.card-img-top {
 			<div class="news-title">주요 뉴스</div>
 			<div class="row">
 				<div class="col-md-4 mb-3">
-					<div class="card h-100">
-						<img src="${CP}/resources/image/earth.jpg" class="card-img-top"
-							alt="지진 이미지" />
-						<div class="card-body">
-							<h5 class="card-title">[속보] 강진 발생</h5>
-							<p class="card-text">해당 지역 주민은 안전한 곳으로 대피 바랍니다.</p>
+					<div class="news-rotator-wrap">
+						<!-- 위치 기준 -->
+						<button class="nav-outer prev" aria-label="이전">‹</button>
+
+						<div class="card h-100 news-rotator" data-feed="breaking"
+							data-idx="0">
+							<img src="${CP}/resources/image/earth.jpg" class="card-img-top"
+								alt="지진 이미지">
+							<div class="card-body">
+								<h5 class="card-title">
+									<a class="title-text title-link" href="#">기사 제목</a>
+								</h5>
+								<p class="card-text card-company no-nav">언론사</p>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div class="col-md-4 mb-3">
-					<div class="card h-100">
-						<img src="${CP}/resources/image/dis.jpg" class="card-img-top"
-							alt="화재 이미지" />
-						<div class="card-body">
-							<h5 class="card-title">화재 시 행동요령 안내</h5>
-							<p class="card-text">119 긴급 행동요령 숙지로 생명을 지키세요.</p>
+					<div class="news-rotator-wrap">
+						<!-- 화살표는 없지만 래퍼는 유지해도 OK -->
+						<div class="card h-100 news-rotator" data-feed="safety"
+							data-idx="0">
+							<img src="${CP}/resources/image/dis.jpg" class="card-img-top"
+								alt="화재 이미지" />
+							<div class="card-body">
+								<h5 class="card-title">
+									<a class="title-text title-link" href="#">기사 제목</a>
+								</h5>
+								<p class="card-text card-company no-nav">언론사</p>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div class="col-md-4 mb-3">
-					<div class="card h-100">
-						<img src="${CP}/resources/image/med.jpg" class="card-img-top"
-							alt="응급 이미지" />
-						<div class="card-body">
-							<h5 class="card-title">응급상황 대응 시스템 강화</h5>
-							<p class="card-text">최근 대응 시간 단축을 위한 시스템 개편 발표.</p>
+					<div class="news-rotator-wrap">
+						<!-- 위치 기준 -->
+						<div class="card h-100 news-rotator" data-feed="emergency"
+							data-idx="0">
+							<img src="${CP}/resources/image/med.jpg" class="card-img-top"
+								alt="응급 이미지">
+							<div class="card-body">
+								<h5 class="card-title">
+									<a class="title-text title-link" href="#">기사 제목</a>
+								</h5>
+								<p class="card-text card-company no-nav">언론사</p>
+							</div>
 						</div>
+
+						<button class="nav-outer next" aria-label="다음">›</button>
 					</div>
 				</div>
 			</div>
@@ -583,47 +806,186 @@ img.card-img-top {
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
-document.addEventListener("DOMContentLoaded", function(){
-  var CP='${CP}';
+  var CP='${CP}';  /* 전역 */
 
-  /* animate */
-  try{
-    var els=document.querySelectorAll(".animate-on-scroll");
-    var io=new IntersectionObserver(function(entries,obs){
-      entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add("backInUp"); obs.unobserve(en.target);} });
-    },{threshold:0.2});
-    els.forEach(function(el){ io.observe(el); });
-  }catch(e){}
+  document.addEventListener("DOMContentLoaded", function(){
 
-  /* refs */
-  var chatModalEl=document.getElementById('chatModal');
-  var chatModal=new bootstrap.Modal(chatModalEl,{backdrop:'static',keyboard:true});
-  var chatBody=document.getElementById('chatBody');
-  var chatInput=document.getElementById('chatInput');
-  var chatMinBtn=document.getElementById('chatMin');
+    /* ========= 애니메이션: 가장 먼저 세팅 ========= */
+    function initScrollAnimations(){
+      try{
+        const els = document.querySelectorAll('.animate-on-scroll:not(.animated)');
+        const io = new IntersectionObserver((entries, obs)=>{
+          entries.forEach(en=>{
+            if(en.isIntersecting){
+              en.target.classList.add('backInUp','animated'); // 중복 방지
+              obs.unobserve(en.target);
+            }
+          });
+        }, { threshold: 0.15 });
+        els.forEach(el => io.observe(el));
+        // 초기 진입 시 이미 보이는 요소 1회 처리
+        els.forEach(el=>{
+          const r = el.getBoundingClientRect();
+          if (r.top < window.innerHeight && r.bottom > 0) {
+            el.classList.add('backInUp','animated');
+          }
+        });
+      }catch(e){
+        document.querySelectorAll('.animate-on-scroll').forEach(el=>{
+          el.classList.add('backInUp','animated');
+        });
+      }
+    }
+    initScrollAnimations(); // ★ 최우선
+
+    /* ========= 뉴스: 서버 렌더 JSON만 사용 ========= */
+    // Controller에서 model.addAttribute("homeNewsJson", objectMapper.writeValueAsString(list));
+    // JSP에서 널이어도 안전하게 기본값 [] 주입
+    const HOME_NEWS = JSON.parse(
+  document.getElementById('homeNewsJson')?.textContent || '[]'
+);
+
+    const pickImg = (kw) => {
+      if(!kw) return CP+'/resources/image/news_default.jpg';
+      if(kw.includes('화재')) return CP+'/resources/image/dis.jpg';
+      if(kw.includes('지진')) return CP+'/resources/image/earth.jpg';
+      if(kw.includes('폭우') || kw.includes('홍수')) return CP+'/resources/image/rain.jpg';
+      if(kw.includes('풍랑') || kw.includes('태풍')) return CP+'/resources/image/wave.jpg';
+      return CP+'/resources/image/news_default.jpg';
+    };
+
+    const asList = Array.isArray(HOME_NEWS) ? HOME_NEWS : [];
+    const mapItem = (n) => ({
+      title: n.title || '(제목 없음)',
+      text : n.company || '',
+      img  : pickImg(n.keyword),
+      href : n.url || '#'
+    });
+
+    let newsData = {
+      breaking : asList.slice(0,3).map(mapItem),
+      safety   : asList.slice(3,6).map(mapItem),
+      emergency: asList.slice(6,9).map(mapItem)
+    };
+
+    const normIndex = (i,len)=>{ i%=len; return i<0? i+len : i; };
+
+    function renderNewsCard(card){
+    	  const feed = card.dataset.feed;
+    	  const list = newsData[feed] || [];
+    	  if(!list.length) return;
+    	  const idx = normIndex(parseInt(card.dataset.idx||'0',10), list.length);
+    	  card.dataset.idx = idx;
+
+    	  const item = list[idx];
+    	  const img   = card.querySelector('.card-img-top');
+    	  const title = card.querySelector('.title-text');    // <a class="title-text">
+    	  const desc  = card.querySelector('.card-text');     // 회사명 자리
+
+    	  if(img){ img.src = item.img; img.alt = item.title; }
+    	  if(title){
+    	    title.textContent = item.title || '(제목 없음)';
+    	    if (title.tagName === 'A') {
+    	      title.href = item.href || '#';
+    	      title.setAttribute('aria-label', item.title || '');
+    	      title.target = '_blank';
+    	      title.rel = 'noopener';
+    	    }
+    	  }
+    	  if(desc){
+    	    desc.textContent = item.text || '';
+    	    desc.classList.add('card-company'); // ← CSS로 클릭 비활성
+    	  }
+    	}
+
+    function stepCard(card, delta){
+      const feed = card.dataset.feed;
+      const len  = (newsData[feed]||[]).length;
+      if(!len) return;
+      const next = normIndex((parseInt(card.dataset.idx||'0',10) + delta), len);
+      card.dataset.idx = next;
+      card.classList.add('switching');
+      setTimeout(()=>{ renderNewsCard(card); card.classList.remove('switching'); }, 80);
+    }
+
+    function stepAll(delta){
+      document.querySelectorAll('.news-rotator').forEach((c)=> stepCard(c, delta));
+    }
+
+    function initRotators(){
+      const cards = document.querySelectorAll('.news-rotator');
+      cards.forEach((card, i) => {
+        if(!card.dataset.feed){
+          const feeds = ['breaking','safety','emergency'];
+          card.dataset.feed = feeds[i] || 'breaking';
+        }
+        card.dataset.idx = card.dataset.idx || '0';
+
+        const wrap = card.closest('.news-rotator-wrap') || card.closest('.news-col') || card.parentElement;
+        const prev = (wrap && wrap.querySelector('.nav-outer.prev')) || card.querySelector('.news-nav.prev');
+        const next = (wrap && wrap.querySelector('.nav-outer.next')) || card.querySelector('.news-nav.next');
+
+        if (prev) prev.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); stepAll(-1); });
+        if (next) next.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); stepAll(+1); });
+
+        renderNewsCard(card);
+      });
+    }
+
+    initRotators();
+    // 레이아웃 변동 시 애니메이션 재평가 1회
+    window.dispatchEvent(new Event('scroll'));
+  });
+
+  /* ========= 챗봇: 안전 가드 적용 ========= */
+  var chatModalEl = document.getElementById('chatModal');
+  var chatModal   = null;
+
+  function ensureModal(){
+    try{
+      if (chatModal) return true;
+      if (!chatModalEl) return false;
+      if (!window.bootstrap || !bootstrap.Modal) {
+        console.warn('bootstrap 모달이 아직 준비되지 않았습니다.');
+        return false;
+      }
+      chatModal = new bootstrap.Modal(chatModalEl, { backdrop:'static', keyboard:true });
+      return true;
+    }catch(e){
+      console.error('Modal 초기화 오류:', e);
+      return false;
+    }
+  }
+
+  var chatBody   = document.getElementById('chatBody');
+  var chatInput  = document.getElementById('chatInput');
+  var chatMinBtn = document.getElementById('chatMin');
 
   /* login → 네임스페이스 */
   var LOGIN_USER_NO_RAW=(document.body.dataset.loginUserNo||'').trim();
   var LOGIN_USER_NO=LOGIN_USER_NO_RAW===''?null:parseInt(LOGIN_USER_NO_RAW,10);
   var NS = (LOGIN_USER_NO!=null) ? ('U:'+LOGIN_USER_NO) : 'GUEST';
 
-  /* ===== 공용 오너 태그 & NS 유틸 ===== */
+  /* 오너/NS 유틸 */
   function nsKey(k){ return NS+'::'+k; }
   function ownerKey(sid){ return 'JM_OWNER_'+sid; }
   function setOwner(sid, owner){ try{ localStorage.setItem(ownerKey(sid), owner); }catch(_){ } }
   function getOwner(sid){ try{ return localStorage.getItem(ownerKey(sid)); }catch(_){ return null; } }
 
-  // 계정 전환 감지 → 내 NS의 활성 세션 초기화
+  var SESSION_ID = null;
+
   var LAST_NS = localStorage.getItem('JM_LAST_NS');
   if(LAST_NS !== NS){
     localStorage.removeItem(nsKey('X-Session-Id'));
+    SESSION_ID = null;
+    chatBody && (chatBody.innerHTML='');
   }
   localStorage.setItem('JM_LAST_NS', NS);
 
-  /* utils */
   function nowText(){ return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
   function escapeHtml(s){ return (s||'').replace(/[&<>\"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
   function appendBubble(text,who){
+    if(!chatBody) return;
     var d=document.createElement('div');
     d.className='chat-bubble '+(who==='bot'?'bot':'user');
     d.innerHTML=text+'<span class="chat-time">'+nowText()+'</span>';
@@ -631,16 +993,16 @@ document.addEventListener("DOMContentLoaded", function(){
   }
   function previewOf(t){ t=(String(t||'')).replace(/\s+/g,' ').trim(); return t.length>40?t.slice(0,40)+'…':t; }
 
-  /* session & cache — NS별로 완전 분리 */
-  var SESSION_ID=localStorage.getItem(nsKey('X-Session-Id'))||null;
-
+  if(SESSION_ID===null){
+    SESSION_ID = localStorage.getItem(nsKey('X-Session-Id'))||null;
+  }
   function getLocalSessions(){ try{ return JSON.parse(localStorage.getItem(nsKey('JM_SESSIONS'))||'[]'); }catch(e){ return []; } }
   function setLocalSessions(arr){ localStorage.setItem(nsKey('JM_SESSIONS'), JSON.stringify((arr||[]).slice(0,50))); }
   function addLocalSession(sid){
     if(!sid) return;
     var owner=getOwner(sid);
-    if(owner && owner!==NS) return;          // 다른 NS 소유 세션은 추가 금지
-    if(!owner) setOwner(sid, NS);            // 오너 미지정이면 내 것으로 태깅
+    if(owner && owner!==NS) return;
+    if(!owner) setOwner(sid, NS);
     var list=getLocalSessions().filter(function(x){ return x!==sid; });
     list.unshift(sid);
     setLocalSessions(list);
@@ -657,7 +1019,6 @@ document.addEventListener("DOMContentLoaded", function(){
     setOwner(newSid, NS);
   }
 
-  // 예전 섞인 목록 정리
   (function cleanupStrays(){
     try{
       var list=getLocalSessions();
@@ -666,11 +1027,12 @@ document.addEventListener("DOMContentLoaded", function(){
       var cur=localStorage.getItem(nsKey('X-Session-Id'));
       if(cur && getOwner(cur)!==NS){
         localStorage.removeItem(nsKey('X-Session-Id'));
+        SESSION_ID=null;
+        chatBody && (chatBody.innerHTML='');
       }
     }catch(_){}
   })();
 
-  /* dock */
   var dockEl=document.getElementById('historyDock');
   var dockHead=document.getElementById('historyHead');
   var dockBody=document.getElementById('historyBody');
@@ -721,7 +1083,6 @@ document.addEventListener("DOMContentLoaded", function(){
     if(!win){ location.href=url; }
   }
 
-  /* 삭제 */
   function removeLocalSession(sid){
     if(!sid) return;
     var list=getLocalSessions().filter(function(x){ return x!==sid; });
@@ -748,7 +1109,7 @@ document.addEventListener("DOMContentLoaded", function(){
         await openDockRoom(SESSION_ID);
       }else{
         localStorage.removeItem(nsKey('X-Session-Id'));
-        chatBody.innerHTML='';
+        chatBody && (chatBody.innerHTML='');
       }
     }
     await loadDockSessions();
@@ -756,6 +1117,7 @@ document.addEventListener("DOMContentLoaded", function(){
   }
 
   function renderDock(list){
+    if(!dockBody) return;
     dockBody.innerHTML='';
     if(!list||!list.length){
       var emp=document.createElement('div');
@@ -781,7 +1143,6 @@ document.addEventListener("DOMContentLoaded", function(){
         if(e.target && e.target.classList.contains('history-del')) return;
         e.stopPropagation();
         SESSION_ID=s.sessionId; localStorage.setItem(nsKey('X-Session-Id'),SESSION_ID);
-        // 오너 자동 세팅 제거(섞임 방지)
         openDockRoom(SESSION_ID).then(function(){
           Array.prototype.forEach.call(document.querySelectorAll('.history-item'),function(x){
             x.classList.toggle('active',x.dataset.sid===SESSION_ID);
@@ -808,10 +1169,10 @@ document.addEventListener("DOMContentLoaded", function(){
       try{
         var res=await fetch(CP+'/api/chat/sessions?limit=100',{headers:{'X-User-No':LOGIN_USER_NO}});
         if(res.ok){
-          var list=await res.json();
-          list = Array.isArray(list) ? list : [];
-          // 서버 목록은 필터 없이 모두 표시 + 로컬 오너 미지정이면 현재 NS로 태깅
-          list.forEach(function(s){ if(!getOwner(s.sessionId)) setOwner(s.sessionId, NS); });
+          var all=await res.json();
+          all = Array.isArray(all) ? all : [];
+          all.forEach(function(s){ if(!getOwner(s.sessionId)) setOwner(s.sessionId, NS); });
+          var list = all.filter(function(s){ return getOwner(s.sessionId) === NS; });
           renderDock(list.map(function(s){
             return {sessionId:s.sessionId,title:s.title||'새 대화',lastMsg:s.lastMsg||'',updatedAt:s.updatedAt||''};
           }));
@@ -819,14 +1180,14 @@ document.addEventListener("DOMContentLoaded", function(){
         }
       }catch(e){ console.warn('sessions api fallback(local)',e); }
     }
-    // 비회원(또는 서버 실패) → 로컬(NS) 목록
     var ids=getLocalSessions();
     renderDock(ids.map(function(id){ return {sessionId:id,title:'내 대화',lastMsg:'',updatedAt:''}; }));
   }
 
   function renderRowsAndCache(sid,rows){
     if(!Array.isArray(rows)||!rows.length) return false;
-    chatBody.innerHTML=''; var fresh=[];
+    chatBody.innerHTML='';
+    var fresh=[];
     rows.forEach(function(m){
       if(m.question && String(m.question).trim()!==''){
         var q=String(m.question);
@@ -845,35 +1206,43 @@ document.addEventListener("DOMContentLoaded", function(){
         fresh.push({role:role,text:t,ts:Date.now()});
       }
     });
-    chatBody.scrollTop=chatBody.scrollHeight; setLocalMsgs(sid,fresh); return true;
+    chatBody.scrollTop=chatBody.scrollHeight;
+    setLocalMsgs(sid,fresh);
+    return true;
   }
 
   async function openDockRoom(sid){
-    if(!sid) return; chatBody.innerHTML='';
-    var cached=getLocalMsgs(sid);
-    if(cached.length){
-      cached.forEach(function(m){
-        appendBubble(escapeHtml(m.text).replace(/\n/g,'<br>'), m.role==='bot'?'bot':'user');
-      });
-      chatBody.scrollTop=chatBody.scrollHeight;
+    if(!sid) return;
+
+    if (LOGIN_USER_NO != null) {
+      var o = getOwner(sid);
+      if (o && o !== NS) { chatBody.innerHTML=''; return; }
     }
-    var replaced=false;
+
+    chatBody.innerHTML='';
     if(LOGIN_USER_NO!=null){
       try{
-        var res=await fetch(CP+'/api/chat/sessions/'+encodeURIComponent(sid)+'/messages?limit=200',{headers:{'X-User-No':LOGIN_USER_NO}});
-        if(res.ok){ var rows=await res.json(); replaced=renderRowsAndCache(sid,rows); }
+        var res=await fetch(CP+'/api/chat/sessions/'+encodeURIComponent(sid)+'/messages?limit=200',
+                            {headers:{'X-User-No':LOGIN_USER_NO}});
+        if(res.ok){ var rows=await res.json(); renderRowsAndCache(sid,rows); }
       }catch(e){ console.warn('member history load failed',e); }
-    }
-    if(!replaced){
+    }else{
+      var cached=getLocalMsgs(sid);
+      if(cached.length){
+        cached.forEach(function(m){
+          appendBubble(escapeHtml(m.text).replace(/\n/g,'<br>'), m.role==='bot'?'bot':'user');
+        });
+        chatBody.scrollTop=chatBody.scrollHeight;
+      }
       try{
         var res2=await fetch(CP+'/api/chat/history?limit=200',{headers:{'X-Session-Id':sid}});
         if(res2.ok){ var rows2=await res2.json(); renderRowsAndCache(sid,rows2); }
       }catch(err){ console.error(err); }
     }
+
     applyBodyPadding();
   }
 
-  /* 현재 NS용 새 세션 확보(보내기 전에 보장) */
   async function ensureNewSidForNS(){
     try{
       var r=await fetch(CP+'/api/chat/sessions/new',{method:'POST', headers: (LOGIN_USER_NO!=null?{'X-User-No':LOGIN_USER_NO}:{})});
@@ -889,35 +1258,24 @@ document.addEventListener("DOMContentLoaded", function(){
     }
   }
 
-  /* + 새 대화: 기본=현재창, Alt/중클릭=팝업 */
   if (dockNew) {
     dockNew.addEventListener('click', async function (e) {
       e.stopPropagation();
-      if (e.altKey) {               // Alt+클릭 → 팝업
-        e.preventDefault();
-        return openInPopup();
-      }
-      await ensureNewSidForNS();    // 새 세션 발급
-      await loadDockSessions();     // 목록 갱신
-      await openDockRoom(SESSION_ID); // 새 방 열기
+      if (e.altKey) { e.preventDefault(); return openInPopup(); }
+      await ensureNewSidForNS();
+      await loadDockSessions();
+      await openDockRoom(SESSION_ID);
       dockEl.classList.remove('collapsed');
       setDockBelow(true);
     });
-    // 중클릭 → 팝업
     dockNew.addEventListener('mouseup', function (e) {
-      if (e.button === 1) {
-        e.preventDefault();
-        e.stopPropagation();
-        openInPopup();
-      }
+      if (e.button === 1) { e.preventDefault(); e.stopPropagation(); openInPopup(); }
     });
   }
 
-  /* send */
   async function sendMessage(){
     var text=document.getElementById('chatInput').value.trim(); if(!text) return;
 
-    // 현재 세션이 없거나 남의 NS 소유면 → 내 NS용 새 세션부터 생성
     if(!SESSION_ID || (getOwner(SESSION_ID) && getOwner(SESSION_ID)!==NS)){
       await ensureNewSidForNS();
     }
@@ -928,7 +1286,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
     try{
       var headers={'Content-Type':'application/json'};
-      if(SESSION_ID) headers['X-Session-Id']=SESSION_ID;
+      if(SESSION_ID && getOwner(SESSION_ID)===NS){ headers['X-Session-Id']=SESSION_ID; }
       if(LOGIN_USER_NO!=null) headers['X-User-No']=LOGIN_USER_NO;
 
       var prevSid=SESSION_ID;
@@ -936,13 +1294,10 @@ document.addEventListener("DOMContentLoaded", function(){
         method:'POST', headers:headers, body:JSON.stringify({question:text,userNo:LOGIN_USER_NO||undefined})
       });
 
-      // 서버가 다른 sid를 내려줘도, 오너가 내 NS가 아니면 무시
       var sid=res.headers.get('X-Session-Id');
       if(sid){
         var owner=getOwner(sid);
-        if(owner && owner!==NS){
-          // 추가하지 않음
-        }else{
+        if(!owner || owner===NS){
           if(!owner) setOwner(sid, NS);
           if(sid!==SESSION_ID){ migrateCache(prevSid,sid); SESSION_ID=sid; }
           localStorage.setItem(nsKey('X-Session-Id'),SESSION_ID);
@@ -966,8 +1321,8 @@ document.addEventListener("DOMContentLoaded", function(){
   document.getElementById('chatSend').addEventListener('click',sendMessage);
   document.getElementById('chatInput').addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } });
 
-  /* 모달 열릴 때 기본 '아래 모드' */
   chatModalEl.addEventListener('shown.bs.modal', async function(){
+    ensureModal();
     chatBody.scrollTop=chatBody.scrollHeight;
     await loadDockSessions();
     if(SESSION_ID) await openDockRoom(SESSION_ID);
@@ -975,21 +1330,28 @@ document.addEventListener("DOMContentLoaded", function(){
   });
 
   if(chatMinBtn){
-    chatMinBtn.addEventListener('click', function(e){ e.preventDefault(); chatModal.hide(); });
+    chatMinBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      if (!ensureModal()) return;
+      chatModal.hide();
+    });
   }
 
-  /* launcher */
   var iconEl=document.querySelector('.floating-icon');
   if(iconEl) iconEl.addEventListener('click',function(e){
-    e.preventDefault(); chatModal.show(); setTimeout(function(){ chatInput && chatInput.focus(); },200);
+    e.preventDefault();
+    if (!ensureModal()) return;
+    chatModal.show();
+    setTimeout(function(){ chatInput && chatInput.focus(); },200);
   });
 
-  /* popup (?popup=1&sid=...) */
   (async function initPopupIfNeeded(){
     const params=new URLSearchParams(location.search);
     const isPopup=params.get('popup')==='1';
     const sidParam=params.get('sid');
     if(!isPopup) return;
+
+    if (!ensureModal()) return;
     chatModal.show();
     setTimeout(function(){ chatInput && chatInput.focus(); },200);
     if(sidParam){
@@ -1002,8 +1364,6 @@ document.addEventListener("DOMContentLoaded", function(){
     }
     setDockBelow(true);
   })();
-
-});
 </script>
 </body>
 </html>

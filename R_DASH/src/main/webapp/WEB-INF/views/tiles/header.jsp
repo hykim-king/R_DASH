@@ -32,19 +32,19 @@
               <div class="collapse" id="navbar-dashboards">
                 <ul class="nav nav-sm flex-column">
                   <li class="nav-item">
-                    <a href="#" class="nav-link">
+                 <a href="${pageContext.request.contextPath}/map?layer=nowcast" class="nav-link">
                       <span class="sidenav-mini-icon"> 날씨 </span>
                       <span class="sidenav-normal"> 날씨 </span>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/map/landslide" class="nav-link">
                       <span class="sidenav-mini-icon"> 산사태 </span>
                       <span class="sidenav-normal"> 산사태 </span>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/map/sinkhole" class="nav-link">
                       <span class="sidenav-mini-icon"> 싱크홀 </span>
                       <span class="sidenav-normal"> 싱크홀 </span>
                     </a>

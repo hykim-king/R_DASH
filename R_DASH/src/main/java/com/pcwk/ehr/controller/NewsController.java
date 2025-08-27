@@ -152,7 +152,7 @@ public class NewsController {
 	    news.setKeyword(keyword);
 	    return service.searchByKeyword(news);
 	}
-    // JSON 반환용 -> AJAX fetch 호출
+     //JSON 반환용 -> AJAX fetch 호출
 //    @GetMapping(value = "/doRetrieve.do", produces = "application/json;charset=UTF-8")
 //    public List<NewsDTO> newsRetrieveJson(@RequestParam(defaultValue = "1") int pageNo,
 //                                          @RequestParam(defaultValue = "10") int pageSize) {
