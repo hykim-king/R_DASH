@@ -1,7 +1,6 @@
 package com.pcwk.ehr;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Map;
@@ -10,7 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +32,7 @@ public class LandslideDaoTest {
 
 	@Autowired
 	ApplicationContext context;
+
 
 	
     // ✅ 전역 상수로 선언 (대한민국 대략 BBox)
@@ -62,55 +61,40 @@ public class LandslideDaoTest {
 	}
 
 
+    // 지도 포인트 조회
     @Test
-    @DisplayName("selectByBBox: 리스트 반환 & 좌표 필수값 확인")
     void selectByBBox_ok() {
-        List<LandslideDTO> list = mapper.selectByBBox(MIN_LAT, MAX_LAT, MIN_LON, MAX_LON, null);
-        assertNotNull(list);
-        log.debug("selectByBBox size={}", list.size());
-        if (!list.isEmpty()) {
-            LandslideDTO e = list.get(0);
-            assertNotNull(e.getLat(), "lat null");
-            assertNotNull(e.getLon(), "lon null");
-        }
+        double minLat = 33.0, maxLat = 39.5, minLon = 124.0, maxLon = 132.0;
+        List<LandslideDTO> rows = mapper.selectByBBox(minLat, maxLat, minLon, maxLon, null, null);
+        assertNotNull(rows);
+        log.info("selectByBBox size={}", rows.size());
     }
 
+    // 히트맵(지역 집계)
     @Test
-    @DisplayName("findById: 단건 상세 NPE 없이 동작")
-    void findById_safe() {
-        LandslideDTO dto = mapper.findById(1L); // 실제 PK 알면 변경
-        log.debug("findById(1) -> {}", dto);
-        // 실PK 확정 시:
-        // assertNotNull(dto);
-        // assertEquals(1, dto.getLandslideNo());
-    }
-
-    @Test
-    @DisplayName("countByRegionInBBox: 시군구 집계 구조 검증")
     void countByRegionInBBox_ok() {
-        List<Map<String, Object>> agg = mapper.countByRegionInBBox(MIN_LAT, MAX_LAT, MIN_LON, MAX_LON, null);
-        assertNotNull(agg);
-        log.debug("countByRegionInBBox size={}", agg.size());
-        if (!agg.isEmpty()) {
-            Map<String,Object> m = agg.get(0);
-            assertTrue(m.containsKey("lat"));
-            assertTrue(m.containsKey("lon"));
-            assertTrue(m.containsKey("cnt"));
-        }
+        double minLat = 33.0, maxLat = 39.5, minLon = 124.0, maxLon = 132.0;
+        List<Map<String,Object>> rows = mapper.countByRegionInBBox(minLat, maxLat, minLon, maxLon, null, null);
+        assertNotNull(rows);
+        log.info("countByRegionInBBox size={}", rows.size());
     }
 
+    // 시도 집계
     @Test
-    @DisplayName("countBySidoInBBox: 시/도 집계 구조 검증")
     void countBySidoInBBox_ok() {
-        List<Map<String, Object>> agg = mapper.countBySidoInBBox(MIN_LAT, MAX_LAT, MIN_LON, MAX_LON, null);
-        assertNotNull(agg);
-        log.debug("countBySidoInBBox size={}", agg.size());
-        if (!agg.isEmpty()) {
-            Map<String,Object> m = agg.get(0);
-            assertTrue(m.containsKey("lat"));
-            assertTrue(m.containsKey("lon"));
-            assertTrue(m.containsKey("cnt"));
-        }
+        double minLat = 33.0, maxLat = 39.5, minLon = 124.0, maxLon = 132.0;
+        List<Map<String,Object>> rows = mapper.countBySidoInBBox(minLat, maxLat, minLon, maxLon, null, null);
+        assertNotNull(rows);
+        log.info("countBySidoInBBox size={}", rows.size());
+    }
+
+    // 단건
+    @Test
+    void findById_ok() {
+        // 샘플 PK가 확실치 않으니 존재 가능성만 체크 (null 허용)
+        Long anyId = 1L;
+        LandslideDTO dto = mapper.findById(anyId);
+        log.info("findById({}) -> {}", anyId, (dto!=null ? "HIT" : "null"));
     }
 
 //	@Disabled

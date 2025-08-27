@@ -85,7 +85,7 @@
 <body>
     <!-- Header -->
     <!-- Header -->
-    <div class="header bg-gradient-warning py-7 py-lg-8 pt-lg-9">
+    <div class="header bg-gradient-warning py-7 py-lg-6 pt-lg-6">
       <!-- Header container -->
       <div class="container-fluid d-flex align-items-center">
         <div class="row">

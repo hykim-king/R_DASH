@@ -5,9 +5,8 @@ import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.stereotype.Service;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.pcwk.ehr.domain.LandslideDTO;
 import com.pcwk.ehr.mapper.LandslideMapper;
@@ -20,31 +19,43 @@ public class LandslideServiceImpl implements LandslideService {
     @Autowired
     private LandslideMapper mapper;
 
+
+    private static double lo(double a, double b){ return Math.min(a,b); }
+    private static double hi(double a, double b){ return Math.max(a,b); }
+
     @Override
-    public List<LandslideDTO> getPoints(double minLat, double maxLat,
-                                        double minLon, double maxLon,
-                                        String q) {
-        log.debug("getPoints bbox=({},{} ~ {},{}), q={}", minLat, minLon, maxLat, maxLon, q);
-        return mapper.selectByBBox(minLat, maxLat, minLon, maxLon, q);
+    public List<Map<String, Object>> countByRegionInBBox(double minLat, double maxLat,
+        double minLon, double maxLon, String q, Integer year) {
+      return mapper.countByRegionInBBox(lo(minLat,maxLat), hi(minLat,maxLat),
+                                        lo(minLon,maxLon), hi(minLon,maxLon),
+                                        q, year);
     }
 
     @Override
-    public List<Map<String, Object>> getBubbles(double minLat, double maxLat,
-                                                double minLon, double maxLon,
-                                                String level, String q) {
-        log.debug("getBubbles level={}, bbox=({},{} ~ {},{}), q={}",
-                level, minLat, minLon, maxLat, maxLon, q);
-        if ("sido".equalsIgnoreCase(level)) {
-            return mapper.countBySidoInBBox(minLat, maxLat, minLon, maxLon, q);
-        }
-        return mapper.countByRegionInBBox(minLat, maxLat, minLon, maxLon, q);
+    public List<LandslideDTO> selectByBBox(double minLat, double maxLat,
+        double minLon, double maxLon, String q, Integer year) {
+      return mapper.selectByBBox(lo(minLat,maxLat), hi(minLat,maxLat),
+                                 lo(minLon,maxLon), hi(minLon,maxLon),
+                                 q, year);
     }
 
     @Override
-    public LandslideDTO getDetail(Long landslideNo) {
-        log.debug("getDetail id={}", landslideNo);
+    public List<Map<String, Object>> countBySidoInBBox(double minLat, double maxLat,
+        double minLon, double maxLon, String q, Integer year) {
+      return mapper.countBySidoInBBox(lo(minLat,maxLat), hi(minLat,maxLat),
+                                      lo(minLon,maxLon), hi(minLon,maxLon),
+                                      q, year);
+    }
+    @Override
+    public LandslideDTO findById(Long landslideNo) {
         return mapper.findById(landslideNo);
     }
+    
+    
+    
+    
+    
+    
     
     @Override
     public List<Map<String,Object>> getByYear() {

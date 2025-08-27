@@ -159,8 +159,8 @@ document.addEventListener('DOMContentLoaded', function(){
                                <tr>
                                   <th scope="col"></th>
                                   <th scope="col"></th>
-                                  <th scope="col">${msgs.count}</th>
-                                  <th scope="col">${msgs.rate}(%)</th>
+                                  <th scope="col" style="font-size:14px;">${msgs.count}</th>
+                                  <th scope="col" style="font-size:14px;">${msgs.rate}(%)</th>
                                </tr>
                             </thead>
                             <c:forEach var="word" items="${rate}" varStatus="status">
