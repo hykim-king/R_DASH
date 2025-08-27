@@ -22,6 +22,8 @@
     <typeAlias alias="TopicWordsDTO" type="com.pcwk.ehr.domain.TopicWordsDTO"/>
     <typeAlias alias="DustDTO" type="com.pcwk.ehr.domain.DustDTO"/>
     <typeAlias alias="ShelterDTO" type="com.pcwk.ehr.domain.ShelterDTO"/>
+    <typeAlias alias="FirestationDTO" type="com.pcwk.ehr.domain.FirestationDTO"/>
+    <typeAlias alias="NowcastDTO" type="com.pcwk.ehr.domain.NowcastDTO"/>
     
  </typeAliases>
  
