@@ -32,6 +32,7 @@ public class SinkholeController {
         return "ok";
     }
 
+
     // 1) 히트맵 포인트 (전체) : optional year/stateNm
     //   → SELECT LAT,LON,1 AS weight
     @GetMapping("/points/all")
@@ -103,7 +104,7 @@ public class SinkholeController {
 		return sinkholeService.getYearlyCounts();
 	}
 
-	@GetMapping("/signgu")
+	@GetMapping("/sido")
 	@ResponseBody
 	public List<Map<String, Object>> signguCounts() {
 		return sinkholeService.getSignguCounts();

@@ -35,7 +35,9 @@
 		    min-width: 300px;
             border-collapse: separate; /* border-radius 적용하려면 separate 필요 */
             border-spacing: 0;
-            background-color: #f9f9f9
+            background-color: #f9f9f9;
+            border: 1px solid #ccc;
+            border-radius: 10px;
 		}
 		
 		.topTable th {
@@ -226,7 +228,7 @@
 		<div class="row mb-6">
 		  <div class="col-md-6">
 			<h2>기온 Top5</h2>
-	        <table class="topTable" border="1">
+	        <table class="topTable">
 	            <thead>
 	                <tr>
 	                    <th>순위</th>
@@ -241,7 +243,7 @@
 	      </div>
 	      <div class="col-md-6">
 	        <h2>습도와 강수량 Top5</h2>
-	        <table class="topTable" border="1" >
+	        <table class="topTable">
 	            <thead>
 	                <tr>
 	                    <th>순위</th>
@@ -356,7 +358,7 @@
 		    <canvas id="yearlyChart"></canvas>
 		</div>
 		<div class="col-md-6 canvasContainer">
-            <canvas id="signguChart"></canvas>
+            <canvas id="sidoChart"></canvas>
         </div>
         
 	</div>
