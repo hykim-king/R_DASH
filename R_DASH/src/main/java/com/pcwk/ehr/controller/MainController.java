@@ -3,6 +3,8 @@ package com.pcwk.ehr.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +12,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.NewsDTO;
+import com.pcwk.ehr.domain.UserDTO;
 import com.pcwk.ehr.mapper.NewsMapper;
 
 @Controller
@@ -35,10 +39,16 @@ public class MainController {
 	 * 메인 화면 출력 URL: http://localhost:8080/ehr/home
 	 */
 	@GetMapping("/home")
-	public String home(Model model) {
+	public String home(Model model,
+			@SessionAttribute(value = "loginUser", required = false) com.pcwk.ehr.domain.UserDTO loginUser,
+			HttpServletResponse response) {
 		log.debug("┌─────────────────────┐");
 		log.debug("│ home() 메서드 실행  │");
 		log.debug("└─────────────────────┘");
+
+		// 캐시 방지(로그인 번호 비어 찍히는 문제 예방)
+		response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+		response.setHeader("Pragma", "no-cache");
 
 		// 오늘자(reg_dt) 최신 9건
 		SearchDTO s = new SearchDTO();
@@ -52,18 +62,26 @@ public class MainController {
 		String homeNewsJson = "[]";
 		try {
 			homeNewsJson = new ObjectMapper().writeValueAsString(homeNews);
-			// ★ 안전 보강: </script> 방지
 			homeNewsJson = homeNewsJson.replace("</", "<\\/");
 		} catch (JsonProcessingException e) {
-			log.error("homeNews JSON 직렬화 실패", e); // 실패해도 빈 배열로 내려가게
+			log.error("homeNews JSON 직렬화 실패", e);
+		}
+
+		// ★ 로그인 사용자 번호 바인딩
+		if (loginUser != null) {
+			model.addAttribute("loginUserNo", loginUser.getUserNo());
+			log.debug("loginUserNo in model: {}", loginUser.getUserNo());
+		} else {
+			model.addAttribute("loginUserNo", null);
+			log.debug("loginUserNo in model: null");
 		}
 
 		model.addAttribute("homeNews", homeNews);
 		model.addAttribute("homeNewsJson", homeNewsJson);
 		model.addAttribute("msg", "저희 재난 알림 사이트를 방문해주셔서 감사합니다.");
+
 		return "main/main";
 	}
-
 	/*
 	 * // ✅ 오늘자(reg_dt) 최신 9건
 	 * 
@@ -80,14 +98,19 @@ public class MainController {
 	 * 검색 처리 URL: http://localhost:8080/ehr/search?keyword=검색어
 	 */
 	@GetMapping("/search")
-	public String search(@RequestParam("keyword") String keyword, Model model) {
+	public String search(@RequestParam(value = "keyword", required = false) String keyword,
+			@SessionAttribute(value = "loginUser", required = false) UserDTO loginUser, Model model) {
 		log.debug("검색 요청 keyword: {}", keyword);
 
-		// 여기서 DB 검색 또는 API 연동 로직 수행
-		// 예: 검색어를 그대로 결과로 반환
-		model.addAttribute("keyword", keyword);
-		model.addAttribute("results", new ArrayList<>()); // 결과 리스트 넣기
+		if (loginUser != null)
+			model.addAttribute("loginUserNo", loginUser.getUserNo());
 
-		return "searchResults"; // /WEB-INF/views/searchResults.jsp
+		if (keyword == null || keyword.trim().isEmpty()) {
+			return "redirect:/home";
+		}
+
+		model.addAttribute("keyword", keyword.trim());
+		model.addAttribute("results", new ArrayList<>());
+		return "searchResults";
 	}
 }
