@@ -6,6 +6,7 @@
         SELECT 
 		  news_no,
 		  keyword,
+		  title,
 		  company,
 		  url,
 		  pub_dt AS pubDt,
