@@ -67,7 +67,7 @@ message.word.keyword=오늘의 키워드
 message.word.descript1=매일 100건의 재난 뉴스를 분석해 일일 단어 통계를 제공합니다.
 message.word.descript1=최신 재난 정보와 트렌드를 쉽게 확인해 보세요.
 message.word.count=빈도
-message.word.rate=증감율
+message.word.rate=전일대비
 
 #topic_word
 message.word.keyword=Today's keyword
