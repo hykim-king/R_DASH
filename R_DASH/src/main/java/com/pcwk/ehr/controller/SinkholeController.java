@@ -49,7 +49,7 @@ public class SinkholeController {
         return sinkholeService.getYearlyCounts();
     }
 
-    @GetMapping("/signgu")
+    @GetMapping("/sido")
     @ResponseBody
     public List<Map<String, Object>> signguCounts() {
         return sinkholeService.getSignguCounts();
