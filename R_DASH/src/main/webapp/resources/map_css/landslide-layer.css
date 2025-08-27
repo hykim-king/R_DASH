@@ -60,5 +60,66 @@
 
 
 
+
+
+
+
+/* ====== 지도 시각화 스타일 ====== */
 .heatmap-overlay{position:absolute; inset:0; pointer-events:none; z-index:20;}
 .heatmap-overlay canvas{border-radius:0; image-rendering:pixelated; opacity:.85;}
+/* 히트맵/포인트 범례 */
+/* 히트맵 범례 (원하면 지워도 됨) */
+#ls-legend{
+  position:absolute;
+  right:12px; bottom:12px; z-index:1000;
+  background:rgba(255,255,255,.92);
+  border-radius:12px;
+  padding:10px 12px;
+  box-shadow:0 10px 22px rgba(0,0,0,.14);
+  font:12px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
+  color:#111827;
+}
+
+
+/* 확대 프리셋 버튼 */
+.ls-zoom{
+  position:absolute;
+  right:12px;
+  bottom:95px;   /* 범례(#ls-legend) 위 */
+  z-index:1001;
+  display:flex; gap:8px;
+  background:rgba(255,255,255,.96);
+  border-radius:12px;
+  padding:8px;
+  box-shadow:0 10px 22px rgba(0,0,0,.12);
+}
+
+/* 지도 고정 안내 배지 */
+.ls-lock-badge{
+  position:absolute;
+  right:12px;
+  bottom:150px;   /* ✅ 버튼보다 더 위로 올림 */
+  z-index:1002;   /* 버튼보다 위에 표시되도록 z-index도 더 높게 */
+  background:rgba(59,130,246,.95);
+  border-radius:10px;
+  padding:4px 8px;
+  color:#fff;
+  font:600 12px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
+  box-shadow:0 4px 12px rgba(0,0,0,.15);
+}
+
+/* 프리셋 버튼 */
+.ls-zoom__btn{
+  padding:6px 10px;
+  border-radius:10px;
+  border:1px solid #e5e7eb;
+  background:#fff;
+  color:#111827;
+  cursor:pointer;
+  font-weight:700;
+}
+.ls-zoom__btn.is-active{
+  background:#111827;
+  color:#fff;
+  border-color:#111827;
+}

@@ -44,7 +44,7 @@
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="${pageContext.request.contextPath}/map/sinkhole" class="nav-link">
                       <span class="sidenav-mini-icon"> 싱크홀 </span>
                       <span class="sidenav-normal"> 싱크홀 </span>
                     </a>
