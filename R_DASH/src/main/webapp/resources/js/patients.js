@@ -74,6 +74,14 @@ $(document).ready(function() {
                                     weight: 'bold'
                                 },
                                 color: '#333'          // 글자 색
+                            },
+                            datalabels: {
+                            anchor: "end",   // 데이터 레이블 위치
+                            align: "top",    // 막대 위쪽에 표시
+                            color: "black",  // 글자색
+                            font: {
+                            weight: "bold"
+                                }
                             }
                         },
                         scales: {
@@ -86,7 +94,8 @@ $(document).ready(function() {
                                     }  
                                 }
                         }
-                    }
+                    },
+                    plugins: [ChartDataLabels]
                 });
                 
                 // 실내/실외 소계 차트
@@ -126,7 +135,8 @@ $(document).ready(function() {
                                     }  
                                 }
                         }
-                    }
+                    },
+                    plugins: [ChartDataLabels]
                 });
             }
         });

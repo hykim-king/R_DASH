@@ -34,6 +34,15 @@ $(document).ready(function() {
                                     weight: 'bold'
                                 },
                                 color: '#333' 
+                            },
+                            datalabels: {
+                            anchor: "end",   // 데이터 레이블 위치
+                            align: "top",    // 막대 위쪽에 표시
+                            color: "black",  // 글자색
+                            font: {
+                            weight: "bold",
+                            size: 16
+                                }
                             }
                         },
                     scales: {
@@ -45,7 +54,8 @@ $(document).ready(function() {
                                 }  
                             }
                     }
-                 }
+                 },
+                plugins: [ChartDataLabels]
             });
         }
     });
@@ -79,6 +89,14 @@ $(document).ready(function() {
                                     weight: 'bold'
                                 },
                                 color: '#333' 
+                            },
+                            datalabels: {
+                            anchor: "end",   // 데이터 레이블 위치
+                            align: "top",    // 막대 위쪽에 표시
+                            color: "black",  // 글자색
+                            font: {
+                            weight: "bold"
+                                }
                             }
                         },
                     scales: {
@@ -90,7 +108,8 @@ $(document).ready(function() {
                                 }  
                             }
                     }
-                 }
+                 },
+                plugins: [ChartDataLabels]
             });
         }
     });
@@ -124,6 +143,14 @@ $(document).ready(function() {
                                     weight: 'bold'
                                 },
                                 color: '#333' 
+                            },
+                            datalabels: {
+                            anchor: "end",   // 데이터 레이블 위치
+                            align: "top",    // 막대 위쪽에 표시
+                            color: "black",  // 글자색
+                            font: {
+                            weight: "bold"
+                                }
                             }
                         },
                   scales: {
@@ -135,7 +162,8 @@ $(document).ready(function() {
                             }
                         }
                     }
-                 }
+                 },
+                plugins: [ChartDataLabels]
             });
         }
     });
@@ -170,6 +198,15 @@ $(document).ready(function() {
                                     weight: 'bold'
                                 },
                                 color: '#333' 
+                            },
+                            datalabels: {
+                            anchor: "end",   // 데이터 레이블 위치
+                            align: "end",    // 막대 오른쪽에 표시
+                            color: "black",  // 글자색
+                            font: {
+                            weight: "bold",
+                            size: 16
+                                }
                             }
                         },
                   scales: {
@@ -180,7 +217,9 @@ $(document).ready(function() {
                               color: 'transparent'
                           }
                       }
-                  }}
+                  }
+                },
+                plugins: [ChartDataLabels]
             });
         }
     });

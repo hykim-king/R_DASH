@@ -7,18 +7,15 @@ import com.pcwk.ehr.domain.LandslideDTO;
 
 public interface LandslideService {
 
-    /** BBox 내 포인트(단건) 목록 */
-    List<LandslideDTO> getPoints(double minLat, double maxLat,
-                                 double minLon, double maxLon,
-                                 String q);
+	List<Map<String, Object>> countByRegionInBBox(double minLat, double maxLat, double minLon, double maxLon, String q,
+			Integer year);
 
-    /** 버블 집계 (level=sgg|sido) */
-    List<Map<String, Object>> getBubbles(double minLat, double maxLat,
-                                         double minLon, double maxLon,
-                                         String level, String q);
+	List<LandslideDTO> selectByBBox(double minLat, double maxLat, double minLon, double maxLon, String q, Integer year);
 
-    /** 단건 상세 */
-    LandslideDTO getDetail(Long landslideNo);
+	List<Map<String, Object>> countBySidoInBBox(double minLat, double maxLat, double minLon, double maxLon, String q,
+			Integer year);
+
+	LandslideDTO findById(Long landslideNo);
 
 	List<Map<String, Object>> getByYear();
 

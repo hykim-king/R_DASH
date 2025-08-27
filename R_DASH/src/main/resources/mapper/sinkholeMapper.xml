@@ -3,37 +3,88 @@
     "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pcwk.ehr.mapper.SinkholeMapper">
 
-  <select id="selectAll" resultType="com.pcwk.ehr.domain.SinkholeDTO">
-    SELECT SINKHOLE_NO AS sinkholeNo, SIDO_NM AS sidoNm, SIGNGU_NM AS signguNm,
-           LAT, LON, TO_CHAR(OCCUR_DT,'YYYY-MM-DD') AS occurDt, STATE_NM AS stateNm
+
+
+  <!-- 1) 히트맵 포인트(전체) -->
+  <select id="selectAllPoints" resultType="map">
+    SELECT
+      LAT AS lat,
+      LON AS lon,
+      1   AS weight
     FROM SINKHOLE
-    ORDER BY OCCUR_DT DESC, SINKHOLE_NO DESC
+    WHERE LAT IS NOT NULL
+      AND LON IS NOT NULL
+    <if test="stateNm != null and stateNm != ''">
+      AND "STATE NM" = #{stateNm}
+    </if>
+    <if test="year != null and year != ''">
+      AND "OCCUR DT" &gt;= TO_DATE(#{year} || '0101','YYYYMMDD')
+      AND "OCCUR DT" &lt;  ADD_MONTHS(TO_DATE(#{year} || '0101','YYYYMMDD'), 12)
+    </if>
   </select>
 
-  <select id="selectByBBox" resultType="com.pcwk.ehr.domain.SinkholeDTO">
-    SELECT SINKHOLE_NO AS sinkholeNo, SIDO_NM AS sidoNm, SIGNGU_NM AS signguNm,
-           LAT, LON, TO_CHAR(OCCUR_DT,'YYYY-MM-DD') AS occurDt, STATE_NM AS stateNm
+  <!-- 2) 히트맵 포인트(BBox, 최대 5000) -->
+  <select id="selectPointsByBBox" resultType="com.pcwk.ehr.domain.SinkholeDTO">
+    SELECT LAT AS lat, LON AS lon
     FROM SINKHOLE
     WHERE LAT BETWEEN #{minLat} AND #{maxLat}
       AND LON BETWEEN #{minLon} AND #{maxLon}
-    ORDER BY OCCUR_DT DESC, SINKHOLE_NO DESC
+    <if test="stateNm != null and stateNm != ''">
+      AND "STATE NM" = #{stateNm}
+    </if>
+    <if test="year != null and year != ''">
+      AND "OCCUR DT" &gt;= TO_DATE(#{year} || '0101','YYYYMMDD')
+      AND "OCCUR DT" &lt;  ADD_MONTHS(TO_DATE(#{year} || '0101','YYYYMMDD'), 12)
+    </if>
+    FETCH FIRST 5000 ROWS ONLY
   </select>
 
-  <select id="findById" resultType="com.pcwk.ehr.domain.SinkholeDTO">
-    SELECT SINKHOLE_NO AS sinkholeNo, SIDO_NM AS sidoNm, SIGNGU_NM AS signguNm,
-           LAT, LON, TO_CHAR(OCCUR_DT,'YYYY-MM-DD') AS occurDt, STATE_NM AS stateNm
+  <!-- 3) 버블: 시/군/구 중심(평균 위경도) + 건수 -->
+  <select id="selectBubbleStats" resultType="com.pcwk.ehr.domain.SinkholeDTO">
+    SELECT
+      "SIDO NM"   AS sidoNm,
+      "SIGNGU NM" AS signguNm,
+      COUNT(*)    AS holeCount,
+      AVG(LAT)    AS lat,
+      AVG(LON)    AS lon
     FROM SINKHOLE
-    WHERE SINKHOLE_NO = #{sinkholeNo}
+    <where>
+      <if test="sido != null and sido != ''">
+        AND "SIDO NM" = #{sido}
+      </if>
+      <if test="stateNm != null and stateNm != ''">
+        AND "STATE NM" = #{stateNm}
+      </if>
+      <if test="year != null and year != ''">
+        AND "OCCUR DT" &gt;= TO_DATE(#{year} || '0101','YYYYMMDD')
+        AND "OCCUR DT" &lt;  ADD_MONTHS(TO_DATE(#{year} || '0101','YYYYMMDD'), 12)
+      </if>
+    </where>
+    GROUP BY "SIDO NM", "SIGNGU NM"
+    ORDER BY holeCount DESC
   </select>
 
-  <select id="countByState" resultType="map">
-    SELECT NVL(STATE_NM, 'UNKNOWN') AS STATE_NM,
-           COUNT(*)                 AS CNT
+  <!-- 4) 버블: BBox 격자(ROUND) 집계 -->
+  <select id="selectBubblesByBBox" resultType="com.pcwk.ehr.domain.SinkholeDTO">
+    SELECT
+      ROUND(LAT, #{round}) AS lat,
+      ROUND(LON, #{round}) AS lon,
+      COUNT(*)             AS holeCount
     FROM SINKHOLE
-    GROUP BY STATE_NM
-    ORDER BY CNT DESC
+    WHERE LAT BETWEEN #{minLat} AND #{maxLat}
+      AND LON BETWEEN #{minLon} AND #{maxLon}
+    <if test="stateNm != null and stateNm != ''">
+      AND "STATE NM" = #{stateNm}
+    </if>
+    <if test="year != null and year != ''">
+      AND "OCCUR DT" &gt;= TO_DATE(#{year} || '0101','YYYYMMDD')
+      AND "OCCUR DT" &lt;  ADD_MONTHS(TO_DATE(#{year} || '0101','YYYYMMDD'), 12)
+    </if>
+    GROUP BY ROUND(LAT, #{round}), ROUND(LON, #{round})
+    ORDER BY holeCount DESC
   </select>
-  
+
+  <!-- 통계용 -->
   <!-- 년도별 발생 횟수 -->
   <select id="selectYearlyCounts" resultType="map">
     SELECT
@@ -75,5 +126,4 @@
     GROUP BY TO_CHAR(OCCUR_DT, 'YYYY')
     ORDER BY YEAR
   </select>
-
 </mapper>

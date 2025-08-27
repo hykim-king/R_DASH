@@ -29,109 +29,66 @@
     <result property="lon"         column="LON"/>
   </resultMap>
 
-  <!-- =========================================================
-       1) BBox 내 포인트(단건) 목록 조회
-       파라미터: minLat, maxLat, minLon, maxLon, q
-       정렬: 발생일시 최신순 -> PK 역순
-       ========================================================= -->
-  <select id="selectByBBox" resultMap="LandslideResultMap">
-    SELECT
-           L.LANDSLIDE_NO,
-           L.LND_APNT_CD,
-           L.LND_APNT_NM,
-           L.LND_APNT_STTS,
-           L.LND_APNT_DT,
-           L.LND_INST_NM,
-           L.LAT,
-           L.LON
-      FROM LANDSLIDE L
-     WHERE L.LAT BETWEEN #{minLat} AND #{maxLat}
-       AND L.LON BETWEEN #{minLon} AND #{maxLon}
+  <!-- 공통 조건 -->
+  <sql id="bboxCond">
+    LAT BETWEEN #{minLat} AND #{maxLat}
+    AND LON BETWEEN #{minLon} AND #{maxLon}
+  </sql>
+
+  <sql id="qCond">
     <if test="q != null and q != ''">
-       AND (
-            L.LND_INST_NM   LIKE '%' || #{q} || '%'
-         OR L.LND_APNT_NM   LIKE '%' || #{q} || '%'
-         OR L.LND_APNT_STTS LIKE '%' || #{q} || '%'
-       )
+      AND (LND_INST_NM LIKE '%' || #{q} || '%')
     </if>
-     ORDER BY L.LND_APNT_DT DESC NULLS LAST,
-              L.LANDSLIDE_NO DESC
-  </select>
+  </sql>
 
-  <!-- =========================================================
-       2) 단건 상세
-       파라미터: landslideNo
-       ========================================================= -->
-  <select id="findById" resultMap="LandslideResultMap">
-    SELECT
-           L.LANDSLIDE_NO,
-           L.LND_APNT_CD,
-           L.LND_APNT_NM,
-           L.LND_APNT_STTS,
-           L.LND_APNT_DT,
-           L.LND_INST_NM,
-           L.LAT,
-           L.LON
-      FROM LANDSLIDE L
-     WHERE L.LANDSLIDE_NO = #{landslideNo}
-  </select>
+  <!-- LND_APNT_DT가 VARCHAR2(19)이므로 SUBSTR로 연도 매칭 -->
+  <sql id="yearCond">
+    <if test="year != null">
+      AND SUBSTR(LND_APNT_DT,1,4) = TO_CHAR(#{year,jdbcType=INTEGER})
+    </if>
+  </sql>
 
-  <!-- =========================================================
-       3) BBox 내 "시군구/지역명" 집계 (버블용)
-       - 행정구역 보조테이블 없이 LND_INST_NM 기준 그룹핑
-       - 버블 좌표: 해당 그룹 포인트의 평균 좌표(간이 중심)
-       반환 키(따옴표 alias로 Map 키 고정):
-         "regionName", "lat", "lon", "cnt"
-       ========================================================= -->
+  <!-- 히트맵/버블용 집계 (기관 위치 단위) -->
   <select id="countByRegionInBBox" resultType="map">
     SELECT
-           L.LND_INST_NM        AS "regionName",
-           AVG(L.LAT)           AS "lat",
-           AVG(L.LON)           AS "lon",
-           COUNT(*)             AS "cnt"
-      FROM LANDSLIDE L
-     WHERE L.LAT BETWEEN #{minLat} AND #{maxLat}
-       AND L.LON BETWEEN #{minLon} AND #{maxLon}
-    <if test="q != null and q != ''">
-       AND (
-            L.LND_INST_NM   LIKE '%' || #{q} || '%'
-         OR L.LND_APNT_NM   LIKE '%' || #{q} || '%'
-         OR L.LND_APNT_STTS LIKE '%' || #{q} || '%'
-       )
-    </if>
-     GROUP BY L.LND_INST_NM
-     ORDER BY "cnt" DESC, "regionName"
+      LND_INST_NM AS name,
+      LAT         AS lat,
+      LON         AS lon,
+      COUNT(*)    AS cnt
+    FROM LANDSLIDE
+    WHERE <include refid="bboxCond"/>
+      <include refid="qCond"/>
+      <include refid="yearCond"/>
+    GROUP BY LND_INST_NM, LAT, LON
   </select>
 
-  <!-- =========================================================
-       4) BBox 내 "시/도" 집계 (줌아웃 버블)
-       - 지역명 규칙에 맞춰 상위 행정구역만 추출
-       - 예: '강원특별자치도 강릉시' 형태면 SUBSTR/REGEXP으로 앞부분만
-       - 아래 예시는 간단히 첫 두 글자를 시/도로 가정(프로젝트 규칙에 맞게 수정)
-       반환 키:
-         "sidoNm", "lat", "lon", "cnt"
-       ========================================================= -->
+  <!-- 원시 포인트(마커/클러스터) -->
+  <select id="selectByBBox" resultMap="LandslideResultMap">
+    SELECT
+      LANDSLIDE_NO,
+      LND_APNT_CD, LND_APNT_NM, LND_APNT_STTS, LND_APNT_DT,
+      LND_INST_NM, LAT, LON
+    FROM LANDSLIDE
+    WHERE <include refid="bboxCond"/>
+      <include refid="qCond"/>
+      <include refid="yearCond"/>
+  </select>
+
+  <!-- 시·도 집계 -->
   <select id="countBySidoInBBox" resultType="map">
     SELECT
-           /* 👇 실제 명명 규칙에 맞게 교체 권장 */
-           SUBSTR(L.LND_INST_NM, 1, 2) AS "sidoNm",
-           AVG(L.LAT)                  AS "lat",
-           AVG(L.LON)                  AS "lon",
-           COUNT(*)                    AS "cnt"
-      FROM LANDSLIDE L
-     WHERE L.LAT BETWEEN #{minLat} AND #{maxLat}
-       AND L.LON BETWEEN #{minLon} AND #{maxLon}
-    <if test="q != null and q != ''">
-       AND (
-            L.LND_INST_NM   LIKE '%' || #{q} || '%'
-         OR L.LND_APNT_NM   LIKE '%' || #{q} || '%'
-         OR L.LND_APNT_STTS LIKE '%' || #{q} || '%'
-       )
-    </if>
-     GROUP BY SUBSTR(L.LND_INST_NM, 1, 2)
-     ORDER BY "cnt" DESC, "sidoNm"
+      REGEXP_SUBSTR(LND_INST_NM, '^[^ ]+') AS sido,
+      COUNT(*) AS cnt
+    FROM LANDSLIDE
+    WHERE <include refid="bboxCond"/>
+      <include refid="qCond"/>
+      <include refid="yearCond"/>
+    GROUP BY REGEXP_SUBSTR(LND_INST_NM, '^[^ ]+')
   </select>
 
+
+ 
+    
     
      <!-- 년도별 통계 -->
     <select id="selectByYear" resultType="map">
@@ -143,7 +100,7 @@
         ORDER BY year
     </select>
 
-    <!-- 지역별 통계 -->
+ <!-- 지역별 통계 -->
     <select id="selectByRegion" resultType="map">
         SELECT 
 		    NVL(SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1), LND_INST_NM) AS region,
@@ -156,11 +113,11 @@
     <!-- 월별 통계 -->
     <select id="selectByMonth" resultType="map">
         SELECT 
-		    TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM') AS month,
-		    COUNT(*) AS total_count
-		FROM LANDSLIDE
-		GROUP BY TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM')
-		ORDER BY month
+            TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM') AS month,
+            COUNT(*) AS total_count
+        FROM LANDSLIDE
+        GROUP BY TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM')
+        ORDER BY month
     </select>
 
     <!-- 주의보/경보 등 예보 상태별 통계 -->

@@ -15,6 +15,9 @@ public class SinkholeDTO extends DTO{
 	private String  stateNm       ;	//복구완료일자
 	private String  compltDt      ;	//지하침하정보(싱크롤)
 	
+    // ✅ 집계 전용 필드 (버블맵용)
+    private Integer holeCount;  // 발생 건수
+	
 	public SinkholeDTO() {
 	}
 
@@ -188,11 +191,28 @@ public class SinkholeDTO extends DTO{
 		this.compltDt = compltDt;
 	}
 
-	@Override
-	public String toString() {
-		return "Sinkhole [sinkholeNo=" + sinkholeNo + ", sidoNm=" + sidoNm + ", signguNm=" + signguNm + ", lat=" + lat
-				+ ", lon=" + lon + ", occurDt=" + occurDt + ", dprsCnt=" + dprsCnt + ", injpsnCnt=" + injpsnCnt
-				+ ", vehcleCnt=" + vehcleCnt + ", stateNm=" + stateNm + ", compltDt=" + compltDt + "]";
-	}
+	
+	  // getter / setter
+    public Integer getHoleCount() { return holeCount; }
+    public void setHoleCount(Integer holeCount) { this.holeCount = holeCount; }
+    
+    
+    @Override
+    public String toString() {
+        return "SinkholeDTO{" +
+                "sinkholeNo=" + sinkholeNo +
+                ", sidoNm='" + sidoNm + '\'' +
+                ", signguNm='" + signguNm + '\'' +
+                ", lat=" + lat +
+                ", lon=" + lon +
+                ", occurDt='" + occurDt + '\'' +
+                ", dprsCnt=" + dprsCnt +
+                ", injpsnCnt=" + injpsnCnt +
+                ", vehcleCnt=" + vehcleCnt +
+                ", stateNm='" + stateNm + '\'' +
+                ", compltDt='" + compltDt + '\'' +
+                ", holeCount=" + holeCount +
+                '}';
+    }
 
 }

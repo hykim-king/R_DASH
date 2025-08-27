@@ -2,9 +2,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%
-    UserDTO loginUser = (UserDTO) session.getAttribute("loginUser");
-%>
+<% UserDTO loginUser = (UserDTO) session.getAttribute("loginUser"); %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -44,7 +42,7 @@
             background-color: #4CAF50;
 		    color: white;
 		    padding: 10px;
-		    text-align: center;
+		    text-align: center !important;
 		    font-size: 16px;
 		    border-bottom: 2px solid #3e8e41;
         }
@@ -84,6 +82,12 @@
             font-size: 18px;
             font-weight: bold;
         }
+        
+        .card-body {
+		  padding: 0; /* 카드 바디 패딩 제거 */
+		  height: 100%;
+		}
+        
         .very-bad { background-color: #e74c3c !important; color: black; }
         .bad { background-color: #f39c12 !important; color: black; }
         .normal { background-color: #d0fb50 !important; color: black; }
@@ -162,7 +166,18 @@
 		  border-radius: 5px;
 		  padding: 4px;
 		}
-
+    
+        .WarningCard {
+		  display: inline-block;
+	      padding: 20px;
+	      margin-top: 30px;
+	      margin-bottom: 30px;
+	      border-radius: 8px;
+	      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+	      font-size: 18px;
+	      font-weight: bold;
+		}
+        
 		
     </style>
 </head>
@@ -269,7 +284,7 @@
 		  <div class="row">
 		    <div class="col-12">
 		      <h2>시/군/구별 소방서 개수</h2>
-		      <table id="firestationTable" class="table table-bordered display">
+		      <table id="firestationTable" class="table table-bordered display topTable">
 		        <thead>
 		          <tr>
 		            <th>지역</th>
@@ -287,9 +302,27 @@
     </c:when>
     <c:when test="${type == 'dust'}">
         <div class="row mb-6">
-            <div class="col-md-12">
+            <div class="col-md-6">
 	           <div id="avgCard" class="card"></div>
 	        </div>
+	        <div class="col-md-6">
+	           <div class="good WarningCard">
+                <div class="title">좋음</div>
+		        <div class="range">0 ≤ 30</div>
+              </div>
+              <div class="normal WarningCard">
+                <div class="title">보통</div>
+		        <div class="range">31 ≤ 80</div>
+              </div>
+		      <div class="bad WarningCard">
+		        <div class="title">나쁨</div>
+                <div class="range">80 ≤ 150</div>
+		      </div>
+			  <div class="very-bad WarningCard">
+		        <div class="title">매우 나쁨</div>
+                <div class="range">150 초과 </div>
+		      </div>
+			</div>
 	    </div>
 	    <div class="row mb-6">
             <div class="col-md-6">
