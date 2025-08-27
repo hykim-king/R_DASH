@@ -56,6 +56,9 @@ document.addEventListener('DOMContentLoaded', function(){
     
     //언어 선택
     const langSelect = document.querySelector("#lang");
+    const currentLang = "${empty lang ? 'ko' : lang}";
+    langSelect.value = currentLang;  // selected 반영
+    
     //조회버튼
     const moveToRegBtn =document.querySelector("#moveToReg");
     console.log(moveToRegBtn);
@@ -100,7 +103,7 @@ function pagerDoRetrieve(url, pageNo){
 }
 //공지사항 검색
 function search(){
-	const selectDiv = document.querySelector('#selectDivButton').dataset.value;
+	const selectDiv = document.querySelector('#selectDivButton').value;
     const searchWord = document.querySelector('#searchWord').value;
     const pageNo = document.querySelector('#pageNo').value;
     const lang = document.querySelector('#lang').value;
@@ -117,15 +120,15 @@ function selectDiv(div){
     const searchWord = document.querySelector('#searchWord');
     
     if(div===10){
-        selectDivButton.innerText = '제목';
+        selectDivButton.innerText = '${msgs.title}';
         selectDivButton.value=div;
         searchWord.disabled = false;
     }else if(div === 20){
-        selectDivButton.innerText = '내용';
+        selectDivButton.innerText = '${msgs.contents}';
         selectDivButton.value=div;
         searchWord.disabled = false;
     }else{
-        selectDivButton.innerText = '전체';
+        selectDivButton.innerText = '${msgs.all}';
         selectDivButton.value='';
         searchWord.disabled = false;  
     }
@@ -157,28 +160,12 @@ span {
 </head>
 <body>
 <div class="main-content">
-    <div class="form-group">
-	    <label for="lang"></label>
-	    <select id="lang" name="lang">
-	        <c:choose>
-	            <c:when test="${lang == 'ko'}">
-	                <option value="ko" selected>KO</option>
-	                <option value="en">EN</option>
-	            </c:when>
-	            <c:when test="${lang == 'en'}">
-	                <option value="ko">KO</option>
-	                <option value="en" selected>EN</option>
-	            </c:when>
-	            <c:otherwise>
-	                <option value="ko">KO</option>
-	                <option value="en">EN</option>
-	            </c:otherwise>
-	        </c:choose>
-	    </select>
-	</div>
-	
 	<!-- header2 -->
 	<div class="header bg-warning pb-6 header bg-gradient-warning py-5 py-lg-6 pt-lg-6">
+     <%--  <select id="lang" name="lang">
+            <option value="ko" ${lang eq 'ko' ? 'selected' : ''}>KO</option>
+            <option value="en" ${lang eq 'en' ? 'selected' : ''}>EN</option>
+        </select> --%>	
       <!-- Header container -->
       <div class="container-fluid d-flex align-items-center">
         <div class="row">
@@ -224,8 +211,11 @@ span {
                 <input type="hidden" id="searchDivValue" value="${search.searchDiv}">
 		        <input type="text" class="form-control" id="searchWord" name="searchWord">
                 <input type="hidden"id="pageNo" name="pageNo" value="${search.pageNo != 0 ? search.pageNo : 1}">  
-                <button type="button" id="searchButton" onclick="javascript:search()" class="btn btn-default text-nowrap" style="margin-left:10px">검색</button>
-                <button type="button" id="moveToReg" class="btn btn-default text-nowrap" style="margin-left:3px">등록</button>
+                <button type="button" id="searchButton" onclick="javascript:search()" class="btn btn-default text-nowrap" style="margin-left:10px">${msgs.search}</button>
+                <!-- 관리자일 경우에만 등록 가능 -->
+                <c:if test="${sessionScope.loginUser.role =='1'  }">
+                  <button type="button" id="moveToReg" class="btn btn-default text-nowrap" style="margin-left:3px">${msgs.reg}</button>
+                </c:if>
               </div>
             </div>   
     <!-- //Page content -->
@@ -253,10 +243,11 @@ span {
 			                  <tr>
 			                    <td ><c:out value="${vo.no}"/></td>
 			                    <td >
-				                    <div class="media-body">
-				                    
+				                    <div class="media-body" style="text-align: left; margin-left: 100px;">
 					                    <span class="name mb-0 text-sm">
-					                    <a href="/ehr/board/doSelectOne.do?boardNo=${vo.boardNo}"><c:out value="${vo.title }"/></a>
+					                    <a href="/ehr/board/doSelectOne.do?boardNo=${vo.boardNo}">
+					                      <c:out value="${vo.title }"/>
+					                    </a>
 					                    </span>
 				                    </div>
 			                    </td>
@@ -269,7 +260,7 @@ span {
 			            </c:when>
 			            <c:otherwise>    <!-- else -->
 			                <tr>
-			                   <td colspan="99">등록된 게시글이 없습니다.</td> 
+			                   <td colspan="99">${msgs.noBoard}</td> 
 			                </tr>
 			            </c:otherwise>
 			          </c:choose>

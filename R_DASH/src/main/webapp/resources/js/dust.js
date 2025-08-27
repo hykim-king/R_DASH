@@ -7,16 +7,52 @@ function getGrade(pm10) {
 }
 
 $(document).ready(function() {
-    // 평균 PM10
-    $.ajax({
-        url: "/ehr/dust/dust-avg",
-        method: "GET",
-        success: function(avg) {
-            const grade = getGrade(avg);
-            $("#avgCard").text(`현재 평균 PM10: ${avg} (${grade.text})`);
-            $("#avgCard").addClass(grade.className);
-        }
-    });
+    // 사용자 주소 (세션에서 내려준 값)
+    let userAddress = window.loginUserAddress;
+
+    if (!userAddress || userAddress === "") {
+        $.ajax({
+            url: "/ehr/dust/dust-avg",
+            method: "GET",
+            success: function(res) {
+                const grade = getGrade(res.value);
+                const displayText = `${res.region}의 미세먼지 대기오염도(단위: μg/㎥): ${res.value}`;
+                $("#avgCard").text(displayText)
+                            .removeClass()
+                            .addClass("card")
+                            .addClass(grade.className);
+            }
+        });
+    } else {
+        // Geocoding API 호출 (예: Kakao)
+        $.ajax({
+            url: `/ehr/dust/geocode`,
+            method: "GET",
+            data: { address: userAddress },
+            success: function(data) {
+                console.log("위도:", data.lat, "경도:", data.lon);
+
+                const lat = (data.lat != null && data.lat !== '') ? data.lat : null;
+                const lon = (data.lon != null && data.lon !== '') ? data.lon : null;
+
+                $.ajax({
+                    url: "/ehr/dust/dust-avg",
+                    method: "GET",
+                    data: { userLat: lat, userLon: lon },
+                    success: function(res) {
+                        const grade = getGrade(res.value);
+                        const displayText = `${res.region}의 미세먼지 대기오염도(단위: μg/㎥): ${res.value}`;
+                        $("#avgCard").text(displayText)
+                                    .removeClass()
+                                    .addClass("card")
+                                    .addClass(grade.className);
+                    }
+                });
+            }
+        });
+    }
+
+    
 
     // TOP5
     $.ajax({
@@ -29,8 +65,8 @@ $(document).ready(function() {
                 const grade = getGrade(item.PM10);
                 table.append(
                     `<tr>
-                        <td>${index + 1}</td>
-                        <td>${item.STN_NM}</td>
+                        <td>${item.RNK}</td>
+                        <td>${item.STN_LIST}</td>
                         <td>${item.PM10}</td>
                         <td class="${grade.className}">${grade.text}</td>
                     </tr>`
@@ -50,8 +86,8 @@ $(document).ready(function() {
                 const grade = getGrade(item.PM10);
                 table.append(
                     `<tr>
-                        <td>${index + 1}</td>
-                        <td>${item.STN_NM}</td>
+                        <td>${item.RNK}</td>
+                        <td>${item.STN_LIST}</td>
                         <td>${item.PM10}</td>
                         <td class="${grade.className}">${grade.text}</td>
                     </tr>`

@@ -40,6 +40,7 @@ import com.pcwk.ehr.cmn.MessageDTO;
 import com.pcwk.ehr.cmn.PcwkString;
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.BoardDTO;
+import com.pcwk.ehr.domain.UserDTO;
 import com.pcwk.ehr.service.BoardService;
 import com.pcwk.ehr.service.MarkdownService;
 
@@ -94,6 +95,7 @@ public class BoardController {
 	    msgs.put("no", messageSource.getMessage("message.board.no", null, locale));
 	    msgs.put("regDt", messageSource.getMessage("message.board.regDt", null, locale));
 	    msgs.put("view", messageSource.getMessage("message.board.view", null, locale));
+	    msgs.put("noBoard", messageSource.getMessage("message.board.noBoard", null, locale));
 	    return msgs;
 	}
 	
@@ -248,10 +250,13 @@ public class BoardController {
 	        totalCnt = list.get(0).getTotalCnt(); // 첫 번째 row에서 가져오기
 	    }
 	    //lang이 값이 없으면 기본값(한국어)
-	    Locale locale = (lang != null && !lang.isEmpty()) ? new Locale(lang) : Locale.KOREAN;
-
+	    String resolvedLang = (lang != null && !lang.isEmpty()) ? lang : "ko";
+	    Locale locale = new Locale(resolvedLang);
+	    
+	    //언어 설정
 	    model.addAttribute("msgs", getBoardMessages(locale));
-		
+	    model.addAttribute("lang", lang);
+	    
 		model.addAttribute("list",list);
 		model.addAttribute("search", param);
 		model.addAttribute("totalCnt", totalCnt);
@@ -302,13 +307,23 @@ public class BoardController {
 	
 	@PostMapping(value = "/doUpdate.do", produces = "text/plain;charset=UTF-8")
 	@ResponseBody
-	public String doUpdate(BoardDTO param, HttpServletRequest req) {
+	public String doUpdate(BoardDTO param, HttpSession session,Model model) {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *doUpdate()*              │");
 		log.debug("└───────────────────────────┘");
 		
+		
+		
 		log.debug("1. param:{}", param);
 		String jsonString = "";
+		
+		UserDTO user = (UserDTO) session.getAttribute("loginUser");
+		model.addAttribute("user",user);
+		if(user != null && user.getRole()==1) {
+			param.setModId(user.getEmail());
+		}else {
+		    throw new RuntimeException("로그인 필요");
+		}
 		
 		int flag = service.doUpdate(param);
 		log.debug("isNotice: {}", param.getIsNotice());
@@ -348,12 +363,22 @@ public class BoardController {
 	//UUID 새로 만들지 말고, Summernote 업로드 시 반환된 URL 그대로 사용
 	@PostMapping(value = "doSave.do", produces = "application/json;charset=UTF-8")
 	@ResponseBody
-	public String doSave(BoardDTO param) {
+	public String doSave(BoardDTO param,HttpSession session,Model model) {
 	    log.debug("param:{}", param);
 	    log.debug("isNotice: {}", param.getIsNotice());
 	    int flag = 0;
 	    
 	    try {
+	        UserDTO user = (UserDTO) session.getAttribute("loginUser");
+	        log.debug("user: {}",user);
+			model.addAttribute("user",user);
+			if(user != null && user.getRole()==1) {
+				param.setRegId(user.getEmail());
+				param.setModId(user.getEmail());
+			}else {
+			    throw new RuntimeException("로그인 필요");
+			}
+	    	
 	        flag = service.doSave(param);
 	    } catch (Exception e) {
 	        log.error("DB 저장 오류", e);

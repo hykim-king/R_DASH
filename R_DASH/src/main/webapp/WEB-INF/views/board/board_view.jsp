@@ -37,7 +37,6 @@ console.log('DOMContentLoaded');
    $("#moveToUpdate").on('click',function(){
 	   if (confirm('수정하시겠습니까?')) {
 		    // 확인(Y) 버튼을 누른 경우 실행
-		    alert("수정 화면으로 이동합니다.");
 		    window.location.href = '/ehr/board/doUpdateView.do?boardNo='+boardNo;
 		} else {
 		    // 취소(N) 버튼을 누른 경우 실행
@@ -107,8 +106,10 @@ console.log('DOMContentLoaded');
 		    </div>
 		  </div>
 		    <div class="boardBtns position-absolute" style="bottom:15px; right:20px;">
+		    <c:if test="${sessionScope.loginUser.role =='1'  }">
 		      <input type="button" id="moveToUpdate" class="btn btn-sm btn-primary" value="수정">
               <input type="button" id="doDelete" class="btn btn-sm btn-primary" value="삭제">
+            </c:if>
               <input type="button" id="moveToList" class="btn btn-sm btn-primary" value="목록으로">
 		    </div>
 	</div><!-- //header -->

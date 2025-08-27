@@ -1,8 +1,12 @@
 package com.pcwk.ehr.controller;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -10,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +38,9 @@ public class NewsController {
 	Logger log = LogManager.getLogger(getClass());
 	
 	@Autowired
+	private MessageSource messageSource;
+	
+	@Autowired
 	NewsService service;
 	
 	public NewsController() {
@@ -48,6 +56,47 @@ public class NewsController {
 	//5. 토픽 단건 조회 Get0
 	//6. 뉴스 키워드 조회 Get0
 	//7. 뉴스 전체 조회 Get0
+	
+	//다국어 소스 담기
+	private Map<String, String> getBoardMessages(Locale locale) {
+		Map<String, String> msgs = new HashMap<>();
+		LocalDate today = LocalDate.now();
+	    String[] korWeek = {"월","화","수","목","금","토","일"};
+	    String[] engWeek = {"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
+
+	    int dayOfWeek = today.getDayOfWeek().getValue() - 1; // 0~6
+	    String dayStr = locale.getLanguage().equals("en") ? engWeek[dayOfWeek] : korWeek[dayOfWeek];
+
+	    Object[] params = {String.valueOf(today.getYear()), today.getMonthValue(), today.getDayOfMonth(), dayStr};
+	    
+		msgs.put("no", messageSource.getMessage("message.board.no", null, locale));
+		msgs.put("title", messageSource.getMessage("message.board.title", null, locale));
+		msgs.put("reg", messageSource.getMessage("message.board.reg", null, locale));
+		msgs.put("topicCount", messageSource.getMessage("message.news.topicCount", null, locale));
+		msgs.put("summrTitle", messageSource.getMessage("message.news.summrTitle", null, locale));
+		msgs.put("total", messageSource.getMessage("message.news.total", null, locale));
+		msgs.put("fire", messageSource.getMessage("message.news.fire", null, locale));
+		msgs.put("sinkhole", messageSource.getMessage("message.news.sinkhole", null, locale));
+		msgs.put("heat", messageSource.getMessage("message.news.heat", null, locale));
+		msgs.put("dust", messageSource.getMessage("message.news.dust", null, locale));
+		msgs.put("typhoon", messageSource.getMessage("message.news.typhoon", null, locale));
+		msgs.put("landslide", messageSource.getMessage("message.news.landslide", null, locale));
+		msgs.put("flood", messageSource.getMessage("message.news.flood", null, locale));   // 홍수
+		msgs.put("cold", messageSource.getMessage("message.news.cold", null, locale));     // 한파
+		msgs.put("modi", messageSource.getMessage("message.news.mod", null, locale));
+		msgs.put("click", messageSource.getMessage("message.news.click", null, locale));
+		msgs.put("more", messageSource.getMessage("message.news.more", null, locale));
+		msgs.put("today", messageSource.getMessage("message.news.today", null, locale));
+		msgs.put("updateDay", messageSource.getMessage("message.news.updateDay", null, locale));
+		
+		msgs.put("noTopic", messageSource.getMessage("message.news.noTopic", null, locale));
+		msgs.put("newspaper", messageSource.getMessage("message.news.newspaper", null, locale));
+		msgs.put("pub", messageSource.getMessage("message.news.pub", null, locale));
+		msgs.put("today", messageSource.getMessage("message.news.today", params , locale));
+			
+		
+		return msgs;
+	}
 	
 	
 	@GetMapping("/doUpdateView.do")
@@ -127,7 +176,11 @@ public class NewsController {
 	}
 	
 	@GetMapping(value="/newsPage.do", produces = "text/plain;charset=UTF-8")
-	public String newsPage(SearchDTO search,NewsDTO news,TopicDTO topic,Model model) {
+	public String newsPage(SearchDTO search,
+			NewsDTO news,
+			TopicDTO topic,
+			Model model,
+			@RequestParam(name="lang", required=false) String lang) {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *newsPage()*              │");
 		log.debug("└───────────────────────────┘");
@@ -173,8 +226,26 @@ public class NewsController {
 	        }
 	        model.addAttribute("topicDetails",topicDetails);
 	    }
+	    //lang이 값이 없으면 기본값(한국어)
+	    String resolvedLang = (lang != null && !lang.isEmpty()) ? lang : "ko";
+	    Locale locale = new Locale(resolvedLang);
+	    
+	    //언어 설정
+	    model.addAttribute("msgs", getBoardMessages(locale));
+	    model.addAttribute("lang", lang);
+
 	    
 		return viewName;
+	}
+	@PostMapping(value = "/newsDelete.do", produces = "application/json;charset=UTF-8")
+	@ResponseBody
+	public MessageDTO newsDelete(NewsDTO param, HttpServletRequest req) {
+	    log.debug("1. param:{}", param);
+
+	    int flag = service.newsDelete(param);  // 삭제 성공 시 1, 실패 시 0
+	    String message = (flag == 1) ? "삭제 되었습니다." : "삭제 실패!";
+
+	    return new MessageDTO(flag, message); // MessageDTO { int messageId, String message }
 	}
 	
 	@PostMapping(value = "/doDelete.do", produces = "text/plain;charset=UTF-8")
@@ -201,14 +272,21 @@ public class NewsController {
 	
 	@PostMapping(value = "doUpdate.do", produces = "text/plain;charset=UTF-8")
 	@ResponseBody
-	public String doUpdate(TopicDTO param) {
+	public String doUpdate(TopicDTO param,HttpSession session,Model model) {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *doSave()*                │");
 		log.debug("└───────────────────────────┘");
 		String jsonString = "";
 		
 		log.debug("param:{}", param);
-		
+		UserDTO user = (UserDTO) session.getAttribute("loginUser");
+		model.addAttribute("user",user);
+		if(user != null && user.getRole()==1) {
+			param.setRegId(user.getEmail());
+			param.setModId(user.getEmail());
+		}else {
+		    throw new RuntimeException("로그인 필요");
+		}
 		int flag = service.doUpdate(param);
 		
 		String message = "";
@@ -227,7 +305,7 @@ public class NewsController {
 	
 	@PostMapping(value = "doSave.do", produces = "text/plain;charset=UTF-8")
 	@ResponseBody
-	public String doSave(TopicDTO param,HttpSession session) {
+	public String doSave(TopicDTO param,HttpSession session,Model model) {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *doSave()*                │");
 		log.debug("└───────────────────────────┘");
@@ -235,12 +313,14 @@ public class NewsController {
 		
 		log.debug("param:{}", param);
 				
-		UserDTO user = (UserDTO) session.getAttribute("user");
-		
-//		if(user != null && user.getRole()==1) {
-//			param.setRegId(user.getEmail());
-//			param.setModId(user.getEmail());
-//		}
+		UserDTO user = (UserDTO) session.getAttribute("loginUser");
+		model.addAttribute("user",user);
+		if(user != null && user.getRole()==1) {
+			param.setRegId(param.getRegId());
+			param.setModId(param.getRegId());
+		}else {
+		    throw new RuntimeException("로그인 필요");
+		}
 		
 		
 		int flag = service.doSave(param);

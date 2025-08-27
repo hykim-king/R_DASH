@@ -83,9 +83,12 @@ public class UserController {
 	
 	@GetMapping("userList")
 	public String userList(HttpServletRequest request,Model model,HttpSession session) {
-		UserDTO user = (UserDTO) session.getAttribute("loginUser");
+		int userNo = ((UserDTO) session.getAttribute("loginUser")).getUserNo();
+		//db에서 다시 조회 (권한이 바뀌었을 수 있음)
+		UserDTO user = service.selectUser(userNo);
 		//접근 제한
 		if(user == null || user.getRole()!=1) {
+			session.setAttribute("loginUser", user);
 			throw new AccessDeniedException("관리자만 접속 가능");
 		}
 		
@@ -155,6 +158,15 @@ public class UserController {
 	@ResponseBody
 	public Map<String, Object> changeRole(UserDTO param, HttpSession session){
 		Map<String, Object> result = new HashMap<>();
+		int userNo = ((UserDTO)session.getAttribute("loginUser")).getUserNo();
+		UserDTO user = service.selectUser(userNo);
+		if(user.getRole()!=1 || user == null) {
+			session.setAttribute("loginUser", user);
+			result.put("success", false);
+			result.put("message", "관리자 권한이 없습니다.");
+			
+			return result;
+		}
 		int flag = service.updateRole(param);
 		
 		if(flag == 1) {

@@ -115,8 +115,7 @@ document.addEventListener('DOMContentLoaded',function(){
 	                	
 	            },
 	            error:function(result){//요청 실패
-	                console.log("error:"+result)
-	                alert(result);
+	            	alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
 	            }
 	            
 	            
@@ -207,8 +206,7 @@ function sendMail(){
             }
         },
         error:function(result){//요청 실패
-            console.log("error:"+result)
-            alert(result);
+        	alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
         }
         
         
@@ -305,7 +303,7 @@ function verify(){
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-hat-3"></i></span>
                     </div>
-                    <input class="form-control" name="name" id="name" placeholder="이름" type="text">
+                    <input class="form-control" name="name" id="name" placeholder="이름" type="text" maxlength="15">
                   </div>
                 </div>
                 <div class="form-group">
@@ -313,7 +311,7 @@ function verify(){
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
-                    <input class="form-control" name="email" id="email" placeholder="이메일" type="email">
+                    <input class="form-control" name="email" id="email" placeholder="이메일" type="email" maxlength="30">
                     <input type="button" onclick="sendMail()" id="sendMailButton" class="btn btn-default btn-sm" value="메일 전송" style="margin-left: 10px;">
                   </div>
                 </div>
@@ -322,8 +320,8 @@ function verify(){
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
-                    <input class="form-control" id="code" placeholder="인증 코드">
-                    <input type="button" onclick="verify()" id="verifyButton" class="btn btn-default btn-sm" value="코드 인증" style="margin-left: 10px;">
+                    <input class="form-control" id="code" placeholder="인증 코드" maxlength="6">
+                    <input type="button" onclick="verify()" id="verifyButton" class="btn btn-default btn-sm" value="코드 인증" style="margin-left: 10px;" >
                   </div>
                   <div id="timer">
                   
@@ -335,7 +333,7 @@ function verify(){
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input class="form-control" name="password" id="password" placeholder="비밀번호" type="password">
+                    <input class="form-control" name="password" id="password" placeholder="비밀번호" type="password" maxlength="16">
                   </div>
                 </div>
                 <div class="form-group">
@@ -361,7 +359,7 @@ function verify(){
                  	 <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-align-left-2"></i></span>
                     </div>
-					  <input type="text" class="form-control" id="detailAddress" name="detailAddress" placeholder="상세주소(선택사항)">
+					  <input type="text" class="form-control" id="detailAddress" name="detailAddress" placeholder="상세주소(선택사항)" maxlength="50">
                   </div>
                 </div>
                 <div class="text-center">

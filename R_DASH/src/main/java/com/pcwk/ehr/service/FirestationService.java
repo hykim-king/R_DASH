@@ -30,5 +30,7 @@ public interface FirestationService {
     List<String> autocompleteStation(String prefix, String area, Integer limit);
     
     List<Map<String, Object>> getfirestationCounts();
+    
+    List<Map<String, Object>> getSigunguFireCounts();
 
 }

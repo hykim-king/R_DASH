@@ -60,7 +60,7 @@
 	            
 	        },
 	        error:function(result){//요청 실패
-	            alert('문제가 발생했습니다. 다음에 다시 요청해주세요.');
+	        	alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
 	        }
 	        
 	        
@@ -84,7 +84,8 @@
         		  codeInput.readOnly = true;
         		  clearInterval(codeTimer); 
         		  document.querySelector('#verifyButton').disabled = true;
-        		  document.querySelector('#timer').textContent = '만료됨';
+        		  document.querySelector('#timer').textContent = '인증';
+                  document.querySelector('#timer').style.color = 'green';
         		  return;
         	  }else{
         		  alert(result.message);
@@ -93,7 +94,7 @@
         		                 
           },
           error:function(result){//요청 실패
-              alert('문제가 발생했습니다. 다음에 다시 요청해주세요.');
+        	  alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
           }
           
           
@@ -102,7 +103,7 @@
   
   function sendResetPw(){
 	  const emailInput = document.querySelector('#email');
-	  
+	  document.querySelector('#resetButton').disabled = true;
 	  $.ajax({
           method:"POST",    //GET/POST
           url:"/ehr/user/resetPw", //서버측 URL
@@ -115,7 +116,7 @@
               window.location.href = "/ehr/user/login";
           },
           error:function(result){//요청 실패
-              alert('문제가 발생했습니다. 다음에 다시 요청해주세요.');
+        	  alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
           }
           
           
@@ -171,7 +172,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
-                    <input class="form-control" placeholder="이메일" id="email" name="email">
+                    <input class="form-control" placeholder="이메일" id="email" name="email" maxlength="30">
                     <input type="button" onclick="javascript:sendMail()" id="sendMailButton" class="btn btn-default btn-sm" value="메일 전송" style="margin-left: 10px;">
                   </div>
                 </div>
@@ -180,7 +181,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input class="form-control" placeholder="인증 코드" id="code" name="code">
+                    <input class="form-control" placeholder="인증 코드" id="code" name="code" maxlength="6">
                     <input type="button" id="verifyButton" onclick="javascript:verify()" class="btn btn-default btn-sm" value="코드 인증" style="margin-left: 10px;">
                   </div>
                   <div id="timer">
@@ -188,7 +189,7 @@
                   </div>
                 </div>
                 <div class="text-center" style="display:none;" id="buttonBox">
-                  <button onclick="javascript:sendResetPw()" class="btn btn-default my-4">비밀번호 찾기</button>
+                  <button onclick="javascript:sendResetPw()" id="resetButton" class="btn btn-default my-4">비밀번호 찾기</button>
                 </div>
             </div>
           </div>

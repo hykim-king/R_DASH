@@ -76,6 +76,55 @@ html, body {
 	z-index: 0
 }
 
+.hero-text {
+	position: relative; /* 비디오 위 */
+	z-index: 1;
+	color: #fff;
+	text-align: center;
+	padding: 0 20px;
+	max-width: 920px;
+}
+
+.hero-text h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+}
+
+.hero-text .white-text {
+  color: #fff; /* 흰색 */
+}
+
+.hero-text p {
+	font-size: clamp(1rem, 2vw, 1.2rem);
+	line-height: 1.6;
+	margin: 0;
+	text-shadow: 0 2px 8px rgba(0, 0, 0, .5);
+}
+
+.hero-text .accent {
+  color: #ff4d4d; /* R-DASH 강조 색상 */
+}
+
+/* 버튼 쓰실 거면 함께 */
+.hero-btn {
+	display: inline-block;
+	margin-top: 18px;
+	padding: 12px 28px;
+	border-radius: 28px;
+	background: #ff6b6b;
+	color: #fff;
+	text-decoration: none;
+	font-weight: 600;
+	transition: .25s;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .25);
+}
+
+.hero-btn:hover {
+	background: #ff4757;
+	transform: translateY(-2px);
+}
+
 /* ===== News / FAQ ===== */
 .news-section {
 	padding: 60px 0
@@ -445,6 +494,111 @@ img.card-img-top {
 		top: 52px
 	}
 }
+
+/* ===== 제목 옆(내부) 화살표: 지금은 사용 안 하므로 숨김 ===== */
+.news-title-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.news-title-row.right-nav {
+	justify-content: space-between;
+}
+
+.news-title-row.left-nav {
+	justify-content: flex-start;
+}
+
+.news-title-row .card-title {
+	margin: 0;
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.news-title-row .news-navs {
+	display: none;
+} /* 내부 버튼 숨김 */
+
+/* ===== 카드 바깥 화살표 버튼 (세로 알약 스타일) ===== */
+.news-rotator-wrap {
+	position: relative;
+	overflow: visible;
+}
+
+.nav-outer {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 18px;
+	height: 72px;
+	padding: 0;
+	border: 1px solid rgba(0, 0, 0, .08); /* 경계선 살짝(가독성↑) */
+	border-radius: 12px;
+	background: rgba(255, 255, 255, .96); /* ← 배경 흰색 */
+	color: #111; /* ← 화살표(문자) 색 어두운 회색 */
+	font-size: 20px;
+	font-weight: 900;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	z-index: 9;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .22);
+	transition: transform .12s, box-shadow .12s, background .12s, opacity
+		.12s;
+	opacity: .95;
+	/* 브라우저 기본 버튼 외형 제거 */
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	color: #111;
+}
+
+.nav-outer.prev {
+	left: -28px;
+	padding-right: 2px;
+}
+
+.nav-outer.next {
+	right: -28px;
+	padding-left: 2px;
+}
+
+.nav-outer:hover {
+	background: #fff; /* 호버 시 더 하얗게 */
+	transform: translateY(-50%) scale(1.04);
+	box-shadow: 0 10px 24px rgba(0, 0, 0, .28);
+}
+
+.nav-outer:focus {
+	outline: 2px solid #94a3b8;
+	outline-offset: 2px;
+}
+
+/* 모바일에서는 조금 짧고, 너무 바깥으로 나가지 않게 */
+@media ( max-width :576px) {
+	.nav-outer {
+		height: 60px;
+	}
+	.nav-outer.prev {
+		left: 6px;
+	}
+	.nav-outer.next {
+		right: 6px;
+	}
+}
+
+/* 전환 페이드 */
+.news-rotator .card-img-top {
+	transition: opacity .18s;
+}
+
+.news-rotator.switching .card-img-top {
+	opacity: .35;
+}
+}
 </style>
 </head>
 
@@ -454,8 +608,17 @@ img.card-img-top {
 		<video id="bg-video" autoplay muted loop preload="auto"
 			poster="${CP}/resources/image/mainboard.png">
 			<source src="${CP}/resources/video/jaemini.mp4" type="video/mp4" />
-			동영상을 재생할 수 없습니다.
 		</video>
+		<!-- 소개 문구 -->
+		<div class="hero-text">
+			<h1>
+				<span class="white-text">재난 알림 플랫폼</span> <span style="color: #ff6b6b;">R-DASH</span>
+			</h1>
+			<p>
+				재민이가 재난 정보를 알려주고<br /> 상황별 행동 요령을 안내해 드립니다.<br /> 여러분의 안전을 지키는
+				든든한 파트너가 되겠습니다.
+			</p>
+		</div>
 	</div>
 
 	<!-- News -->
@@ -464,33 +627,55 @@ img.card-img-top {
 			<div class="news-title">주요 뉴스</div>
 			<div class="row">
 				<div class="col-md-4 mb-3">
-					<div class="card h-100">
-						<img src="${CP}/resources/image/earth.jpg" class="card-img-top"
-							alt="지진 이미지" />
-						<div class="card-body">
-							<h5 class="card-title">[속보] 강진 발생</h5>
-							<p class="card-text">해당 지역 주민은 안전한 곳으로 대피 바랍니다.</p>
+					<div class="news-rotator-wrap">
+						<!-- 위치 기준 -->
+						<button class="nav-outer prev" aria-label="이전">‹</button>
+
+						<div class="card h-100 news-rotator" data-feed="breaking"
+							data-idx="0">
+							<img src="${CP}/resources/image/earth.jpg" class="card-img-top"
+								alt="지진 이미지">
+							<div class="card-body">
+								<h5 class="card-title">
+									<span class="title-text">[속보] 강진 발생</span>
+								</h5>
+								<p class="card-text">해당 지역 주민은 안전한 곳으로 대피 바랍니다.</p>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div class="col-md-4 mb-3">
-					<div class="card h-100">
-						<img src="${CP}/resources/image/dis.jpg" class="card-img-top"
-							alt="화재 이미지" />
-						<div class="card-body">
-							<h5 class="card-title">화재 시 행동요령 안내</h5>
-							<p class="card-text">119 긴급 행동요령 숙지로 생명을 지키세요.</p>
+					<div class="news-rotator-wrap">
+						<!-- 화살표는 없지만 래퍼는 유지해도 OK -->
+						<div class="card h-100 news-rotator" data-feed="safety"
+							data-idx="0">
+							<img src="${CP}/resources/image/dis.jpg" class="card-img-top"
+								alt="화재 이미지" />
+							<div class="card-body">
+								<h5 class="card-title">
+									<span class="title-text">화재 시 행동요령 안내</span>
+								</h5>
+								<p class="card-text">119 긴급 행동요령 숙지로 생명을 지키세요.</p>
+							</div>
 						</div>
 					</div>
 				</div>
 				<div class="col-md-4 mb-3">
-					<div class="card h-100">
-						<img src="${CP}/resources/image/med.jpg" class="card-img-top"
-							alt="응급 이미지" />
-						<div class="card-body">
-							<h5 class="card-title">응급상황 대응 시스템 강화</h5>
-							<p class="card-text">최근 대응 시간 단축을 위한 시스템 개편 발표.</p>
+					<div class="news-rotator-wrap">
+						<!-- 위치 기준 -->
+						<div class="card h-100 news-rotator" data-feed="emergency"
+							data-idx="0">
+							<img src="${CP}/resources/image/med.jpg" class="card-img-top"
+								alt="응급 이미지">
+							<div class="card-body">
+								<h5 class="card-title">
+									<span class="title-text">응급상황 대응 시스템 강화</span>
+								</h5>
+								<p class="card-text">최근 대응 시간 단축을 위한 시스템 개편 발표.</p>
+							</div>
 						</div>
+
+						<button class="nav-outer next" aria-label="다음">›</button>
 					</div>
 				</div>
 			</div>
@@ -583,238 +768,373 @@ img.card-img-top {
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
-  document.addEventListener("DOMContentLoaded", function(){
-    var CP='${CP}';
+document.addEventListener("DOMContentLoaded", function(){
+  var CP='${CP}';
+  
+  /* === 뉴스 데이터(예시) === */
+  const newsData = {
+    breaking: [
+      { title:'[속보] 강진 발생',    text:'해당 지역 주민은 안전한 곳으로 대피 바랍니다.', img: CP+'/resources/image/earth.jpg', href:'#' },
+      { title:'[속보] 기록적 폭우',  text:'하천 접근 금지 및 산사태 주의 바랍니다.',       img: CP+'/resources/image/rain.jpg',  href:'#' },
+      { title:'[속보] 해상 풍랑 경보', text:'해안가·방파제 접근을 자제해 주세요.',          img: CP+'/resources/image/wave.jpg',  href:'#' }
+    ],
 
-    /* animate */
+    /* ← 가운데 카드용 */
+    safety: [
+      { title:'화재 시 행동요령 안내', text:'119 긴급 행동요령 숙지로 생명을 지키세요.', img: CP+'/resources/image/dis.jpg', href:'#' },
+      { title:'피난 계단 확보',         text:'계단·복도 물건 보관 금지, 출입구 확보.',    img: CP+'/resources/image/dis.jpg', href:'#' },
+      { title:'소화기 사용 3단계',      text:'안전핀 뽑고 · 노즐 겨냥 · 손잡이 압착.',     img: CP+'/resources/image/dis.jpg', href:'#' }
+    ],
+    /* 세번째 카드용*/
+    emergency: [
+      { title:'응급상황 대응 시스템 강화', text:'최근 대응 시간 단축을 위한 시스템 개편 발표.', img: CP+'/resources/image/med.jpg',    href:'#' },
+      { title:'AED 설치 확대',           text:'지하철 역사 및 공공시설에 추가 설치됩니다.',    img: CP+'/resources/image/aed.jpg',    href:'#' },
+      { title:'119 문자신고 고도화',      text:'위치 자동전송 기능 시범 적용.',               img: CP+'/resources/image/119sms.jpg', href:'#' }
+    ]
+  };
+  function normIndex(i,len){ i%=len; return i<0? i+len : i; }
+
+  function renderNewsCard(card){
+    const feed = card.dataset.feed;
+    const list = newsData[feed] || [];
+    if(!list.length) return;
+    const idx = normIndex(parseInt(card.dataset.idx||'0',10), list.length);
+    card.dataset.idx = idx;
+
+    const item = list[idx];
+    const img  = card.querySelector('.card-img-top');
+    const titleSpan = card.querySelector('.title-text');
+    const desc = card.querySelector('.card-text');
+
+    if(img){ img.src = item.img; img.alt = item.title; }
+    if(titleSpan){ titleSpan.textContent = item.title; }
+    if(desc){ desc.textContent = item.text; }
+
+    // 카드 전체 클릭(화살표 클릭 제외) → 링크
+    card.onclick = (e)=>{
+      if(e.target.closest('.news-nav')) return;
+      if(item.href) location.href = item.href;
+    };
+  }
+
+  function stepCard(card, delta){
+    const feed = card.dataset.feed;
+    const len  = (newsData[feed]||[]).length;
+    if(!len) return;
+    const next = normIndex((parseInt(card.dataset.idx||'0',10) + delta), len);
+    card.dataset.idx = next;
+    card.classList.add('switching');
+    setTimeout(()=>{ renderNewsCard(card); card.classList.remove('switching'); }, 80);
+  }
+  
+  function stepAll(delta){
+	  document.querySelectorAll('.news-rotator').forEach((c)=>{
+	    stepCard(c, delta);   // 기존 stepCard 재사용
+	  });
+	}
+
+//초기화: prev/next가 있는 카드 → 클릭 시 전체 전환
+document.querySelectorAll('.news-rotator').forEach((card) => {
+  const wrap = card.closest('.news-rotator-wrap') || card.closest('.news-col') || card.parentElement;
+  const prev = (wrap && wrap.querySelector('.nav-outer.prev')) || card.querySelector('.news-nav.prev');
+  const next = (wrap && wrap.querySelector('.nav-outer.next')) || card.querySelector('.news-nav.next');
+
+  if (prev) prev.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); stepAll(-1); });
+  if (next) next.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); stepAll(+1); });
+
+  renderNewsCard(card);
+});
+
+  /* animate */
+  try{
+    var els=document.querySelectorAll(".animate-on-scroll");
+    var io=new IntersectionObserver(function(entries,obs){
+      entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add("backInUp"); obs.unobserve(en.target);} });
+    },{threshold:0.2});
+    els.forEach(function(el){ io.observe(el); });
+  }catch(e){}
+
+  /* refs */
+  var chatModalEl=document.getElementById('chatModal');
+  var chatModal=new bootstrap.Modal(chatModalEl,{backdrop:'static',keyboard:true});
+  var chatBody=document.getElementById('chatBody');
+  var chatInput=document.getElementById('chatInput');
+  var chatMinBtn=document.getElementById('chatMin');
+
+  /* login → 네임스페이스 */
+  var LOGIN_USER_NO_RAW=(document.body.dataset.loginUserNo||'').trim();
+  var LOGIN_USER_NO=LOGIN_USER_NO_RAW===''?null:parseInt(LOGIN_USER_NO_RAW,10);
+  var NS = (LOGIN_USER_NO!=null) ? ('U:'+LOGIN_USER_NO) : 'GUEST';
+
+  /* 오너/NS 유틸 */
+  function nsKey(k){ return NS+'::'+k; }
+  function ownerKey(sid){ return 'JM_OWNER_'+sid; }
+  function setOwner(sid, owner){ try{ localStorage.setItem(ownerKey(sid), owner); }catch(_){ } }
+  function getOwner(sid){ try{ return localStorage.getItem(ownerKey(sid)); }catch(_){ return null; } }
+
+  /* === 세션ID 런타임 변수 (중요) === */
+  var SESSION_ID = null;
+
+  /* 계정 전환 시 활성 세션 초기화 (로컬+런타임 모두) */
+  var LAST_NS = localStorage.getItem('JM_LAST_NS');
+  if(LAST_NS !== NS){
+    localStorage.removeItem(nsKey('X-Session-Id')); // 다른 NS의 저장값 제거
+    SESSION_ID = null;                               // ★ 런타임까지 즉시 무효화
+    chatBody.innerHTML='';
+  }
+  localStorage.setItem('JM_LAST_NS', NS);
+
+  /* utils */
+  function nowText(){ return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
+  function escapeHtml(s){ return (s||'').replace(/[&<>\"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function appendBubble(text,who){
+    var d=document.createElement('div');
+    d.className='chat-bubble '+(who==='bot'?'bot':'user');
+    d.innerHTML=text+'<span class="chat-time">'+nowText()+'</span>';
+    chatBody.appendChild(d); chatBody.scrollTop=chatBody.scrollHeight;
+  }
+  function previewOf(t){ t=(String(t||'')).replace(/\s+/g,' ').trim(); return t.length>40?t.slice(0,40)+'…':t; }
+
+  /* session & cache — NS 분리 */
+  // (계정 전환 클린업 이후 로드)
+  if(SESSION_ID===null){
+    SESSION_ID = localStorage.getItem(nsKey('X-Session-Id'))||null;
+  }
+  function getLocalSessions(){ try{ return JSON.parse(localStorage.getItem(nsKey('JM_SESSIONS'))||'[]'); }catch(e){ return []; } }
+  function setLocalSessions(arr){ localStorage.setItem(nsKey('JM_SESSIONS'), JSON.stringify((arr||[]).slice(0,50))); }
+  function addLocalSession(sid){
+    if(!sid) return;
+    var owner=getOwner(sid);
+    if(owner && owner!==NS) return;
+    if(!owner) setOwner(sid, NS);
+    var list=getLocalSessions().filter(function(x){ return x!==sid; });
+    list.unshift(sid);
+    setLocalSessions(list);
+  }
+  function _msgsKey(sid){ return nsKey('JM_MSGS_'+sid); }
+  function getLocalMsgs(sid){ if(!sid)return[]; try{ return JSON.parse(localStorage.getItem(_msgsKey(sid))||'[]'); }catch(e){ return []; } }
+  function setLocalMsgs(sid,a){ if(!sid)return; localStorage.setItem(_msgsKey(sid),JSON.stringify((a||[]).slice(0,500))); }
+  function pushLocalMsg(sid,role,text){ if(!sid)return; var arr=getLocalMsgs(sid); arr.push({role:role,text:String(text||''),ts:Date.now()}); setLocalMsgs(sid,arr); }
+  function migrateCache(oldSid,newSid){
+    if(!oldSid||!newSid||oldSid===newSid)return;
+    var o=getLocalMsgs(oldSid), n=getLocalMsgs(newSid);
+    if(o.length&&!n.length) setLocalMsgs(newSid,o);
+    localStorage.removeItem(_msgsKey(oldSid));
+    setOwner(newSid, NS);
+  }
+
+  /* 섞인 목록 정리 */
+  (function cleanupStrays(){
     try{
-      var els=document.querySelectorAll(".animate-on-scroll");
-      var io=new IntersectionObserver(function(entries,obs){
-        entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add("backInUp"); obs.unobserve(en.target);} });
-      },{threshold:0.2});
-      els.forEach(function(el){ io.observe(el); });
-    }catch(e){}
+      var list=getLocalSessions();
+      var cleaned=list.filter(function(sid){ return getOwner(sid) === NS; });
+      if(cleaned.length!==list.length) setLocalSessions(cleaned);
+      var cur=localStorage.getItem(nsKey('X-Session-Id'));
+      if(cur && getOwner(cur)!==NS){
+        localStorage.removeItem(nsKey('X-Session-Id'));
+        SESSION_ID=null;                           // ★ 런타임까지 무효화
+        chatBody.innerHTML='';
+      }
+    }catch(_){}
+  })();
 
-    /* refs */
-    var chatModalEl=document.getElementById('chatModal');
-    // ▼ 변경: backdrop true 로
-    var chatModal=new bootstrap.Modal(chatModalEl,{backdrop:true,keyboard:true});
-    var chatBody=document.getElementById('chatBody');
-    var chatInput=document.getElementById('chatInput');
-    var chatMinBtn=document.getElementById('chatMin');
+  /* dock */
+  var dockEl=document.getElementById('historyDock');
+  var dockHead=document.getElementById('historyHead');
+  var dockBody=document.getElementById('historyBody');
+  var dockTgl=document.getElementById('historyToggle');
+  var dockNew=document.getElementById('historyNew');
 
-    /* login */
-    var LOGIN_USER_NO_RAW=(document.body.dataset.loginUserNo||'').trim();
-    var LOGIN_USER_NO=LOGIN_USER_NO_RAW===''?null:parseInt(LOGIN_USER_NO_RAW,10);
+  function applyBodyPadding(){
+    if(!dockEl || !chatBody) return;
+    var isBelow=dockEl.classList.contains('below') && !dockEl.classList.contains('collapsed');
+    var h=isBelow ? Math.min(dockEl.scrollHeight, window.innerHeight*0.6) : 0;
+    chatBody.style.paddingTop=isBelow ? (h+'px') : '0px';
+  }
+  function setDockBelow(on){ if(!dockEl) return; dockEl.classList.toggle('below', !!on); applyBodyPadding(); }
+  window.addEventListener('resize', applyBodyPadding);
 
-    /* utils */
-    function nowText(){ return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
-    function escapeHtml(s){ return (s||'').replace(/[&<>\"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
-    function appendBubble(text,who){
-      var d=document.createElement('div');
-      d.className='chat-bubble '+(who==='bot'?'bot':'user');
-      d.innerHTML=text+'<span class="chat-time">'+nowText()+'</span>';
-      chatBody.appendChild(d); chatBody.scrollTop=chatBody.scrollHeight;
+  (function protectDock(){
+    var events=['click','mousedown','mouseup','touchstart','touchend','pointerdown','pointerup','wheel'];
+    function stopAll(e){ e.stopPropagation(); }
+    [dockEl,dockBody,dockTgl,dockNew].forEach(function(el){ if(!el)return; events.forEach(function(ev){ el.addEventListener(ev,stopAll,false); }); });
+  })();
+
+  function toggleDock(){
+    if(!dockEl)return;
+    var collapsed=dockEl.classList.toggle('collapsed');
+    if(dockTgl){ dockTgl.setAttribute('aria-expanded', String(!collapsed)); }
+    if(!collapsed){ setDockBelow(true); } else { setDockBelow(false); }
+  }
+  if(dockHead){
+    dockHead.addEventListener('click',function(e){ e.stopPropagation(); toggleDock(); });
+    dockHead.tabIndex=0;
+    dockHead.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleDock(); } });
+  }
+  if(dockTgl){ dockTgl.addEventListener('click',function(e){ e.stopPropagation(); toggleDock(); }); }
+
+  async function openInPopup(){
+    let sid;
+    try{
+      const r=await fetch(CP+'/api/chat/sessions/new',{method:'POST', headers: (LOGIN_USER_NO!=null?{'X-User-No':LOGIN_USER_NO}:{})});
+      sid=(await r.text()) || (crypto.randomUUID?crypto.randomUUID():String(Date.now()));
+    }catch(_){
+      sid=(crypto.randomUUID?crypto.randomUUID():String(Date.now()));
     }
-    function previewOf(t){ t=(String(t||'')).replace(/\s+/g,' ').trim(); return t.length>40?t.slice(0,40)+'…':t; }
+    setOwner(sid, NS);
+    addLocalSession(sid);
+    const base=location.origin+location.pathname;
+    const url =base+'?popup=1&sid='+encodeURIComponent(sid);
+    const win =window.open(url,'jaemini_'+sid,'width=420,height=720,resizable=yes,scrollbars=yes');
+    if(!win){ location.href=url; }
+  }
 
-    /* session & cache */
-    var SESSION_ID=localStorage.getItem('X-Session-Id')||null;
-    function getLocalSessions(){ try{ return JSON.parse(localStorage.getItem('JM_SESSIONS')||'[]'); }catch(e){ return []; } }
-    function setLocalSessions(arr){ localStorage.setItem('JM_SESSIONS',JSON.stringify(arr.slice(0,50))); }
-    function addLocalSession(sid){ if(!sid)return; var list=getLocalSessions().filter(function(x){ return x!==sid; }); list.unshift(sid); setLocalSessions(list); }
-    function _msgsKey(sid){ return 'JM_MSGS_'+sid; }
-    function getLocalMsgs(sid){ if(!sid)return[]; try{ return JSON.parse(localStorage.getItem(_msgsKey(sid))||'[]'); }catch(e){ return []; } }
-    function setLocalMsgs(sid,a){ if(!sid)return; localStorage.setItem(_msgsKey(sid),JSON.stringify((a||[]).slice(-500))); }
-    function pushLocalMsg(sid,role,text){ if(!sid)return; var arr=getLocalMsgs(sid); arr.push({role:role,text:String(text||''),ts:Date.now()}); setLocalMsgs(sid,arr); }
-    function migrateCache(oldSid,newSid){ if(!oldSid||!newSid||oldSid===newSid)return; var o=getLocalMsgs(oldSid), n=getLocalMsgs(newSid); if(o.length&&!n.length) setLocalMsgs(newSid,o); localStorage.removeItem(_msgsKey(oldSid)); }
-
-    /* dock */
-    var dockEl=document.getElementById('historyDock');
-    var dockHead=document.getElementById('historyHead');
-    var dockBody=document.getElementById('historyBody');
-    var dockTgl=document.getElementById('historyToggle');
-    var dockNew=document.getElementById('historyNew');
-
-    /* body padding when dock is below */
-    function applyBodyPadding(){
-      if(!dockEl || !chatBody) return;
-      var isBelow=dockEl.classList.contains('below') && !dockEl.classList.contains('collapsed');
-      var h=isBelow ? Math.min(dockEl.scrollHeight, window.innerHeight*0.6) : 0;
-      chatBody.style.paddingTop=isBelow ? (h+'px') : '0px';
-    }
-    function setDockBelow(on){
-      if(!dockEl) return;
-      dockEl.classList.toggle('below', !!on);
-      applyBodyPadding();
-    }
-    window.addEventListener('resize', applyBodyPadding);
-
-    /* stop propagation */
-    (function protectDock(){
-      var events=['click','mousedown','mouseup','touchstart','touchend','pointerdown','pointerup','wheel'];
-      function stopAll(e){ e.stopPropagation(); }
-      [dockEl,dockBody,dockTgl,dockNew].forEach(function(el){ if(!el)return; events.forEach(function(ev){ el.addEventListener(ev,stopAll,false); }); });
-    })();
-
-    /* 토글: 아래로 펼치기 */
-    function toggleDock(){
-      if(!dockEl)return;
-      var collapsed=dockEl.classList.toggle('collapsed');
-      if(dockTgl){ dockTgl.setAttribute('aria-expanded', String(!collapsed)); }
-      if(!collapsed){ setDockBelow(true); } else { setDockBelow(false); }
-    }
-    if(dockHead){
-      dockHead.addEventListener('click',function(e){ e.stopPropagation(); toggleDock(); });
-      dockHead.tabIndex=0;
-      dockHead.addEventListener('keydown',function(e){ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggleDock(); } });
-    }
-    if(dockTgl){ dockTgl.addEventListener('click',function(e){ e.stopPropagation(); toggleDock(); }); }
-
-    /* 팝업 열기 공용 함수 (Alt/중클릭 전용) */
-    async function openInPopup(){
-      let sid;
+  /* 삭제 */
+  function removeLocalSession(sid){
+    if(!sid) return;
+    var list=getLocalSessions().filter(function(x){ return x!==sid; });
+    setLocalSessions(list);
+    localStorage.removeItem(_msgsKey(sid));
+  }
+  async function deleteSession(sid){
+    if(!sid) return;
+    if(LOGIN_USER_NO!=null){
       try{
-        const r=await fetch(CP+'/api/chat/sessions/new',{method:'POST'});
-        sid=(await r.text()) || (crypto.randomUUID?crypto.randomUUID():String(Date.now()));
-      }catch(_){
-        sid=(crypto.randomUUID?crypto.randomUUID():String(Date.now()));
-      }
-      addLocalSession(sid);
-      const base=location.origin+location.pathname;
-      const url =base+'?popup=1&sid='+encodeURIComponent(sid);
-      const win =window.open(url,'jaemini_'+sid,'width=420,height=720,resizable=yes,scrollbars=yes');
-      if(!win){ location.href=url; }
-    }
-
-    /* ===== 삭제 관련 유틸/동작 ===== */
-    function removeLocalSession(sid){
-      if(!sid) return;
-      var list=getLocalSessions().filter(function(x){ return x!==sid; });
-      setLocalSessions(list);
-      localStorage.removeItem(_msgsKey(sid));
-    }
-
-    async function deleteSession(sid){
-      if(!sid) return;
-
-      if(LOGIN_USER_NO!=null){
-        try{
-          const res = await fetch(CP+'/api/chat/sessions/'+encodeURIComponent(sid), {
-            method:'DELETE',
-            headers:{ 'X-User-No': LOGIN_USER_NO }
-          });
-          if(!res.ok){ console.warn('delete api failed', res.status); }
-        }catch(e){ console.warn('delete api error', e); }
-      }
-
-      removeLocalSession(sid);
-
-      if(SESSION_ID===sid){
-        const rest=getLocalSessions();
-        SESSION_ID = rest[0] || null;
-        if(SESSION_ID){
-          localStorage.setItem('X-Session-Id', SESSION_ID);
-          await openDockRoom(SESSION_ID);
-        }else{
-          localStorage.removeItem('X-Session-Id');
-          chatBody.innerHTML='';
-        }
-      }
-      await loadDockSessions();
-      applyBodyPadding();
-    }
-
-    function renderDock(list){
-      dockBody.innerHTML='';
-      if(!list||!list.length){
-        var emp=document.createElement('div');
-        emp.style.cssText='padding:10px;color:#cfd6e3;font-size:.86rem;';
-        emp.textContent='저장된 대화가 없습니다.';
-        dockBody.appendChild(emp);
-        applyBodyPadding(); return;
-      }
-      list.forEach(function(s){
-        var cached=getLocalMsgs(s.sessionId);
-        if((!s.lastMsg||s.lastMsg==='')&&cached.length){ s.lastMsg=previewOf(cached[cached.length-1].text); }
-
-        var it=document.createElement('div');
-        it.className='history-item'+(s.sessionId===SESSION_ID?' active':'');
-        it.dataset.sid=s.sessionId;
-
-        it.innerHTML =
-          '<div class="history-title">'+escapeHtml(s.title||'새 대화')+'</div>'
-         +'<div class="history-sub">'+escapeHtml(s.lastMsg||'')+'</div>'
-         +'<div class="history-time">'+escapeHtml(s.updatedAt||'')+'</div>'
-         +'<button class="history-del" title="삭제" aria-label="대화 삭제" data-del="'+s.sessionId+'">×</button>';
-
-        it.addEventListener('click',function(e){
-          if(e.target && e.target.classList.contains('history-del')) return;
-          e.stopPropagation();
-          SESSION_ID=s.sessionId; localStorage.setItem('X-Session-Id',SESSION_ID);
-          openDockRoom(SESSION_ID).then(function(){
-            Array.prototype.forEach.call(document.querySelectorAll('.history-item'),function(x){
-              x.classList.toggle('active',x.dataset.sid===SESSION_ID);
-            });
-            dockEl.classList.add('collapsed');
-          });
+        const res = await fetch(CP+'/api/chat/sessions/'+encodeURIComponent(sid), {
+          method:'DELETE',
+          headers:{ 'X-User-No': LOGIN_USER_NO }
         });
-
-        it.querySelector('.history-del').addEventListener('click', function(e){
-          e.stopPropagation();
-          var sid=e.currentTarget.getAttribute('data-del');
-          if(confirm('이 대화를 삭제할까요?')){ deleteSession(sid); }
-        });
-
-        dockBody.appendChild(it);
-      });
-      applyBodyPadding();
+        if(!res.ok){ console.warn('delete api failed', res.status); }
+      }catch(e){ console.warn('delete api error', e); }
     }
-
-    async function loadDockSessions(){
-      if(!dockBody)return;
-      if(LOGIN_USER_NO!=null){
-        try{
-          var res=await fetch(CP+'/api/chat/sessions?limit=100',{headers:{'X-User-No':LOGIN_USER_NO}});
-          if(res.ok){
-            var list=await res.json();
-            renderDock(Array.isArray(list)?list.map(function(s){
-              return {sessionId:s.sessionId,title:s.title||'새 대화',lastMsg:s.lastMsg||'',updatedAt:s.updatedAt||''};
-            }):[]);
-            return;
-          }
-        }catch(e){ console.warn('sessions api fallback(local)',e); }
+    removeLocalSession(sid);
+    if(SESSION_ID===sid){
+      const rest=getLocalSessions();
+      SESSION_ID = rest[0] || null;
+      if(SESSION_ID){
+        localStorage.setItem(nsKey('X-Session-Id'), SESSION_ID);
+        await openDockRoom(SESSION_ID);
+      }else{
+        localStorage.removeItem(nsKey('X-Session-Id'));
+        chatBody.innerHTML='';
       }
-      var ids=getLocalSessions();
-      renderDock(ids.map(function(id){ return {sessionId:id,title:'내 대화',lastMsg:'',updatedAt:''}; }));
     }
+    await loadDockSessions();
+    applyBodyPadding();
+  }
 
-    function renderRowsAndCache(sid,rows){
-      if(!Array.isArray(rows)||!rows.length) return false;
-      chatBody.innerHTML=''; var fresh=[];
-      rows.forEach(function(m){
-        if(m.question && String(m.question).trim()!==''){
-          var q=String(m.question);
-          appendBubble(escapeHtml(q).replace(/\n/g,'<br>'),'user');
-          fresh.push({role:'user',text:q,ts:Date.now()});
-        }
-        if(m.answer && String(m.answer).trim()!==''){
-          var a=String(m.answer);
-          appendBubble(escapeHtml(a).replace(/\n/g,'<br>'),'bot');
-          fresh.push({role:'bot',text:a,ts:Date.now()});
-        }
-        if(!m.question && !m.answer && m.text){
-          var role=(m.role==='bot'||m.role==='assistant')?'bot':'user';
-          var t=String(m.text);
-          appendBubble(escapeHtml(t).replace(/\n/g,'<br>'),role);
-          fresh.push({role:role,text:t,ts:Date.now()});
-        }
+  function renderDock(list){
+    dockBody.innerHTML='';
+    if(!list||!list.length){
+      var emp=document.createElement('div');
+      emp.style.cssText='padding:10px;color:#cfd6e3;font-size:.86rem;';
+      emp.textContent='저장된 대화가 없습니다.';
+      dockBody.appendChild(emp);
+      applyBodyPadding(); return;
+    }
+    list.forEach(function(s){
+      var cached=getLocalMsgs(s.sessionId);
+      if((!s.lastMsg||s.lastMsg==='')&&cached.length){ s.lastMsg=previewOf(cached[cached.length-1].text); }
+
+      var it=document.createElement('div');
+      it.className='history-item'+(s.sessionId===SESSION_ID?' active':'');
+      it.dataset.sid=s.sessionId;
+      it.innerHTML =
+        '<div class="history-title">'+escapeHtml(s.title||'새 대화')+'</div>'
+       +'<div class="history-sub">'+escapeHtml(s.lastMsg||'')+'</div>'
+       +'<div class="history-time">'+escapeHtml(s.updatedAt||'')+'</div>'
+       +'<button class="history-del" title="삭제" aria-label="대화 삭제" data-del="'+s.sessionId+'">×</button>';
+
+      it.addEventListener('click',function(e){
+        if(e.target && e.target.classList.contains('history-del')) return;
+        e.stopPropagation();
+        SESSION_ID=s.sessionId; localStorage.setItem(nsKey('X-Session-Id'),SESSION_ID);
+        openDockRoom(SESSION_ID).then(function(){
+          Array.prototype.forEach.call(document.querySelectorAll('.history-item'),function(x){
+            x.classList.toggle('active',x.dataset.sid===SESSION_ID);
+          });
+          dockEl.classList.add('collapsed');
+        });
       });
-      chatBody.scrollTop=chatBody.scrollHeight; setLocalMsgs(sid,fresh); return true;
+
+      it.querySelector('.history-del').addEventListener('click', function(e){
+        e.stopPropagation();
+        var sid=e.currentTarget.getAttribute('data-del');
+        if(confirm('이 대화를 삭제할까요?')){ deleteSession(sid); }
+      });
+
+      dockBody.appendChild(it);
+    });
+    applyBodyPadding();
+  }
+
+  /* 서버 세션은 현재 NS(owner)만 표시 */
+  async function loadDockSessions(){
+    if(!dockBody)return;
+
+    if(LOGIN_USER_NO!=null){
+      try{
+        var res=await fetch(CP+'/api/chat/sessions?limit=100',{headers:{'X-User-No':LOGIN_USER_NO}});
+        if(res.ok){
+          var all=await res.json();
+          all = Array.isArray(all) ? all : [];
+          all.forEach(function(s){ if(!getOwner(s.sessionId)) setOwner(s.sessionId, NS); });
+          var list = all.filter(function(s){ return getOwner(s.sessionId) === NS; });
+          renderDock(list.map(function(s){
+            return {sessionId:s.sessionId,title:s.title||'새 대화',lastMsg:s.lastMsg||'',updatedAt:s.updatedAt||''};
+          }));
+          return;
+        }
+      }catch(e){ console.warn('sessions api fallback(local)',e); }
+    }
+    var ids=getLocalSessions();
+    renderDock(ids.map(function(id){ return {sessionId:id,title:'내 대화',lastMsg:'',updatedAt:''}; }));
+  }
+
+  function renderRowsAndCache(sid,rows){
+    if(!Array.isArray(rows)||!rows.length) return false;
+    chatBody.innerHTML='';
+    var fresh=[];
+    rows.forEach(function(m){
+      if(m.question && String(m.question).trim()!==''){
+        var q=String(m.question);
+        appendBubble(escapeHtml(q).replace(/\n/g,'<br>'),'user');
+        fresh.push({role:'user',text:q,ts:Date.now()});
+      }
+      if(m.answer && String(m.answer).trim()!==''){
+        var a=String(m.answer);
+        appendBubble(escapeHtml(a).replace(/\n/g,'<br>'),'bot');
+        fresh.push({role:'bot',text:a,ts:Date.now()});
+      }
+      if(!m.question && !m.answer && m.text){
+        var role=(m.role==='bot'||m.role==='assistant')?'bot':'user';
+        var t=String(m.text);
+        appendBubble(escapeHtml(t).replace(/\n/g,'<br>'),role);
+        fresh.push({role:role,text:t,ts:Date.now()});
+      }
+    });
+    chatBody.scrollTop=chatBody.scrollHeight;
+    setLocalMsgs(sid,fresh);
+    return true;
+  }
+
+  /* 열기: 로그인은 서버만, 그리고 내 소유 아닌 sid는 열지 않음 */
+  async function openDockRoom(sid){
+    if(!sid) return;
+
+    if (LOGIN_USER_NO != null) {
+      var o = getOwner(sid);
+      if (o && o !== NS) { chatBody.innerHTML=''; return; }
     }
 
-    async function openDockRoom(sid){
-      if(!sid) return; chatBody.innerHTML='';
+    chatBody.innerHTML='';
+    if(LOGIN_USER_NO!=null){
+      try{
+        var res=await fetch(CP+'/api/chat/sessions/'+encodeURIComponent(sid)+'/messages?limit=200',
+                            {headers:{'X-User-No':LOGIN_USER_NO}});
+        if(res.ok){ var rows=await res.json(); renderRowsAndCache(sid,rows); }
+      }catch(e){ console.warn('member history load failed',e); }
+    }else{
       var cached=getLocalMsgs(sid);
       if(cached.length){
         cached.forEach(function(m){
@@ -822,130 +1142,141 @@ img.card-img-top {
         });
         chatBody.scrollTop=chatBody.scrollHeight;
       }
-      var replaced=false;
-      if(LOGIN_USER_NO!=null){
-        try{
-          var res=await fetch(CP+'/api/chat/sessions/'+encodeURIComponent(sid)+'/messages?limit=200',{headers:{'X-User-No':LOGIN_USER_NO}});
-          if(res.ok){ var rows=await res.json(); replaced=renderRowsAndCache(sid,rows); }
-        }catch(e){ console.warn('member history load failed',e); }
-      }
-      if(!replaced){
-        try{
-          var res2=await fetch(CP+'/api/chat/history?limit=200',{headers:{'X-Session-Id':sid}});
-          if(res2.ok){ var rows2=await res2.json(); renderRowsAndCache(sid,rows2); }  // ▼ 오타 수정(res2.json)
-        }catch(err){ console.error(err); }
-      }
-      applyBodyPadding();
-    }
-
-    /* + 새 대화 */
-    if(dockNew){
-      dockNew.addEventListener('click', async function(e){
-        e.stopPropagation();
-        if(e.altKey){ e.preventDefault(); return openInPopup(); }
-        try{
-          var res=await fetch(CP+'/api/chat/sessions/new',{method:'POST'});
-          var sid=(await res.text())||crypto.randomUUID();
-          SESSION_ID=sid; localStorage.setItem('X-Session-Id',sid); addLocalSession(sid);
-          await loadDockSessions(); await openDockRoom(sid);
-          dockEl.classList.remove('collapsed'); setDockBelow(true);
-        }catch(e){
-          var sid2=crypto.randomUUID(); SESSION_ID=sid2; localStorage.setItem('X-Session-Id',sid2); addLocalSession(sid2);
-          await loadDockSessions(); await openDockRoom(sid2);
-          dockEl.classList.remove('collapsed'); setDockBelow(true);
-        }
-      });
-      dockNew.addEventListener('mouseup', function(e){
-        if(e.button===1){ e.preventDefault(); e.stopPropagation(); openInPopup(); }
-      });
-    }
-
-    /* send */
-    async function sendMessage(){
-      var text=document.getElementById('chatInput').value.trim(); if(!text) return;
-      if(!SESSION_ID){
-        SESSION_ID=localStorage.getItem('X-Session-Id')||(crypto.randomUUID?crypto.randomUUID():String(Date.now()));
-        localStorage.setItem('X-Session-Id',SESSION_ID); addLocalSession(SESSION_ID);
-      }
-      appendBubble(escapeHtml(text).replace(/\n/g,'<br>'),'user'); pushLocalMsg(SESSION_ID,'user',text); document.getElementById('chatInput').value='';
       try{
-        var headers={'Content-Type':'application/json'};
-        if(SESSION_ID) headers['X-Session-Id']=SESSION_ID;
-        if(LOGIN_USER_NO!=null) headers['X-User-No']=LOGIN_USER_NO;
-        var prevSid=SESSION_ID;
-        var res=await fetch(CP+'/api/chat/send',{method:'POST',headers:headers,body:JSON.stringify({question:text,userNo:LOGIN_USER_NO||undefined})});
-        var sid=res.headers.get('X-Session-Id');
-        if(sid){
-          if(sid!==SESSION_ID){ migrateCache(prevSid,sid); SESSION_ID=sid; }
-          localStorage.setItem('X-Session-Id',SESSION_ID); addLocalSession(SESSION_ID);
-        }
-        var raw=await res.text(); var data=null; try{ data=JSON.parse(raw);}catch(e){}
-        if(!res.ok){
-          var err='AI 호출 실패('+res.status+') '+(raw||'');
-          appendBubble(escapeHtml(err),'bot'); pushLocalMsg(SESSION_ID,'bot',err); console.error('chat/send error',res.status,raw); return;
-        }
-        var answer=(data&&data.answer)?String(data.answer):'응답을 불러오지 못했어요.';
-        appendBubble(escapeHtml(answer).replace(/\n/g,'<br>'),'bot'); pushLocalMsg(SESSION_ID,'bot',answer);
-        loadDockSessions();
-      }catch(e){
-        var net='네트워크 오류가 발생했어요. 연결 상태를 확인해 주세요.';
-        appendBubble(escapeHtml(net),'bot'); pushLocalMsg(SESSION_ID,'bot',net); console.error(e);
-      }
+        var res2=await fetch(CP+'/api/chat/history?limit=200',{headers:{'X-Session-Id':sid}});
+        if(res2.ok){ var rows2=await res2.json(); renderRowsAndCache(sid,rows2); }
+      }catch(err){ console.error(err); }
     }
-    document.getElementById('chatSend').addEventListener('click',sendMessage);
-    document.getElementById('chatInput').addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } });
 
-    /* 모달 열릴 때 기본을 '아래 모드'로 */
-    chatModalEl.addEventListener('shown.bs.modal', async function(){
-      chatBody.scrollTop=chatBody.scrollHeight;
+    applyBodyPadding();
+  }
+
+  /* 새 세션 확보 */
+  async function ensureNewSidForNS(){
+    try{
+      var r=await fetch(CP+'/api/chat/sessions/new',{method:'POST', headers: (LOGIN_USER_NO!=null?{'X-User-No':LOGIN_USER_NO}:{})});
+      var sid=(await r.text())||crypto.randomUUID();
+      SESSION_ID=sid; setOwner(SESSION_ID, NS);
+      localStorage.setItem(nsKey('X-Session-Id'),SESSION_ID);
+      addLocalSession(SESSION_ID);
+    }catch(_){
+      SESSION_ID=crypto.randomUUID();
+      setOwner(SESSION_ID, NS);
+      localStorage.setItem(nsKey('X-Session-Id'),SESSION_ID);
+      addLocalSession(SESSION_ID);
+    }
+  }
+
+  /* + 새 대화 */
+  if (dockNew) {
+    dockNew.addEventListener('click', async function (e) {
+      e.stopPropagation();
+      if (e.altKey) { e.preventDefault(); return openInPopup(); }
+      await ensureNewSidForNS();
       await loadDockSessions();
-      if(SESSION_ID) await openDockRoom(SESSION_ID);
+      await openDockRoom(SESSION_ID);
+      dockEl.classList.remove('collapsed');
       setDockBelow(true);
     });
+    dockNew.addEventListener('mouseup', function (e) {
+      if (e.button === 1) { e.preventDefault(); e.stopPropagation(); openInPopup(); }
+    });
+  }
 
-    /* – 버튼으로 모달 숨기기 */
-    if(chatMinBtn){
-      chatMinBtn.addEventListener('click', function(e){
-        e.preventDefault();
-        chatModal.hide();
-      });
+  /* send */
+  async function sendMessage(){
+    var text=document.getElementById('chatInput').value.trim(); if(!text) return;
+
+    // 현재 세션이 없거나 현재 NS 소유가 아니면 새로 생성
+    if(!SESSION_ID || (getOwner(SESSION_ID) && getOwner(SESSION_ID)!==NS)){
+      await ensureNewSidForNS();
     }
 
-    /* ▼ 안전망: 모달 밖(메인화면) 클릭 시 닫기 */
-    document.addEventListener('click', function(e){
-      if(!chatModalEl.classList.contains('show')) return;                 // 모달 열렸을 때만
-      if(e.target.closest('#chatModal .modal-content')) return;           // 모달 내부 클릭은 무시
-      if(e.target.closest('.floating-icon')) return;                      // 런처 클릭은 무시
-      chatModal.hide();
-    }, true); // 캡처 단계
+    appendBubble(escapeHtml(text).replace(/\n/g,'<br>'),'user');
+    pushLocalMsg(SESSION_ID,'user',text);
+    document.getElementById('chatInput').value='';
 
-    /* launcher */
-    var iconEl=document.querySelector('.floating-icon');
-    if(iconEl) iconEl.addEventListener('click',function(e){
-      e.preventDefault(); chatModal.show(); setTimeout(function(){ chatInput && chatInput.focus(); },200);
-    });
+    try{
+      var headers={'Content-Type':'application/json'};
 
-    /* popup (?popup=1&sid=...) */
-    (async function initPopupIfNeeded(){
-      const params=new URLSearchParams(location.search);
-      const isPopup=params.get('popup')==='1';
-      const sidParam=params.get('sid');
-      if(!isPopup) return;
-      chatModal.show();
-      setTimeout(function(){ chatInput && chatInput.focus(); },200);
-      if(sidParam){
-        SESSION_ID=sidParam; localStorage.setItem('X-Session-Id',SESSION_ID); addLocalSession(SESSION_ID);
-        try{ await openDockRoom(SESSION_ID); }catch(_){}
-      }else{
-        const sid=await (async()=>{
-          try{ const r=await fetch(CP+'/api/chat/sessions/new',{method:'POST'}); return (await r.text()) || (crypto.randomUUID?crypto.randomUUID():String(Date.now())); }
-          catch(_){ return (crypto.randomUUID?crypto.randomUUID():String(Date.now())); }
-        })();
-        SESSION_ID=sid; localStorage.setItem('X-Session-Id',sid); addLocalSession(sid); await openDockRoom(sid);
+      // ★ 핵심가드: 내 NS 소유인 경우에만 세션ID를 헤더에 실음
+      if(SESSION_ID && getOwner(SESSION_ID)===NS){
+        headers['X-Session-Id']=SESSION_ID;
       }
-      setDockBelow(true);
-    })();
+      if(LOGIN_USER_NO!=null) headers['X-User-No']=LOGIN_USER_NO;
+
+      var prevSid=SESSION_ID;
+      var res=await fetch(CP+'/api/chat/send',{
+        method:'POST', headers:headers, body:JSON.stringify({question:text,userNo:LOGIN_USER_NO||undefined})
+      });
+
+      var sid=res.headers.get('X-Session-Id');
+      if(sid){
+        var owner=getOwner(sid);
+        if(owner && owner!==NS){
+          // 다른 NS 소유 sid는 무시
+        }else{
+          if(!owner) setOwner(sid, NS);
+          if(sid!==SESSION_ID){ migrateCache(prevSid,sid); SESSION_ID=sid; }
+          localStorage.setItem(nsKey('X-Session-Id'),SESSION_ID);
+          addLocalSession(SESSION_ID);
+        }
+      }
+
+      var raw=await res.text(); var data=null; try{ data=JSON.parse(raw);}catch(e){}
+      if(!res.ok){
+        var err='AI 호출 실패('+res.status+') '+(raw||'');
+        appendBubble(escapeHtml(err),'bot'); pushLocalMsg(SESSION_ID,'bot',err); console.error('chat/send error',res.status,raw); return;
+      }
+      var answer=(data&&data.answer)?String(data.answer):'응답을 불러오지 못했어요.';
+      appendBubble(escapeHtml(answer).replace(/\n/g,'<br>'),'bot'); pushLocalMsg(SESSION_ID,'bot',answer);
+      loadDockSessions();
+    }catch(e){
+      var net='네트워크 오류가 발생했어요. 연결 상태를 확인해 주세요.';
+      appendBubble(escapeHtml(net),'bot'); pushLocalMsg(SESSION_ID,'bot',net); console.error(e);
+    }
+  }
+  document.getElementById('chatSend').addEventListener('click',sendMessage);
+  document.getElementById('chatInput').addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } });
+
+  /* 모달 열릴 때 기본 '아래 모드' */
+  chatModalEl.addEventListener('shown.bs.modal', async function(){
+    chatBody.scrollTop=chatBody.scrollHeight;
+    await loadDockSessions();
+    if(SESSION_ID) await openDockRoom(SESSION_ID);
+    setDockBelow(true);
   });
+
+  if(chatMinBtn){
+    chatMinBtn.addEventListener('click', function(e){ e.preventDefault(); chatModal.hide(); });
+  }
+
+  /* launcher */
+  var iconEl=document.querySelector('.floating-icon');
+  if(iconEl) iconEl.addEventListener('click',function(e){
+    e.preventDefault(); chatModal.show(); setTimeout(function(){ chatInput && chatInput.focus(); },200);
+  });
+
+  /* popup (?popup=1&sid=...) */
+  (async function initPopupIfNeeded(){
+    const params=new URLSearchParams(location.search);
+    const isPopup=params.get('popup')==='1';
+    const sidParam=params.get('sid');
+    if(!isPopup) return;
+    chatModal.show();
+    setTimeout(function(){ chatInput && chatInput.focus(); },200);
+    if(sidParam){
+      SESSION_ID=sidParam; setOwner(SESSION_ID, NS);
+      localStorage.setItem(nsKey('X-Session-Id'),SESSION_ID); addLocalSession(SESSION_ID);
+      try{ await openDockRoom(SESSION_ID); }catch(_){}
+    }else{
+      await ensureNewSidForNS();
+      await openDockRoom(SESSION_ID);
+    }
+    setDockBelow(true);
+  })();
+
+});
 </script>
 </body>
 </html>

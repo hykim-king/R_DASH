@@ -22,6 +22,17 @@
   <sql id="cols">
     STATION_NO, STATION_NM, AREA, FIRE_HEAD, TEL, LAT, LON
   </sql>
+  
+  <sql id="onlySafetyCenters">
+    STATION_NM LIKE '%안전센터%' OR STATION_NM LIKE '%119%'
+  </sql>
+  
+  <sql id="region">
+    COALESCE(
+        REGEXP_SUBSTR(AREA, '[^ ]+ [^ ]+[시구군]'),
+        REGEXP_SUBSTR(AREA, '^[^ ]+[시구군]')
+    )
+  </sql>
 
   <!-- ✅ 메인 소방서만: '소방서' 포함 & '안전센터'/'119' 미포함 -->
   <sql id="onlyMainStations">
@@ -183,6 +194,31 @@
     ) t
     GROUP BY REGION
     ORDER BY REGION ASC
+  </select>
+  
+  <select id="sigunguFireCount" resultType="map">
+    SELECT r.AREA AS REGION,
+           NVL(m.MAIN_CNT,0) AS MAIN_CNT,
+           NVL(s.SAFE_CNT,0) AS SAFE_CNT
+    FROM (
+        SELECT DISTINCT <include refid="region"/> AS AREA
+        FROM FIRE_STATION
+    ) r
+    LEFT JOIN (
+        SELECT <include refid="region"/> AS REGION,
+               COUNT(*) AS MAIN_CNT
+        FROM FIRE_STATION
+        WHERE <include refid="onlyMainStations"/>
+        GROUP BY <include refid="region"/>
+    ) m ON r.AREA = m.REGION
+    LEFT JOIN (
+        SELECT <include refid="region"/> AS REGION,
+               COUNT(*) AS SAFE_CNT
+        FROM FIRE_STATION
+        WHERE <include refid="onlySafetyCenters"/>
+        GROUP BY <include refid="region"/>
+    ) s ON r.AREA = s.REGION
+    ORDER BY r.AREA
   </select>
 
 </mapper>

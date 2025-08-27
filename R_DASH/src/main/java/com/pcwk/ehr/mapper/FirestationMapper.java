@@ -64,4 +64,6 @@ public interface FirestationMapper extends WorkDiv<FirestationDTO> {
      */
     List<Map<String, Object>> firestationCount();
     
+    List<Map<String, Object>> sigunguFireCount();
+    
 }

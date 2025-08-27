@@ -18,13 +18,33 @@ $(document).ready(function() {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: '년도별 산사태 건수',
+                        label: '산사태 수',
                         data: counts,
                         backgroundColor: 'rgba(75, 192, 192, 0.6)'
                     }]
                 },
                 options: { 
                     responsive: true,
+                    plugins: {
+                            title: {
+                                display: true, 
+                                text: '연도별 산사태 건 수 (2019~2024)',
+                                font: {
+                                    size: 18,
+                                    weight: 'bold'
+                                },
+                                color: '#333' 
+                            },
+                            datalabels: {
+                            anchor: "end",   // 데이터 레이블 위치
+                            align: "top",    // 막대 위쪽에 표시
+                            color: "black",  // 글자색
+                            font: {
+                            weight: "bold",
+                            size: 16
+                                }
+                            }
+                        },
                     scales: {
                         x: { 
                             grid: {
@@ -34,7 +54,8 @@ $(document).ready(function() {
                                 }  
                             }
                     }
-                 }
+                 },
+                plugins: [ChartDataLabels]
             });
         }
     });
@@ -52,12 +73,32 @@ $(document).ready(function() {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: '지역별 산사태 건수',
+                        label: '산사태 수',
                         data: counts,
                         backgroundColor: 'rgba(255, 99, 132, 0.6)'
                     }]
                 },
-                options: { responsive: true,
+                options: { 
+                    responsive: true,
+                    plugins: {
+                            title: {
+                                display: true, 
+                                text: '지역별 산사태 건수 (2019년 ~ 2024년)',
+                                font: {
+                                    size: 18,
+                                    weight: 'bold'
+                                },
+                                color: '#333' 
+                            },
+                            datalabels: {
+                            anchor: "end",   // 데이터 레이블 위치
+                            align: "top",    // 막대 위쪽에 표시
+                            color: "black",  // 글자색
+                            font: {
+                            weight: "bold"
+                                }
+                            }
+                        },
                     scales: {
                         x: { 
                             grid: {
@@ -67,7 +108,8 @@ $(document).ready(function() {
                                 }  
                             }
                     }
-                 }
+                 },
+                plugins: [ChartDataLabels]
             });
         }
     });
@@ -85,13 +127,32 @@ $(document).ready(function() {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: '월별 산사태 건수',
+                        label: '산사태 수',
                         data: counts,
                         backgroundColor: 'rgba(54, 162, 235, 0.6)'
                     }]
                 },
                 options: { 
                   responsive: true,
+                  plugins: {
+                            title: {
+                                display: true, 
+                                text: '월별 산사태 건수 (2019년 ~ 2024년)',
+                                font: {
+                                    size: 18,
+                                    weight: 'bold'
+                                },
+                                color: '#333' 
+                            },
+                            datalabels: {
+                            anchor: "end",   // 데이터 레이블 위치
+                            align: "top",    // 막대 위쪽에 표시
+                            color: "black",  // 글자색
+                            font: {
+                            weight: "bold"
+                                }
+                            }
+                        },
                   scales: {
                         x: {
                             grid: {
@@ -101,7 +162,8 @@ $(document).ready(function() {
                             }
                         }
                     }
-                 }
+                 },
+                plugins: [ChartDataLabels]
             });
         }
     });
@@ -119,7 +181,7 @@ $(document).ready(function() {
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: '예보상태별 산사태 건수',
+                        label: '산사태 수',
                         data: counts,
                         backgroundColor: 'rgba(255, 206, 86, 0.6)'
                     }]
@@ -127,6 +189,26 @@ $(document).ready(function() {
                 options: { 
                   indexAxis: 'y',
                   responsive: true,
+                  plugins: {
+                            title: {
+                                display: true, 
+                                text: '예보상태별 산사태 건수 (2019년 ~ 2024년)',
+                                font: {
+                                    size: 18,
+                                    weight: 'bold'
+                                },
+                                color: '#333' 
+                            },
+                            datalabels: {
+                            anchor: "end",   // 데이터 레이블 위치
+                            align: "end",    // 막대 오른쪽에 표시
+                            color: "black",  // 글자색
+                            font: {
+                            weight: "bold",
+                            size: 16
+                                }
+                            }
+                        },
                   scales: {
                       y: {
                           grid: {
@@ -135,7 +217,9 @@ $(document).ready(function() {
                               color: 'transparent'
                           }
                       }
-                  }}
+                  }
+                },
+                plugins: [ChartDataLabels]
             });
         }
     });
