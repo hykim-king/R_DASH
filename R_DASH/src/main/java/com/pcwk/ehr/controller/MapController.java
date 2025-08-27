@@ -45,4 +45,10 @@ public class MapController {
 	        return "redirect:/map?layer=landslide";
 	    }
 
+	    @GetMapping("/map/sinkhole")
+	    public String sinkholeRedirect() {
+	        // 필요 시 클러스터 기본 ON: &cluster=on (옵션)
+	        return "redirect:/map?layer=sinkhole";
+	    }
+
 }
