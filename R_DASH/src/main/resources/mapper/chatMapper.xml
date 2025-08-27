@@ -50,10 +50,12 @@
 		SELECT A.*, B.TOTAL_CNT
 		FROM (
 		SELECT TT3.RNUM AS NO,
-		TT3.LOG_NO, TT3.USER_NO, TT3.SESSION_ID, TT3.QUESTION, TT3.ANSWER,
+		TT3.LOG_NO,
+		TT3.USER_NO, TT3.SESSION_ID, TT3.QUESTION, TT3.ANSWER,
 		TO_CHAR(TT3.REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
 		FROM (
-		SELECT ROWNUM AS RNUM, TT2.*
+		SELECT
+		ROWNUM AS RNUM, TT2.*
 		FROM (
 		SELECT T1.*
 		FROM JM.CHAT_LOG T1
@@ -76,9 +78,12 @@
 
 	<insert id="insertChat" parameterType="ChatDTO"
 		useGeneratedKeys="true" keyProperty="logNo" keyColumn="LOG_NO">
-		INSERT INTO JM.CHAT_LOG (USER_NO, SESSION_ID, QUESTION, ANSWER, REG_DT)
-		VALUES (#{userNo, jdbcType=NUMERIC}, #{sessionId}, #{question},
-		#{answer}, SYSDATE)
+		INSERT INTO
+		JM.CHAT_LOG (USER_NO, SESSION_ID, QUESTION, ANSWER, REG_DT)
+		VALUES
+		(#{userNo, jdbcType=NUMERIC}, #{sessionId}, #{question},
+		#{answer},
+		SYSDATE)
 	</insert>
 
 	<update id="updateChat" parameterType="ChatDTO">
@@ -96,11 +101,21 @@
 	<select id="findRecentBySession" resultMap="chatResultMap">
 		SELECT *
 		FROM (
-		SELECT t.LOG_NO, t.USER_NO, t.SESSION_ID, t.QUESTION, t.ANSWER,
+		SELECT
+		t.LOG_NO, t.USER_NO, t.SESSION_ID, t.QUESTION,
+		t.ANSWER,
 		TO_CHAR(t.REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
-		FROM JM.CHAT_LOG t
+		FROM
+		JM.CHAT_LOG t
 		WHERE t.SESSION_ID = #{sessionId}
-		<if test="userNo != null">AND t.USER_NO = #{userNo}</if>
+		<choose>
+			<when test="userNo == null">
+				AND t.USER_NO IS NULL
+			</when>
+			<otherwise>
+				AND t.USER_NO = #{userNo}
+			</otherwise>
+		</choose>
 		ORDER BY t.REG_DT DESC
 		)
 		WHERE ROWNUM &lt;= #{limit}
@@ -114,17 +129,20 @@
 		TO_CHAR(MAX(t.reg_dt),'YYYY-MM-DD HH24:MI:SS') AS updatedAt,
 		MAX(t.log_no) KEEP (DENSE_RANK LAST ORDER BY t.reg_dt) AS lastLogNo,
 		/* 첫 질문 30자 */
-		SUBSTR(MAX(t.question) KEEP (DENSE_RANK FIRST ORDER BY t.log_no), 1, 30) AS title,
+		SUBSTR(MAX(t.question) KEEP (DENSE_RANK FIRST ORDER BY
+		t.log_no), 1, 30) AS title,
 		/* 최신 답변이 있으면 답변, 없으면 최신 질문 30자 */
 		SUBSTR(
 		NVL(
 		MAX(t.answer) KEEP (DENSE_RANK LAST ORDER BY t.reg_dt),
 		MAX(t.question) KEEP (DENSE_RANK LAST ORDER BY t.reg_dt)
 		), 1, 30
-		) AS lastMsg
+		) AS
+		lastMsg
 		FROM JM.CHAT_LOG t
 		WHERE t.user_no = #{userNo}
-		GROUP BY t.session_id
+		GROUP BY
+		t.session_id
 		ORDER BY MAX(t.reg_dt) DESC
 		FETCH FIRST #{limit} ROWS ONLY
 	</select>
@@ -136,14 +154,42 @@
 		TO_CHAR(t.REG_DT,'YYYY-MM-DD HH24:MI:SS') AS REG_DT
 		FROM JM.CHAT_LOG t
 		WHERE t.SESSION_ID = #{sessionId}
-		<if test="userNo != null">AND t.USER_NO = #{userNo}</if>
-		<if test="beforeLogNo != null">AND t.LOG_NO &lt; #{beforeLogNo}</if>
+		<choose>
+			<when test="userNo == null">
+				AND t.USER_NO IS NULL
+			</when>
+			<otherwise>
+				AND t.USER_NO = #{userNo}
+			</otherwise>
+		</choose>
+		<if test="beforeLogNo != null">
+			AND t.LOG_NO &lt; #{beforeLogNo}
+		</if>
 		ORDER BY t.LOG_NO DESC
 		FETCH FIRST #{limit} ROWS ONLY
 	</select>
 
+	<select id="countBySessionAndUser" resultType="int">
+		SELECT COUNT(*)
+		FROM JM.CHAT_LOG
+		WHERE SESSION_ID = #{sessionId} AND USER_NO =
+		#{userNo}
+	</select>
+
+	<select id="countGuestBySession" resultType="int">
+		SELECT COUNT(*) FROM
+		JM.CHAT_LOG
+		WHERE SESSION_ID = #{sessionId} AND USER_NO IS NULL
+	</select>
+
+	<select id="countUserBySession" resultType="int">
+		SELECT COUNT(*) FROM JM.CHAT_LOG
+		WHERE SESSION_ID = #{sessionId} AND USER_NO IS NOT NULL
+	</select>
+
 	<delete id="deleteChat" parameterType="java.lang.Long">
-		DELETE FROM JM.CHAT_LOG WHERE LOG_NO = #{logNo}
+		DELETE FROM JM.CHAT_LOG
+		WHERE LOG_NO = #{logNo}
 	</delete>
 
 	<delete id="deleteAll">

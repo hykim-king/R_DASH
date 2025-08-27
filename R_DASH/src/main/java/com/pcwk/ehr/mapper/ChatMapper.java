@@ -25,6 +25,10 @@ public interface ChatMapper extends WorkDiv<ChatDTO> {
 
 	int deleteAll();
 
+	boolean existsSessionForUser(String sessionId, Integer userNo);
+
+	boolean isGuestSession(String sessionId);
+
 	List<ChatDTO> findRecentBySession(@Param("sessionId") String sessionId, @Param("userNo") Integer userNo,
 			@Param("limit") int limit);
 
@@ -32,5 +36,11 @@ public interface ChatMapper extends WorkDiv<ChatDTO> {
 
 	List<ChatDTO> listMessagesBySession(@Param("sessionId") String sessionId, @Param("userNo") Integer userNo,
 			@Param("beforeLogNo") Long beforeLogNo, @Param("limit") int limit);
+
+	int countBySessionAndUser(@Param("sessionId") String sessionId, @Param("userNo") Integer userNo);
+
+	int countGuestBySession(@Param("sessionId") String sessionId);
+	
+	int countUserBySession(@Param("sessionId") String sessionId); // ★ 추가
 
 }

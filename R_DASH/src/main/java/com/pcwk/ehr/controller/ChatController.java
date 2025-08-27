@@ -43,48 +43,101 @@ public class ChatController {
 	@PostMapping(value = "/send", consumes = "application/json", produces = "application/json;charset=UTF-8")
 	public ResponseEntity<ChatDTO> sendChat(@RequestBody @Valid ChatDTO chat,
 			@RequestHeader(value = "X-Session-Id", required = false) String sessionId,
-			@RequestHeader(value = "X-User-No", required = false) Integer userNoHeader, // ★ 추가
-			@AuthenticationPrincipal Object principal // 실제 CustomUser 사용 시 타입 교체
-	) {
+			@RequestHeader(value = "X-User-No", required = false) Integer userNoHeader,
+			@AuthenticationPrincipal Object principal) {
+
 		log.debug("┌──────── sendChat ────────┐");
 		log.debug("chat={}", chat);
 		log.debug("sessionId(header)={}", sessionId);
 		log.debug("userNo(header)={}", userNoHeader);
 		log.debug("└──────────────────────────┘");
 
-		// 1) 세션/사용자 보정
-		if (sessionId == null || sessionId.trim().isEmpty()) {
-			sessionId = UUID.randomUUID().toString(); // 컨트롤러에서 생성해 클라이언트에 돌려줌
+		// 1) 사용자 번호: principal 최우선 → body/header 보강
+		Integer effectiveUserNo = extractUserNo(principal);
+		if (effectiveUserNo == null) {
+			effectiveUserNo = (chat.getUserNo() != null) ? chat.getUserNo() : userNoHeader;
 		}
+		log.debug("effectiveUserNo={}", effectiveUserNo);
+
+		// 2) 세션ID 기본값
+		final String originalSessionId = sessionId;
+		if (sessionId == null || sessionId.trim().isEmpty()) {
+			sessionId = UUID.randomUUID().toString();
+		}
+
+		// 3) 세션 성격/소유 확인 후 필요 시 분리
+		boolean mustSplit = false;
+		try {
+			boolean hasGuestLogs = chatService.isGuestSession(sessionId); // USER_NO IS NULL 존재?
+			boolean belongsToThisUser = (effectiveUserNo != null)
+					&& chatService.existsSessionForUser(sessionId, effectiveUserNo); // 내 세션인가?
+			boolean hasUserLogs = chatService.hasAnyUserLogs(sessionId); // USER_NO IS NOT NULL 존재?
+
+			log.debug("check session. guestLogs={}, belongsToThisUser={}, userLogs={}", hasGuestLogs, belongsToThisUser,
+					hasUserLogs);
+
+			if (effectiveUserNo != null) {
+				if (hasGuestLogs || !belongsToThisUser)
+					mustSplit = true;
+			} else {
+				if (hasUserLogs)
+					mustSplit = true;
+			}
+		} catch (Exception e) {
+			log.warn("session ownership check failed: {}", e.getMessage());
+		}
+
+		if (mustSplit) {
+			String newSid;
+			try {
+				newSid = chatService.newSessionId();
+			} catch (Exception e) {
+				newSid = UUID.randomUUID().toString();
+			}
+			log.debug("force split session: {} -> {}", originalSessionId, newSid);
+			sessionId = newSid;
+		}
+
+		// 4) 사용자/세션 세팅
+		chat.setUserNo(effectiveUserNo); // 로그인: 숫자, 비로그인: null
 		chat.setSessionId(sessionId);
 
-		// 로그인 정보를 쓰는 경우:
-		// if (principal instanceof CustomUser) chat.setUserNo(((CustomUser)
-		// principal).getUserNo());
-		// 헤더 값이 들어왔다면 우선 적용 (비로그인/임시 처리용)
-		if (chat.getUserNo() == null && userNoHeader != null) {
-			chat.setUserNo(userNoHeader);
-		}
-
-		// 2) 질문 검증
+		// 5) 질문 검증
 		if (chat.getQuestion() == null || chat.getQuestion().trim().isEmpty()) {
 			return ResponseEntity.badRequest().build();
 		}
 
-		// 3) 봇 호출(→ 내부에서 DB 저장까지 수행)
+		// 6) 봇 호출(저장 포함)
 		final String answer;
 		try {
 			answer = botService.reply(chat.getQuestion(), chat.getSessionId(), chat.getUserNo());
 		} catch (Exception e) {
 			log.error("BotService.reply error", e);
-			return ResponseEntity.status(502).build(); // Bad Gateway
+			return ResponseEntity.status(502).build();
 		}
 		chat.setAnswer(answer);
 
-		// 4) 여기서 추가 INSERT 금지 (BotService에서 이미 저장함)
+		// 7) 최종 세션ID(+ 유저) 헤더 반환
+		ResponseEntity.BodyBuilder resp = ResponseEntity.ok().header("X-Session-Id", sessionId);
+		if (effectiveUserNo != null) {
+			resp.header("X-User-No", String.valueOf(effectiveUserNo));
+		}
+		return resp.body(chat);
+	}
 
-		// 5) 응답 (세션ID를 헤더로 돌려주면 프론트에서 이어서 사용하기 좋음)
-		return ResponseEntity.ok().header("X-Session-Id", sessionId).body(chat);
+	/** principal에서 userNo를 꺼내는 유틸 (환경에 맞게 필요시 수정) */
+	private Integer extractUserNo(Object principal) {
+		if (principal == null)
+			return null;
+		try {
+			// 예: CustomUser#getUserNo()
+			java.lang.reflect.Method m = principal.getClass().getMethod("getUserNo");
+			Object v = m.invoke(principal);
+			if (v instanceof Number)
+				return ((Number) v).intValue();
+		} catch (Exception ignore) {
+		}
+		return null;
 	}
 
 	/** 특정 logNo의 채팅 조회 */
