@@ -60,8 +60,6 @@ public class BoardController {
 	
 	private static final String IMAGE_UPLOAD_PATH = "C:/images/summernote/";
 	
-	@Autowired
-    private MarkdownService markdownService;
 	
 	public BoardController() {
 		log.debug("┌───────────────────────────┐");
@@ -96,18 +94,14 @@ public class BoardController {
 	    msgs.put("regDt", messageSource.getMessage("message.board.regDt", null, locale));
 	    msgs.put("view", messageSource.getMessage("message.board.view", null, locale));
 	    msgs.put("noBoard", messageSource.getMessage("message.board.noBoard", null, locale));
+	    msgs.put("toList", messageSource.getMessage("message.board.toList", null, locale));
+	    msgs.put("admin", messageSource.getMessage("message.admin", null, locale));
+	    msgs.put("modi", messageSource.getMessage("message.news.mod", null, locale));
+	    
+	    
 	    return msgs;
 	}
 	
-    /**
-     * 마크다운을 HTML로 변환하는 API
-     * @param markdownText 마크다운 원본
-     * @return HTML 문자열
-     */
-    @PostMapping("/convert")
-    public String convertMarkdown(@RequestBody String markdownText) {
-        return markdownService.convertToMarkdownHtml(markdownText);
-    }
     @PostMapping("/saveImageByUrl")
     @ResponseBody
     public MessageDTO saveImageByUrl(@RequestBody Map<String, String> param) {
@@ -265,7 +259,9 @@ public class BoardController {
 	}
 	
 	@GetMapping(value="/doSelectOne.do", produces = "text/plain;charset=UTF-8")
-	public String doSelectOne(BoardDTO param, Model model, HttpServletRequest req) {
+	public String doSelectOne(BoardDTO param, Model model, 
+			HttpServletRequest req,
+			@RequestParam(name="lang", required=false) String lang) {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *doSelectOne()*           │");
 		log.debug("└───────────────────────────┘");
@@ -273,12 +269,18 @@ public class BoardController {
 		String viewName = "board/board_view";
 		
 		BoardDTO outVO = service.doSelectOne(param);
-		String html = markdownService.convertToMarkdownHtml(outVO.getContents());
 		log.debug("2. outVO:{}", outVO);
 		
+		//lang이 값이 없으면 기본값(한국어)
+	    String resolvedLang = (lang != null && !lang.isEmpty()) ? lang : "ko";
+	    Locale locale = new Locale(resolvedLang);
+	    
+	    //언어 설정
+	    model.addAttribute("msgs", getBoardMessages(locale));
+	    model.addAttribute("lang", lang);
+		
+		
 		model.addAttribute("vo", outVO);
-		model.addAttribute("contentsTextAreaHtml",html);
-		log.debug("3 html: {}",html);
 		
 		return viewName;
 	}
