@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', function(){
             dataType: 'json',
             success: function(data) {
                 const tbody = $("#newsList"); // tbody id와 일치
-                tbody.empty();
+                
                 if (!data || data.length === 0) {
                     if (pageNo === 1) { // 첫 페이지도 데이터 없으면
                         tbody.html("<tr><td colspan='3'>데이터 없음</td></tr>");
