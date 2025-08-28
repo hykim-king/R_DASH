@@ -156,9 +156,20 @@
     <!-- Main content -->
   <div class="main-content" id="panel">
     <!-- Topnav -->
-    <nav class="navbar navbar-horizontal navbar-expand-lg navbar-dark bg-warning">
+    <nav class="navbar navbar-top navbar-expand navbar-dark bg-warning border-bottom">
       <div class="container-fluid">
         <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
+        <ul class="navbar-nav align-items-center ml-md-auto">
+            <li class="nav-item d-xl-none">
+                <div class="pr-3 sidenav-toggler sidenav-toggler-dark" data-action="sidenav-pin" data-target="#sidenav-main">
+                    <div class="sidenav-toggler-inner">
+                        <i class="sidenav-toggler-line"></i>
+                        <i class="sidenav-toggler-line"></i>
+                        <i class="sidenav-toggler-line"></i>
+                    </div>
+                </div>
+            </li>
+        </ul>
           <c:choose>
             <c:when test="${empty sessionScope.loginUser}">   
             <ul class="navbar-nav align-items-center">
