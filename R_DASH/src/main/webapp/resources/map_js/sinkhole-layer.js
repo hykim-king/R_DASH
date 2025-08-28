@@ -2,16 +2,12 @@
 (function (global) {
   'use strict';
 
-  // ──────────────────────────────────────────────
-  //  페이지/레이어 가드: ?layer=sinkhole
-  // ──────────────────────────────────────────────
   var qs = new URLSearchParams(location.search || '');
   var LAYER = (qs.get('layer') || '').toLowerCase();
   var BODY_LAYER = (document.body.getAttribute('data-layer') || '').toLowerCase();
   var IS_ME = (LAYER === 'sinkhole') || (BODY_LAYER === 'sinkhole');
   if (!IS_ME) { console.log('[Sinkhole] skip (not my layer)'); return; }
 
-  // 컨텍스트 경로 추론
   function detectCtx() {
     var ctx = document.body.getAttribute('data-ctx');
     if (ctx && ctx.trim()) return ctx.trim();
@@ -22,73 +18,18 @@
   var YEAR  = document.body.getAttribute('data-year')  || '';
   var STATE = document.body.getAttribute('data-state') || '';
 
-  // API
   var API_POINTS = CTX + '/sinkholes/points';
 
-  // 아이콘/애니메이션
-  var VLC_ICON_URL       = 'https://img.icons8.com/3d-fluency/100/vlc.png';
-  var SHOW_OVERLAY_LEVEL = 5;
-  var ANIM_CLASS         = 'animate__shakeY';
-  var ANIM_DURATION      = '900ms';
-
-  // 마스코트
-  var MASCOT_1 = CTX + '/resources/image/jaeminsinkhole_1.png';
-
-  // KakaoMap 준비 후 init
-  if (global.AppMap) init();
-  else global.addEventListener('appmap:ready', init, { once: true });
+  if (global.AppMap) init(); else global.addEventListener('appmap:ready', init, { once: true });
 
   function init() {
     var App = global.AppMap || {};
     var map = App.map;
     if (!map || !global.kakao || !kakao.maps) {
-      console.error('[Sinkhole] kakao map not ready');
-      return;
+      console.error('[Sinkhole] kakao map not ready'); return;
     }
 
-    // ───────────────────────────
-    //  말풍선 HUD
-    // ───────────────────────────
-    var bubbleOv = null;
-    function showBubbleAt(pos, row){
-      var raw = (row.stateNm || row.STATE_NM || row['STATE NM'] || row.status || '') + '';
-      var s   = raw.replace(/\s+/g,'');
-      var label = '상태 미상';
-      var colorClass = 'sh-mini-prog';
-      if (s.includes('완료'))      { label = '복구 완료'; colorClass = 'sh-mini-done'; }
-      else if (s.includes('임시')) { label = '임시복구';  colorClass = 'sh-mini-temp'; }
-      else if (s.includes('중'))   { label = '복구중';    colorClass = 'sh-mini-prog'; }
-
-      var sido   = row.SIDO_NM || row.sidoNm || row['SIDO NM'] || '';
-      var signgu = row.SIGNGU_NM || row.signguNm || row['SIGNGU NM'] || '';
-      var occur  = row.OCCUR_DT || row.occurDt || row['OCCUR DT'] || '';
-
-      var html =
-        '<div class="sh-bubble">' +
-          '<h5>싱크홀 복구현황</h5>' +
-          '<div class="sh-badge"><span class="sh-dot-mini '+colorClass+'"></span><span>'+label+'</span></div>' +
-          (sido||signgu ? '<div class="sh-place">'+ [sido, signgu].filter(Boolean).join(' ') +'</div>' : '') +
-          (occur ? '<div class="sh-date">발생일: '+ occur +'</div>' : '') +
-        '</div>';
-
-      if (bubbleOv) bubbleOv.setMap(null);
-      bubbleOv = new kakao.maps.CustomOverlay({ position: pos, content: html, yAnchor: 1.15, xAnchor: 0.5, zIndex: 300 });
-      bubbleOv.setMap(map);
-
-      clearTimeout(showBubbleAt._t);
-      showBubbleAt._t = setTimeout(function(){
-        if (bubbleOv) { bubbleOv.setMap(null); bubbleOv = null; }
-      }, 10000);
-    }
-
-    // ───────────────────────────
-    //  클러스터 (투명 마커)
-    // ───────────────────────────
-    var TRANSPARENT_IMG = 'data:image/png;base64,iVBOR...'; // 생략
-    var transparentImage = new kakao.maps.MarkerImage(
-      TRANSPARENT_IMG, new kakao.maps.Size(1, 1), { offset: new kakao.maps.Point(0, 0) }
-    );
-
+    // ── 클러스터 배지 스타일 ──────────────────────
     function svgCircle(size, inner, outer){
       var svg =
         '<svg xmlns="http://www.w3.org/2000/svg" width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">' +
@@ -98,57 +39,45 @@
         '</svg>';
       return 'url("data:image/svg+xml;utf8,' + encodeURIComponent(svg) + '")';
     }
-
     var styles = [
-      { width:'40px', height:'40px', lineHeight:'40px', background: svgCircle(40,'rgba(144,238,144,.9)','rgba(34,197,94,.35)') },
-      { width:'52px', height:'52px', lineHeight:'52px', background: svgCircle(52,'rgba(255,255,153,.95)','rgba(234,179,8,.35)') },
-      { width:'64px', height:'64px', lineHeight:'64px', background: svgCircle(64,'rgba(253,230,138,.95)','rgba(245,158,11,.35)') },
-      { width:'76px', height:'76px', lineHeight:'76px', background: svgCircle(76,'rgba(250,204,21,.98)','rgba(245,158,11,.45)') },
-      { width:'90px', height:'90px', lineHeight:'90px', background: svgCircle(90,'rgba(96,165,250,.98)','rgba(59,130,246,.45)') },
+      { width:'40px', height:'40px', lineHeight:'40px', textAlign:'center', color:'#1f2937', fontWeight:'700', fontSize:'14px',
+        background: svgCircle(40,'rgba(144,238,144,.9)','rgba(34,197,94,.35)') },
+      { width:'52px', height:'52px', lineHeight:'52px', textAlign:'center', color:'#1f2937', fontWeight:'700', fontSize:'15px',
+        background: svgCircle(52,'rgba(255,255,153,.95)','rgba(234,179,8,.35)') },
+      { width:'64px', height:'64px', lineHeight:'64px', textAlign:'center', color:'#1f2937', fontWeight:'800', fontSize:'16px',
+        background: svgCircle(64,'rgba(253,230,138,.95)','rgba(245,158,11,.35)') },
+      { width:'76px', height:'76px', lineHeight:'76px', textAlign:'center', color:'#111827', fontWeight:'800', fontSize:'17px',
+        background: svgCircle(76,'rgba(250,204,21,.98)','rgba(245,158,11,.45)') },
+      { width:'90px', height:'90px', lineHeight:'90px', textAlign:'center', color:'#0b1020', fontWeight:'900', fontSize:'18px',
+        background: svgCircle(90,'rgba(96,165,250,.98)','rgba(59,130,246,.45)') },
     ];
-
     var clusterer = new kakao.maps.MarkerClusterer({
-      map: map, averageCenter: true, minLevel: 6, styles: styles,
-      calculator: [10,50,150,400], gridSize: 80
+      map, averageCenter:true, minLevel:6, styles, calculator:[10,50,150,400], gridSize:80
     });
 
-    // ───────────────────────────
-    //  상태
-    // ───────────────────────────
     var markers = [];
-    var overlays = [];
-    var rowsCache = [];
+    var animOverlays = []; // 임시 애니메이션 오버레이들
 
+    // 레이어 등록
     var layer = { name:'sinkhole', activate, deactivate };
     if (typeof App.register === 'function') App.register('sinkhole', layer);
 
-    var debouncedLoad = debounce(loadAndRender, 250);
-    var onZoomChanged = debounce(updateOverlayVisibility, 0);
-
     function activate(){
-      installStaticPanel();
       loadAndRender();
-      kakao.maps.event.addListener(map, 'idle',          debouncedLoad);
-      kakao.maps.event.addListener(map, 'zoom_changed',  onZoomChanged);
-      kakao.maps.event.addListener(map, 'click', function(){
-        if (bubbleOv){ bubbleOv.setMap(null); bubbleOv = null; }
-      });
+      kakao.maps.event.addListener(map, 'idle', debounce(loadAndRender, 250));
     }
     function deactivate(){
-      kakao.maps.event.removeListener(map, 'idle',         debouncedLoad);
-      kakao.maps.event.removeListener(map, 'zoom_changed', onZoomChanged);
-      clearAll(); removeStaticPanel();
+      kakao.maps.event.removeListener(map, 'idle', loadAndRender);
+      clear();
     }
 
-    function clearAll(){
+    function clear(){
       if (clusterer) clusterer.clear();
-      markers.forEach(m => m.setMap(null)); markers = [];
-      overlays.forEach(ov => ov.setMap(null)); overlays = [];
-    }
-
-    function updateOverlayVisibility(){
-      var show = map.getLevel() <= SHOW_OVERLAY_LEVEL;
-      overlays.forEach(function(ov){ ov.setMap(show ? map : null); });
+      markers.forEach(m => m.setMap(null));
+      markers = [];
+      // 남아있는 애니메이션 오버레이 제거
+      animOverlays.forEach(ov => ov.setMap(null));
+      animOverlays = [];
     }
 
     function loadAndRender(){
@@ -159,89 +88,60 @@
       if (STATE) params.stateNm = STATE;
 
       ajaxJSON(API_POINTS, params).then(function(rows){
-        rowsCache = rows || [];
-        render(rowsCache);
-        refreshStaticPanel();
+        clear();
+        markers = (rows||[]).map(function(r){
+          var lat = Number(r.lat), lon = Number(r.lon);
+          if (isNaN(lat) || isNaN(lon)) return null;
+          var pos = new kakao.maps.LatLng(lat, lon);
+          var m = new kakao.maps.Marker({ position: pos });
+          // 클릭 시 애니메이션 spawn
+          kakao.maps.event.addListener(m, 'click', function(){ spawnClickAnim(pos); });
+          return m;
+        }).filter(Boolean);
+        clusterer.addMarkers(markers);
+        console.log('[Sinkhole] cluster markers:', markers.length);
       }).catch(function(e){ console.error('[Sinkhole] load error:', e); });
     }
 
-    function render(rows){
-      if (clusterer) clusterer.clear();
-      markers.forEach(m => m.setMap(null)); markers = [];
-      overlays.forEach(ov => ov.setMap(null)); overlays = [];
+    // ▶ 클릭 애니메이션: 해당 좌표에 잠깐 CustomOverlay를 띄우고 애니메 끝나면 제거
+    function spawnClickAnim(position){
+      var el = document.createElement('div');
+      // 전역 CSS 안 쓰고 inline + animate.css 클래스만 사용
+      el.style.cssText = [
+        'width:18px;height:18px;border-radius:50%;',
+        'background:#8b5cf6;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);',
+        'transform:translate(-50%,-50%);'
+      ].join('');
+      // 애니메이션 클래스 + 개별 duration 지정
+      el.classList.add('animate__animated','animate__shakeY');
+      el.style.setProperty('--animate-duration','800ms');
 
-      overlays = (rows || []).map(function(r){
-        var lat = +(r.lat || r.LAT);
-        var lon = +(r.lon || r.LON);
-        if (isNaN(lat) || isNaN(lon)) return null;
-        var pos = new kakao.maps.LatLng(lat, lon);
+      // 끝나면 제거
+      function cleanup(){
+        ov.setMap(null);
+        el.removeEventListener('animationend', cleanup);
+        var idx = animOverlays.indexOf(ov);
+        if (idx >= 0) animOverlays.splice(idx,1);
+      }
+      el.addEventListener('animationend', cleanup);
 
-        var img = document.createElement('img');
-        img.src = VLC_ICON_URL;
-        img.className = 'sh-icon animate__animated';
-        img.style.setProperty('--animate-duration', ANIM_DURATION);
-        img.addEventListener('click', function(e){
-          e.stopPropagation();
-          img.classList.remove(ANIM_CLASS); void img.offsetWidth; img.classList.add(ANIM_CLASS);
-          showBubbleAt(pos, r);
-        });
-
-        var ov = new kakao.maps.CustomOverlay({ position: pos, content: img, yAnchor: 1 });
-        ov.setMap(map.getLevel() <= SHOW_OVERLAY_LEVEL ? map : null);
-        return ov;
-      }).filter(Boolean);
-
-      markers = overlays.map(function(ov){
-        return new kakao.maps.Marker({ position: ov.getPosition(), image: transparentImage });
+      var ov = new kakao.maps.CustomOverlay({
+        position: position,
+        content: el,
+        yAnchor: 1,
+        zIndex: 999
       });
-      clusterer.addMarkers(markers);
-    }
+      ov.setMap(map);
+      animOverlays.push(ov);
 
-    // ───────────────────────────
-    //  고정 패널
-    // ───────────────────────────
-    function installStaticPanel(){
-      if (document.getElementById('sinkholePanel')) return;
-      var wrap = document.createElement('div');
-      wrap.id = 'sinkholePanel';
-      wrap.className = 'sh-fixed-wrap';
-
-      var img = document.createElement('img');
-      img.src = MASCOT_1; img.alt = 'mascot'; img.className = 'sh-mascot';
-      wrap.appendChild(img);
-
-      var panel = document.createElement('div');
-      panel.className = 'sh-panel';
-      panel.innerHTML =
-        '<h4>복구현황 (현재 화면)</h4>' +
-        '<div class="sh-row"><div class="sh-dot sh-dot-temp"></div><div class="sh-name">임시복구</div><div class="sh-cnt" id="cntTemp">0</div></div>' +
-        '<div class="sh-row"><div class="sh-dot sh-dot-prog"></div><div class="sh-name">복구중</div><div class="sh-cnt" id="cntProg">0</div></div>' +
-        '<div class="sh-row"><div class="sh-dot sh-dot-done"></div><div class="sh-name">복구 완료</div><div class="sh-cnt" id="cntDone">0</div></div>';
-      wrap.appendChild(panel);
-      document.body.appendChild(wrap);
-    }
-    function removeStaticPanel(){
-      var el = document.getElementById('sinkholePanel'); if (el) el.remove();
-    }
-    function refreshStaticPanel(){
-      var wrap = document.getElementById('sinkholePanel'); if (!wrap) return;
-      var temp=0, prog=0, done=0;
-      rowsCache.forEach(function(r){
-        var s = (r.stateNm || r.STATE_NM || r['STATE NM'] || r.status || '').replace(/\s+/g,'');
-        if (!s) return;
-        if (s.indexOf('임시') > -1) temp++;
-        else if (s.indexOf('중') > -1) prog++;
-        else if (s.indexOf('완료') > -1) done++;
-      });
-      wrap.querySelector('#cntTemp').textContent = temp.toLocaleString();
-      wrap.querySelector('#cntProg').textContent = prog.toLocaleString();
-      wrap.querySelector('#cntDone').textContent = done.toLocaleString();
+      // 같은 애니메이션을 연속 클릭에도 재생되게 reflow 트릭
+      void el.offsetWidth;
+      el.classList.remove('animate__shakeY');
+      el.classList.add('animate__shakeY');
     }
   }
 
-  // ───────────────────────────
-  //  유틸
-  // ───────────────────────────
+  // 공통 유틸: GET JSON
   function ajaxJSON(url, params) {
     return new Promise(function (resolve, reject) {
       var q = '';
