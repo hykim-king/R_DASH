@@ -4,6 +4,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
+
 <c:set var="CP" value="${pageContext.request.contextPath}" />
 <c:set var="now" value="<%=new java.util.Date()%>" />
 <c:set var="sysDate">
@@ -21,7 +22,11 @@
 	href="${CP}/resources/template/Animate/backInUp.css" />
 
 <style>
-/* ===== Base ===== */
+/* =========================
+   Base (공통)
+========================= */
+:root {--topbar-h: 64px;}
+
 html, body {
 	margin: 0;
 	padding: 0;
@@ -29,7 +34,7 @@ html, body {
 	scroll-behavior: smooth;
 	color: #fff;
 	font-family: 'Noto Sans KR', system-ui, -apple-system, 'Segoe UI',
-		Roboto, sans-serif
+		Roboto, sans-serif;
 }
 
 .main-background {
@@ -37,10 +42,63 @@ html, body {
 	background-size: cover;
 	background-position: center;
 	background-repeat: no-repeat;
-	background-attachment: fixed
+	background-attachment: fixed;
 }
 
-/* ===== Hero ===== */
+/* =========================
+   Header (홈에서 투명)
+========================= */
+body.home-page header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: var(- -topbar-h);
+	background: transparent !important;
+	box-shadow: none !important;
+	z-index: 2000;
+}
+
+body.home-page header.scrolled {
+	background: rgba(0, 0, 0, .35) !important;
+	backdrop-filter: blur(4px);
+	box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
+}
+
+/* Argon 상단바(주황) 제거 + 고정 */
+body.home-page .navbar.navbar-horizontal.bg-warning {
+	background: transparent !important;
+	box-shadow: none !important;
+}
+
+body.home-page .navbar.navbar-horizontal {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: var(- -topbar-h);
+	z-index: 2000;
+}
+
+body.home-page .navbar.navbar-horizontal .navbar-nav .nav-link, body.home-page .navbar.navbar-horizontal .media-body span
+	{
+	color: #fff !important;
+}
+
+/* 사이드바는 원래 fixed 유지 + 계층만 올림 */
+body.home-page #sidenav-main {
+	position: fixed !important;
+	z-index: 3001 !important;
+}
+
+/* 비디오/오버레이는 클릭 막지 않기 */
+#bg-video, .main-section>video, .main-section::before {
+	pointer-events: none;
+}
+
+/* =========================
+   Hero(비디오 영역)
+========================= */
 .main-section {
 	height: 100vh;
 	width: 100%;
@@ -51,21 +109,20 @@ html, body {
 	justify-content: center;
 	align-items: center;
 	text-align: center;
-	overflow: hidden
+	overflow: hidden;
 }
 
 .main-section.main-background {
-	background: none
+	background: none;
 }
 
 #bg-video, .main-section>video {
 	position: absolute;
-	top: 0;
-	left: 0;
+	inset: 0;
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
-	z-index: -1
+	z-index: -1;
 }
 
 .main-section::before {
@@ -73,26 +130,30 @@ html, body {
 	position: absolute;
 	inset: 0;
 	background: rgba(0, 0, 0, .25);
-	z-index: 0
+	z-index: 0;
 }
 
 .hero-text {
-	position: relative; /* 비디오 위 */
+	position: relative;
 	z-index: 1;
 	color: #fff;
-	text-align: center;
 	padding: 0 20px;
 	max-width: 920px;
 }
 
 .hero-text h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  text-shadow: 2px 2px 8px rgba(0,0,0,0.6);
+	font-size: clamp(2rem, 5vw, 2.8rem);
+	font-weight: 800;
+	margin: 0 0 12px;
+	text-shadow: 2px 2px 8px rgba(0, 0, 0, .6);
 }
 
 .hero-text .white-text {
-  color: #fff; /* 흰색 */
+	color: #fff;
+}
+
+.hero-text .accent {
+	color: #ff4d4d;
 }
 
 .hero-text p {
@@ -102,11 +163,6 @@ html, body {
 	text-shadow: 0 2px 8px rgba(0, 0, 0, .5);
 }
 
-.hero-text .accent {
-  color: #ff4d4d; /* R-DASH 강조 색상 */
-}
-
-/* 버튼 쓰실 거면 함께 */
 .hero-btn {
 	display: inline-block;
 	margin-top: 18px;
@@ -125,14 +181,41 @@ html, body {
 	transform: translateY(-2px);
 }
 
-/* ===== News / FAQ ===== */
+/* 히어로 아래 첫 섹션이 가려지지 않도록 필요 시 부여 */
+.after-hero {padding-top: var(--topbar-h);}
+
+/* =========================
+   News (섹션/카드)
+========================= */
 .news-section {
-	padding: 60px 0
+	padding: 60px 0;
+	background: #212529; /* FAQ와 같은 배경 */
+	color: #fff;
 }
 
+/* 카드: 흰색으로 통일 */
 .news-section .card {
-	background: rgba(255, 255, 255, .85);
-	color: #111
+	background: #fff !important;
+	color: #111 !important;
+	border: 1px solid #e9ecef;
+	border-radius: 12px;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .12);
+	transition: transform .18s, box-shadow .18s;
+}
+
+.news-section .card:hover {
+	transform: translateY(-3px);
+	box-shadow: 0 12px 28px rgba(0, 0, 0, .2);
+}
+
+.news-section .card .card-title, .news-section .card .card-title a,
+	.news-section .card .card-text {
+	color: #111 !important;
+	text-decoration: none;
+}
+
+.news-section .card .card-company {
+	color: #6b7280 !important;
 }
 
 .news-title {
@@ -141,42 +224,128 @@ html, body {
 	font-weight: 700;
 	margin-bottom: 30px;
 	color: #fff;
-	text-shadow: 1px 1px 3px #000
+	text-shadow: 1px 1px 3px #000;
 }
 
+/* 카드 이미지 */
+img.card-img-top {
+	width: 100%;
+	height: 200px;
+	object-fit: cover;
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
+}
+
+/* 뉴스 좌우 화살표 (카드 외부 알약 버튼) */
+.news-rotator-wrap {
+	position: relative;
+	overflow: visible;
+}
+
+.nav-outer {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 18px;
+	height: 72px;
+	padding: 0;
+	border: 1px solid rgba(0, 0, 0, .08);
+	border-radius: 12px;
+	background: rgba(255, 255, 255, .96);
+	color: #111;
+	font-size: 20px;
+	font-weight: 900;
+	line-height: 1;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	z-index: 9;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .22);
+	transition: transform .12s, box-shadow .12s, background .12s, opacity
+		.12s;
+	opacity: .95;
+}
+
+.nav-outer.prev {
+	left: -28px;
+	padding-right: 2px;
+}
+
+.nav-outer.next {
+	right: -28px;
+	padding-left: 2px;
+}
+
+.nav-outer:hover {
+	background: #fff;
+	transform: translateY(-50%) scale(1.04);
+	box-shadow: 0 10px 24px rgba(0, 0, 0, .28);
+}
+
+.nav-outer:focus {
+	outline: 2px solid #94a3b8;
+	outline-offset: 2px;
+}
+
+@media ( max-width :576px) {
+	.nav-outer {
+		height: 60px;
+	}
+	.nav-outer.prev {
+		left: 6px;
+	}
+	.nav-outer.next {
+		right: 6px;
+	}
+}
+
+/* 내부 전환 페이드 */
+.news-rotator .card-img-top {
+	transition: opacity .18s;
+}
+
+.news-rotator.switching .card-img-top {
+	opacity: .35;
+}
+
+/* =========================
+   FAQ
+========================= */
 .faq-section {
 	background: #212529;
 	color: #fff;
-	padding: 60px 20px
+	padding: 60px 20px;
+}
+
+.faq-section h4, .faq-section h4 a {
+	color: #fff !important;
+	text-decoration: none;
 }
 
 .accordion-button {
 	background: #343a40;
-	color: #fff
+	color: #fff;
 }
 
 .accordion-button:not(.collapsed) {
-	background: #495057
+	background: #495057;
 }
 
 .accordion-body {
 	background: #2c2f33;
-	color: #ccc
+	color: #ccc;
 }
 
-img.card-img-top {
-	width: 100%;
-	height: 200px;
-	object-fit: cover
-}
-
-/* ===== Floating launcher ===== */
+/* =========================
+   Chat launcher & Modal
+========================= */
 .floating-icon {
 	position: fixed;
 	right: 22px;
 	bottom: 20px;
 	z-index: 9999;
-	cursor: pointer
+	cursor: pointer;
 }
 
 .floating-icon img {
@@ -184,24 +353,23 @@ img.card-img-top {
 	height: 76px;
 	object-fit: cover;
 	border-radius: 50%;
+	background: #fff;
 	box-shadow: 0 6px 14px rgba(0, 0, 0, .35);
 	transition: transform .18s, box-shadow .18s;
-	background: #fff
 }
 
 .floating-icon:hover img {
 	transform: scale(1.07);
-	box-shadow: 0 10px 18px rgba(0, 0, 0, .45)
+	box-shadow: 0 10px 18px rgba(0, 0, 0, .45);
 }
 
 @media ( max-width :576px) {
 	.floating-icon img {
 		width: 60px;
-		height: 60px
+		height: 60px;
 	}
 }
 
-/* ===== Chat modal ===== */
 .chat-modal .modal-dialog {
 	max-width: 560px;
 	width: min(92vw, 560px);
@@ -209,7 +377,7 @@ img.card-img-top {
 	right: 28px;
 	bottom: 120px;
 	margin: 0;
-	z-index: 1065
+	z-index: 1065;
 }
 
 .chat-modal .modal-content {
@@ -219,7 +387,7 @@ img.card-img-top {
 	max-height: 820px;
 	display: flex;
 	flex-direction: column;
-	position: relative
+	position: relative;
 }
 
 .chat-header {
@@ -232,7 +400,7 @@ img.card-img-top {
 	min-height: 56px;
 	display: flex;
 	align-items: center;
-	justify-content: space-between
+	justify-content: space-between;
 }
 
 .chat-head-actions {
@@ -266,7 +434,7 @@ img.card-img-top {
 	min-height: 0;
 	overflow-y: auto;
 	background: #f6f7f9;
-	padding: 14px
+	padding: 14px;
 }
 
 .chat-footer {
@@ -274,7 +442,7 @@ img.card-img-top {
 	gap: 10px;
 	padding: 12px 14px 16px;
 	background: #fff;
-	border-top: 1px solid #eee
+	border-top: 1px solid #eee;
 }
 
 .chat-input {
@@ -284,7 +452,7 @@ img.card-img-top {
 	padding: 12px 14px;
 	border: 1px solid #ddd;
 	border-radius: 10px;
-	outline: none
+	outline: none;
 }
 
 .chat-send-btn {
@@ -294,7 +462,7 @@ img.card-img-top {
 	background: #dc3545;
 	color: #fff;
 	font-weight: 700;
-	height: 52px
+	height: 52px;
 }
 
 .chat-bubble {
@@ -306,27 +474,29 @@ img.card-img-top {
 	word-break: break-word;
 	box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
 	font-size: 1rem;
-	color: #111
+	color: #111;
 }
 
 .chat-bubble.user {
 	margin-left: auto;
-	background: #ffe3e6
+	background: #ffe3e6;
 }
 
 .chat-bubble.bot {
 	margin-right: auto;
-	background: #fff
+	background: #fff;
 }
 
 .chat-time {
 	display: block;
 	margin-top: 2px;
 	font-size: .78rem;
-	opacity: .6
+	opacity: .6;
 }
 
-/* ===== 내 대화방 패널 ===== */
+/* =========================
+   대화 기록 Dock
+========================= */
 .history-dock {
 	position: absolute;
 	left: 0;
@@ -346,7 +516,7 @@ img.card-img-top {
 }
 
 .history-dock.collapsed {
-	max-height: 46px
+	max-height: 46px;
 }
 
 .history-dock.below {
@@ -368,7 +538,7 @@ img.card-img-top {
 	border-bottom: 1px solid rgba(255, 255, 255, .08);
 	font-weight: 700;
 	font-size: .95rem;
-	cursor: pointer
+	cursor: pointer;
 }
 
 .history-toggle {
@@ -379,11 +549,11 @@ img.card-img-top {
 	background: #374151;
 	color: #fff;
 	cursor: pointer;
-	transition: transform .18s
+	transition: transform .18s;
 }
 
 .history-dock:not(.collapsed) .history-toggle {
-	transform: rotate(180deg)
+	transform: rotate(180deg);
 }
 
 .history-body {
@@ -391,7 +561,7 @@ img.card-img-top {
 	padding: 8px 6px;
 	gap: 4px;
 	display: flex;
-	flex-direction: column
+	flex-direction: column;
 }
 
 .history-item {
@@ -400,38 +570,38 @@ img.card-img-top {
 	padding: 8px 10px;
 	transition: background .12s;
 	position: relative;
-	padding-right: 42px; /* delete 버튼 공간 */
+	padding-right: 42px;
 }
 
 .history-item:hover {
-	background: rgba(255, 255, 255, .08)
+	background: rgba(255, 255, 255, .08);
 }
 
 .history-item.active {
-	background: rgba(220, 53, 69, .92)
+	background: rgba(220, 53, 69, .92);
 }
 
 .history-title {
 	font-weight: 700;
-	font-size: .9rem
+	font-size: .9rem;
 }
 
 .history-sub {
 	font-size: .78rem;
 	color: #c7d2fe;
 	opacity: .9;
-	margin-top: 2px
+	margin-top: 2px;
 }
 
 .history-time {
 	font-size: .72rem;
 	opacity: .6;
-	margin-top: 2px
+	margin-top: 2px;
 }
 
 .history-foot {
 	padding: 8px;
-	border-top: 1px solid rgba(255, 255, 255, .08)
+	border-top: 1px solid rgba(255, 255, 255, .08);
 }
 
 .history-new {
@@ -442,9 +612,9 @@ img.card-img-top {
 	font-weight: 700;
 	background: #0d6efd;
 	color: #fff;
-	cursor: pointer
+	cursor: pointer;
 }
-/* 삭제 버튼 */
+
 .history-del {
 	position: absolute;
 	right: 8px;
@@ -459,16 +629,16 @@ img.card-img-top {
 	font-weight: 900;
 	line-height: 28px;
 	cursor: pointer;
-	opacity: .0;
+	opacity: 0;
 	transition: opacity .12s, background .12s;
 }
 
 .history-item:hover .history-del {
-	opacity: .9
+	opacity: .9;
 }
 
 .history-del:hover {
-	background: #ef4444
+	background: #ef4444;
 }
 
 @media ( max-width :576px) {
@@ -476,26 +646,28 @@ img.card-img-top {
 		right: 14px;
 		bottom: 90px;
 		width: 94vw;
-		max-width: none
+		max-width: none;
 	}
 	.chat-modal .modal-content {
-		height: 72vh
+		height: 72vh;
 	}
 	.chat-input, .chat-send-btn {
-		height: 48px
+		height: 48px;
 	}
 	.history-dock {
 		width: 260px;
-		top: -8px
+		top: -8px;
 	}
 	.history-dock.below {
 		left: 8px;
 		right: 8px;
-		top: 52px
+		top: 52px;
 	}
 }
 
-/* ===== 제목 옆(내부) 화살표: 지금은 사용 안 하므로 숨김 ===== */
+/* =========================
+   News 제목/내비 Row
+========================= */
 .news-title-row {
 	display: flex;
 	align-items: center;
@@ -518,91 +690,25 @@ img.card-img-top {
 
 .news-title-row .news-navs {
 	display: none;
-} /* 내부 버튼 숨김 */
-
-/* ===== 카드 바깥 화살표 버튼 (세로 알약 스타일) ===== */
-.news-rotator-wrap {
-	position: relative;
-	overflow: visible;
 }
 
-.nav-outer {
-	position: absolute;
-	top: 50%;
-	transform: translateY(-50%);
-	width: 18px;
-	height: 72px;
-	padding: 0;
-	border: 1px solid rgba(0, 0, 0, .08); /* 경계선 살짝(가독성↑) */
-	border-radius: 12px;
-	background: rgba(255, 255, 255, .96); /* ← 배경 흰색 */
-	color: #111; /* ← 화살표(문자) 색 어두운 회색 */
-	font-size: 20px;
-	font-weight: 900;
-	line-height: 1;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	z-index: 9;
-	box-shadow: 0 6px 18px rgba(0, 0, 0, .22);
-	transition: transform .12s, box-shadow .12s, background .12s, opacity
-		.12s;
-	opacity: .95;
-	/* 브라우저 기본 버튼 외형 제거 */
-	appearance: none;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	color: #111;
-}
-
-.nav-outer.prev {
-	left: -28px;
-	padding-right: 2px;
-}
-
-.nav-outer.next {
-	right: -28px;
-	padding-left: 2px;
-}
-
-.nav-outer:hover {
-	background: #fff; /* 호버 시 더 하얗게 */
-	transform: translateY(-50%) scale(1.04);
-	box-shadow: 0 10px 24px rgba(0, 0, 0, .28);
-}
-
-.nav-outer:focus {
-	outline: 2px solid #94a3b8;
-	outline-offset: 2px;
-}
-
-/* 모바일에서는 조금 짧고, 너무 바깥으로 나가지 않게 */
-@media ( max-width :576px) {
-	.nav-outer {
-		height: 60px;
-	}
-	.nav-outer.prev {
-		left: 6px;
-	}
-	.nav-outer.next {
-		right: 6px;
-	}
-}
-
-/* 전환 페이드 */
-.news-rotator .card-img-top {
-	transition: opacity .18s;
-}
-
-.news-rotator.switching .card-img-top {
-	opacity: .35;
-}
+/* =========================
+   Animation
+========================= */
+@
+keyframes backInUp{
+from { opacity:0; transform: translate3d(0, 60px, 0) scale(.98);}
+to {opacity: 1; transform: translate3d(0, 0, 0) scale(1);}
 }
 </style>
+<!-- 서버에서 내려준 JSON을 실행되지 않는 데이터 블록으로 주입 -->
+<script type="application/json" id="homeNewsJson">
+  <c:out value="${homeNewsJson}" default="[]" escapeXml="false"/>
+</script>
 </head>
 
-<body data-login-user-no="${empty loginUserNo ? '' : loginUserNo}">
+<body class="home-page"
+	data-login-user-no="${empty loginUserNo ? '' : loginUserNo}">
 	<!-- Hero -->
 	<div class="main-section main-background">
 		<video id="bg-video" autoplay muted loop preload="auto"
@@ -612,11 +718,12 @@ img.card-img-top {
 		<!-- 소개 문구 -->
 		<div class="hero-text">
 			<h1>
-				<span class="white-text">재난 알림 플랫폼</span> <span style="color: #ff6b6b;">R-DASH</span>
+				<span class="white-text">재난 알림 플랫폼</span> <span
+					style="color: #ff6b6b;">R-DASH</span>
 			</h1>
 			<p>
-				재민이가 재난 정보를 알려주고<br /> 상황별 행동 요령을 안내해 드립니다.<br /> 여러분의 안전을 지키는
-				든든한 파트너가 되겠습니다.
+				재민이가 재난 정보를 알려주고<br /> 상황별 행동 요령을 안내해 드립니다.<br /> 여러분의 안전을 지키는 든든한
+				파트너가 되겠습니다.
 			</p>
 		</div>
 	</div>
@@ -637,9 +744,9 @@ img.card-img-top {
 								alt="지진 이미지">
 							<div class="card-body">
 								<h5 class="card-title">
-									<span class="title-text">[속보] 강진 발생</span>
+									<a class="title-text title-link" href="#">기사 제목</a>
 								</h5>
-								<p class="card-text">해당 지역 주민은 안전한 곳으로 대피 바랍니다.</p>
+								<p class="card-text card-company no-nav">언론사</p>
 							</div>
 						</div>
 					</div>
@@ -653,9 +760,9 @@ img.card-img-top {
 								alt="화재 이미지" />
 							<div class="card-body">
 								<h5 class="card-title">
-									<span class="title-text">화재 시 행동요령 안내</span>
+									<a class="title-text title-link" href="#">기사 제목</a>
 								</h5>
-								<p class="card-text">119 긴급 행동요령 숙지로 생명을 지키세요.</p>
+								<p class="card-text card-company no-nav">언론사</p>
 							</div>
 						</div>
 					</div>
@@ -669,9 +776,9 @@ img.card-img-top {
 								alt="응급 이미지">
 							<div class="card-body">
 								<h5 class="card-title">
-									<span class="title-text">응급상황 대응 시스템 강화</span>
+									<a class="title-text title-link" href="#">기사 제목</a>
 								</h5>
-								<p class="card-text">최근 대응 시간 단축을 위한 시스템 개편 발표.</p>
+								<p class="card-text card-company no-nav">언론사</p>
 							</div>
 						</div>
 
@@ -768,98 +875,178 @@ img.card-img-top {
 	<script
 		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 	<script>
-document.addEventListener("DOMContentLoaded", function(){
-  var CP='${CP}';
-  
-  /* === 뉴스 데이터(예시) === */
-  const newsData = {
-    breaking: [
-      { title:'[속보] 강진 발생',    text:'해당 지역 주민은 안전한 곳으로 대피 바랍니다.', img: CP+'/resources/image/earth.jpg', href:'#' },
-      { title:'[속보] 기록적 폭우',  text:'하천 접근 금지 및 산사태 주의 바랍니다.',       img: CP+'/resources/image/rain.jpg',  href:'#' },
-      { title:'[속보] 해상 풍랑 경보', text:'해안가·방파제 접근을 자제해 주세요.',          img: CP+'/resources/image/wave.jpg',  href:'#' }
-    ],
+  var CP='${CP}';  /* 전역 */
 
-    /* ← 가운데 카드용 */
-    safety: [
-      { title:'화재 시 행동요령 안내', text:'119 긴급 행동요령 숙지로 생명을 지키세요.', img: CP+'/resources/image/dis.jpg', href:'#' },
-      { title:'피난 계단 확보',         text:'계단·복도 물건 보관 금지, 출입구 확보.',    img: CP+'/resources/image/dis.jpg', href:'#' },
-      { title:'소화기 사용 3단계',      text:'안전핀 뽑고 · 노즐 겨냥 · 손잡이 압착.',     img: CP+'/resources/image/dis.jpg', href:'#' }
-    ],
-    /* 세번째 카드용*/
-    emergency: [
-      { title:'응급상황 대응 시스템 강화', text:'최근 대응 시간 단축을 위한 시스템 개편 발표.', img: CP+'/resources/image/med.jpg',    href:'#' },
-      { title:'AED 설치 확대',           text:'지하철 역사 및 공공시설에 추가 설치됩니다.',    img: CP+'/resources/image/aed.jpg',    href:'#' },
-      { title:'119 문자신고 고도화',      text:'위치 자동전송 기능 시범 적용.',               img: CP+'/resources/image/119sms.jpg', href:'#' }
-    ]
-  };
-  function normIndex(i,len){ i%=len; return i<0? i+len : i; }
+  document.addEventListener("DOMContentLoaded", function(){
 
-  function renderNewsCard(card){
-    const feed = card.dataset.feed;
-    const list = newsData[feed] || [];
-    if(!list.length) return;
-    const idx = normIndex(parseInt(card.dataset.idx||'0',10), list.length);
-    card.dataset.idx = idx;
+    /* ========= 애니메이션 ========= */
+    function initScrollAnimations(){
+      try{
+        const els = document.querySelectorAll('.animate-on-scroll:not(.animated)');
+        const io = new IntersectionObserver((entries, obs)=>{
+          entries.forEach(en=>{
+            if(en.isIntersecting){
+              en.target.classList.add('backInUp','animated');
+              obs.unobserve(en.target);
+            }
+          });
+        }, { threshold: 0.15 });
+        els.forEach(el => io.observe(el));
+        els.forEach(el=>{
+          const r = el.getBoundingClientRect();
+          if (r.top < window.innerHeight && r.bottom > 0) {
+            el.classList.add('backInUp','animated');
+          }
+        });
+      }catch(e){
+        document.querySelectorAll('.animate-on-scroll').forEach(el=>{
+          el.classList.add('backInUp','animated');
+        });
+      }
+    }
+    initScrollAnimations();
 
-    const item = list[idx];
-    const img  = card.querySelector('.card-img-top');
-    const titleSpan = card.querySelector('.title-text');
-    const desc = card.querySelector('.card-text');
+    /* ========= 뉴스 ========= */
+    const HOME_NEWS = JSON.parse(
+      document.getElementById('homeNewsJson')?.textContent || '[]'
+    );
 
-    if(img){ img.src = item.img; img.alt = item.title; }
-    if(titleSpan){ titleSpan.textContent = item.title; }
-    if(desc){ desc.textContent = item.text; }
-
-    // 카드 전체 클릭(화살표 클릭 제외) → 링크
-    card.onclick = (e)=>{
-      if(e.target.closest('.news-nav')) return;
-      if(item.href) location.href = item.href;
+    const pickImg = (kw) => {
+      if(!kw) return CP+'/resources/image/news_default.jpg';
+      if(kw.includes('화재')) return CP+'/resources/image/dis.jpg';
+      if(kw.includes('지진')) return CP+'/resources/image/earth.jpg';
+      if(kw.includes('폭우') || kw.includes('홍수')) return CP+'/resources/image/rain.jpg';
+      if(kw.includes('풍랑') || kw.includes('태풍')) return CP+'/resources/image/wave.jpg';
+      return CP+'/resources/image/news_default.jpg';
     };
+
+    const asList = Array.isArray(HOME_NEWS) ? HOME_NEWS : [];
+    const mapItem = (n) => ({
+      title: n.title || '(제목 없음)',
+      text : n.company || '',
+      img  : pickImg(n.keyword),
+      href : n.url || '#'
+    });
+
+    let newsData = {
+      breaking : asList.slice(0,3).map(mapItem),
+      safety   : asList.slice(3,6).map(mapItem),
+      emergency: asList.slice(6,9).map(mapItem)
+    };
+
+    const normIndex = (i,len)=>{ i%=len; return i<0? i+len : i; };
+
+    function renderNewsCard(card){
+      const feed = card.dataset.feed;
+      const list = newsData[feed] || [];
+      if(!list.length) return;
+      const idx = normIndex(parseInt(card.dataset.idx||'0',10), list.length);
+      card.dataset.idx = idx;
+
+      const item = list[idx];
+      const img   = card.querySelector('.card-img-top');
+      const title = card.querySelector('.title-text');
+      const desc  = card.querySelector('.card-text');
+
+      if(img){ img.src = item.img; img.alt = item.title; }
+      if(title){
+        title.textContent = item.title || '(제목 없음)';
+        if (title.tagName === 'A') {
+          title.href = item.href || '#';
+          title.setAttribute('aria-label', item.title || '');
+          title.target = '_blank';
+          title.rel = 'noopener';
+        }
+      }
+      if(desc){
+        desc.textContent = item.text || '';
+        desc.classList.add('card-company');
+      }
+    }
+
+    function stepCard(card, delta){
+      const feed = card.dataset.feed;
+      const len  = (newsData[feed]||[]).length;
+      if(!len) return;
+      const next = normIndex((parseInt(card.dataset.idx||'0',10) + delta), len);
+      card.dataset.idx = next;
+      card.classList.add('switching');
+      setTimeout(()=>{ renderNewsCard(card); card.classList.remove('switching'); }, 80);
+    }
+
+    function stepAll(delta){
+      document.querySelectorAll('.news-rotator').forEach((c)=> stepCard(c, delta));
+    }
+
+    function initRotators(){
+      const cards = document.querySelectorAll('.news-rotator');
+      cards.forEach((card, i) => {
+        if(!card.dataset.feed){
+          const feeds = ['breaking','safety','emergency'];
+          card.dataset.feed = feeds[i] || 'breaking';
+        }
+        card.dataset.idx = card.dataset.idx || '0';
+
+        const wrap = card.closest('.news-rotator-wrap') || card.closest('.news-col') || card.parentElement;
+        const prev = (wrap && wrap.querySelector('.nav-outer.prev')) || card.querySelector('.news-nav.prev');
+        const next = (wrap && wrap.querySelector('.nav-outer.next')) || card.querySelector('.news-nav.next');
+
+        if (prev) prev.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); stepAll(-1); });
+        if (next) next.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); stepAll(+1); });
+
+        renderNewsCard(card);
+      });
+    }
+
+    initRotators();
+    window.dispatchEvent(new Event('scroll'));
+  });
+
+  /* ========= 챗봇 ========= */
+  var chatModalEl = document.getElementById('chatModal');
+  var chatModal   = null;
+
+  function ensureModal(){
+    try{
+      if (chatModal) return true;
+      if (!chatModalEl) return false;
+      if (!window.bootstrap || !bootstrap.Modal) {
+        console.warn('bootstrap 모달이 아직 준비되지 않았습니다.');
+        return false;
+      }
+      chatModal = new bootstrap.Modal(chatModalEl, { backdrop:'static', keyboard:true });
+      return true;
+    }catch(e){
+      console.error('Modal 초기화 오류:', e);
+      return false;
+    }
   }
 
-  function stepCard(card, delta){
-    const feed = card.dataset.feed;
-    const len  = (newsData[feed]||[]).length;
-    if(!len) return;
-    const next = normIndex((parseInt(card.dataset.idx||'0',10) + delta), len);
-    card.dataset.idx = next;
-    card.classList.add('switching');
-    setTimeout(()=>{ renderNewsCard(card); card.classList.remove('switching'); }, 80);
+  var chatBody   = document.getElementById('chatBody');
+  var chatInput  = document.getElementById('chatInput');
+  var chatMinBtn = document.getElementById('chatMin');
+
+  /* 인사 메시지 (빈 방일 때만 1회 표시) */
+  function nowText(){ return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
+  function ensureGreeting(){
+    if(!chatBody) return;
+    if(chatBody.querySelector('.jm-greeting')) return;
+    var d=document.createElement('div');
+    d.className='chat-bubble bot jm-greeting';
+    d.innerHTML='안녕하세요! 재난 알림 도우미 <b>재민이</b>입니다. 무엇을 도와드릴까요?'
+                +'<span class="chat-time">'+nowText()+'</span>';
+    chatBody.appendChild(d);
+    chatBody.scrollTop=chatBody.scrollHeight;
   }
-  
-  function stepAll(delta){
-	  document.querySelectorAll('.news-rotator').forEach((c)=>{
-	    stepCard(c, delta);   // 기존 stepCard 재사용
-	  });
-	}
 
-//초기화: prev/next가 있는 카드 → 클릭 시 전체 전환
-document.querySelectorAll('.news-rotator').forEach((card) => {
-  const wrap = card.closest('.news-rotator-wrap') || card.closest('.news-col') || card.parentElement;
-  const prev = (wrap && wrap.querySelector('.nav-outer.prev')) || card.querySelector('.news-nav.prev');
-  const next = (wrap && wrap.querySelector('.nav-outer.next')) || card.querySelector('.news-nav.next');
-
-  if (prev) prev.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); stepAll(-1); });
-  if (next) next.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); stepAll(+1); });
-
-  renderNewsCard(card);
-});
-
-  /* animate */
-  try{
-    var els=document.querySelectorAll(".animate-on-scroll");
-    var io=new IntersectionObserver(function(entries,obs){
-      entries.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add("backInUp"); obs.unobserve(en.target);} });
-    },{threshold:0.2});
-    els.forEach(function(el){ io.observe(el); });
-  }catch(e){}
-
-  /* refs */
-  var chatModalEl=document.getElementById('chatModal');
-  var chatModal=new bootstrap.Modal(chatModalEl,{backdrop:'static',keyboard:true});
-  var chatBody=document.getElementById('chatBody');
-  var chatInput=document.getElementById('chatInput');
-  var chatMinBtn=document.getElementById('chatMin');
+  function escapeHtml(s){ return (s||'').replace(/[&<>\"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function appendBubble(text,who){
+    if(!chatBody) return;
+    var d=document.createElement('div');
+    d.className='chat-bubble '+(who==='bot'?'bot':'user');
+    d.innerHTML=text+'<span class="chat-time">'+nowText()+'</span>';
+    chatBody.appendChild(d); chatBody.scrollTop=chatBody.scrollHeight;
+  }
 
   /* login → 네임스페이스 */
   var LOGIN_USER_NO_RAW=(document.body.dataset.loginUserNo||'').trim();
@@ -872,31 +1059,18 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
   function setOwner(sid, owner){ try{ localStorage.setItem(ownerKey(sid), owner); }catch(_){ } }
   function getOwner(sid){ try{ return localStorage.getItem(ownerKey(sid)); }catch(_){ return null; } }
 
-  /* === 세션ID 런타임 변수 (중요) === */
   var SESSION_ID = null;
 
-  /* 계정 전환 시 활성 세션 초기화 (로컬+런타임 모두) */
   var LAST_NS = localStorage.getItem('JM_LAST_NS');
   if(LAST_NS !== NS){
-    localStorage.removeItem(nsKey('X-Session-Id')); // 다른 NS의 저장값 제거
-    SESSION_ID = null;                               // ★ 런타임까지 즉시 무효화
-    chatBody.innerHTML='';
+    localStorage.removeItem(nsKey('X-Session-Id'));
+    SESSION_ID = null;
+    chatBody && (chatBody.innerHTML='');
   }
   localStorage.setItem('JM_LAST_NS', NS);
 
-  /* utils */
-  function nowText(){ return new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
-  function escapeHtml(s){ return (s||'').replace(/[&<>\"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
-  function appendBubble(text,who){
-    var d=document.createElement('div');
-    d.className='chat-bubble '+(who==='bot'?'bot':'user');
-    d.innerHTML=text+'<span class="chat-time">'+nowText()+'</span>';
-    chatBody.appendChild(d); chatBody.scrollTop=chatBody.scrollHeight;
-  }
   function previewOf(t){ t=(String(t||'')).replace(/\s+/g,' ').trim(); return t.length>40?t.slice(0,40)+'…':t; }
 
-  /* session & cache — NS 분리 */
-  // (계정 전환 클린업 이후 로드)
   if(SESSION_ID===null){
     SESSION_ID = localStorage.getItem(nsKey('X-Session-Id'))||null;
   }
@@ -923,7 +1097,6 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
     setOwner(newSid, NS);
   }
 
-  /* 섞인 목록 정리 */
   (function cleanupStrays(){
     try{
       var list=getLocalSessions();
@@ -932,13 +1105,12 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
       var cur=localStorage.getItem(nsKey('X-Session-Id'));
       if(cur && getOwner(cur)!==NS){
         localStorage.removeItem(nsKey('X-Session-Id'));
-        SESSION_ID=null;                           // ★ 런타임까지 무효화
-        chatBody.innerHTML='';
+        SESSION_ID=null;
+        chatBody && (chatBody.innerHTML='');
       }
     }catch(_){}
   })();
 
-  /* dock */
   var dockEl=document.getElementById('historyDock');
   var dockHead=document.getElementById('historyHead');
   var dockBody=document.getElementById('historyBody');
@@ -989,7 +1161,6 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
     if(!win){ location.href=url; }
   }
 
-  /* 삭제 */
   function removeLocalSession(sid){
     if(!sid) return;
     var list=getLocalSessions().filter(function(x){ return x!==sid; });
@@ -1012,11 +1183,12 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
       const rest=getLocalSessions();
       SESSION_ID = rest[0] || null;
       if(SESSION_ID){
-        localStorage.setItem(nsKey('X-Session-Id'), SESSION_ID);
+        localStorage.setItem(nsKey('X-Session-Id'),SESSION_ID);
         await openDockRoom(SESSION_ID);
       }else{
         localStorage.removeItem(nsKey('X-Session-Id'));
-        chatBody.innerHTML='';
+        chatBody && (chatBody.innerHTML='');
+        ensureGreeting(); // 방 자체가 없으면 인사 유지
       }
     }
     await loadDockSessions();
@@ -1024,6 +1196,7 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
   }
 
   function renderDock(list){
+    if(!dockBody) return;
     dockBody.innerHTML='';
     if(!list||!list.length){
       var emp=document.createElement('div');
@@ -1068,7 +1241,6 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
     applyBodyPadding();
   }
 
-  /* 서버 세션은 현재 NS(owner)만 표시 */
   async function loadDockSessions(){
     if(!dockBody)return;
 
@@ -1118,13 +1290,13 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
     return true;
   }
 
-  /* 열기: 로그인은 서버만, 그리고 내 소유 아닌 sid는 열지 않음 */
+  /* ★ 여기서 기록 없으면 인사! */
   async function openDockRoom(sid){
-    if(!sid) return;
+    if(!sid) { chatBody && (chatBody.innerHTML=''); ensureGreeting(); return; }
 
     if (LOGIN_USER_NO != null) {
       var o = getOwner(sid);
-      if (o && o !== NS) { chatBody.innerHTML=''; return; }
+      if (o && o !== NS) { chatBody.innerHTML=''; ensureGreeting(); return; }
     }
 
     chatBody.innerHTML='';
@@ -1132,8 +1304,14 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
       try{
         var res=await fetch(CP+'/api/chat/sessions/'+encodeURIComponent(sid)+'/messages?limit=200',
                             {headers:{'X-User-No':LOGIN_USER_NO}});
-        if(res.ok){ var rows=await res.json(); renderRowsAndCache(sid,rows); }
-      }catch(e){ console.warn('member history load failed',e); }
+        if(res.ok){
+          var rows=await res.json();
+          var hasAny = renderRowsAndCache(sid,rows);
+          if(!hasAny) ensureGreeting();
+        }else{
+          ensureGreeting();
+        }
+      }catch(e){ console.warn('member history load failed',e); ensureGreeting(); }
     }else{
       var cached=getLocalMsgs(sid);
       if(cached.length){
@@ -1144,14 +1322,17 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
       }
       try{
         var res2=await fetch(CP+'/api/chat/history?limit=200',{headers:{'X-Session-Id':sid}});
-        if(res2.ok){ var rows2=await res2.json(); renderRowsAndCache(sid,rows2); }
-      }catch(err){ console.error(err); }
+        if(res2.ok){
+          var rows2=await res2.json();
+          var hasAny = renderRowsAndCache(sid,rows2);
+          if(!hasAny && cached.length===0) ensureGreeting();
+        }else if(cached.length===0){ ensureGreeting(); }
+      }catch(err){ console.error(err); if(cached.length===0) ensureGreeting(); }
     }
 
     applyBodyPadding();
   }
 
-  /* 새 세션 확보 */
   async function ensureNewSidForNS(){
     try{
       var r=await fetch(CP+'/api/chat/sessions/new',{method:'POST', headers: (LOGIN_USER_NO!=null?{'X-User-No':LOGIN_USER_NO}:{})});
@@ -1167,7 +1348,6 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
     }
   }
 
-  /* + 새 대화 */
   if (dockNew) {
     dockNew.addEventListener('click', async function (e) {
       e.stopPropagation();
@@ -1183,11 +1363,9 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
     });
   }
 
-  /* send */
   async function sendMessage(){
     var text=document.getElementById('chatInput').value.trim(); if(!text) return;
 
-    // 현재 세션이 없거나 현재 NS 소유가 아니면 새로 생성
     if(!SESSION_ID || (getOwner(SESSION_ID) && getOwner(SESSION_ID)!==NS)){
       await ensureNewSidForNS();
     }
@@ -1198,11 +1376,7 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
 
     try{
       var headers={'Content-Type':'application/json'};
-
-      // ★ 핵심가드: 내 NS 소유인 경우에만 세션ID를 헤더에 실음
-      if(SESSION_ID && getOwner(SESSION_ID)===NS){
-        headers['X-Session-Id']=SESSION_ID;
-      }
+      if(SESSION_ID && getOwner(SESSION_ID)===NS){ headers['X-Session-Id']=SESSION_ID; }
       if(LOGIN_USER_NO!=null) headers['X-User-No']=LOGIN_USER_NO;
 
       var prevSid=SESSION_ID;
@@ -1213,9 +1387,7 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
       var sid=res.headers.get('X-Session-Id');
       if(sid){
         var owner=getOwner(sid);
-        if(owner && owner!==NS){
-          // 다른 NS 소유 sid는 무시
-        }else{
+        if(!owner || owner===NS){
           if(!owner) setOwner(sid, NS);
           if(sid!==SESSION_ID){ migrateCache(prevSid,sid); SESSION_ID=sid; }
           localStorage.setItem(nsKey('X-Session-Id'),SESSION_ID);
@@ -1239,44 +1411,68 @@ document.querySelectorAll('.news-rotator').forEach((card) => {
   document.getElementById('chatSend').addEventListener('click',sendMessage);
   document.getElementById('chatInput').addEventListener('keydown',function(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMessage(); } });
 
-  /* 모달 열릴 때 기본 '아래 모드' */
   chatModalEl.addEventListener('shown.bs.modal', async function(){
+    if (!ensureModal()) return;
     chatBody.scrollTop=chatBody.scrollHeight;
     await loadDockSessions();
     if(SESSION_ID) await openDockRoom(SESSION_ID);
+    if(!chatBody.children.length) ensureGreeting(); // ★ 혹시라도 비어 있으면 인사
     setDockBelow(true);
   });
 
   if(chatMinBtn){
-    chatMinBtn.addEventListener('click', function(e){ e.preventDefault(); chatModal.hide(); });
+    chatMinBtn.addEventListener('click', function(e){
+      e.preventDefault();
+      if (!ensureModal()) return;
+      chatModal.hide();
+    });
   }
 
-  /* launcher */
   var iconEl=document.querySelector('.floating-icon');
   if(iconEl) iconEl.addEventListener('click',function(e){
-    e.preventDefault(); chatModal.show(); setTimeout(function(){ chatInput && chatInput.focus(); },200);
+    e.preventDefault();
+    if (!ensureModal()) return;
+    chatModal.show();
+    setTimeout(function(){ chatInput && chatInput.focus(); },200);
   });
 
-  /* popup (?popup=1&sid=...) */
+  (async function bootChatInline(){
+	  if (!chatBody) return;
+
+	  try {
+	    await loadDockSessions();                 // 좌측/하단 방 목록 로드
+	    if (SESSION_ID) {
+	      await openDockRoom(SESSION_ID);         // 현재 세션 방 열기
+	    }
+	  } catch (e) {
+	    console.warn('bootChatInline error', e);
+	  } finally {
+	    // 기록이 하나도 없으면 인사 메시지 1회 삽입
+	    if (!chatBody.children || chatBody.children.length === 0) {
+	      ensureGreeting();
+	    }
+	  }
+	})();
+  
   (async function initPopupIfNeeded(){
     const params=new URLSearchParams(location.search);
     const isPopup=params.get('popup')==='1';
     const sidParam=params.get('sid');
     if(!isPopup) return;
+
+    if (!ensureModal()) return;
     chatModal.show();
     setTimeout(function(){ chatInput && chatInput.focus(); },200);
     if(sidParam){
       SESSION_ID=sidParam; setOwner(SESSION_ID, NS);
       localStorage.setItem(nsKey('X-Session-Id'),SESSION_ID); addLocalSession(SESSION_ID);
-      try{ await openDockRoom(SESSION_ID); }catch(_){}
+      try{ await openDockRoom(SESSION_ID); }catch(_){ ensureGreeting(); }
     }else{
       await ensureNewSidForNS();
       await openDockRoom(SESSION_ID);
     }
     setDockBelow(true);
   })();
-
-});
 </script>
 </body>
 </html>
