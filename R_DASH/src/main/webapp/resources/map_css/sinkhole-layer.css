@@ -1,89 +1,98 @@
-/* /resources/map_css/sinkhole-bubbles.css */
+/* ============================
+   Sinkhole Layer – 공용 스타일
+   - 우측 고정 패널(집계)
+   - 아이콘/말풍선 HUD
+   ============================ */
 
-/* 지도 안에만 붙는 루트 오버레이 */
-.sh-root{
-  position: absolute;        /* 지도 div 기준 */
-  inset: 0;
-  pointer-events: none;      /* 기본은 클릭 안 받음 */
-  z-index: 7;                /* 지도 타일(5) 위, 카카오 로고/컨트롤(10) 아래면 7~8 적당 */
+/* 우측 고정 컨테이너 (마스코트 + 패널) */
+.sh-fixed-wrap{
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 210;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
 }
 
-/* 버블(픽셀 고정) */
-.sh-bubble{
-  position: absolute;        /* 부모 .sh-root 기준 */
-  transform: translate(-50%, -50%);
-  border-radius: 9999px;
-  background: rgba(151,117,250,.35);
-  border: 2px solid rgba(111,66,193,.85);
-  box-shadow: 0 4px 14px rgba(0,0,0,.22);
-  pointer-events: auto;      /* 버블만 클릭 가능 */
-  transition: transform .08s ease, box-shadow .12s ease, border-color .12s;
-}
-.sh-bubble:hover{
-  box-shadow: 0 10px 22px rgba(0,0,0,.28);
-  border-color: rgba(111,66,193,1);
-}
-
-.sh-bubble-label{
-  position: absolute; left:50%; top:50%;
-  transform: translate(-50%, -50%);
-  font: 700 12px/1 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
-  color: #2d2355;
-  text-shadow: 0 1px 0 rgba(255,255,255,.35);
+/* 마스코트 이미지 */
+.sh-mascot{
+  width: 120px;
+  height: 120px;
   user-select: none;
+  -webkit-user-drag: none;
 }
 
-/* hover 카드 */
-.sh-bubble-card{
-  position: absolute; left:50%; top:0;
-  transform: translate(-50%, calc(-100% - 8px));
-  background:#fff; color:#111827;
-  border-radius:10px; padding:8px 10px;
-  box-shadow:0 12px 28px rgba(0,0,0,.22);
-  font:600 12px/1.25 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
-  white-space:nowrap; opacity:0; pointer-events:none;
-  transition: opacity .12s ease, transform .12s ease;
+/* 집계 패널 */
+.sh-panel{
+  background: rgba(255,255,255,.96);
+  border-radius: 14px;
+  box-shadow: 0 12px 24px rgba(0,0,0,.18);
+  padding: 10px 12px;
+  min-width: 200px;
+  backdrop-filter: blur(2px);
+  font: 700 13px/1.25 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
 }
-.sh-bubble.hover .sh-bubble-card{
-  opacity:1; transform: translate(-50%, calc(-100% - 10px));
+.sh-panel h4{
+  margin: 2px 0 8px 0;
+  font-size: 13px;
+  text-align: left;
+  color: #111827;
 }
+.sh-row{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 8px 0;
+}
+.sh-dot{
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.15);
+}
+.sh-name{ flex: 1; color: #1d4ed8; }
+.sh-cnt{ font-weight: 900; color: #111827; }
 
-/* 범례: 지도 안 오른쪽 위 */
-.sh-legend{
-  position: absolute; right: 12px; top: 12px;
-  z-index: 8;                        /* 버블 위에(=sh-root 7보다 크게) */
-  background: rgba(255,255,255,.92);
-  border-radius: 14px; padding: 10px 12px;
-  box-shadow: 0 10px 24px rgba(0,0,0,.18);
-  backdrop-filter: blur(4px);
-  min-width: 170px;
+/* 상태별 색상 */
+.sh-dot-temp{ background:#bae6fd; }  /* 임시복구 */
+.sh-dot-prog{ background:#93c5fd; }  /* 복구중 */
+.sh-dot-done{ background:#60a5fa; }  /* 복구 완료 */
+
+/* 말풍선 HUD(아이콘 클릭 시) */
+.sh-bubble{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:12px;
+  padding:10px 12px;
+  box-shadow:0 10px 20px rgba(0,0,0,.12);
+  font:600 13px/1.3 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
+  color:#0f172a;
+  max-width:220px;
+  pointer-events:auto;
 }
-.sh-legend-title{
-  font: 800 13px/1 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
-  color: #1f2937; margin-bottom: 6px; text-align: center;
+.sh-bubble h5{
+  margin:0 0 6px 0;
+  font-size:14px;
+  color:#111827;
 }
-.sh-legend-row{ display:flex; align-items:center; gap:10px; margin:8px 0; }
-.sh-legend-dot{
-  flex:0 0 auto; width:14px; height:14px;
+.sh-badge{ display:inline-flex; align-items:center; gap:6px; font-weight:800; }
+.sh-dot-mini{
+  width:12px; height:12px;
   border-radius:9999px;
-  background: rgba(151,117,250,.35);
-  border: 2px solid rgba(111,66,193,.85);
-  box-shadow: 0 3px 10px rgba(0,0,0,.16);
+  box-shadow:0 1px 3px rgba(0,0,0,.2);
 }
-.sh-legend-lb{
-  font:600 12px/1.1 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
-  color:#374151;
+.sh-mini-temp{ background:#bae6fd; }
+.sh-mini-prog{ background:#93c5fd; }
+.sh-mini-done{ background:#60a5fa; }
+
+/* VLC 아이콘 (커스텀 오버레이로 올림) */
+.sh-icon{
+  width:60px; height:60px;
+  transform: translate(-50%, -100%);
+  cursor:pointer;
+  user-select:none;
+  -webkit-user-drag:none;
 }
-
-
-
-/* 싱크홀 마커 기본형 (보라 점) */
-.shk-marker { --animate-duration: 800ms; }              /* ✅ 이 레이어에만 적용 */
-.shk-marker .pin {
-  width:14px;height:14px;border-radius:50%;
-  background:#8b5cf6;border:2px solid #fff;
-  box-shadow:0 2px 6px rgba(0,0,0,.3);
-}
-/* 클릭 시 강조 */
-.shk-marker.is-active .pin { box-shadow:0 0 0 4px rgba(139,92,246,.25); }
-
