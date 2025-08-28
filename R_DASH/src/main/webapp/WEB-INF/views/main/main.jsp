@@ -429,12 +429,18 @@ img.card-img-top {
 	background: rgba(255, 255, 255, .35);
 }
 
-.chat-body {
-	flex: 1;
-	min-height: 0;
-	overflow-y: auto;
-	background: #f6f7f9;
-	padding: 14px;
+/* 추가/수정 */
+.chat-body{
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  background:#f6f7f9;
+  padding:14px;
+
+  /* ↓ 새로 추가 */
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 
 .chat-footer {
@@ -477,14 +483,19 @@ img.card-img-top {
 	color: #111;
 }
 
-.chat-bubble.user {
-	margin-left: auto;
-	background: #ffe3e6;
+/* 사용자: 오른쪽 */
+.chat-bubble.user{
+  align-self:flex-end;     /* ← 오른쪽 정렬(핵심) */
+  margin-left:auto;        /* ← 안전망(있어도 무방) */
+  background:#ffdfe3;
+  color:#222;
 }
 
-.chat-bubble.bot {
-	margin-right: auto;
-	background: #fff;
+/* 봇: 왼쪽 */
+.chat-bubble.bot{
+  align-self:flex-start;   /* ← 왼쪽 정렬 */
+  margin-right:auto;
+  background:#fff;
 }
 
 .chat-time {
@@ -856,7 +867,7 @@ to {opacity: 1; transform: translate3d(0, 0, 0) scale(1);}
 				</div>
 				<div id="chatBody" class="chat-body">
 					<div class="chat-bubble bot">
-						안녕하세요! 재난 알림 도우미 <b>재민이</b>입니다. 무엇을 도와드릴까요? <span
+						안녕하세요! 재난 알림 도우미 <b>재민이</b>입니다. 저는 재난 및 안전 정보를 제공할 수 있습니다. 기상 정보, 지진, 화재, 태풍 등 자연재해와 관련된 정보를 알려드릴 수 있으며, 안전 수칙이나 대처 방법도 안내해 드릴 수 있습니다. 궁금한 점이 있으면 말씀해 주세요. <span
 							class="chat-time"></span>
 					</div>
 				</div>
@@ -1033,7 +1044,7 @@ to {opacity: 1; transform: translate3d(0, 0, 0) scale(1);}
     if(chatBody.querySelector('.jm-greeting')) return;
     var d=document.createElement('div');
     d.className='chat-bubble bot jm-greeting';
-    d.innerHTML='안녕하세요! 재난 알림 도우미 <b>재민이</b>입니다. 무엇을 도와드릴까요?'
+    d.innerHTML='안녕하세요! 재난 알림 도우미 <b>재민이</b>입니다. 저는 재난 및 안전 정보를 제공할 수 있습니다. 기상 정보, 지진, 화재, 태풍 등 자연재해와 관련된 정보를 알려드릴 수 있으며, 안전 수칙이나 대처 방법도 안내해 드릴 수 있습니다. 궁금한 점이 있으면 말씀해 주세요.'
                 +'<span class="chat-time">'+nowText()+'</span>';
     chatBody.appendChild(d);
     chatBody.scrollTop=chatBody.scrollHeight;
