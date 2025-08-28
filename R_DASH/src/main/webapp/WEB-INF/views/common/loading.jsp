@@ -15,14 +15,16 @@
     opacity: 1;
     transition: opacity 0.5s ease;
   }
-  .loading {
+.loading {
     width: 90vw;
     margin: 3rem auto;
     text-align: center;
-    position: absolute;
-    top:35%;
+    position: fixed; /* 화면 고정 */
+    top: 35%;
+    left: 0;
+    right: 0;
     z-index: 9999;  
-  }
+}
   .loading_spinner {
     display: flex;
     justify-content: center;
