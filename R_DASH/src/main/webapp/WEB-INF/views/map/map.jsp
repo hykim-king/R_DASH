@@ -8,11 +8,12 @@
 
 <style>
 #map {
-	position: relative; /* ✅ 오버레이 absolute 기준은 지도 div */
+	position: absolute; /* 화면 기준으로 붙여버림 */
+	top: 90px;
+	left: 0;
 	width: 100%;
-	height: calc(100vh - 56px - 40px);
-	top: 56px; /* 상단바 높이에 맞춰 조정 */
-	z-index: 5;
+	height: 100vh; /* 브라우저 창 전체 높이 */
+	z-index: 1;
 }
 
 html, body {
@@ -42,7 +43,8 @@ html, body {
 
 
 <!-- 마커 애니메이션  -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
 <!-- 레이어별 스타일 -->
 <link rel="stylesheet"
@@ -55,6 +57,8 @@ html, body {
 	href="${pageContext.request.contextPath}/resources/map_css/landslide-layer.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/map_css/sinkhole-layer.css" />
+	<link rel="stylesheet"
+    href="${pageContext.request.contextPath}/resources/map_css/dust-layer.css" />
 </head>
 
 <body data-context-path="${pageContext.request.contextPath}"
