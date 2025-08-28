@@ -13,7 +13,7 @@
 		  reg_dt AS regDt
 		FROM news
 		WHERE keyword=#{keyword}
-		AND TRUNC(reg_dt) = TRUNC(SYSDATE)
+		AND TRUNC(pub_dt) = TRUNC(SYSDATE)
 		ORDER BY pub_dt DESC
 		FETCH FIRST 3 ROWS ONLY
     </select>
