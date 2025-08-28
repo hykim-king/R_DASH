@@ -21,7 +21,7 @@
       return;
     }
 
-    // 히트맵 스크립트 로드 후 레이어 등록
+    // heatmap.js 로드 후 레이어 등록
     loadHeatmapLib(function ok () {
       var layer = createLandslideHeatLayer(App);
       if (typeof App.register === 'function') {
@@ -54,15 +54,15 @@
     var map = App.map;
     var BASE = (document.body && document.body.getAttribute('data-context-path')) || ''; // ex) "/ehr"
     var API = {
-      byRegion: BASE + '/landslide/byRegionInBBox.do', // 집계: [{NAME, LAT, LON, CNT}, ...]
-      points:   BASE + '/landslide/points.do'          // 사건: [{ID, LAT, LON, DATE(YYYY-MM-DD), LEVEL, ...}]
+      byRegion: BASE + '/landslide/byRegionInBBox.do',
+      points:   BASE + '/landslide/points.do'
     };
 
     // ---------- 컨테이너 & heatmap 인스턴스 ----------
     var mapEl = document.querySelector('#map') || document.body;
+
     var container = document.createElement('div');
     container.id = 'ls-heat-container';
-    container.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:25;width:100%;height:100%;';
     mapEl.appendChild(container);
 
     var heat = h337.create({
@@ -74,30 +74,21 @@
       backgroundColor: 'rgba(0,0,0,0)'
     });
 
-    // 포인트(최근 사건) 오버레이 루트
     var pointRoot = document.createElement('div');
     pointRoot.id = 'ls-point-root';
-    pointRoot.style.cssText = 'position:absolute;inset:0;pointer-events:none;z-index:26;';
     mapEl.appendChild(pointRoot);
 
     // 범례/필터/HUD
     ensureLegend();
     ensureControls();
 
-
     // ---------- 내부 상태 ----------
     var idleListener = null, resizeObserver = null, idleTimer = null;
-    var lastAggRows = null;     // 집계 캐시
-    var lastPointRows = null;   // 포인트 캐시
-    var dotOverlays = [];       // CustomOverlay[]
+    var lastAggRows = null;
+    var lastPointRows = null;
+    var dotOverlays = [];
 
-    // 기본 필터 상태
-    var state = {
-      recentDays: 30,           // 최근 N일
-      from: null,               // YYYY-MM-DD
-      to: null,                 // YYYY-MM-DD
-      level: 'ALL'              // 'ALL' | '경보' | '주의보'
-    };
+    var state = { recentDays: 30, from: null, to: null, level: 'ALL' };
 
     // ---------- 유틸 ----------
     function toNum(a,b,def){ var v = (a!=null?a:b); var n = Number(v); return isNaN(n)?(def==null?NaN:def):n; }
@@ -159,7 +150,7 @@
     function fetchAgg(extra){ return fetchJSON(API.byRegion + '?' + getBBoxParams(extra)); }
     function fetchPoints(extra){ return fetchJSON(API.points + '?' + getBBoxParams(extra)); }
 
-    // ---------- 지도 좌표 → heatmap 좌표(px) ----------
+    // ---------- 좌표 변환 ----------
     function aggToHeat(aggRows) {
       if (!aggRows || !aggRows.length) return { max: 0, data: [] };
       var proj = map.getProjection();
@@ -192,13 +183,12 @@
       heat.configure({ radius: scaled });
     }
 
-    // ---------- 포인트(최근 사건) 표시 ----------
+    // ---------- 포인트 ----------
     function clearDots(){
       for (var i=0;i<dotOverlays.length;i++){ dotOverlays[i].setMap(null); }
       dotOverlays.length = 0;
     }
     function colorForLevel(level){
-      // 경보=빨강, 주의보=주황, 기타=보라(※ 필요시 바꾸세요)
       var s = (level||'').toString();
       if (s.indexOf('경보')>-1) return '#e11d48';
       if (s.indexOf('주의')>-1) return '#f97316';
@@ -208,7 +198,7 @@
       clearDots();
       if (!pointRows || !pointRows.length) return;
       var zoom = map.getLevel();
-      var size = (zoom>=9?6:(zoom>=7?8:(zoom>=5?10:12))); // 줌에 따른 점 크기
+      var size = (zoom>=9?6:(zoom>=7?8:(zoom>=5?10:12)));
       for (var i=0;i<pointRows.length;i++){
         var p = normPoint(pointRows[i]);
         if (isNaN(p.lat) || isNaN(p.lon)) continue;
@@ -247,12 +237,10 @@
       for (var i=0;i<rows.length;i++){
         var p = normPoint(rows[i]);
 
-        // 등급
         if (extra && extra.level && extra.level !== 'ALL'){
           if ((p.level||'').indexOf(extra.level) === -1) continue;
         }
 
-        // 기간
         var d = parseDate(p.date);
         if (from || to){
           if (d){
@@ -261,17 +249,16 @@
           }
         } else if (extra && extra.recentDays != null){
           if (d){
-            var diff = (now - d) / 86400000; // 일수
+            var diff = (now - d) / 86400000;
             if (diff > Number(extra.recentDays)) continue;
           }
         }
-
         out.push(rows[i]);
       }
       return out;
     }
 
-    // ---------- HUD ----------
+    // ---------- HUD (필요 시 확장) ----------
     function ensureHUD(){
       if (document.getElementById('ls-hud')) return;
       var hudEl = document.createElement('div');
@@ -303,30 +290,28 @@
       if (r) r.textContent = '최근 발생일: ' + recentStr;
     }
 
-    // ---------- 범례 ----------
+    // ---------- 범례(배너 카드) ----------
     function ensureLegend(){
       if (document.getElementById('ls-legend')) return;
       var el = document.createElement('div');
       el.id = 'ls-legend';
+
+      var heroSrc = BASE + '/resources/image/jaeminsinkhole_8.png';
       el.innerHTML =
-        '<div style="font-weight:700;margin-bottom:6px">산사태 밀도(히트맵)</div>' +
-        '<div style="display:flex;gap:10px;align-items:center;margin-bottom:8px">' +
-          '<span style="display:inline-block;width:60px;height:12px;background:linear-gradient(90deg,#00f,#0ff,#0f0,#ff0,#f00);border-radius:6px"></span>' +
-          '<span>낮음 → 높음</span>' +
-        '</div>'+
-        '<div style="font-weight:700;margin:6px 0 4px">포인트 색상</div>'+
-        '<div style="display:flex;gap:10px;align-items:center">'+
-          badge('#e11d48','경보')+
-          badge('#f97316','주의보')+
-          badge('#7c3aed','기타')+
+        '<div class="legend-hero"><img src="'+heroSrc+'" alt="산사태 배너"></div>'+
+        '<div class="legend-body">'+
+        '  <h4 class="legend-title">산사태 밀도(히트맵)</h4>'+
+        '  <div class="legend-section-title">밀도 스케일</div>'+
+        '  <div class="legend-grad"></div>'+
+        '  <div class="legend-scale"><span>낮음</span><span style="margin-left:auto">→</span><span>높음</span></div>'+
+        '  <div class="legend-section-title">포인트 색상</div>'+
+        '  <div class="legend-keys">'+
+        '    <div class="legend-key"><span class="dot red"></span><span>경보</span></div>'+
+        '    <div class="legend-key"><span class="dot orange"></span><span>주의보</span></div>'+
+        '    <div class="legend-key"><span class="dot purp"></span><span>기타</span></div>'+
+        '  </div>'+
         '</div>';
       (document.querySelector('#map') || document.body).appendChild(el);
-
-      function badge(c,txt){
-        return '<span style="display:inline-flex;align-items:center;gap:6px">' +
-               '<i style="display:inline-block;width:10px;height:10px;border-radius:999px;background:'+c+';box-shadow:0 0 8px '+c+'"></i>'+
-               '<b>'+txt+'</b></span>';
-      }
     }
 
     // ---------- 필터 UI ----------
@@ -362,8 +347,8 @@
           '</select>'+
         '</div>'+
         '<div style="display:flex;gap:8px;justify-content:flex-end">'+
-          '<button id="ls-apply" style="padding:8px 10px;border-radius:10px;background:#111827;color:#fff;font-weight:700;border:none;cursor:pointer">적용</button>'+
-          '<button id="ls-reset" style="padding:8px 10px;border-radius:10px;background:#e5e7eb;color:#111827;font-weight:700;border:none;cursor:pointer">초기화</button>'+
+          '<button id="ls-apply" class="ls-btn-primary">적용</button>'+
+          '<button id="ls-reset" class="ls-btn-ghost">초기화</button>'+
         '</div>';
       (document.querySelector('#map') || document.body).appendChild(el);
 
@@ -389,11 +374,9 @@
 
     // ---------- 데이터 갱신 ----------
     function refresh() {
-      // 1) 히트맵(집계)
       fetchAgg(state).then(function(rows){ renderHeatmap(rows||[]); })
         .catch(function (err) { console.error('[LandslideHeat] agg error:', err && err.message ? err.message : err); });
 
-      // 2) 포인트(사건) → 필터 → 점/HUD
       fetchPoints(state).then(function(rows){
         var filtered = applyClientFilter(rows||[], state);
         lastPointRows = filtered;
@@ -441,12 +424,12 @@
       (document.querySelector('#map') || document.body).appendChild(box);
 
       var baseCenter = map.getCenter();
-      var baseLevel  = map.getLevel(); // 이 레벨을 100%로 간주
+      var baseLevel  = map.getLevel();
 
       function levelFor(percent){
-        if (percent === 100) return baseLevel;     // 기준
-        if (percent === 70)  return baseLevel + 1; // 약간 축소
-        if (percent === 50)  return baseLevel + 2; // 더 축소
+        if (percent === 100) return baseLevel;
+        if (percent === 70)  return baseLevel + 1;
+        if (percent === 50)  return baseLevel + 2;
         return baseLevel;
       }
       function setActive(pct){
@@ -461,9 +444,7 @@
         map.setCenter(baseCenter);
         map.setLevel(levelFor(pct));
         setActive(pct);
-        // 히트맵 반경 보정
         adjustRadius();
-        // 포인트 크기/위치 자연스럽게 유지 (재그리기 필요 없음)
       }
 
       box.addEventListener('click', function(ev){
@@ -476,7 +457,6 @@
 
     // ---------- 활성/비활성 ----------
     function activate() {
-      // 지도 고정 + 확대 프리셋 버튼
       lockMap();
       ensureZoomButtons();
 
@@ -503,11 +483,7 @@
       updateHUD([]);
     }
 
-    return {
-      name: 'landslide',
-      activate: activate,
-      deactivate: deactivate,
-      destroy: deactivate
-    };
+    return { name: 'landslide', activate: activate, deactivate: deactivate, destroy: deactivate };
   }
+
 })(this);

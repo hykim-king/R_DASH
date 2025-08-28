@@ -1,3 +1,4 @@
+
 /* eslint-disable */
 (function (global) {
   'use strict';
@@ -10,6 +11,71 @@
     console.log('[NowcastLayer] skip (layer != nowcast)');
     return;
   }
+
+  // ===== NOWCAST 전용 CSS 인라인 삽입 =====
+  (function injectCSS(){
+    if (document.getElementById('nowcast-inline-style')) return;
+    var css = `
+      /* (요청) 우상단 요소들 120px 위치 */
+      .sido-filter-host.top-right { position:absolute; top:120px; right:16px; z-index:50; }
+
+      /* 선택된 시군구 폴리곤 강조(입체 느낌) */
+      .__nc_selected_shadow { box-shadow: 0 8px 16px rgba(0,0,0,.2); }
+
+      /* NOWCAST 전용 아이콘 + 말풍선 */
+      .nc-cta {
+        position: absolute;
+        top: 120px;              /* ← 20px에서 120px로 */
+        right: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        z-index: 60;
+        pointer-events: auto;
+      }
+      .nc-cta .bubble {
+        max-width: 260px;
+        background: #ffffff;
+        border: 1px solid #d6e2f0;
+        box-shadow: 0 6px 14px rgba(23, 50, 93, .15);
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 13px;
+        line-height: 1.35;
+        color: #123;
+        position: relative;
+        white-space: pre-line;
+      }
+      .nc-cta .bubble::after {
+        content: "";
+        position: absolute;
+        right: -8px;
+        top: 16px;
+        border-width: 8px;
+        border-style: solid;
+        border-color: transparent transparent transparent #ffffff;
+        filter: drop-shadow(0 1px 1px rgba(23,50,93,.12));
+      }
+      .nc-cta .icon-btn {
+        width: 44px; height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: #fff;
+        border: 1px solid #d6e2f0;
+        box-shadow: 0 6px 14px rgba(23,50,93,.15);
+        cursor: pointer;
+        transition: transform .1s ease;
+      }
+      .nc-cta .icon-btn:hover { transform: translateY(-1px); }
+      .nc-cta .icon-btn img { width: 28px; height: 28px; display:block; }
+    `.trim();
+    var node = document.createElement('style');
+    node.id = 'nowcast-inline-style';
+    node.textContent = css;
+    document.head.appendChild(node);
+  })();
 
   var NowcastLayer = (global.NowcastLayer = global.NowcastLayer || {});
 
@@ -35,7 +101,7 @@
       }
     };
 
-    // 라벨/단위 (HUD 표기용)
+    // 라벨/단위
     var LABEL = { T1H: '기온', RN1: '1시간 강수량', WSD: '풍속', REH: '습도' };
     var UNIT  = { T1H: '℃',   RN1: 'mm',         WSD: 'm/s', REH: '%'   };
 
@@ -43,13 +109,28 @@
     var cache = { T1H: null, RN1: null, REH: null, WSD: null };
     var currentCategory = (qs.get('category') || 'T1H').toUpperCase();
 
+    // 추가 상태: 선택 폴리곤/행정구역
+    var __selectedPoly = null;
+    var __selectedSido = null;
+    var __selectedSgg  = null;
+
     // ===== 유틸 =====
     function pickValue(row) {
       if (!row) return null;
-      return (row.OBSR_VALUE != null) ? row.OBSR_VALUE
-           : (row.obsrValue != null) ? row.obsrValue
-           : (row.val != null)       ? row.val
-           : null;
+      var cand = [row.OBSR_VALUE, row.obsrValue, row.obsr_value, row.value, row.val, row.RN1, row.rn1];
+      for (var i=0;i<cand.length;i++) if (cand[i] != null && cand[i] !== '') return cand[i];
+      return null;
+    }
+    var CAT_ALIASES = {
+      T1H: ['T1H','TEMP','TA'],
+      RN1: ['RN1','PCP','PRCP','RAIN1H','R1H','RN','RAIN','RAINFALL'],
+      WSD: ['WSD','WIND','WS'],
+      REH: ['REH','HUMI','RH']
+    };
+    function normCat(c){
+      c = (c||'').toUpperCase();
+      for (var k in CAT_ALIASES) if (CAT_ALIASES[k].indexOf(c) !== -1) return k;
+      return c;
     }
     function fmt(v, u) {
       if (v == null) return '-';
@@ -57,8 +138,6 @@
       if (isNaN(n)) return '-';
       return String(n) + (u || '');
     }
-
-    // ---- 이름 표준화(슬러그)
     function _sidoSlug(s){
       s = (s || '').replace(/\s+/g, '');
       s = s.replace(/특별자치도|자치도|광역시|특별시|자치시|도|시$/g, '');
@@ -67,11 +146,13 @@
            .replace(/^충청북/, '충북').replace(/^충청남/, '충남');
       return s;
     }
+    // 붙어있는 '성남시분당구', '포항시북구' 대응
     function _sggSlug(s){
-      s = (s || '').trim();
-      s = s.replace(/특별자치시/g, '시').replace(/특례시/g, '시');
+      s = (s || '').trim().replace(/특별자치시|특례시/g, '시');
       var parts = s.split(/\s+/);
-      return parts[parts.length - 1];
+      if (parts.length > 1) return parts[parts.length - 1];
+      var m = s.match(/(?:.*?(?:시|군))(.+)$/);
+      return m ? m[1] : s;
     }
     function _slug(sido, sgg){ return _sidoSlug(sido) + '|' + _sggSlug(sgg); }
 
@@ -114,26 +195,45 @@
       }
 
       NowcastLayer.hud = {
-        show: function(map, position, title, vals){
-          if (hudOverlay){ hudOverlay.setMap(null); hudOverlay = null; }
-          var content = document.createElement('div');
-          content.innerHTML = buildHudHTML(title, vals);
-          hudOverlay = new kakao.maps.CustomOverlay({ position: position, content: content, xAnchor:0.5, yAnchor:1.05 });
-          hudOverlay.setMap(map);
-          var closeBtn = content.querySelector('.nc-close');
-          if (closeBtn){
-            closeBtn.addEventListener('click', function(){
-              if (hudOverlay){ hudOverlay.setMap(null); hudOverlay = null; }
-            });
-          }
-        },
-        hide: function(){ if (hudOverlay){ hudOverlay.setMap(null); hudOverlay = null; } },
-        atPolygon: function(poly, title, vals){
-          NowcastLayer.hud.show(map, polygonCenter(poly), title, vals);
-        }
-      };
+  show: function(map, position, title, vals){
+    if (hudOverlay){ hudOverlay.setMap(null); hudOverlay = null; }
+    var content = document.createElement('div');
+    content.innerHTML = buildHudHTML(title, vals);
 
-      // 아이콘(SVG) 문자열
+    // 🔽 여기서 yAnchor + offsetY 로 HUD 전체를 조금 아래로
+    hudOverlay = new kakao.maps.CustomOverlay({ 
+      position: position, 
+      content: content, 
+      xAnchor:0.5, 
+      yAnchor:1.05,
+      yAnchor:1.05,       // 기존 값
+      yAnchor:1.05,       // 유지
+      map: map
+    });
+
+    // 🔽 오프셋 직접 지정 (px 단위)
+    hudOverlay.setMap(map);
+    hudOverlay.setYOffset(-100);   // HUD를 화면에서 100px 내려줌
+
+    var closeBtn = content.querySelector('.nc-close');
+    if (closeBtn){
+      closeBtn.addEventListener('click', function(){
+        if (hudOverlay){ hudOverlay.setMap(null); hudOverlay = null; }
+        if (__selectedPoly) {
+          elevatePolygon(__selectedPoly, false);
+          __selectedPoly = null;
+          __selectedSido = null;
+          __selectedSgg  = null;
+        }
+      });
+    }
+  },
+  hide: function(){ if (hudOverlay){ hudOverlay.setMap(null); hudOverlay = null; } },
+  atPolygon: function(poly, title, vals){
+    NowcastLayer.hud.show(map, polygonCenter(poly), title, vals);
+  }
+};
+
       NowcastLayer.icons = {
         sun:  '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.8"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
         rain: '<svg viewBox="0 0 24 24" fill="none"><path d="M7 15a5 5 0 0 1 0-10c1.7 0 3.2.84 4.1 2.12A4.5 4.5 0 1 1 17 15H7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 20l1-2M12 21l1-2M16 20l1-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
@@ -154,15 +254,12 @@
     console.log('[NowcastLayer] ready, default =', currentCategory);
 
     // ---------- functions ----------
-
-    // hex → rgb
     function hexToRgb(hex) {
       hex = (hex || '#000000').replace('#','');
       var bigint = parseInt(hex, 16);
       return { r: (bigint>>16)&255, g: (bigint>>8)&255, b: bigint&255 };
     }
 
-    // 4개 카테고리 미리 불러오기
     function preloadAll() {
       ['T1H', 'RN1', 'REH', 'WSD'].forEach(function (cat) {
         $.getJSON(API.nationLatest(cat))
@@ -190,36 +287,53 @@
     }
     NowcastLayer.setCategory = setCategory;
 
-    // 전국 스냅샷을 폴리곤에 칠하기(표준화 키 사용) + 파란계열 애니메이션
     function applySnapshot(rows, cat) {
       if (!$.isArray(rows)) rows = [];
-      if (!App || !App.layers || !App.layers.sig) {
-        console.warn('[NowcastLayer] polygon layer missing');
-        return;
-      }
+      if (!App || !App.layers || !App.layers.sig) return;
+
       var byKey = {};
       rows.forEach(function (r) {
+        var sido = r.sidoNm || r.SIDO_NM || r.CTP_KOR_NM || r.CTPRVN_NM || '';
+        var sgg  = r.signguNm || r.SIGNGU_NM || r.SIG_KOR_NM || r.SIG_NM || '';
+
         var v = pickValue(r);
-        var key = _slug(r.sidoNm, r.signguNm);
-        byKey[key] = { value: v, display: fmt(v, UNIT[cat]) };
+        if ((cat||'').toUpperCase()==='RN1' && (v==null || v==='')) v = 0;
+
+        var key1 = _slug(sido, sgg);
+        byKey[key1] = { value: v, display: fmt(v, UNIT[cat]) };
+
+        var sgg2 = (function(x){
+          x = (x||'').trim();
+          if (/\s/.test(x)) return x;
+          var m = x.match(/(?:.*?(?:시|군))(.+)$/);
+          return m ? m[1] : x;
+        })(sgg);
+        var key2 = _sidoSlug(sido) + '|' + _sggSlug(sgg2);
+        byKey[key2] = { value: v, display: fmt(v, UNIT[cat]) };
       });
+
       if (App.layers.sig.setData) App.layers.sig.setData(byKey, { category: cat, label: LABEL[cat] });
-      if (App.layers.sig.repaint) App.layers.sig.repaint(); // 내부에서 애니메이션 처리
+      if (App.layers.sig.repaint) App.layers.sig.repaint();
     }
 
-    // 폴리곤 레이어 구성 + 시도 필터 지원
+    function elevatePolygon(poly, active){
+      if (!poly) return;
+      if (active){
+        poly.setOptions({ strokeWeight:3, strokeColor:'#113a74', fillOpacity:0.8 });
+        poly.setZIndex(10);
+      }else{
+        poly.setOptions({ strokeWeight:1, strokeColor:'#2b4a7d', fillOpacity:0.35 });
+        poly.setZIndex(0);
+      }
+    }
+
     function ensurePolygonLayer() {
       if (App.layers && App.layers.sig) return;
 
-      // <body data-nowcast-geo="...">[, data-nowcast-geo2="..."] 지원
       var attr  = (document.body && document.body.getAttribute('data-nowcast-geo'))  || '';
       var extra = (document.body && document.body.getAttribute('data-nowcast-geo2')) || '';
-      var urls = []
-        .concat(attr ? attr.split(',') : [])
-        .concat(extra ? [extra] : [])
-        .map(function (s) { return (s || '').trim(); })
-        .filter(function (s) { return !!s; });
-
+      var urls = [].concat(attr ? attr.split(',') : []).concat(extra ? [extra] : [])
+                   .map(function (s) { return (s || '').trim(); }).filter(Boolean);
       if (!urls.length) { console.warn('[NowcastLayer] no geo urls on <body>'); return; }
       console.log('[NowcastLayer] geo urls:', urls);
 
@@ -228,37 +342,31 @@
       App.layers.sig = {
         _values: {},
         _byKey: polyByKey,
-        _sidoFilterSlug: '', // '' = 전체
+        _sidoFilterSlug: '',
         setData: function (byKey, meta) { this._values = byKey || {}; this._meta = meta || {}; },
-        setSidoFilter: function(sidoNm){
-          this._sidoFilterSlug = _sidoSlug(sidoNm || '');
-          this.repaint();
-        },
+        setSidoFilter: function(sidoNm){ this._sidoFilterSlug = _sidoSlug(sidoNm || ''); this.repaint(); },
         repaint: function () {
           var self = this;
           Object.keys(polyByKey).forEach(function (k) {
             var poly = polyByKey[k];
 
-            // 가시성: 시·도 필터
             var visible = !self._sidoFilterSlug || (poly.__sidoSlug === self._sidoFilterSlug);
             if (poly.getMap() !== (visible ? map : null)) poly.setMap(visible ? map : null);
             if (!visible) return;
 
-            // 목표 색상 (파란 계열): 값이 높을수록 진한 파랑
             var entry = self._values[k];
             var v = entry ? Number(entry.value) : NaN;
 
-            var targetHex = '#BFD7FF'; // 매우 낮음
+            var targetHex = '#BFD7FF';
             if (!isNaN(v)) {
-              targetHex = (v >= 25) ? '#004AAD' :    // 높음(진파랑)
-                          (v >= 15) ? '#2E75FF' :    // 중간
-                          (v >= 5)  ? '#6FA8FF' :    // 낮음
-                                      '#BFD7FF';     // 매우 낮음
+              targetHex = (v >= 25) ? '#004AAD' :
+                          (v >= 15) ? '#2E75FF' :
+                          (v >= 5)  ? '#6FA8FF' :
+                                      '#BFD7FF';
             }
 
-            // 애니메이션: 현재색 → 목표색 보간
             var startHex = poly.__fillHex || '#BFD7FF';
-            var steps = 12, step = 0, interval = 30; // 총 360ms
+            var steps = 12, step = 0, interval = 30;
             var s = hexToRgb(startHex), t = hexToRgb(targetHex);
             clearInterval(poly.__animTimer);
             poly.__animTimer = setInterval(function(){
@@ -268,23 +376,13 @@
               var g = Math.round(s.g + (t.g - s.g) * ratio);
               var b = Math.round(s.b + (t.b - s.b) * ratio);
               var col = 'rgb('+r+','+g+','+b+')';
-              poly.setOptions({
-                fillColor: col,
-                fillOpacity: 0.6,
-                strokeWeight: 1,
-                strokeOpacity: 0.9,
-                strokeColor: '#2b4a7d'
-              });
-              if (step >= steps){
-                clearInterval(poly.__animTimer);
-                poly.__fillHex = targetHex;
-              }
+              poly.setOptions({ fillColor: col, fillOpacity: 0.6, strokeWeight: 1, strokeOpacity: 0.9, strokeColor: '#2b4a7d' });
+              if (step >= steps){ clearInterval(poly.__animTimer); poly.__fillHex = targetHex; }
             }, interval);
           });
         }
       };
 
-      // ---- 속성 추출 (시도코드 보강 포함) ----
       function pickNames(p) {
         var SIDO_BY_PREFIX = {
           '11':'서울특별시','26':'부산광역시','27':'대구광역시','28':'인천광역시',
@@ -297,29 +395,22 @@
         var sgg  = p.SIG_KOR_NM || p.SIGUNGU || p.SIG_NM || p.SGG_NM || p.signguNm || p.SGG || p.sigungu || '';
         if (!sido) {
           var sigcd = (p.SIG_CD || p.sig_cd || '').toString();
-          if (sigcd.length >= 2 && SIDO_BY_PREFIX[sigcd.substr(0,2)]) {
-            sido = SIDO_BY_PREFIX[sigcd.substr(0,2)];
-          }
+          if (sigcd.length >= 2 && SIDO_BY_PREFIX[sigcd.substr(0,2)]) sido = SIDO_BY_PREFIX[sigcd.substr(0,2)];
         }
         return { sido: (sido || '').trim(), sgg: (sgg || '').trim() };
       }
 
-      // ---- 좌표 → 경로 변환(모든 링 처리) ----
       function toPaths(g) {
         var paths = [];
         if (!g) return paths;
         if (g.type === 'Polygon') {
           (g.coordinates || []).forEach(function (ring) {
-            if (ring && ring.length) {
-              paths.push(ring.map(function (c) { return new kakao.maps.LatLng(c[1], c[0]); }));
-            }
+            if (ring && ring.length) paths.push(ring.map(function (c) { return new kakao.maps.LatLng(c[1], c[0]); }));
           });
         } else if (g.type === 'MultiPolygon') {
           (g.coordinates || []).forEach(function (poly) {
             (poly || []).forEach(function (ring) {
-              if (ring && ring.length) {
-                paths.push(ring.map(function (c) { return new kakao.maps.LatLng(c[1], c[0]); }));
-              }
+              if (ring && ring.length) paths.push(ring.map(function (c) { return new kakao.maps.LatLng(c[1], c[0]); }));
             });
           });
         }
@@ -334,7 +425,7 @@
           return;
         }
 
-        var key = _slug(n.sido, n.sgg); // 표준화 키
+        var key = _slug(n.sido, n.sgg);
         if (polyByKey[key]) return;
 
         var paths = toPaths(f.geometry);
@@ -359,30 +450,28 @@
         poly.__fillHex  = '#BFD7FF';
         polyByKey[key] = poly;
 
-        // 클릭 시 HUD
         kakao.maps.event.addListener(poly, 'click', function () {
+          if (__selectedPoly && __selectedPoly !== poly) elevatePolygon(__selectedPoly, false);
+          __selectedPoly = poly; __selectedSido = n.sido; __selectedSgg = n.sgg;
+          elevatePolygon(poly, true);
+
           $.getJSON(API.latest4Region(n.sido, n.sgg)).done(function (rows) {
             var vals = {T1H:null, RN1:null, WSD:null, REH:null};
             (rows||[]).forEach(function(r){
-              var cat = (r.category || '').toUpperCase();
-              var v = (r.OBSR_VALUE!=null)? r.OBSR_VALUE : (r.obsrValue!=null? r.obsrValue : r.val);
+              var cat = normCat(r.category);
+              var v   = pickValue(r);
+              if (cat === 'RN1' && (v==null || v==='')) v = 0;
               if (vals.hasOwnProperty(cat)) vals[cat] = v;
             });
+            if (vals.RN1 == null) vals.RN1 = 0;
             NowcastLayer.hud.atPolygon(poly, n.sido + ' ' + n.sgg, vals);
+          }).fail(function(){
+            NowcastLayer.hud.atPolygon(poly, n.sido + ' ' + n.sgg, {T1H:null,RN1:0,WSD:null,REH:null});
           });
         });
       }
 
-      function loadOne(url) {
-        return $.getJSON(url).then(function (geo) {
-          if (!geo || !geo.features) { console.warn('[NowcastLayer] bad geojson', url); return; }
-          geo.features.forEach(addFeature);
-        }).fail(function (xhr) {
-          console.warn('[NowcastLayer] geo load fail', url, xhr && xhr.status);
-        });
-      }
-
-      var tasks = urls.map(loadOne);
+      var tasks = urls.map(function (u){ return $.getJSON(u).then(function(geo){ if(geo && geo.features) geo.features.forEach(addFeature); }); });
       $.when.apply($, tasks).always(function () {
         var cnt = Object.keys(polyByKey).length;
         console.log('[NowcastLayer] polygon layer ready:', cnt, 'areas (merged)');
@@ -415,22 +504,24 @@
     function focusAndShowNowcast(sidoNm, sggNm){
       var poly = findPolygon(sidoNm, sggNm);
       if (!poly){ console.warn('polygon not found', sidoNm, sggNm); return; }
-      var center = (function(){
-        var p = poly.__paths || [];
-        var sumLat=0,sumLng=0,n=0;
-        for (var i=0;i<p.length;i++) for (var j=0;j<p[i].length;j++){ sumLat+=p[i][j].getLat(); sumLng+=p[i][j].getLng(); n++; }
-        return (n? new kakao.maps.LatLng(sumLat/n, sumLng/n): new kakao.maps.LatLng(36.5,127.8));
-      })();
-      map.setBounds(polygonBounds(poly), 20, 20, 20, 120);
 
+      if (__selectedPoly && __selectedPoly !== poly) elevatePolygon(__selectedPoly, false);
+      __selectedPoly = poly; __selectedSido = sidoNm; __selectedSgg = sggNm;
+      elevatePolygon(poly, true);
+
+      // 지도를 움직이지 않고 HUD만 표시
       $.getJSON(API.latest4Region(sidoNm, sggNm)).done(function (rows) {
         var vals = {T1H:null, RN1:null, WSD:null, REH:null};
         (rows||[]).forEach(function(r){
-          var cat = (r.category || '').toUpperCase();
-          var v = (r.OBSR_VALUE!=null)? r.OBSR_VALUE : (r.obsrValue!=null? r.obsrValue : r.val);
+          var cat = normCat(r.category);
+          var v   = pickValue(r);
+          if (cat === 'RN1' && (v==null || v==='')) v = 0;
           if (vals.hasOwnProperty(cat)) vals[cat] = v;
         });
-        NowcastLayer.hud.show(map, center, sidoNm+' '+sggNm, vals);
+        if (vals.RN1 == null) vals.RN1 = 0;
+        NowcastLayer.hud.atPolygon(poly, sidoNm+' '+sggNm, vals);
+      }).fail(function(){
+        NowcastLayer.hud.atPolygon(poly, sidoNm+' '+sggNm, {T1H:null,RN1:0,WSD:null,REH:null});
       });
     }
 
@@ -443,7 +534,6 @@
         "전라남도","전라북도","제주특별자치도","충청남도","충청북도"
       ];
 
-      // host/card/wrap
       var host = document.getElementById('sido-filter');
       if (!host) { host = document.createElement('div'); host.id='sido-filter'; document.body.appendChild(host); }
       host.classList.add('sido-filter-host','top-right');
@@ -476,7 +566,6 @@
           });
           sggWrap.appendChild(btn);
         });
-        // 첫 칩 자동 실행 (원치 않으면 주석)
         var first = sggWrap.querySelector('.sgg-chip'); if (first) first.click();
       }
 
@@ -498,12 +587,17 @@
           host.dispatchEvent(new CustomEvent('sido:change', { detail:{ value: selected }}));
 
           if (selected){ renderSggChips(selected); }
-          else { sggWrap.innerHTML=''; sggCard.style.display='none'; NowcastLayer.hud.hide(); }
+          else { 
+            sggWrap.innerHTML=''; sggCard.style.display='none'; NowcastLayer.hud.hide();
+            if (__selectedPoly) { elevatePolygon(__selectedPoly, false); __selectedPoly=null; }
+          }
         });
         wrap.appendChild(btn);
       });
 
-      // 외부에서 제어할 수 있도록
+      // NOWCAST 전용 아이콘+말풍선
+      mountCTA();
+
       NowcastLayer.setSidoFilter = function(sidoNm){
         var targetSlug = _sidoSlug(sidoNm || '');
         [].forEach.call(wrap.querySelectorAll('.sido-chip'), function(el){
@@ -513,6 +607,42 @@
         if (App.layers && App.layers.sig && App.layers.sig.setSidoFilter){ App.layers.sig.setSidoFilter(sidoNm||''); }
         if (sidoNm){ renderSggChips(sidoNm); } else { sggWrap.innerHTML=''; sggCard.style.display='none'; }
       };
+
+      function mountCTA(){
+        if (document.getElementById('nc-cta')) return;
+        var box = document.createElement('div');
+        box.id = 'nc-cta';
+        box.className = 'nc-cta';
+
+        var bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.textContent = '너네 마을은 이따가 비온대 ?\n 우리 마을은 비 많이 와  !!';
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'icon-btn';
+        var img = document.createElement('img');
+        img.alt = 'nowcast icon';
+        img.src = (BASE || '') + '/resources/image/jaeminsinkhole_4.png';
+        btn.appendChild(img);
+
+        function showHUDByCTA(){
+          if (__selectedSido && __selectedSgg) { focusAndShowNowcast(__selectedSido, __selectedSgg); return; }
+          var host = document.getElementById('sido-filter');
+          var activeSido = host && host.querySelector('.sido-chip.active');
+          var activeSgg  = host && host.querySelector('.sgg-chip.active');
+          var sidoNm = activeSido ? (activeSido.dataset.sido || '') : '';
+          var sggNm  = activeSgg ? activeSgg.textContent : '';
+          if (sidoNm && sggNm) focusAndShowNowcast(sidoNm, sggNm);
+          else alert('시/군/구를 먼저 선택해 주세요 🙂');
+        }
+        btn.addEventListener('click', showHUDByCTA);
+        bubble.addEventListener('click', showHUDByCTA);
+
+        box.appendChild(bubble);
+        box.appendChild(btn);
+        document.body.appendChild(box);
+      }
     } // mountSidoSggFilterUI
   } // init
 })(window);

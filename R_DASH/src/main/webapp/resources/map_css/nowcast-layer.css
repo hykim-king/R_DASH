@@ -1,88 +1,190 @@
 /* === 우측 상단 위치 === */
-.sido-filter-host.top-right{
-  position: fixed;
-  top: 72px;         /* 헤더 높이에 맞춰 조절 */
-  right: 24px;
-  z-index: 5000;
+.sido-filter-host.top-right {
+	position: fixed;
+	top: 270px; /* 헤더 높이에 맞춰 조절 */
+	right: 24px;
+	z-index: 5000;
 }
 
 /* === 카드 박스 === */
-.sido-filter-card{
-  width: 340px;
-  max-width: 90vw;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 8px 18px rgba(0,0,0,.12);
-  border: 1px solid rgba(0,0,0,.06);
-  padding: 10px 12px;
+.sido-filter-card {
+	width: 340px;
+	max-width: 90vw;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 8px 18px rgba(0, 0, 0, .12);
+	border: 1px solid rgba(0, 0, 0, .06);
+	padding: 10px 12px;
 }
 
 /* === 시·도 칩 영역 === */
-.sido-filter{
-  display:flex; flex-wrap:wrap; gap:10px 10px; align-items:center;
-  max-height: 220px; overflow-y: auto; padding: 6px 2px 4px;
+.sido-filter {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px 10px;
+	align-items: center;
+	max-height: 220px;
+	overflow-y: auto;
+	padding: 6px 2px 4px;
 }
 
 /* === 시군구 카드/칩 영역 === */
-.sgg-filter-card{
-  margin-top:8px; padding:10px 12px; border-radius:12px;
-  background:#fafafa; border:1px solid #ececec;
+.sgg-filter-card {
+	margin-top: 8px;
+	padding: 10px 12px;
+	border-radius: 12px;
+	background: #fafafa;
+	border: 1px solid #ececec;
 }
-.sgg-filter{
-  display:flex; flex-wrap:wrap; gap:8px; max-height:200px; overflow-y:auto;
+
+.sgg-filter {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	max-height: 200px;
+	overflow-y: auto;
 }
 
 /* === 칩 공통 === */
-.sido-chip,.sgg-chip{
-  display:inline-flex; align-items:center; justify-content:center;
-  height:28px; padding:0 12px;
-  border-radius:999px; white-space:nowrap;
-  font:600 13px/1 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
-  border:1px solid #e5e7eb; background:#fff; color:#111827; cursor:pointer;
-  box-shadow:0 1px 0 rgba(0,0,0,.04);
+.sido-chip, .sgg-chip {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 28px;
+	padding: 0 12px;
+	border-radius: 999px;
+	white-space: nowrap;
+	font: 600 13px/1 system-ui, -apple-system, Segoe UI, Roboto, Apple SD
+		Gothic Neo, Malgun Gothic, sans-serif;
+	border: 1px solid #e5e7eb;
+	background: #fff;
+	color: #111827;
+	cursor: pointer;
+	box-shadow: 0 1px 0 rgba(0, 0, 0, .04);
 }
-.sido-chip:hover,.sgg-chip:hover{ background:#f3f4f6; }
-.sido-chip.active,.sgg-chip.active{
-  background:#2563eb; color:#fff; border-color:#2563eb;
-  box-shadow:0 2px 6px rgba(37,99,235,.25);
+
+.sido-chip:hover, .sgg-chip:hover {
+	background: #f3f4f6;
+}
+
+.sido-chip.active, .sgg-chip.active {
+	background: #2563eb;
+	color: #fff;
+	border-color: #2563eb;
+	box-shadow: 0 2px 6px rgba(37, 99, 235, .25);
 }
 
 /* === HUD 카드 === */
-.nc-wrap { position: relative; }
-.nc-card{
-  min-width:210px; max-width:260px;
-  background:#7cb7c6; border-radius:14px;
-  box-shadow:0 8px 18px rgba(0,0,0,.14);
-  color:#0f172a;
-  font:600 13px system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
+.nc-wrap {
+	position: relative;
 }
-.nc-hdr{
-  background:rgba(255,255,255,.75);
-  margin:8px; padding:12px; border-radius:12px;
-  text-align:center; font-weight:700; font-size:18px;
-  color:#1f2937;
+
+.nc-card {
+	min-width: 210px;
+	max-width: 260px;
+	background: #7cb7c6;
+	border-radius: 14px;
+	box-shadow: 0 8px 18px rgba(0, 0, 0, .14);
+	color: #0f172a;
+	font: 600 13px system-ui, -apple-system, Segoe UI, Roboto, Apple SD
+		Gothic Neo, Malgun Gothic, sans-serif;
 }
-.nc-grid{
-  display:grid; grid-template-columns:1fr 1fr; gap:8px;
-  padding:10px 12px 14px;
+
+/* 아이콘/말풍선도 같이 */
+.nc-cta {
+  position: fixed;
+  top: 200px;        /* ← 기존 20px → 120px */
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 6000;
 }
-.nc-chip{
-  display:flex; align-items:center; justify-content:space-between;
-  gap:8px; padding:8px 10px; border-radius:10px;
-  background:rgba(255,255,255,.85);
+
+
+/* === 아이콘 버튼 === */
+.nc-cta .icon-btn {
+  width: auto;       /* 버튼 크기 제한 해제 */
+  height: auto;
+  background: none;  /* 배경 제거 → 흰색 원 사라짐 */
+  border: none;      /* 테두리 제거 */
+  box-shadow: none;  /* 그림자 제거 */
+  padding: 0;
+  cursor: pointer;
 }
-.nc-chip svg{ width:18px; height:18px }
-.nc-chip .v{ font-weight:700 }
-.nc-close{
-  position:absolute; top:-10px; right:-10px; width:28px; height:28px;
-  border-radius:999px; display:flex; align-items:center; justify-content:center;
-  background:#fff; color:#111; border:1px solid #e5e7eb; cursor:pointer;
-  box-shadow:0 2px 6px rgba(0,0,0,.12);
+
+.nc-cta .icon-btn img {
+  width: 90px;   /* 기존 28px → 64px (약 2배 이상) */
+  height: 90px;
+  display: block;
 }
-.nc-close:hover{ background:#f3f4f6 }
+
+
+.nc-hdr {
+	background: rgba(255, 255, 255, .75);
+	margin: 8px;
+	padding: 12px;
+	border-radius: 12px;
+	text-align: center;
+	font-weight: 700;
+	font-size: 18px;
+	color: #1f2937;
+}
+
+.nc-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+	padding: 10px 12px 14px;
+}
+
+.nc-chip {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 8px 10px;
+	border-radius: 10px;
+	background: rgba(255, 255, 255, .85);
+}
+
+.nc-chip svg {
+	width: 18px;
+	height: 18px
+}
+
+.nc-chip .v {
+	font-weight: 700
+}
+
+.nc-close {
+	position: absolute;
+	top: -10px;
+	right: -10px;
+	width: 28px;
+	height: 28px;
+	border-radius: 999px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #fff;
+	color: #111;
+	border: 1px solid #e5e7eb;
+	cursor: pointer;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
+}
+
+.nc-close:hover {
+	background: #f3f4f6
+}
 
 /* 반응형 */
-@media (max-width: 640px){
-  .sido-filter-host.top-right{ right: 12px; top: 64px; }
-  .sido-filter-card{ width: 300px; }
+@media ( max-width : 640px) {
+	.sido-filter-host.top-right {
+		right: 12px;
+		top: 64px;
+	}
+	.sido-filter-card {
+		width: 300px;
+	}
 }
