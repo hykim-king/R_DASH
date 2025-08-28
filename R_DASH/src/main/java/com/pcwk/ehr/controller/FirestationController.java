@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,41 +24,32 @@ public class FirestationController {
     @Autowired
     private FirestationService service;
 
-    /** 지도 BBox 조회 */
-    @GetMapping(value="/bbox", produces="application/json; charset=UTF-8")
+    /** BBox 조회: /firestations/bbox?minLat&maxLat&minLon&maxLon&limit&fireTp&fireTpLabel */
+
+    @GetMapping(value = "/bbox", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public List<FirestationDTO> bbox(
-            @RequestParam double minLat, @RequestParam double maxLat,
-            @RequestParam double minLon, @RequestParam double maxLon,
-            @RequestParam(required=false) String q,
-            @RequestParam(required=false) Integer limit) {
-        return service.selectByBBox(minLat, maxLat, minLon, maxLon, q, limit);
+            @RequestParam double minLat,
+            @RequestParam double maxLat,
+            @RequestParam double minLon,
+            @RequestParam double maxLon,
+            @RequestParam(defaultValue = "1000") int limit,
+            @RequestParam(required = false) String fireTp,
+            @RequestParam(required = false) String fireTpLabel
+    ) {
+        return service.selectByBBox(minLat, maxLat, minLon, maxLon, limit, fireTp, fireTpLabel);
     }
 
-    /** 검색 (목록 + 페이징 + 정렬 + BBox) */
-    @GetMapping(value="/search", produces="application/json; charset=UTF-8")
+    @GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public Map<String, Object> search(
-            @RequestParam(required=false) String q,
-            @RequestParam(required=false) String area,
-            @RequestParam(required=false) Double minLat,
-            @RequestParam(required=false) Double maxLat,
-            @RequestParam(required=false) Double minLon,
-            @RequestParam(required=false) Double maxLon,
-            @RequestParam(required=false, defaultValue="name") String orderBy,
-            @RequestParam(required=false, defaultValue="20") Integer limit,
-            @RequestParam(required=false, defaultValue="0") Integer offset) {
-
-        List<FirestationDTO> rows = service.search(
-                q, area, minLat, maxLat, minLon, maxLon, orderBy, limit, offset);
-        int total = service.countSearch(q, area, minLat, maxLat, minLon, maxLon);
-
-        Map<String, Object> res = new HashMap<>();
-        res.put("rows", rows);
-        res.put("total", total);
-        res.put("limit", limit);
-        res.put("offset", offset);
-        return res;
+    public List<FirestationDTO> search(
+            @RequestParam(required = false, defaultValue = "") String q,
+            @RequestParam(defaultValue = "50") int limit,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(required = false) String fireTp,
+            @RequestParam(required = false) String fireTpLabel
+    ) {
+        return service.search(q, limit, offset, fireTp, fireTpLabel);
     }
 
     /** 단건 상세 */
@@ -67,20 +59,22 @@ public class FirestationController {
         return service.selectOne(stationNo);
     }
 
-    /** 자동완성: 지역 */
+    /** 자동완성: 지역 (fireTp도 선택적으로 전달) */
     @GetMapping(value="/auto/area", produces="application/json; charset=UTF-8")
     @ResponseBody
     public List<String> autoArea(@RequestParam String prefix,
-                                 @RequestParam(required=false, defaultValue="10") Integer limit) {
-        return service.autocompleteArea(prefix, limit);
+                                 @RequestParam(required=false, defaultValue="10") Integer limit,
+                                 @RequestParam(required=false, defaultValue="ALL") String fireTp) {
+        return service.autocompleteArea(prefix, limit, fireTp);
     }
 
-    /** 자동완성: 소방서명 */
+    /** 자동완성: 소방서명 (fireTp도 선택적으로 전달) */
     @GetMapping(value="/auto/station", produces="application/json; charset=UTF-8")
     @ResponseBody
     public List<String> autoStation(@RequestParam String prefix,
                                     @RequestParam(required=false) String area,
-                                    @RequestParam(required=false, defaultValue="10") Integer limit) {
-        return service.autocompleteStation(prefix, area, limit);
+                                    @RequestParam(required=false, defaultValue="10") Integer limit,
+                                    @RequestParam(required=false, defaultValue="ALL") String fireTp) {
+        return service.autocompleteStation(prefix, area, limit, fireTp);
     }
 }

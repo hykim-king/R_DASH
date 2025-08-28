@@ -2,6 +2,7 @@
 (function (global) {
   'use strict';
 
+  // ───────── 기본 가드 ─────────
   var qs = new URLSearchParams(location.search || '');
   var LAYER = (qs.get('layer') || '').toLowerCase();
   var BODY_LAYER = (document.body.getAttribute('data-layer') || '').toLowerCase();
@@ -29,7 +30,20 @@
       console.error('[Sinkhole] kakao map not ready'); return;
     }
 
-    // ── 클러스터 배지 스타일 ──────────────────────
+    // ───────── 아이콘(🚧) 설정 ─────────
+    var ICON_URL = 'https://img.icons8.com/emoji/48/construction-emoji.png';
+    var BASE = 28; // px
+    function makeIcon(size){
+      return new kakao.maps.MarkerImage(
+        ICON_URL,
+        new kakao.maps.Size(size, size),
+        { offset: new kakao.maps.Point(size/2, size/2) }
+      );
+    }
+    var MARKER_IMAGE     = makeIcon(BASE);
+    var MARKER_IMAGE_BIG = makeIcon(Math.round(BASE * 1.35)); // 클릭 애니메이션용
+
+    // ───────── 클러스터 스타일 ─────────
     function svgCircle(size, inner, outer){
       var svg =
         '<svg xmlns="http://www.w3.org/2000/svg" width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'">' +
@@ -56,28 +70,31 @@
     });
 
     var markers = [];
-    var animOverlays = []; // 임시 애니메이션 오버레이들
+    var infoOverlay = null; // 말풍선
 
-    // 레이어 등록
+    // ───────── 우측 패널 설치 ─────────
+    mountRightPanel();
+
+    // 레이어 등록(있을 경우)
     var layer = { name:'sinkhole', activate, deactivate };
     if (typeof App.register === 'function') App.register('sinkhole', layer);
 
     function activate(){
       loadAndRender();
       kakao.maps.event.addListener(map, 'idle', debounce(loadAndRender, 250));
+      kakao.maps.event.addListener(map, 'click', hideInfo);
     }
     function deactivate(){
-      kakao.maps.event.removeListener(map, 'idle', loadAndRender);
+      kakao.maps.event.removeListener(map, 'idle', debounce(loadAndRender, 250));
       clear();
     }
 
     function clear(){
       if (clusterer) clusterer.clear();
-      markers.forEach(m => m.setMap(null));
+      markers.forEach(function(m){ m.setMap(null); });
       markers = [];
-      // 남아있는 애니메이션 오버레이 제거
-      animOverlays.forEach(ov => ov.setMap(null));
-      animOverlays = [];
+      hideInfo();
+      updateRightPanel({ total:0, byState:{} });
     }
 
     function loadAndRender(){
@@ -89,59 +106,156 @@
 
       ajaxJSON(API_POINTS, params).then(function(rows){
         clear();
-        markers = (rows||[]).map(function(r){
-          var lat = Number(r.lat), lon = Number(r.lon);
+
+        // 통계 누적
+        var stats = { total:0, byState:{} };
+
+        markers = (rows || []).map(function(r){
+          var lat = Number(r.lat || r.LAT);
+          var lon = Number(r.lon || r.LON);
           if (isNaN(lat) || isNaN(lon)) return null;
+
+          // 상태 집계
+          var st = getVal(r, ['stateNm','STATE_NM','STATE NM','status']);
+          var stNorm = normalizeState(st) || '미상';
+          stats.total += 1;
+          stats.byState[stNorm] = (stats.byState[stNorm] || 0) + 1;
+
           var pos = new kakao.maps.LatLng(lat, lon);
-          var m = new kakao.maps.Marker({ position: pos });
-          // 클릭 시 애니메이션 spawn
-          kakao.maps.event.addListener(m, 'click', function(){ spawnClickAnim(pos); });
+          var m = new kakao.maps.Marker({ position: pos, image: MARKER_IMAGE });
+
+          kakao.maps.event.addListener(m, 'click', function(){
+            // 1) 아이콘 확대 애니메이션
+            spawnClickAnim(m);
+            // 2) 말풍선(발생일자 + 복구현황)
+            showInfoAt(pos, {
+              occur: getVal(r, ['occurDt','OCCUR_DT','OCCUR DT']),
+              state: st
+            });
+          });
+
           return m;
         }).filter(Boolean);
+
         clusterer.addMarkers(markers);
+        updateRightPanel(stats);
         console.log('[Sinkhole] cluster markers:', markers.length);
-      }).catch(function(e){ console.error('[Sinkhole] load error:', e); });
+      }).catch(function(e){
+        console.error('[Sinkhole] load error:', e);
+      });
     }
 
-    // ▶ 클릭 애니메이션: 해당 좌표에 잠깐 CustomOverlay를 띄우고 애니메 끝나면 제거
-    function spawnClickAnim(position){
+    // ───────── 아이콘 애니메이션 ─────────
+    function spawnClickAnim(marker){
+      try{
+        marker.setImage(MARKER_IMAGE_BIG);
+        setTimeout(function(){ marker.setImage(MARKER_IMAGE); }, 800);
+      }catch(e){ console.warn('[Sinkhole] marker animation failed:', e); }
+    }
+
+    // ───────── 말풍선 ─────────
+    function showInfoAt(position, data){
+      hideInfo();
+
       var el = document.createElement('div');
-      // 전역 CSS 안 쓰고 inline + animate.css 클래스만 사용
       el.style.cssText = [
-        'width:18px;height:18px;border-radius:50%;',
-        'background:#8b5cf6;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);',
-        'transform:translate(-50%,-50%);'
+        'transform:translate(-50%,-100%);',
+        'background:#111827;color:#fff;border-radius:12px;',
+        'padding:10px 12px;box-shadow:0 8px 22px rgba(0,0,0,.25);',
+        'font-size:12px;line-height:1.45;white-space:nowrap;'
       ].join('');
-      // 애니메이션 클래스 + 개별 duration 지정
-      el.classList.add('animate__animated','animate__shakeY');
-      el.style.setProperty('--animate-duration','800ms');
 
-      // 끝나면 제거
-      function cleanup(){
-        ov.setMap(null);
-        el.removeEventListener('animationend', cleanup);
-        var idx = animOverlays.indexOf(ov);
-        if (idx >= 0) animOverlays.splice(idx,1);
-      }
-      el.addEventListener('animationend', cleanup);
+      var occurText = formatDateLabel(data.occur) || '미상';
+      var stateText = normalizeState(data.state) || '미상';
 
-      var ov = new kakao.maps.CustomOverlay({
+      el.innerHTML =
+        '<div style="font-weight:700;margin-bottom:4px;">싱크홀 정보</div>'+
+        '<div><b>발생일자</b> : ' + escapeHTML(occurText) + '</div>'+
+        '<div><b>복구현황</b> : ' + escapeHTML(stateText) + '</div>';
+
+      infoOverlay = new kakao.maps.CustomOverlay({
         position: position,
         content: el,
         yAnchor: 1,
-        zIndex: 999
+        zIndex: 1000
       });
-      ov.setMap(map);
-      animOverlays.push(ov);
-
-      // 같은 애니메이션을 연속 클릭에도 재생되게 reflow 트릭
-      void el.offsetWidth;
-      el.classList.remove('animate__shakeY');
-      el.classList.add('animate__shakeY');
+      infoOverlay.setMap(map);
     }
+
+    function hideInfo(){
+      if (infoOverlay){
+        infoOverlay.setMap(null);
+        infoOverlay = null;
+      }
+    }
+
+
+// ───────── 우측 패널 구현 ─────────
+function mountRightPanel(){
+  if (document.getElementById('sinkholeStat')) {
+    // 이미 만들어져 있으면 위치만 갱신할 수 있게
+    document.getElementById('sinkholeStat').style.top = PANEL_TOP + 'px';
+    return;
   }
 
-  // 공통 유틸: GET JSON
+  var PANEL_BANNER_URL = CTX + '/resources/image/jaeminsinkhole_7.png';
+  var BANNER_HEIGHT = 180;   // 배너 높이
+  var PANEL_TOP     = 220;   // ← 여기만 늘리면 패널이 더 아래로 이동 (예: 220, 260, 300)
+
+  var wrap = document.createElement('div');
+  wrap.id = 'sinkholeStat';
+  wrap.style.cssText = [
+    'position:fixed;right:16px;top:'+PANEL_TOP+'px;z-index:900;',
+    'width:220px;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;',
+    'box-shadow:0 10px 28px rgba(0,0,0,.15);overflow:hidden;font-family:inherit;'
+  ].join('');
+
+  wrap.innerHTML =
+    '<img src="'+PANEL_BANNER_URL+'" alt="Sinkhole banner" '+
+      'style="display:block;width:100%;height:'+BANNER_HEIGHT+'px;object-fit:cover;'+
+             'border-bottom:1px solid #f1f5f9;" '+
+      'onerror="this.style.display=\'none\'" />'+
+    '<div style="padding:10px 12px;border-bottom:1px solid #f1f5f9;font-weight:700;font-size:13px;">싱크홀 발생 현황</div>'+
+    '<div id="sinkholeStatBody" style="padding:10px 12px;font-size:12px;line-height:1.6">'+
+      '<div>총 건수: <b>0</b></div>'+
+      '<div style="margin-top:6px;opacity:.85">복구현황별</div>'+
+      '<ul id="sinkholeStateList" style="list-style:none;margin:6px 0 0;padding:0;"></ul>'+
+    '</div>';
+
+  document.body.appendChild(wrap);
+}
+
+
+
+    function updateRightPanel(stats){
+      var body = document.getElementById('sinkholeStatBody');
+      var list = document.getElementById('sinkholeStateList');
+      if (!body || !list) return;
+
+      // 총 건수
+      var totalEl = body.querySelector('div b');
+      if (totalEl) totalEl.textContent = (stats.total || 0).toLocaleString();
+
+      // 상태별
+      list.innerHTML = '';
+      var entries = Object.entries(stats.byState || {});
+      if (!entries.length){
+        list.innerHTML = '<li style="color:#6b7280;">(표시할 데이터 없음)</li>';
+        return;
+      }
+      entries.sort(function(a,b){ return b[1]-a[1]; });
+      entries.forEach(function(pair){
+        var li = document.createElement('li');
+        li.style.padding = '3px 0';
+        li.innerHTML =
+          '<span>'+escapeHTML(pair[0])+'</span>'+
+          '<span style="float:right;font-weight:700;">'+pair[1].toLocaleString()+'</span>';
+        list.appendChild(li);
+      });
+    }
+  } // init 끝
+
+  // ───────── 유틸 ─────────
   function ajaxJSON(url, params) {
     return new Promise(function (resolve, reject) {
       var q = '';
@@ -164,5 +278,42 @@
     });
   }
   function debounce(fn, ms){ var t; return function(){ clearTimeout(t); t = setTimeout(fn, ms); }; }
+  function getVal(obj, keys){
+    if (!obj) return null;
+    for (var i=0;i<keys.length;i++){
+      if (Object.prototype.hasOwnProperty.call(obj, keys[i])) return obj[keys[i]];
+    }
+    var oks = Object.keys(obj);
+    for (var j=0;j<keys.length;j++){
+      var target = String(keys[j]).replace(/\s+|_/g,'').toLowerCase();
+      var hit = oks.find(function(k){ return k.replace(/\s+|_/g,'').toLowerCase() === target; });
+      if (hit) return obj[hit];
+    }
+    return null;
+  }
+  function normalizeState(s){
+    if (!s) return '';
+    var t = (''+s).trim();
+    if (/완료/.test(t)) return '복구 완료';
+    if (/임시/.test(t)) return '임시복구';
+    if (/중/.test(t))   return '복구중';
+    return t;
+  }
+  function formatDateLabel(v){
+    if (!v) return '';
+    try{
+      var s = String(v).replace(/[^\d]/g,'');
+      if (s.length >= 8) return s.slice(0,4)+'-'+s.slice(4,6)+'-'+s.slice(6,8);
+      var d = new Date(v);
+      if (!isNaN(d)) return [d.getFullYear(), pad(d.getMonth()+1), pad(d.getDate())].join('-');
+    }catch(_){}
+    return String(v);
+  }
+  function pad(n){ return (n<10?'0':'')+n; }
+  function escapeHTML(s){
+    return String(s||'').replace(/[&<>"']/g, function(m){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]);
+    });
+  }
 
 })(this);
