@@ -54,40 +54,48 @@
 document.addEventListener('DOMContentLoaded', function(){
     console.log('DOMContentLoaded');
     
-    //언어 선택
-    const langSelect = document.querySelector("#lang");
-    const currentLang = "${empty lang ? 'ko' : lang}";
-    langSelect.value = currentLang;  // selected 반영
-    
     //조회버튼
     const moveToRegBtn =document.querySelector("#moveToReg");
     console.log(moveToRegBtn);
-    
+    if(moveToRegBtn) {
     moveToRegBtn.addEventListener("click",function(event){
         console.log('moveToSaveButton click');
-    	if(confirm('등록 화면으로 이동 하시겠습니까?') === false)return;
+        if(confirm('등록 화면으로 이동 하시겠습니까?') === false)return;
     
-    	window.location.href = '/ehr/board/doSaveView.do';
- });
+        window.location.href = '/ehr/board/doSaveView.do';
+         });
+    }
+    const searchDivValue = '${search.searchDiv}';
+    const searchWordValue = '${search.searchWord}';
     
-    if('${search.searchDiv}'===''){
+    if(searchDivValue===''){
         searchWord.disabled = false;
     }else{
-        document.querySelector('#selectDivButton').value = '${search.searchDiv}';
+        document.querySelector('#selectDivButton').value = searchDivValue;
     }
     
-    if('${search.searchWord}'!==''){
-        document.querySelector('#searchWord').value = '${search.searchWord}';
+    if(searchWordValue!==''){
+        document.querySelector('#searchWord').value = searchWordValue;
     }
-    // 언어 변경 이벤트
-    langSelect.addEventListener("change", function(){
-        const selectLang = langSelect.value;
-        const selectDivButton = document.querySelector('#selectDivButton').value;
-        const searchWord = document.querySelector('#searchWord').value;
-        const pageNo = document.querySelector('#pageNo').value;
-
-        window.location.href = '/ehr/board/doRetrieve.do?lang='+selectLang+'&searchDiv='+selectDivButton + '&searchWord=' + searchWord + '&pageNo=' + pageNo;
-    });
+  //언어 선택
+    const langSelect = document.querySelector("#lang");
+    // selected 반영
+    if (langSelect) {
+        // 언어 변경 이벤트
+	    const currentLang = "${empty lang ? 'ko' : lang}";
+	    const selectLang = langSelect.value = currentLang; 
+	        
+	    langSelect.addEventListener("change", function(){
+	    	
+	        
+	        const selectLang = langSelect.value;
+	        const selectDivButton = document.querySelector('#selectDivButton').value;
+	        const searchWord = document.querySelector('#searchWord').value;
+	        const pageNo = document.querySelector('#pageNo').value;
+	
+	        window.location.href = '/ehr/board/doRetrieve.do?lang='+selectLang+'&searchDiv='+selectDivButton + '&searchWord=' + encodeURIComponent(searchWord) + '&pageNo=' + pageNo;
+	    });
+    }
 });
 
 
@@ -103,10 +111,12 @@ function pagerDoRetrieve(url, pageNo){
 }
 //공지사항 검색
 function search(){
-	const selectDiv = document.querySelector('#selectDivButton').value;
-    const searchWord = document.querySelector('#searchWord').value;
+    const selectDiv = document.querySelector('#selectDivButton').value;
+    const searchWord = document.querySelector('#searchWord').value; 
     const pageNo = document.querySelector('#pageNo').value;
     const lang = document.querySelector('#lang').value;
+    
+    searchWord.value='';
 
     window.location.href = '/ehr/board/doRetrieve.do?lang=' + lang
                             + '&searchDiv=' + selectDiv
@@ -160,12 +170,8 @@ span {
 </head>
 <body>
 <div class="main-content">
-	<!-- header2 -->
-	<div class="header bg-warning pb-6 header bg-gradient-warning py-5 py-lg-6 pt-lg-6">
-     <%--  <select id="lang" name="lang">
-            <option value="ko" ${lang eq 'ko' ? 'selected' : ''}>KO</option>
-            <option value="en" ${lang eq 'en' ? 'selected' : ''}>EN</option>
-        </select> --%>	
+    <!-- header2 -->
+    <div class="header bg-warning pb-6 header bg-gradient-warning py-5 py-lg-6 pt-lg-6"> 
       <!-- Header container -->
       <div class="container-fluid d-flex align-items-center">
         <div class="row">
@@ -179,21 +185,21 @@ span {
         </div>
       </div>
     </div>
-	
-	<!-- //header2 -->
-	<!-- Page content -->
-	<div class="container-fluid mt--6" style="min-height: 700px; max-width:1700px; margin:0 auto;">
-		<div class="row">
-	 <!-- Light table -->
-		<div class="col">
-  		    <div class="card"> 
-  		    <!-- Card header -->
-		        <div class="card-header border-0 d-flex align-items-center">
-		            <h3 class="mb-0">${msgs.noticeBoard} <span>(${ totalCnt}${msgs.gun})</span></h3>
-		            <!-- 검색란 -->
-		            <div class="ml-auto d-flex align-items-center" ><!-- 오른쪽 끝으로 밀기 -->
-		            <!-- 드롭다운 -->
-		             <div class="dropdown">
+    
+    <!-- //header2 -->
+    <!-- Page content -->
+    <div class="container-fluid mt--6" style="min-height: 700px; max-width:1700px; margin:0 auto;">
+        <div class="row">
+     <!-- Light table -->
+        <div class="col">
+            <div class="card"> 
+            <!-- Card header -->
+                <div class="card-header border-0 d-flex align-items-center">
+                    <h3 class="mb-0">${msgs.noticeBoard} <span>(${ totalCnt}${msgs.gun})</span></h3>
+                    <!-- 검색란 -->
+                    <div class="ml-auto d-flex align-items-center" ><!-- 오른쪽 끝으로 밀기 -->
+                    <!-- 드롭다운 -->
+                     <div class="dropdown">
                   <button class="btn btn-secondary dropdown-toggle" type="button" value="" id="selectDivButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <c:choose>
                         <c:when test="${search.searchDiv == '10' }">${msgs.title}</c:when>
@@ -209,7 +215,7 @@ span {
                 </div>
                 <!-- //드롭다운 -->
                 <input type="hidden" id="searchDivValue" value="${search.searchDiv}">
-		        <input type="text" class="form-control" id="searchWord" name="searchWord">
+                <input type="text" class="form-control" id="searchWord" name="searchWord">
                 <input type="hidden"id="pageNo" name="pageNo" value="${search.pageNo != 0 ? search.pageNo : 1}">  
                 <button type="button" id="searchButton" onclick="javascript:search()" class="btn btn-default text-nowrap" style="margin-left:10px">${msgs.search}</button>
                 <!-- 관리자일 경우에만 등록 가능 -->
@@ -219,65 +225,65 @@ span {
               </div>
             </div>   
     <!-- //Page content -->
-		<!-- Light table -->
-		<div class="table-responsive">
-			<table class="table align-items-center table-flush">
-			 <colgroup>
-		        <col style="width: 10%;"> <!-- 2 -->
-		        <col style="width: 50%;" class="left-col"> <!-- 6 -->
-		        <col style="width: 15%;"> <!-- 2 -->
-		        <col style="width: 35%;"> <!-- 2 -->
-		    </colgroup>
-			    <thead class="thead-light">
-			       <tr>
-				        <th scope="col" >${msgs.no}</th>
-				        <th scope="col" >${msgs.title}</th>
-				        <th scope="col" >${msgs.view}</th>
-				        <th scope="col" >${msgs.regDt}</th>
-			        </tr>
-			    </thead>
-			     <tbody class="list">
-			          <c:choose>
-			            <c:when test="${list.size() > 0 }"> <!-- if -->
-			                <c:forEach var="vo" items="${list }"> <!-- 향상된 for -->
-			                  <tr>
-			                    <td ><c:out value="${vo.no}"/></td>
-			                    <td >
-				                    <div class="media-body" style="text-align: left; margin-left: 100px;">
-					                    <span class="name mb-0 text-sm">
-					                    <a href="/ehr/board/doSelectOne.do?boardNo=${vo.boardNo}">
-					                      <c:out value="${vo.title }"/>
-					                    </a>
-					                    </span>
-				                    </div>
-			                    </td>
-		
-			                    <td ><c:out value="${vo.viewCnt }"/></td>
-			                    <td ><c:out value="${vo.modDt }"/></td>
-			                    <td style="display: none;"><c:out value="${vo.boardNo }"/></td>
-			                  </tr> 
-			                </c:forEach>
-			            </c:when>
-			            <c:otherwise>    <!-- else -->
-			                <tr>
-			                   <td colspan="99">${msgs.noBoard}</td> 
-			                </tr>
-			            </c:otherwise>
-			          </c:choose>
-			     </tbody>
-				</table>
-			</div>
-			<!-- //Light table -->
-			<!-- 카드 푸터 -->
-			<div class="card-footer py-4">
-			<%
+        <!-- Light table -->
+        <div class="table-responsive">
+            <table class="table align-items-center table-flush">
+             <colgroup>
+                <col style="width: 10%;"> <!-- 2 -->
+                <col style="width: 50%;" class="left-col"> <!-- 6 -->
+                <col style="width: 15%;"> <!-- 2 -->
+                <col style="width: 35%;"> <!-- 2 -->
+            </colgroup>
+                <thead class="thead-light">
+                   <tr>
+                        <th scope="col" >${msgs.no}</th>
+                        <th scope="col" >${msgs.title}</th>
+                        <th scope="col" >${msgs.view}</th>
+                        <th scope="col" >${msgs.regDt}</th>
+                    </tr>
+                </thead>
+                 <tbody class="list">
+                      <c:choose>
+                        <c:when test="${list.size() > 0 }"> <!-- if -->
+                            <c:forEach var="vo" items="${list }"> <!-- 향상된 for -->
+                              <tr>
+                                <td ><c:out value="${vo.no}"/></td>
+                                <td >
+                                    <div class="media-body" style="text-align: left; margin-left: 100px;">
+                                        <span class="name mb-0 text-sm">
+                                        <a href="/ehr/board/doSelectOne.do?boardNo=${vo.boardNo}">
+                                          <c:out value="${vo.title }"/>
+                                        </a>
+                                        </span>
+                                    </div>
+                                </td>
+        
+                                <td ><c:out value="${vo.viewCnt }"/></td>
+                                <td ><c:out value="${vo.modDt }"/></td>
+                                <td style="display: none;"><c:out value="${vo.boardNo }"/></td>
+                              </tr> 
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>    <!-- else -->
+                            <tr>
+                               <td colspan="99">${msgs.noBoard}</td> 
+                            </tr>
+                        </c:otherwise>
+                      </c:choose>
+                 </tbody>
+                </table>
+            </div>
+            <!-- //Light table -->
+            <!-- 카드 푸터 -->
+            <div class="card-footer py-4">
+            <%
                 out.print(pageHtml);
             %>
-			 </div>
-			<!-- //카드 푸터 -->
-		    </div>
-		</div>
-	</div>
+             </div>
+            <!-- //카드 푸터 -->
+            </div>
+        </div>
+    </div>
 </div>
 <!--// table 영역 -->
 </div>
