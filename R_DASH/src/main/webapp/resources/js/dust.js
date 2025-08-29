@@ -30,8 +30,6 @@ $(document).ready(function() {
             method: "GET",
             data: { address: userAddress },
             success: function(data) {
-                console.log("위도:", data.lat, "경도:", data.lon);
-
                 const lat = (data.lat != null && data.lat !== '') ? data.lat : null;
                 const lon = (data.lon != null && data.lon !== '') ? data.lon : null;
 
