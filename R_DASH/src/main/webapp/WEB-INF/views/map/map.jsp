@@ -8,12 +8,12 @@
 
 <style>
 #map {
-	position: absolute; /* 화면 기준으로 붙여버림 */
-	top: 90px;
-	left: 0;
-	width: 100%;
-	height: 100vh; /* 브라우저 창 전체 높이 */
-	z-index: 1;
+ position: absolute;
+  top: var(--header-height);
+  left: 0;
+  width: 100%;
+  height: calc(100vh - var(--header-height));
+  z-index: 1;
 }
 
 html, body {
