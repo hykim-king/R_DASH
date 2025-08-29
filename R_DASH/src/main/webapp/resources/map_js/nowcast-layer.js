@@ -169,19 +169,18 @@
         var wsd  = (vals && vals.WSD!=null) ? nfmt(vals.WSD)+' m/s' : '-';
         var reh  = (vals && vals.REH!=null) ? nfmt(vals.REH)+'%' : '-';
 
-        return ''
-        + '<div class="nc-wrap">'
-        + '  <div class="nc-card">'
-        + '    <div class="nc-hdr">'+ t +'</div>'
-        + '    <div class="nc-grid">'
-        + '      <div class="nc-chip c-temp">'+ NowcastLayer.icons.sun +' <span>기온</span><span class="v">'+ temp +'</span></div>'
-        + '      <div class="nc-chip c-rain">'+ NowcastLayer.icons.rain +' <span>강수</span><span class="v">'+ rn1 +'</span></div>'
-        + '      <div class="nc-chip c-wind">'+ NowcastLayer.icons.wind +' <span>풍속</span><span class="v">'+ wsd +'</span></div>'
-        + '      <div class="nc-chip c-humi">'+ NowcastLayer.icons.humi +' <span>습도</span><span class="v">'+ reh +'</span></div>'
-        + '    </div>'
-        + '  </div>'
-        + '  <div class="nc-close" title="닫기" aria-label="닫기">×</div>'
-        + '</div>';
+  return ''
+  + '<div class="nc-wrap">'
+  + '  <div class="nc-card">'
+  + '    <div class="nc-hdr">'+ t +'</div>'
+  + '    <div class="nc-grid">'
+  + '      <div class="nc-chip c-temp">'+ NowcastLayer.icons.sun +' <span>기온</span><span class="v">'+ temp +'</span></div>'
+  + '      <div class="nc-chip c-rain">'+ NowcastLayer.icons.rain +' <span>강수</span><span class="v">'+ rn1 +'</span></div>'
+  + '      <div class="nc-chip c-wind">'+ NowcastLayer.icons.wind +' <span>풍속</span><span class="v">'+ wsd +'</span></div>'
+  + '      <div class="nc-chip c-humi">'+ NowcastLayer.icons.humi +' <span>습도</span><span class="v">'+ reh +'</span></div>'
+  + '    </div>'
+  + '  </div>'
+  + '</div>';
       }
 
       function polygonCenter(poly){
@@ -200,55 +199,40 @@ NowcastLayer.hud = (function(){
   var escHandler = null;
 
   function attachGlobalClosers(doClose){
-    // 지도 아무데나 클릭 → 닫기
-    if (!mapClickHandler){
-      mapClickHandler = kakao.maps.event.addListener(map, 'click', function(){
-        doClose();
-      });
-    }
-    // ESC → 닫기
-    if (!escHandler){
-      escHandler = function(e){
-        if (e.key === 'Escape') doClose();
-      };
-      document.addEventListener('keydown', escHandler);
-    }
+ // 이전 리스너/타이머 정리
+  if (rebindTimer){ clearTimeout(rebindTimer); rebindTimer = null; }
+  if (mapClickHandler){
+    kakao.maps.event.removeListener(map, 'click', mapClickHandler);
+    mapClickHandler = null;
   }
+  if (!escHandler){
+    escHandler = function(e){ if (e.key === 'Escape') doClose(); };
+    document.addEventListener('keydown', escHandler);
+  }
+  // ★ 핵심: HUD 표시 직후 같은 클릭이 닿지 않도록 약간 늦게 바인딩
+  rebindTimer = setTimeout(function(){
+    mapClickHandler = kakao.maps.event.addListener(map, 'click', function(){
+      doClose();
+    });
+    rebindTimer = null;
+  }, 180); // 150~220ms 사이 권장
+}
 
   function detachGlobalClosers(){
-    if (mapClickHandler){
-      kakao.maps.event.removeListener(map, 'click', mapClickHandler);
-      mapClickHandler = null;
-    }
-    if (escHandler){
-      document.removeEventListener('keydown', escHandler);
-      escHandler = null;
-    }
+  if (rebindTimer){ clearTimeout(rebindTimer); rebindTimer = null; }
+  if (mapClickHandler){
+    kakao.maps.event.removeListener(map, 'click', mapClickHandler);
+    mapClickHandler = null;
+  }
+  if (escHandler){
+    document.removeEventListener('keydown', escHandler);
+    escHandler = null;
+  }
   }
 
   function nfmt(v){ if(v==null || isNaN(+v)) return '-'; return (Math.round(+v*10)/10); }
 
-  function buildHudHTML(title, vals){
-    var t = title || '';
-    var temp = (vals && vals.T1H!=null) ? nfmt(vals.T1H)+' ℃' : '-';
-    var rn1  = (vals && vals.RN1!=null) ? nfmt(vals.RN1)+' mm' : '-';
-    var wsd  = (vals && vals.WSD!=null) ? nfmt(vals.WSD)+' m/s' : '-';
-    var reh  = (vals && vals.REH!=null) ? nfmt(vals.REH)+'%' : '-';
-
-    return ''
-    + '<div class="nc-wrap">'
-    + '  <div class="nc-card">'
-    + '    <div class="nc-hdr">'+ t +'</div>'
-    + '    <div class="nc-grid">'
-    + '      <div class="nc-chip c-temp">'+ NowcastLayer.icons.sun  +' <span>기온</span><span class="v">'+ temp +'</span></div>'
-    + '      <div class="nc-chip c-rain">'+ NowcastLayer.icons.rain +' <span>강수</span><span class="v">'+ rn1  +'</span></div>'
-    + '      <div class="nc-chip c-wind">'+ NowcastLayer.icons.wind +' <span>풍속</span><span class="v">'+ wsd  +'</span></div>'
-    + '      <div class="nc-chip c-humi">'+ NowcastLayer.icons.humi +' <span>습도</span><span class="v">'+ reh  +'</span></div>'
-    + '    </div>'
-    + '  </div>'
-    + '  <div class="nc-close" title="닫기" aria-label="닫기">×</div>'
-    + '</div>';
-  }
+  
 
   function doCloseWithAnim(rootEl){
     // rootEl: .nc-wrap
