@@ -80,45 +80,58 @@
 }
 
 .nc-card {
-	min-width: 210px;
-	max-width: 260px;
-	background: #7cb7c6;
+	min-width: 240px;
+	max-width: 300px;
+	background: #dff0f5;
 	border-radius: 14px;
 	box-shadow: 0 8px 18px rgba(0, 0, 0, .14);
 	color: #0f172a;
 	font: 600 13px system-ui, -apple-system, Segoe UI, Roboto, Apple SD
 		Gothic Neo, Malgun Gothic, sans-serif;
+	padding-top: 7px;
+	transition: transform .22s ease, opacity .22s ease;
+	transform: translateY(0);
+	opacity: 1;
 }
-
+/* 아이콘 버튼 포커스시 기본 테두리 제거 */
+.nc-cta .icon-btn:focus {
+  outline: none;
+  box-shadow: none;
+}
+.nc-card.is-hiding{
+  transform: translateY(12px);  /* 살짝 아래로 */
+  opacity: 0;                   /* 페이드 아웃 */
+  pointer-events: none;
+}
+/* 완전 숨김 처리용 */
+.nc-wrap.is-hidden{ display: none !important; }
 /* 아이콘/말풍선도 같이 */
 .nc-cta {
-  position: fixed;
-  top: 200px;        /* ← 기존 20px → 120px */
-  right: 24px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  z-index: 6000;
+	position: fixed;
+	top: 200px; /* ← 기존 20px → 120px */
+	right: 24px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	z-index: 6000;
 }
-
 
 /* === 아이콘 버튼 === */
 .nc-cta .icon-btn {
-  width: auto;       /* 버튼 크기 제한 해제 */
-  height: auto;
-  background: none;  /* 배경 제거 → 흰색 원 사라짐 */
-  border: none;      /* 테두리 제거 */
-  box-shadow: none;  /* 그림자 제거 */
-  padding: 0;
-  cursor: pointer;
+	width: auto; /* 버튼 크기 제한 해제 */
+	height: auto;
+	background: none; /* 배경 제거 → 흰색 원 사라짐 */
+	border: none; /* 테두리 제거 */
+	box-shadow: none; /* 그림자 제거 */
+	padding: 0;
+	cursor: pointer;
 }
 
 .nc-cta .icon-btn img {
-  width: 90px;   /* 기존 28px → 64px (약 2배 이상) */
-  height: 90px;
-  display: block;
+	width: 90px; /* 기존 28px → 64px (약 2배 이상) */
+	height: 90px;
+	display: block;
 }
-
 
 .nc-hdr {
 	background: rgba(255, 255, 255, .75);
@@ -157,22 +170,7 @@
 	font-weight: 700
 }
 
-.nc-close {
-	position: absolute;
-	top: -10px;
-	right: -10px;
-	width: 28px;
-	height: 28px;
-	border-radius: 999px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: #fff;
-	color: #111;
-	border: 1px solid #e5e7eb;
-	cursor: pointer;
-	box-shadow: 0 2px 6px rgba(0, 0, 0, .12);
-}
+
 
 .nc-close:hover {
 	background: #f3f4f6
