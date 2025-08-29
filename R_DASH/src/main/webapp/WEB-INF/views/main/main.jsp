@@ -25,7 +25,7 @@
 /* =========================
    Base (공통)
 ========================= */
-:root {--topbar-h: 64px;}
+:root { --topbar-h: 64px;}
 
 html, body {
 	margin: 0;
@@ -45,144 +45,254 @@ html, body {
 	background-attachment: fixed;
 }
 
+/* =========================================================
+   HOME (Header 투명 + Sidebar 최상단 + 오버레이 무력화 + 가독성 복구)
+========================================================= */
+
+/* 공통 변수 */
+:root {
+  --topbar-h: 64px;
+  --z-header: 2000;
+  --z-sidebar: 99999;
+}
+
 /* =========================
    Header (홈에서 투명)
 ========================= */
 body.home-page header {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: var(- -topbar-h);
-	background: transparent !important;
-	box-shadow: none !important;
-	z-index: 2000;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--topbar-h);
+  background: transparent !important;
+  box-shadow: none !important;
+  z-index: var(--z-header) !important;
 }
-
 body.home-page header.scrolled {
-	background: rgba(0, 0, 0, .35) !important;
-	backdrop-filter: blur(4px);
-	box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
+  background: rgba(0,0,0,.35) !important;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 2px 10px rgba(0,0,0,.2);
 }
 
-/* Argon 상단바(주황) 제거 + 고정 */
+/* Argon 상단바 투명 고정 */
+body.home-page .navbar.navbar-top.bg-warning,
 body.home-page .navbar.navbar-horizontal.bg-warning {
-	background: transparent !important;
-	box-shadow: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-bottom: 0 !important;
 }
-
+body.home-page .navbar.navbar-top,
 body.home-page .navbar.navbar-horizontal {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: var(- -topbar-h);
-	z-index: 2000;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--topbar-h);
+  z-index: var(--z-header) !important; /* 사이드바보다 낮음 */
 }
 
-body.home-page .navbar.navbar-horizontal .navbar-nav .nav-link, body.home-page .navbar.navbar-horizontal .media-body span
-	{
-	color: #fff !important;
+/* 헤더 글자 흰색 */
+body.home-page .navbar .navbar-nav .nav-link,
+body.home-page .navbar .media-body span {
+  color: #fff !important;
 }
 
-/* 사이드바는 원래 fixed 유지 + 계층만 올림 */
+/* 토글은 항상 클릭 가능 */
+body.home-page .sidenav-toggler,
+body.home-page .sidenav-toggler * {
+  pointer-events: auto !important;
+}
+
+/* =========================
+   Sidebar (항상 최상단 + 가독성 복구)
+========================= */
 body.home-page #sidenav-main {
-	position: fixed !important;
-	z-index: 3001 !important;
+  position: fixed !important;
+  top: 0; bottom: 0; left: 0;
+  z-index: var(--z-sidebar) !important;     /* 무엇보다 위 */
+  pointer-events: auto !important;
+  will-change: transform;                   /* 토글 성능 */
+  background: #fff !important;              /* Argon 기본 */
+  color: #344767 !important;                /* Argon 기본 텍스트 */
 }
 
-/* 비디오/오버레이는 클릭 막지 않기 */
-#bg-video, .main-section>video, .main-section::before {
-	pointer-events: none;
+/* 사이드바 내부 텍스트/링크 기본색 복구 */
+body.home-page #sidenav-main .navbar-brand,
+body.home-page #sidenav-main .nav-link,
+body.home-page #sidenav-main .nav-link .nav-link-text,
+body.home-page #sidenav-main .sidenav-normal,
+body.home-page #sidenav-main .sidenav-mini-icon,
+body.home-page #sidenav-main .dropdown-item,
+body.home-page #sidenav-main .form-control,
+body.home-page #sidenav-main select {
+  color: #344767 !important;
 }
+
+/* 아이콘은 원래 색 유지(Primary 등) / 필요 시 톤 다운 */
+body.home-page #sidenav-main .nav-link i {
+  opacity: .9;
+}
+
+/* hover/active 상태 가독성 */
+body.home-page #sidenav-main .nav-link:hover {
+  background: #f6f9fc !important;
+  color: #111827 !important;
+}
+body.home-page #sidenav-main .nav-link.active,
+body.home-page #sidenav-main .nav-link[aria-expanded="true"] {
+  background: #eef3ff !important;
+  color: #111827 !important;
+}
+
+/* collapse 안쪽 링크도 동일 팔레트 */
+body.home-page #sidenav-main .nav .nav-link {
+  color: #344767 !important;
+}
+
+/* 언어 셀렉트 드롭다운 가독성 */
+body.home-page #sidenav-main .form-control,
+body.home-page #sidenav-main select {
+  background: #fff;
+  border: 1px solid #e9ecef;
+}
+
+/* 사이드바 내부는 모두 클릭 가능 */
+body.home-page #sidenav-main * {
+  pointer-events: auto !important;
+}
+
+/* =========================
+   메인 영역/패널
+========================= */
+body.home-page .main-content,
+body.home-page #panel {
+  position: relative;
+  z-index: 0 !important; /* 사이드바 뒤 */
+}
+
+/* =========================
+   오버레이/백드롭 무력화
+========================= */
+body.home-page .modal-backdrop,
+body.home-page .sidenav-backdrop,
+body.home-page .sidenav-mask,
+body.home-page .backdrop,
+body.home-page .mask,
+body.home-page .page-overlay {
+  pointer-events: none !important;
+  background: transparent !important;
+  z-index: -1 !important;
+}
+
+/* =========================
+   배경(히어로/비디오) 클릭 차단
+========================= */
+body.home-page .main-section,
+body.home-page #bg-video,
+body.home-page .main-section > video,
+body.home-page .main-section::before {
+  pointer-events: none !important; /* 배경은 클릭 금지 */
+  z-index: 0 !important;
+}
+
+/* 히어로/상단바/플로팅 버튼만 다시 클릭 허용 */
+body.home-page .hero-text,
+body.home-page .navbar,
+body.home-page .floating-icon {
+  pointer-events: auto !important;
+}
+
 
 /* =========================
    Hero(비디오 영역)
 ========================= */
 .main-section {
-	height: 100vh;
-	width: 100%;
-	margin: 0 !important;
-	padding: 0 !important;
-	position: relative;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	text-align: center;
-	overflow: hidden;
+  height: 100vh;
+  width: 100%;
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+  z-index: 0 !important;
+  pointer-events: none;
+}
+.main-section.main-background { background: none; }
+
+/* 4) 비디오/오버레이는 기본적으로 클릭 막기(겹침 방지) */
+.main-section,
+#bg-video,
+.main-section > video,
+.main-section::before{
+  pointer-events: none !important;
+  z-index: 0 !important;
 }
 
-.main-section.main-background {
-	background: none;
+#bg-video, .main-section > video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
 }
-
-#bg-video, .main-section>video {
-	position: absolute;
-	inset: 0;
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	z-index: -1;
-}
-
 .main-section::before {
-	content: "";
-	position: absolute;
-	inset: 0;
-	background: rgba(0, 0, 0, .25);
-	z-index: 0;
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.25);
+  z-index: 0;
 }
 
+/* 히어로 텍스트만 클릭 가능 */
 .hero-text {
-	position: relative;
-	z-index: 1;
-	color: #fff;
-	padding: 0 20px;
-	max-width: 920px;
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  padding: 0 20px;
+  max-width: 920px;
+  pointer-events: auto;
 }
-
 .hero-text h1 {
-	font-size: clamp(2rem, 5vw, 2.8rem);
-	font-weight: 800;
-	margin: 0 0 12px;
-	text-shadow: 2px 2px 8px rgba(0, 0, 0, .6);
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  font-weight: 800;
+  margin: 0 0 12px;
+  text-shadow: 2px 2px 8px rgba(0,0,0,.6);
 }
-
-.hero-text .white-text {
-	color: #fff;
-}
-
-.hero-text .accent {
-	color: #ff4d4d;
-}
-
+.hero-text .white-text { color: #fff; }
+.hero-text .accent { color: #ff4d4d; }
 .hero-text p {
-	font-size: clamp(1rem, 2vw, 1.2rem);
-	line-height: 1.6;
-	margin: 0;
-	text-shadow: 0 2px 8px rgba(0, 0, 0, .5);
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  line-height: 1.6;
+  margin: 0;
+  text-shadow: 0 2px 8px rgba(0,0,0,.5);
 }
-
+/* 5) 실제로 눌러야 하는 것들은 다시 클릭 가능 */
+.hero-text,
+body.home-page .navbar,
+.floating-icon{
+  pointer-events: auto !important;
+}
 .hero-btn {
-	display: inline-block;
-	margin-top: 18px;
-	padding: 12px 28px;
-	border-radius: 28px;
-	background: #ff6b6b;
-	color: #fff;
-	text-decoration: none;
-	font-weight: 600;
-	transition: .25s;
-	box-shadow: 0 6px 18px rgba(0, 0, 0, .25);
+  display: inline-block;
+  margin-top: 18px;
+  padding: 12px 28px;
+  border-radius: 28px;
+  background: #ff6b6b;
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  transition: .25s;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
 }
 
 .hero-btn:hover {
-	background: #ff4757;
-	transform: translateY(-2px);
+  background: #ff4757;
+  transform: translateY(-2px);
 }
 
-/* 히어로 아래 첫 섹션이 가려지지 않도록 필요 시 부여 */
-.after-hero {padding-top: var(--topbar-h);}
+/* 히어로 아래 첫 섹션이 가리지 않도록 */
+.after-hero { padding-top: var(--topbar-h); }
 
 /* =========================
    News (섹션/카드)
@@ -430,17 +540,16 @@ img.card-img-top {
 }
 
 /* 추가/수정 */
-.chat-body{
-  flex:1;
-  min-height:0;
-  overflow-y:auto;
-  background:#f6f7f9;
-  padding:14px;
-
-  /* ↓ 새로 추가 */
-  display:flex;
-  flex-direction:column;
-  gap:10px;
+.chat-body {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	background: #f6f7f9;
+	padding: 14px;
+	/* ↓ 새로 추가 */
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
 }
 
 .chat-footer {
@@ -484,18 +593,18 @@ img.card-img-top {
 }
 
 /* 사용자: 오른쪽 */
-.chat-bubble.user{
-  align-self:flex-end;     /* ← 오른쪽 정렬(핵심) */
-  margin-left:auto;        /* ← 안전망(있어도 무방) */
-  background:#ffdfe3;
-  color:#222;
+.chat-bubble.user {
+	align-self: flex-end; /* ← 오른쪽 정렬(핵심) */
+	margin-left: auto; /* ← 안전망(있어도 무방) */
+	background: #ffdfe3;
+	color: #222;
 }
 
 /* 봇: 왼쪽 */
-.chat-bubble.bot{
-  align-self:flex-start;   /* ← 왼쪽 정렬 */
-  margin-right:auto;
-  background:#fff;
+.chat-bubble.bot {
+	align-self: flex-start; /* ← 왼쪽 정렬 */
+	margin-right: auto;
+	background: #fff;
 }
 
 .chat-time {
@@ -707,9 +816,9 @@ img.card-img-top {
    Animation
 ========================= */
 @
-keyframes backInUp{
+keyframes backInUp {
 from { opacity:0; transform: translate3d(0, 60px, 0) scale(.98);}
-to {opacity: 1; transform: translate3d(0, 0, 0) scale(1);}
+to {opacity: 1;	transform: translate3d(0, 0, 0) scale(1);}
 }
 </style>
 <!-- 서버에서 내려준 JSON을 실행되지 않는 데이터 블록으로 주입 -->
@@ -867,8 +976,9 @@ to {opacity: 1; transform: translate3d(0, 0, 0) scale(1);}
 				</div>
 				<div id="chatBody" class="chat-body">
 					<div class="chat-bubble bot">
-						안녕하세요! 재난 알림 도우미 <b>재민이</b>입니다. 저는 재난 및 안전 정보를 제공할 수 있습니다. 기상 정보, 지진, 화재, 태풍 등 자연재해와 관련된 정보를 알려드릴 수 있으며, 안전 수칙이나 대처 방법도 안내해 드릴 수 있습니다. 궁금한 점이 있으면 말씀해 주세요. <span
-							class="chat-time"></span>
+						안녕하세요! 재난 알림 도우미 <b>재민이</b>입니다. 저는 재난 및 안전 정보를 제공할 수 있습니다. 기상 정보,
+						지진, 화재, 태풍 등 자연재해와 관련된 정보를 알려드릴 수 있으며, 안전 수칙이나 대처 방법도 안내해 드릴 수
+						있습니다. 궁금한 점이 있으면 말씀해 주세요. <span class="chat-time"></span>
 					</div>
 				</div>
 
@@ -918,35 +1028,161 @@ to {opacity: 1; transform: translate3d(0, 0, 0) scale(1);}
     initScrollAnimations();
 
     /* ========= 뉴스 ========= */
-    const HOME_NEWS = JSON.parse(
-      document.getElementById('homeNewsJson')?.textContent || '[]'
-    );
+    let HOME_NEWS = [];
+    try {
+      HOME_NEWS = JSON.parse(
+        document.getElementById('homeNewsJson')?.textContent || '[]'
+      );
+    } catch (e) {
+      console.warn('homeNewsJson 파싱 오류:', e);
+      HOME_NEWS = [];
+    }
 
-    const pickImg = (kw) => {
-      if(!kw) return CP+'/resources/image/news_default.jpg';
-      if(kw.includes('화재')) return CP+'/resources/image/dis.jpg';
-      if(kw.includes('지진')) return CP+'/resources/image/earth.jpg';
-      if(kw.includes('폭우') || kw.includes('홍수')) return CP+'/resources/image/rain.jpg';
-      if(kw.includes('풍랑') || kw.includes('태풍')) return CP+'/resources/image/wave.jpg';
-      return CP+'/resources/image/news_default.jpg';
+    const DEFAULT_IMG = CP + '/resources/image/new.png';
+    
+ // 상대경로를 절대경로로
+
+    function absolutize(u){
+      if (!u) return '';
+      u = String(u).trim();
+      if (/^(https?:|data:|blob:)/i.test(u)) return u;      // 외부/데이터 URL
+      if (u.startsWith('//')) return location.protocol + u; // //example.com/...
+      if (u.startsWith('/'))  return CP + u;                // /resources/...
+      return CP + '/' + u.replace(/^\.?\//,'');             // resources/... or ./...
+    }
+    function looksLikeImgUrl(v){
+    	  if (typeof v !== 'string') return false;
+    	  const s = v.trim();
+    	  return /^data:image\//i.test(s) ||
+    	         /\.(png|jpe?g|gif|webp|svg)(\?.*)?$/i.test(s) ||
+    	         /^https?:\/\//i.test(s) || s.startsWith('/') || s.startsWith('./') || s.startsWith('../');
+    	}
+
+    	function getProvidedImageDeep(obj){
+    	  if (!obj || typeof obj !== 'object') return '';
+
+    	  // (a) 키 이름 힌트 우선
+    	  for (const k of Object.keys(obj)) {
+    	    const lk = k.toLowerCase();
+    	    if (/(thumb|image|img|thumbnail|picture|photo|url)$/.test(lk)) {
+    	      const v = obj[k];
+    	      if (typeof v === 'string' && looksLikeImgUrl(v)) return v;
+    	      if (Array.isArray(v)) for (const x of v) if (looksLikeImgUrl(x)) return x;
+    	    }
+    	  }
+    	  // (b) 값 자체가 이미지처럼 보이면
+    	  for (const v of Object.values(obj)) {
+    	    if (typeof v === 'string' && looksLikeImgUrl(v)) return v;
+    	  }
+    	  // (c) 배열/중첩 객체 재귀
+    	  for (const v of Object.values(obj)) {
+    	    if (Array.isArray(v)) {
+    	      for (const x of v) { const r = getProvidedImageDeep(x); if (r) return r; }
+    	    } else if (v && typeof v === 'object') {
+    	      const r = getProvidedImageDeep(v); if (r) return r;
+    	    }
+    	  }
+    	  return '';
+    	}
+
+    // 여러 후보 필드 중 첫 번째 썸네일 값 꺼내기
+    function getProvidedImage(n){
+      return n?.thumb || n?.image || n?.img || n?.imageUrl
+          || n?.thumbnail || n?.thumbnailUrl || n?.thumbUrl || n?.imgUrl || '';
+    }
+
+    function pickImg(raw) {
+    	  const t = String(raw || '');
+
+    	  // 보험/재무 문맥: '화재'가 회사명/보험 기사일 때
+    	  const insuranceCtx = /(삼성화재|메리츠화재|흥국화재|현대해상|DB손해|DB손해보험|KB손해|KB손해보험|한화손해|롯데손해|캐롯|농협손해|손해보험|보험|보험료|보험금|실손|실손보험|주가|실적|영업이익|순이익|배당)/i.test(t);
+    	  // 실제 화재 상황을 암시하는 단어들
+    	  const fireCtx = /(산불|불길|화염|연기|대피|진화|사망|사상|인명|피해|참사|소방|방화|폭발|누전|발화|화마|전소|불이|불로|화재 발생|화재로|화재 진압|화재 진화)/.test(t);
+
+    	  // 🔥 화재: '산불'은 항상, '화재'는 문맥 있을 때만 (보험/재무 문맥이면 제외)
+    	  if (/산불/.test(t) || (/화재/.test(t) && fireCtx && !insuranceCtx)) {
+    	    return CP + '/resources/image/fire.png';
+    	  }
+
+      // 2) 태풍/풍랑/강풍
+      if (/태풍|풍랑|강풍|돌풍|폭풍/.test(t)) return CP + '/resources/image/typhoon.png';
+
+      // 3) 지진/여진
+      if (/지진|여진|진도/.test(t)) return CP + '/resources/image/earthquake.png';
+
+      // 4) 산사태
+      if (/산사태/.test(t)) return CP + '/resources/image/landslide.png';
+
+      // 5) 폭설/대설/눈보라
+      if (/폭설|대설|눈보라|적설/.test(t)) return CP + '/resources/image/snow.png';
+
+      // 6) 폭염/열대야/고온(기온/재난 제거)
+      if (/폭염|열대야|고온|온열/.test(t)) return CP + '/resources/image/temper.png';
+
+      // 7) 싱크홀/땅꺼짐/지반침하
+      if (/싱크홀|땅꺼짐|지반침하/.test(t)) return CP + '/resources/image/sinkhole.png';
+
+      // 8) 황사/미세먼지
+      if (/황사|미세먼지|스모그|대기오염/.test(t)) return CP + '/resources/image/dust.png';
+
+      // 9) 감염병/전염병
+      if (/감염병|전염병|질병|독감|코로나|인플루엔자/.test(t)) return CP + '/resources/image/disease.png';
+
+      // 기본
+      return DEFAULT_IMG;
     };
 
     const asList = Array.isArray(HOME_NEWS) ? HOME_NEWS : [];
-    const mapItem = (n) => ({
-      title: n.title || '(제목 없음)',
-      text : n.company || '',
-      img  : pickImg(n.keyword),
-      href : n.url || '#'
-    });
+    
+    function extractKeywords(n){
+    	  const parts = [];
+    	  const add = (v) => {
+    	    if (!v) return;
+    	    if (Array.isArray(v)) { v.forEach(add); return; }
+    	    if (typeof v === 'object') { Object.values(v).forEach(add); return; }
+    	    parts.push(String(v));
+    	  };
+    	  add(n?.keyword);
+    	  add(n?.keywords);
+    	  add(n?.category);
+    	  add(n?.categories);
+    	  add(n?.tags);
+    	  add(n?.title);
+    	  return parts.join(' ');
+    	}
+ // 2) mapItem 교체 (제공 썸네일 > 키워드 매핑 > 기본 + fallback 보강)
+    const mapItem = (n) => {
+      const providedRaw = getProvidedImage(n) || getProvidedImageDeep(n); // 빠른→깊은
+      const provided    = absolutize(providedRaw);
+      const kwText      = extractKeywords(n);
+      const byKeyword   = pickImg(kwText);
 
-    let newsData = {
-      breaking : asList.slice(0,3).map(mapItem),
-      safety   : asList.slice(3,6).map(mapItem),
-      emergency: asList.slice(6,9).map(mapItem)
+      const item = {
+        title   : n?.title || '(제목 없음)',
+        text    : n?.company || '',
+        href    : n?.url || '#',
+        img     : provided || byKeyword || DEFAULT_IMG,
+        fallback: byKeyword || DEFAULT_IMG
+      };
+
+      // 혼합콘텐츠 차단(https 페이지에서 http 이미지) 회피
+      if (location.protocol === 'https:' && /^http:\/\//i.test(item.img)) {
+        item.img = item.fallback;
+      }
+      return item;
     };
+    	
+    const newsData = { breaking: [], safety: [], emergency: [] };
+    asList.forEach((n, i) => {
+      const item = mapItem(n);
+      (i % 3 === 0 ? newsData.breaking
+       : i % 3 === 1 ? newsData.safety
+                     : newsData.emergency).push(item);
+    });
 
     const normIndex = (i,len)=>{ i%=len; return i<0? i+len : i; };
 
+ // 3) renderNewsCard에서 onerror가 fallback을 사용하도록 수정
     function renderNewsCard(card){
       const feed = card.dataset.feed;
       const list = newsData[feed] || [];
@@ -954,12 +1190,16 @@ to {opacity: 1; transform: translate3d(0, 0, 0) scale(1);}
       const idx = normIndex(parseInt(card.dataset.idx||'0',10), list.length);
       card.dataset.idx = idx;
 
-      const item = list[idx];
+      const item  = list[idx];
       const img   = card.querySelector('.card-img-top');
       const title = card.querySelector('.title-text');
       const desc  = card.querySelector('.card-text');
 
-      if(img){ img.src = item.img; img.alt = item.title; }
+      if(img){
+        img.onerror = () => { img.onerror = null; img.src = item.fallback || DEFAULT_IMG; };
+        img.src = item.img;
+        img.alt = item.title;
+      }
       if(title){
         title.textContent = item.title || '(제목 없음)';
         if (title.tagName === 'A') {
@@ -998,7 +1238,7 @@ to {opacity: 1; transform: translate3d(0, 0, 0) scale(1);}
         }
         card.dataset.idx = card.dataset.idx || '0';
 
-        const wrap = card.closest('.news-rotator-wrap') || card.closest('.news-col') || card.parentElement;
+        const wrap = card.closest('.news-rotator-wrap') || card.parentElement;
         const prev = (wrap && wrap.querySelector('.nav-outer.prev')) || card.querySelector('.news-nav.prev');
         const next = (wrap && wrap.querySelector('.nav-outer.next')) || card.querySelector('.news-nav.next');
 
@@ -1012,6 +1252,7 @@ to {opacity: 1; transform: translate3d(0, 0, 0) scale(1);}
     initRotators();
     window.dispatchEvent(new Event('scroll'));
   });
+
 
   /* ========= 챗봇 ========= */
   var chatModalEl = document.getElementById('chatModal');
