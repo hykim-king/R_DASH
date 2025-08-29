@@ -90,7 +90,7 @@
       wrap.innerHTML =
         '<div class="bubble-beside">'+
           '<div class="bubble-wrap">'+
-            '<div class="bubble">지금 너가 있는 지역은 소방서 어디에 있어 ?</div>'+
+            '<div class="bubble">너네 마을에 소방서랑 119안전센터 어딨는지 궁금 하지 않아?</div>'+
             '<div class="bubble">궁금하면 날 클릭해 !</div>'+
           '</div>'+
           '<img id="fireBtnImg" class="launcher-img" alt="fire" src="'+ BTN_IMG +'" onerror="this.style.opacity=0">'+
