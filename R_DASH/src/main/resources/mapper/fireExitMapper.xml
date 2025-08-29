@@ -5,7 +5,7 @@
     <!-- 호선별 소화기 개수 -->
     <select id="selectSubwayFireExtCount" resultType="map">
         SELECT SUB_NO,
-               COUNT(*) AS EXTINGUISHER_COUNT
+               SUM(EXIT_CNT) AS EXTINGUISHER_COUNT
         FROM FIRE_EXIT
         GROUP BY SUB_NO
         ORDER BY SUB_NO
