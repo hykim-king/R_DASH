@@ -1,176 +1,269 @@
-/* HUD 본체: top을 더 내림 */
+:root {
+  --header-height: 90px;   /* tiles 높이 */
+  --launcher-gap: 16px;     /* ← 현재 16px, 더 위로 붙이고 싶으면 줄이기 */
+  --hud-gap: 120px;        /* ← 현재 120px, HUD 더 위로 붙이고 싶으면 줄이기 */
+}
+
+/* ===== HUD 본체 ===== */
 #fsHud {
-	position: fixed;
-	right: 16px;
-	 top: 310px !important; /* ✅ 원래 100px → 140px으로 HUD 전체 아래로 */
-	z-index: 9999;
-	width: 260px; /* 살짝 줄여서 더 아담하게 */
-	border-radius: 16px;
-	background: #ffffff;
-	box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
-	border: 1px solid #e5e7eb;
-	overflow: hidden;
-	display: none;
+    position: fixed;
+    right: 16px;
+    top: calc(var(--header-height) + var(--hud-gap)) !important; /* ✅ 페이지 기준 아래로 */
+    z-index: 9999;
+    width: 260px; /* 살짝 줄여서 아담하게 */
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    display: none;
 }
 
 /* 검색 영역 */
 #fsHud .fs-search {
-	display: flex;
-	gap: 8px;
-	padding: 10px;
+    display: flex;
+    gap: 8px;
+    padding: 10px;
 }
 
 #fsHud .fs-input {
-	flex: 1;
-	height: 36px;
-	font-size: 13px;
-	padding: 0 10px;
-	border: none;
-	outline: none;
-	border-radius: 10px;
-	background: #f9fafb;
-	box-shadow: inset 0 0 0 1px #e5e7eb;
+    flex: 1;
+    height: 36px;
+    font-size: 13px;
+    padding: 0 10px;
+    border: none;
+    outline: none;
+    border-radius: 10px;
+    background: #f9fafb;
+    box-shadow: inset 0 0 0 1px #e5e7eb;
 }
 
 #fsHud .fs-clear {
-	width: 30px;
-	height: 30px;
-	border-radius: 8px;
-	border: 0;
-	cursor: pointer;
-	background: linear-gradient(180deg, #f8fafc, #eef2ff);
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: 0;
+    cursor: pointer;
+    background: linear-gradient(180deg, #f8fafc, #eef2ff);
 }
 
 /* 구분선 */
 #fsHud .fs-divider {
-	height: 2px;
-	margin: 2px 10px 8px;
-	background: linear-gradient(to right, rgba(0, 0, 0, .08),
-		rgba(0, 0, 0, 0));
+    height: 2px;
+    margin: 2px 10px 8px;
+    background: linear-gradient(to right, rgba(0, 0, 0, .08), rgba(0, 0, 0, 0));
 }
 
 /* 지역 칩 */
 #fsHud .fs-chips {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 6px;
-	padding: 6px 10px 8px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 6px 10px 8px;
 }
 
 #fsHud .chip-btn {
-	padding: 6px 10px;
-	border: 1px solid #e5e7eb;
-	border-radius: 9999px;
-	background: #f3f6ff;
-	color: #374151;
-	font-size: 12px;
-	white-space: nowrap;
-	cursor: pointer;
+    padding: 6px 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 9999px;
+    background: #f3f6ff;
+    color: #374151;
+    font-size: 12px;
+    white-space: nowrap;
+    cursor: pointer;
 }
 
 #fsHud .chip-btn.is-active {
-	background: #111827;
-	color: #fff;
-	border-color: #111827;
+    background: #111827;
+    color: #fff;
+    border-color: #111827;
 }
 
 /* 결과 리스트 */
-/* 리스트 영역 크기 조정 */
 #fsHud .fs-list {
-	max-height: 28vh; /* ✅ 기존 45vh → 줄임 */
-	overflow: auto;
-	border-top: 1px solid #eee;
+    max-height: 28vh; /* ✅ 기존 45vh → 줄임 */
+    overflow: auto;
+    border-top: 1px solid #eee;
 }
 
 #fsHud .fs-item {
-	padding: 9px 10px;
-	border-bottom: 1px solid #f1f1f1;
-	cursor: pointer;
+    padding: 9px 10px;
+    border-bottom: 1px solid #f1f1f1;
+    cursor: pointer;
 }
 
 #fsHud .fs-item:hover {
-	background: #fafafa;
+    background: #fafafa;
 }
 
 #fsHud .fs-item-title {
-	font-weight: 700;
-	font-size: 13px;
+    font-weight: 700;
+    font-size: 13px;
 }
 
 #fsHud .fs-item-sub {
-	font-size: 12px;
-	color: #667085;
+    font-size: 12px;
+    color: #667085;
 }
 
 /* ===== 런처: 버블이 왼쪽, 아이콘이 오른쪽 ===== */
 .layer-launcher {
-	position: fixed;
-	right: 16px !important;
-  top: 220px !important;
-	z-index: 10000; /* HUD보다 위 */
-	pointer-events: auto;
+    position: fixed;
+    right: 16px !important;
+    top: calc(var(--header-height) + var(--launcher-gap)) !important;
+    z-index: 10000; /* HUD보다 위 */
+    pointer-events: auto;
 }
 
 .layer-launcher .bubble-beside {
-	display: flex;
-	align-items: center;
-	gap: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .layer-launcher .bubble-wrap {
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	align-items: flex-end;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
 }
 
 .layer-launcher .bubble {
-	background: #ffe7c2;
-	color: #5c4a34;
-	font-weight: 700;
-	font-size: 13px;
-	padding: 10px 15px;
-	border-radius: 16px;
-	border: 1px solid #f5d9ae;
-	box-shadow: 0 8px 18px rgba(0, 0, 0, .12);
-    white-space: normal; /* ✅ 여러 줄 허용 → 세로도 늘어남 */
+    max-width: 260px;
+    background: #ffe7c2;
+    color: #5c4a34;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 10px 15px;
+    border-radius: 16px;
+    border: 1px solid #f5d9ae;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, .12);
+    white-space: normal; /* ✅ 여러 줄 허용 */
+    line-height: 1.35;
+    position: relative;  /* 꼬리용 */
+}
+
+/* 말풍선 꼬리(오른쪽) */
+.layer-launcher .bubble::after {
+    content: "";
+    position: absolute;
+    right: -8px;
+    top: 18px;
+    border: 8px solid transparent;
+    border-left-color: #ffe7c2;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,.06));
 }
 
 .layer-launcher .launcher-img {
-	width: 88px;
-	height: 88px;
-	object-fit: contain;
-	cursor: pointer;
-	filter: drop-shadow(0 10px 24px rgba(0, 0, 0, .25));
-	transition: transform .12s ease;
+    width: 88px;
+    height: 88px;
+    object-fit: contain;
+    cursor: pointer;
+    filter: drop-shadow(0 10px 24px rgba(0, 0, 0, .25));
+    transition: transform .12s ease;
 }
 
 .layer-launcher .launcher-img:hover {
-	transform: translateY(-2px) scale(1.03);
+    transform: translateY(-2px) scale(1.03);
 }
 
 /* ===== 하단 필터바 ===== */
 #fsFilterBar {
-  position: fixed;
+     position: fixed;
   left: 50%;
   transform: translateX(-50%);
   bottom: 20px;
   z-index: 9999;
+
   display: flex;
-  gap: 10px;
+  gap: 8px;
+
+  /* ▼ 긴 원형 배경 */
+  padding: 8px 10px;
+  background: rgba(255,255,255,.9);
+  border: 1px solid #e5e7eb;
+  border-radius: 9999px;        /* 긴 원형 */
+  box-shadow: 0 10px 26px rgba(0,0,0,.14);
+  backdrop-filter: blur(6px);
+  pointer-events: auto;         /* 지도 위에서도 클릭 잘 되게 */
+    
+    
+    
+    
 }
 
 #fsFilterBar .fs-btn {
-	padding: 10px 16px;
-	border: 1px solid #ddd;
-	border-radius: 9999px;
-	background: #f9fafb;
-	font-size: 13px;
-	cursor: pointer;
+    padding: 10px 16px;
+    border: none;
+  background: transparent; 
+    border-radius: 9999px;
+    background: #f9fafb;
+    font-size: 13px;
+    cursor: pointer;
 }
 
 #fsFilterBar .fs-btn.is-active {
-	background: #111827;
-	color: #fff;
-	border-color: #111827;
+    background: #111827;
+    color: #fff;
+    border-color: #111827;
+}
+
+/* ====== Firestation 상세 오버레이(스샷 스타일) ====== */
+.fs-bubble{
+    position: relative;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    box-shadow:0 10px 24px rgba(0,0,0,.12);
+    padding:10px 12px 12px;
+    color:#111827;
+    font:500 13px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
+}
+/* 제목 */
+.fs-bubble .title{
+  font-size: 15px;
+  font-weight: 800;   /* ← 강조 */
+  margin: 2px 0 6px 2px;
+  padding-right: 32px; 
+  white-space: normal;
+  word-break: keep-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* 본문 라인 */
+.fs-bubble .addr,
+.fs-bubble .row { 
+  margin-left: 2px;
+  line-height: 1.45;
+}
+
+/* 전화 줄 정렬 */
+.fs-bubble .row.tel{
+  position: relative;
+  padding-left: 20px;
+  margin-left: 2px;
+  line-height: 1.45;
+}
+.fs-bubble .row.tel::before{
+  content: "☎";
+  position: absolute;
+  left: 2px;
+  top: 0.1em;
+  width: 16px;
+  text-align: center;
+  opacity: .9;
+}
+
+/* 닫기 버튼 */
+.fs-bubble .close{
+    position:absolute; right:8px; top:6px;
+    width:20px; height:20px; line-height:20px; text-align:center;
+    cursor:pointer; border-radius:4px; color:#6b7280; font-weight:700;
+}
+.fs-bubble .close:hover{ background:#f3f4f6; color:#111827; }
+
+/* ===== 레이어 우선순위: 헤더 > 런처 > HUD > 지도 ===== */
+header.tiles, #tiles, header, #header{
+  position: relative;       /* z-index 적용되도록 */
+  z-index: 1200 !important; /* 헤더가 최상위 */
 }
