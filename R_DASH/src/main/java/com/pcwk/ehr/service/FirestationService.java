@@ -7,30 +7,22 @@ import com.pcwk.ehr.domain.FirestationDTO;
 
 public interface FirestationService {
 
-    // 지도용: BBox + 키워드
-    List<FirestationDTO> selectByBBox(double minLat, double maxLat,
-                                      double minLon, double maxLon,
-                                      String q, Integer limit);
+	List<FirestationDTO> selectByBBox(double minLat, double maxLat, double minLon, double maxLon, int limit,
+			String fireTp, String fireTpLabel);
 
-    // 검색(옵션: 지역, BBox, 정렬, 페이징)
-    List<FirestationDTO> search(String q, String area,
-                                Double minLat, Double maxLat,
-                                Double minLon, Double maxLon,
-                                String orderBy, Integer limit, Integer offset);
+	List<FirestationDTO> search(String q, int limit, int offset, String fireTp, String fireTpLabel);
 
-    int countSearch(String q, String area,
-                    Double minLat, Double maxLat,
-                    Double minLon, Double maxLon);
+	int countSearch(String q, String area, Double minLat, Double maxLat, Double minLon, Double maxLon, String fireTp);
 
-    // 단건 상세
-    FirestationDTO selectOne(int stationNo);
+	FirestationDTO selectOne(int stationNo);
 
-    // 자동완성
-    List<String> autocompleteArea(String prefix, Integer limit);
-    List<String> autocompleteStation(String prefix, String area, Integer limit);
-    
-    List<Map<String, Object>> getfirestationCounts();
-    
-    List<Map<String, Object>> getSigunguFireCounts();
+	// 자동완성
+	List<String> autocompleteArea(String prefix, Integer limit, String fireTp);
+
+	List<String> autocompleteStation(String prefix, String area, Integer limit, String fireTp);
+
+	List<Map<String, Object>> getfirestationCounts();
+
+	List<Map<String, Object>> getSigunguFireCounts();
 
 }

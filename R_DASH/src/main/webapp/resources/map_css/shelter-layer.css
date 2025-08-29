@@ -8,8 +8,8 @@
   right: var(--launcherRight, 16px);
 }
 .launcher-img{
-  width: 120px; height: 120px; display:block; cursor:pointer;
-  box-shadow:0 6px 16px rgba(0,0,0,.18);
+  width: 120px; height: 120px; display:block;
+
  
 }
 .launcher-img:hover{ transform: translateY(-1px); box-shadow:0 10px 22px rgba(0,0,0,.22); }

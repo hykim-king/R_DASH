@@ -22,7 +22,7 @@
     <style>
         .canvasContainer {
             width: 700px; 
-            height: 400px;
+            height: 500px;
             margin-top: 20px;
         }
         
@@ -103,7 +103,7 @@
 		}
 		
 		.body-container {
-		    width: 80%;
+		    width: 90%;
 		    margin: 0 auto; /* 상하 0, 좌우 자동 중앙 정렬 */
 		}
 		
@@ -180,14 +180,49 @@
 	      font-weight: bold;
 		}
         
-		
+		.typeMent{
+		  font-family: "Do Hyeon", sans-serif;
+		  font-weight: bold;
+		  font-style: normal;
+		  font-size: 20px;
+		}
     </style>
 </head>
 <body>
 <div class="body-container">
 <c:set var="type" value="${not empty param.type ? param.type : (not empty pageType ? pageType : 'weather')}" />
-<div class="menuChart mt--7">
-    <canvas id="SelectTemperature"></canvas>
+<div class="d-flex align-items-center">
+    <div class="menuChart mt--7">
+        <canvas id="SelectTemperature"></canvas>
+    </div>
+    <div class="ml-3" style="white-space: nowrap;"> <!-- 차트 옆에 붙일 멘트 영역 -->
+        <c:choose>
+            <c:when test="${type == 'weather'}">
+                <pre class = "typeMent">
+                  본 페이지에서는 기온 관련 통계를 확인할 수 있습니다.
+                  스크롤을 내려 자료를 확인할 수 있습니다.
+                </pre>
+            </c:when>
+            <c:when test="${type == 'fire'}">
+                <pre class = "typeMent">
+                  본 페이지에서는 화재 관련 통계를 확인할 수 있습니다.
+		스크롤을 내려 자료를 확인할 수 있습니다.
+                </pre>
+            </c:when>
+            <c:when test="${type == 'landslide'}">
+                <pre class = "typeMent">
+                  본 페이지에서는 산사태 관련 통계를 확인할 수 있습니다.
+                  스크롤을 내려 자료를 확인할 수 있습니다.
+                </pre>
+            </c:when>
+            <c:when test="${type == 'sinkhole'}">
+                <pre class = "typeMent">
+                  본 페이지에서는 싱크홀 관련 통계를 확인할 수 있습니다.   
+                  스크롤을 내려 자료를 확인할 수 있습니다.
+                </pre>
+            </c:when>
+        </c:choose>
+    </div>
 </div>
 <div class="main-container">
 <c:choose>

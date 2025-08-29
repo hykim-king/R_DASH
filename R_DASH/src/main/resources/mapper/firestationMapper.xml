@@ -42,66 +42,88 @@
   </sql>
 
   <!-- 1) BBox + 키워드 검색 -->
-  <select id="selectByBBox" resultMap="FirestationMap">
-    SELECT <include refid="cols"/>
-    FROM FIRE_STATION
-    WHERE <include refid="onlyMainStations"/>
-      AND LAT BETWEEN #{minLat} AND #{maxLat}
-      AND LON BETWEEN #{minLon} AND #{maxLon}
-      <if test="q != null and q != ''">
-        AND (
-          STATION_NM LIKE '%' || #{q} || '%'
-          OR AREA       LIKE '%' || #{q} || '%'
-          OR FIRE_HEAD  LIKE '%' || #{q} || '%'
-        )
-      </if>
-    ORDER BY STATION_NM
-    FETCH FIRST
-      <choose>
-        <when test="limit != null"> #{limit} </when>
-        <otherwise> 500 </otherwise>
-      </choose>
-    ROWS ONLY
+ <!-- 파라미터: fireTp (코드), fireTpLabel (한글) 둘 다 옵션 -->
+  <!-- BBox -->
+<!-- BBox -->
+  <select id="selectByBBox" parameterType="map"
+          resultType="com.pcwk.ehr.domain.FirestationDTO">
+    SELECT *
+    FROM (
+      SELECT
+        NVL(STATION_NO, 0) AS stationNo,
+        STATION_NM         AS stationNm,
+        AREA               AS area,
+        FIRE_HEAD          AS fireNead,   -- ✅ 실제 컬럼명
+        TEL                AS tel,
+        NVL(LAT, 0)        AS lat,        -- NULL 방어 (DTO가 primitive double)
+        NVL(LON, 0)        AS lon,
+        FIRE_TP            AS fireTp
+      FROM FIRE_STATION                     -- ✅ 실제 테이블명
+      WHERE LAT BETWEEN #{minLat} AND #{maxLat}
+        AND LON BETWEEN #{minLon} AND #{maxLon}
+
+        <!-- 타입 필터: 코드 우선, 없으면 한글 라벨 -->
+        <choose>
+          <when test="fireTp != null and fireTp != '' and fireTp != 'ALL'">
+            AND (
+              (#{fireTp} = 'MAIN'   AND FIRE_TP = '소방서')
+              OR (#{fireTp} = 'SAFETY' AND FIRE_TP = '119안전센터')
+            )
+          </when>
+          <when test="(fireTp == null or fireTp == '' or fireTp == 'ALL')
+                      and fireTpLabel != null and fireTpLabel != ''">
+            AND FIRE_TP = #{fireTpLabel}
+          </when>
+        </choose>
+
+      ORDER BY STATION_NO
+    )
+    WHERE ROWNUM &lt;= #{limit}
   </select>
 
-  <!-- 2) 검색 (지역/BBox/정렬/페이징) -->
-  <select id="search" resultMap="FirestationMap">
-    SELECT <include refid="cols"/>
-    FROM FIRE_STATION
-    <where>
-      <include refid="onlyMainStations"/>
-      <if test="q != null and q != ''">
-        AND (
-          STATION_NM LIKE '%' || #{q} || '%'
-          OR AREA       LIKE '%' || #{q} || '%'
-          OR FIRE_HEAD  LIKE '%' || #{q} || '%'
-        )
-      </if>
-      <if test="area != null and area != ''">
-        AND AREA = #{area}
-      </if>
-      <if test="minLat != null and maxLat != null">
-        AND LAT BETWEEN #{minLat} AND #{maxLat}
-      </if>
-      <if test="minLon != null and maxLon != null">
-        AND LON BETWEEN #{minLon} AND #{maxLon}
-      </if>
-    </where>
-    <choose>
-      <when test="orderBy == 'recent'">
-        ORDER BY STATION_NO DESC
-      </when>
-      <otherwise>
-        ORDER BY STATION_NM ASC
-      </otherwise>
-    </choose>
-    <if test="limit != null and offset != null">
-      OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
-    </if>
-    <if test="limit != null and offset == null">
-      FETCH FIRST #{limit} ROWS ONLY
-    </if>
+  <!-- 검색 -->
+  <select id="search" parameterType="map"
+          resultType="com.pcwk.ehr.domain.FirestationDTO">
+    SELECT *
+    FROM (
+      SELECT
+        NVL(STATION_NO, 0) AS stationNo,
+        STATION_NM         AS stationNm,
+        AREA               AS area,
+        FIRE_HEAD          AS fireNead,   -- ✅
+        TEL                AS tel,
+        NVL(LAT, 0)        AS lat,
+        NVL(LON, 0)        AS lon,
+        FIRE_TP            AS fireTp
+      FROM FIRE_STATION                     -- ✅
+      WHERE 1=1
+        <if test="q != null and q != ''">
+          AND (
+            STATION_NM LIKE '%' || #{q} || '%'
+            OR AREA     LIKE '%' || #{q} || '%'
+            OR FIRE_HEAD LIKE '%' || #{q} || '%'
+          )
+        </if>
+
+        <choose>
+          <when test="fireTp != null and fireTp != '' and fireTp != 'ALL'">
+            AND (
+              (#{fireTp} = 'MAIN'   AND FIRE_TP = '소방서')
+              OR (#{fireTp} = 'SAFETY' AND FIRE_TP = '119안전센터')
+            )
+          </when>
+          <when test="(fireTp == null or fireTp == '' or fireTp == 'ALL')
+                      and fireTpLabel != null and fireTpLabel != ''">
+            AND FIRE_TP = #{fireTpLabel}
+          </when>
+        </choose>
+
+      ORDER BY STATION_NO
+    )
+    WHERE ROWNUM &lt;= #{limit}
+    OFFSET #{offset} ROWS
   </select>
+
 
   <!-- 3) countSearch -->
   <select id="countSearch" resultType="int">

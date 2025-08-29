@@ -211,7 +211,7 @@ jq36(document).ready(function() {
                     datasets: [{
                         label: '재산피해 합계',
                         data: damage,
-                        backgroundColor: '#FF9333',
+                        backgroundColor: 'rgba(255, 182, 87, 0.8)',
                         borderColor: '#FFD1A6',
                         borderWidth: 1
                     }]
@@ -283,7 +283,7 @@ jq36(document).ready(function() {
                     datasets: [{
                         label: '소화기 개수',
                         data: counts,
-                        backgroundColor: '#FF9333',
+                        backgroundColor: 'rgba(255, 182, 87, 0.8)',
                         borderColor: '#FFD1A6',
                         borderWidth: 1
                     }]
@@ -297,15 +297,8 @@ jq36(document).ready(function() {
                                      size: 18,          // 폰트 크기
                                      weight: 'bold'
                                  },
-                                 color: '#333' },
-                        datalabels: {
-                            anchor: "end",   // 데이터 레이블 위치
-                            align: "top",    // 막대 위쪽에 표시
-                            color: "black",  // 글자색
-                            font: {
-                            weight: "bold"
-                                }
-                            }
+                                 color: '#333'
+                             },
                     },
                     scales: {
                         y: { beginAtZero: true },
@@ -318,7 +311,6 @@ jq36(document).ready(function() {
                             }
                     }
                 },
-                plugins: [ChartDataLabels]
             });
         },
         error: function() { console.error('호선별 소화기 AJAX 오류'); }

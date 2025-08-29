@@ -24,7 +24,15 @@ $.getJSON("/ehr/sinkholes/year", function(data) {
                         weight: 'bold'
                     },
                     color: '#333' 
-                }
+                },
+                datalabels: {
+                    anchor: "end",   // 데이터 레이블 위치
+                    align: "top",    // 막대 위쪽에 표시
+                    color: "black",  // 글자색
+                    font: {
+                    weight: "bold"
+                        }
+                    }
             },
             scales:{
                 x:{
@@ -35,7 +43,8 @@ $.getJSON("/ehr/sinkholes/year", function(data) {
                     } 
                 }
             }
-        }
+        },
+        plugins: [ChartDataLabels]
     });
 });
 
@@ -65,7 +74,15 @@ $.getJSON("/ehr/sinkholes/sido", function(data) {
                         weight: 'bold'
                     },
                     color: '#333' 
-                }
+                },
+                datalabels: {
+                    anchor: "end",   // 데이터 레이블 위치
+                    align: "top",    // 막대 위쪽에 표시
+                    color: "black",  // 글자색
+                    font: {
+                    weight: "bold"
+                        }
+                    }
             },
             scales: {
               x: {
@@ -81,7 +98,8 @@ $.getJSON("/ehr/sinkholes/sido", function(data) {
                     } 
               }
           }
-        }
+        },
+        plugins: [ChartDataLabels]
     });
 });
 
@@ -113,7 +131,16 @@ $.getJSON("/ehr/sinkholes/month", function(data) {
                         weight: 'bold'
                     },
                     color: '#333' 
-                }
+                },
+                datalabels: {
+                    anchor: "end",   // 데이터 레이블 위치
+                    align: "top",    // 막대 위쪽에 표시
+                    color: "black",  // 글자색
+                    font: {
+                    weight: "bold"
+                        }
+                    }
+                
             },
             scales: {
                 x: {
@@ -124,7 +151,8 @@ $.getJSON("/ehr/sinkholes/month", function(data) {
                     } 
                 }
             }
-        }
+        },
+        plugins: [ChartDataLabels]
     });
 });
 
@@ -229,6 +257,18 @@ $.getJSON("/ehr/sinkholes/damage", function(data) {
                         weight: 'bold'
                     },
                     color: '#333' 
+                },
+                datalabels: {
+                    anchor: "end",   // 데이터 레이블 위치
+                    align: "top",    // 막대 위쪽에 표시
+                    color: "black",  // 글자색
+                    font: {
+                    weight: "bold"
+                        },
+                    display: function(context) {
+                        return context.dataset.data[context.dataIndex] !== 0; 
+                        // 값이 0이 아닐 때만 라벨 표시
+                    }
                 }
             },
             scales: {
@@ -238,8 +278,13 @@ $.getJSON("/ehr/sinkholes/damage", function(data) {
                         drawBorder: false,  // 축선 제거
                         color: 'transparent' // 격자선 색상 투명
                     } 
+                },
+                y: {
+                    beginAtZero: true,
+                    suggestedMax: 15 // 데이터 최댓값보다 살짝 큰 값으로 설정
                 }
             }
-        }
+        },
+        plugins: [ChartDataLabels]
     });
 });
