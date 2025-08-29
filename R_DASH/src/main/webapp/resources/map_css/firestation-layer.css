@@ -1,151 +1,176 @@
-/* /resources/map_css/firestation-layer.css */
-
-/* ===== HUD ===== */
-.fs-hud {
+/* HUD 본체: top을 더 내림 */
+#fsHud {
 	position: fixed;
-	right: 14px;
-	top: 74px; /* 공통 헤더 높이에 맞춰 조절 */
-	width: 320px;
-	z-index: 1300;
+	right: 16px;
+	 top: 310px !important; /* ✅ 원래 100px → 140px으로 HUD 전체 아래로 */
+	z-index: 9999;
+	width: 260px; /* 살짝 줄여서 더 아담하게 */
+	border-radius: 16px;
+	background: #ffffff;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
+	border: 1px solid #e5e7eb;
+	overflow: hidden;
 	display: none;
-	pointer-events: none; /* 내부 요소만 클릭 가능 */
 }
 
-.fs-hud * {
-	box-sizing: border-box;
-}
-
-.fs-search {
+/* 검색 영역 */
+#fsHud .fs-search {
 	display: flex;
-	align-items: center;
-	gap: 6px;
-	pointer-events: auto;
+	gap: 8px;
+	padding: 10px;
 }
 
-.fs-input {
+#fsHud .fs-input {
 	flex: 1;
 	height: 36px;
-	padding: 0 12px;
-	border: 1px solid #dfe3ea;
-	border-radius: 10px;
-	background: #ffffff;
+	font-size: 13px;
+	padding: 0 10px;
+	border: none;
 	outline: none;
-	font-size: 14px;
-}
-
-.fs-input:focus {
-	border-color: #5a8cff;
-	box-shadow: 0 0 0 3px rgba(90, 140, 255, .15);
-}
-
-.fs-clear {
-	width: 36px;
-	height: 36px;
-	border: 0;
 	border-radius: 10px;
-	background: #f1f3f7;
-	cursor: pointer;
-	font-size: 18px;
-	line-height: 1;
+	background: #f9fafb;
+	box-shadow: inset 0 0 0 1px #e5e7eb;
 }
 
-.fs-list {
-	margin-top: 8px;
-	max-height: 360px;
+#fsHud .fs-clear {
+	width: 30px;
+	height: 30px;
+	border-radius: 8px;
+	border: 0;
+	cursor: pointer;
+	background: linear-gradient(180deg, #f8fafc, #eef2ff);
+}
+
+/* 구분선 */
+#fsHud .fs-divider {
+	height: 2px;
+	margin: 2px 10px 8px;
+	background: linear-gradient(to right, rgba(0, 0, 0, .08),
+		rgba(0, 0, 0, 0));
+}
+
+/* 지역 칩 */
+#fsHud .fs-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	padding: 6px 10px 8px;
+}
+
+#fsHud .chip-btn {
+	padding: 6px 10px;
+	border: 1px solid #e5e7eb;
+	border-radius: 9999px;
+	background: #f3f6ff;
+	color: #374151;
+	font-size: 12px;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+#fsHud .chip-btn.is-active {
+	background: #111827;
+	color: #fff;
+	border-color: #111827;
+}
+
+/* 결과 리스트 */
+/* 리스트 영역 크기 조정 */
+#fsHud .fs-list {
+	max-height: 28vh; /* ✅ 기존 45vh → 줄임 */
 	overflow: auto;
-	padding: 6px;
-	border-radius: 12px;
-	background: rgba(255, 255, 255, .96);
-	border: 1px solid #e7ebf2;
+	border-top: 1px solid #eee;
+}
+
+#fsHud .fs-item {
+	padding: 9px 10px;
+	border-bottom: 1px solid #f1f1f1;
+	cursor: pointer;
+}
+
+#fsHud .fs-item:hover {
+	background: #fafafa;
+}
+
+#fsHud .fs-item-title {
+	font-weight: 700;
+	font-size: 13px;
+}
+
+#fsHud .fs-item-sub {
+	font-size: 12px;
+	color: #667085;
+}
+
+/* ===== 런처: 버블이 왼쪽, 아이콘이 오른쪽 ===== */
+.layer-launcher {
+	position: fixed;
+	right: 16px !important;
+  top: 220px !important;
+	z-index: 10000; /* HUD보다 위 */
 	pointer-events: auto;
 }
 
-.fs-item {
-	padding: 8px 10px;
-	border-radius: 10px;
+.layer-launcher .bubble-beside {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.layer-launcher .bubble-wrap {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	align-items: flex-end;
+}
+
+.layer-launcher .bubble {
+	background: #ffe7c2;
+	color: #5c4a34;
+	font-weight: 700;
+	font-size: 13px;
+	padding: 10px 15px;
+	border-radius: 16px;
+	border: 1px solid #f5d9ae;
+	box-shadow: 0 8px 18px rgba(0, 0, 0, .12);
+    white-space: normal; /* ✅ 여러 줄 허용 → 세로도 늘어남 */
+}
+
+.layer-launcher .launcher-img {
+	width: 88px;
+	height: 88px;
+	object-fit: contain;
+	cursor: pointer;
+	filter: drop-shadow(0 10px 24px rgba(0, 0, 0, .25));
+	transition: transform .12s ease;
+}
+
+.layer-launcher .launcher-img:hover {
+	transform: translateY(-2px) scale(1.03);
+}
+
+/* ===== 하단 필터바 ===== */
+#fsFilterBar {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 20px;
+  z-index: 9999;
+  display: flex;
+  gap: 10px;
+}
+
+#fsFilterBar .fs-btn {
+	padding: 10px 16px;
+	border: 1px solid #ddd;
+	border-radius: 9999px;
+	background: #f9fafb;
+	font-size: 13px;
 	cursor: pointer;
 }
 
-.fs-item:hover {
-	background: #f4f7ff;
-}
-
-.fs-item-title {
-	font-weight: 700;
-	font-size: 14px;
-	color: #111827;
-}
-
-.fs-item-sub {
-	margin-top: 2px;
-	font-size: 12px;
-	color: #6b7280;
-}
-
-.fs-empty {
-	padding: 10px;
-	font-size: 13px;
-	color: #6b7280;
-}
-
-/* ===== 버블 마커 ===== */
-/* 기본은 점만 보이게 */
-.fs-bubble {
-	position: relative;
-	transform: translate(-50%, -100%);
-}
-
-.fs-dot {
-	width: 10px;
-	height: 10px;
-	border-radius: 50%;
-	background: #e74c3c;
-	border: 2px solid #fff;
-	box-shadow: 0 0 4px rgba(0, 0, 0, .2);
-}
-
-.fs-card {
-	display: none;
-	position: absolute;
-	top: -10px;
-	left: 12px;
-	background: #fff;
-	border-radius: 12px;
-	box-shadow: 0 6px 18px rgba(0, 0, 0, .15);
-	padding: 10px 12px;
-	min-width: 220px;
-}
-
-.fs-title {
-	font-weight: 700;
-	margin-bottom: 4px;
-}
-
-.fs-area {
-	font-size: 12px;
-	color: #666;
-}
-
-.fs-tel {
-	margin-top: 6px;
-	font-size: 12px;
-	color: #357edd;
-}
-
-
-/* 활성화 시 카드 보이기 */
-.fs-bubble.active .fs-card { display:block; }
-/* 겹칠 때 위로 오도록 */
-.kakao_customoverlay { z-index: 3; }
-
-
-/* 유형별 컬러 변형 (선택) */
-.fs-bubble.안전센터 .fs-dot {
-	background: #22c55e;
-} /* 예: FIRE_TP=안전센터 */
-.fs-bubble.소방서 .fs-dot {
-	background: #ef4444;
-} /* 예: FIRE_TP=소방서 */
-.fs-bubble.기타 .fs-dot {
-	background: #a78bfa;
+#fsFilterBar .fs-btn.is-active {
+	background: #111827;
+	color: #fff;
+	border-color: #111827;
 }

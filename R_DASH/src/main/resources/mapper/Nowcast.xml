@@ -24,134 +24,149 @@
     <result property="obsrValue"  column="OBSR_VALUE"/>
   </resultMap>
 
-  <!-- 1) /nowcast/latest.do?category=T1H | RN1 | REH | WSD -->
-  <select id="selectNationLatest" resultMap="NowcastNationRow">
-    WITH ranked AS (
-      SELECT
-        SIDO_NM,
-        SIGNGU_NM,
-        OBSR_VALUE AS OBSR_VALUE,
-        ROW_NUMBER() OVER (
-          PARTITION BY SIDO_NM, SIGNGU_NM, TRIM(UPPER(CATEGORY))
-          ORDER BY BASE_DATE DESC,
-                   TO_NUMBER(LPAD(TRIM(BASE_TIME), 4, '0')) DESC,
-                   NOWCAST_NO DESC
-        ) AS RN
-      FROM NOWCAST
-      WHERE TRIM(UPPER(CATEGORY)) = TRIM(UPPER(#{category}))
-    )
-    SELECT SIDO_NM, SIGNGU_NM, OBSR_VALUE
-    FROM ranked
-    WHERE RN = 1
-    ORDER BY SIDO_NM, SIGNGU_NM
-  </select>
-
-  <!-- 2) 전국: 모든 시군구 × 4카테고리 최신값(지역당 4행) -->
-  <select id="selectLatest4All" resultMap="NowcastMap">
-    WITH base AS (
-      SELECT
-        NOWCAST_NO, BASE_DATE, BASE_TIME,
-        SIDO_NM, SIGNGU_NM, NX, NY,
-        CATEGORY, OBSR_VALUE,
-        ( BASE_DATE
-          + NUMTODSINTERVAL(SUBSTR(BASE_TIME,1,2), 'HOUR')
-          + NUMTODSINTERVAL(SUBSTR(BASE_TIME,3,2), 'MINUTE')
-        ) AS TS
-      FROM NOWCAST
-      WHERE TRIM(UPPER(CATEGORY)) IN ('T1H','RN1','REH','WSD')
-    ),
-    latest AS (
-      SELECT
-        NOWCAST_NO, BASE_DATE, BASE_TIME,
-        SIDO_NM, SIGNGU_NM, NX, NY,
-        CATEGORY, OBSR_VALUE, TS,
-        ROW_NUMBER() OVER (
-          PARTITION BY SIDO_NM, SIGNGU_NM, CATEGORY
-          ORDER BY TS DESC
-        ) rn
-      FROM base
-    ),
-    regions AS (SELECT DISTINCT SIDO_NM, SIGNGU_NM FROM NOWCAST),
-    cats AS (
-      SELECT 'T1H' AS CATEGORY FROM dual UNION ALL
-      SELECT 'RN1'             FROM dual UNION ALL
-      SELECT 'REH'             FROM dual UNION ALL
-      SELECT 'WSD'             FROM dual
-    )
+  <!-- 1) /nowcast/latest.do?category=...  : 전국 스냅샷도 카테고리 정규화 -->
+<select id="selectNationLatest" resultMap="NowcastNationRow">
+  WITH ranked AS (
     SELECT
-      r.SIDO_NM                           AS SIDO_NM,
-      r.SIGNGU_NM                         AS SIGNGU_NM,
-      c.CATEGORY                          AS CATEGORY,
-      NVL(l.NOWCAST_NO, 0)                AS NOWCAST_NO,
-      CASE WHEN l.BASE_DATE IS NOT NULL
-           THEN TO_CHAR(l.BASE_DATE,'YYYYMMDD')
-           ELSE NULL
-      END                                  AS BASE_DATE,
-      l.BASE_TIME                          AS BASE_TIME,
-      NVL(l.NX,0)                          AS NX,
-      NVL(l.NY,0)                          AS NY,
-      NVL(l.OBSR_VALUE,0)                  AS OBSR_VALUE
-    FROM regions r
-    CROSS JOIN cats c
-    LEFT JOIN latest l
-      ON l.rn = 1
-     AND l.SIDO_NM   = r.SIDO_NM
-     AND l.SIGNGU_NM = r.SIGNGU_NM
-     AND l.CATEGORY  = c.CATEGORY
-    ORDER BY r.SIDO_NM, r.SIGNGU_NM, c.CATEGORY
-  </select>
+      SIDO_NM,
+      SIGNGU_NM,
+      OBSR_VALUE AS OBSR_VALUE,
+      ROW_NUMBER() OVER (
+        PARTITION BY SIDO_NM, SIGNGU_NM, TRIM(UPPER(CATEGORY))
+        ORDER BY BASE_DATE DESC,
+                 TO_NUMBER(LPAD(TRIM(BASE_TIME), 4, '0')) DESC,
+                 NOWCAST_NO DESC
+      ) AS RN
+    FROM NOWCAST
+    WHERE TRIM(UPPER(CATEGORY)) = TRIM(UPPER(#{category}))
+  )
+  SELECT SIDO_NM, SIGNGU_NM, OBSR_VALUE
+  FROM ranked
+  WHERE RN = 1
+  ORDER BY SIDO_NM, SIGNGU_NM
+</select>
 
-  <!-- 3) 특정 시군구: 4카테고리 최신값(항상 4행) -->
-  <select id="selectLatest4ByRegion" resultMap="NowcastMap">
-    WITH base AS (
-      SELECT
-        NOWCAST_NO, BASE_DATE, BASE_TIME,
-        SIDO_NM, SIGNGU_NM, NX, NY,
-        CATEGORY, OBSR_VALUE,
-        ( BASE_DATE
-          + NUMTODSINTERVAL(SUBSTR(BASE_TIME,1,2), 'HOUR')
-          + NUMTODSINTERVAL(SUBSTR(BASE_TIME,3,2), 'MINUTE')
-        ) AS TS
-      FROM NOWCAST
-      WHERE TRIM(UPPER(CATEGORY)) IN ('T1H','RN1','REH','WSD')
-        AND SIDO_NM   = #{sidoNm}
-        AND SIGNGU_NM = #{signguNm}
-    ),
-    latest AS (
-      SELECT
-        NOWCAST_NO, BASE_DATE, BASE_TIME,
-        SIDO_NM, SIGNGU_NM, NX, NY,
-        CATEGORY, OBSR_VALUE, TS,
-        ROW_NUMBER() OVER (
-          PARTITION BY SIDO_NM, SIGNGU_NM, CATEGORY
-          ORDER BY TS DESC
-        ) rn
-      FROM base
-    ),
-    cats AS (
-      SELECT 'T1H' AS CATEGORY FROM dual UNION ALL
-      SELECT 'RN1'             FROM dual UNION ALL
-      SELECT 'REH'             FROM dual UNION ALL
-      SELECT 'WSD'             FROM dual
-    )
+<!-- 2) 전국: 모든 시군구 × 4카테고리 최신값 (정규화 + RN1 NULL→0) -->
+<select id="selectLatest4All" resultMap="NowcastMap">
+  WITH base AS (
     SELECT
-      #{sidoNm}    AS SIDO_NM,
-      #{signguNm}  AS SIGNGU_NM,
-      c.CATEGORY   AS CATEGORY,
-      NVL(l.NOWCAST_NO, 0) AS NOWCAST_NO,
-      CASE WHEN l.BASE_DATE IS NOT NULL
-           THEN TO_CHAR(l.BASE_DATE,'YYYYMMDD')
-           ELSE NULL
-      END          AS BASE_DATE,
-      l.BASE_TIME  AS BASE_TIME,
-      NVL(l.NX,0)  AS NX,
-      NVL(l.NY,0)  AS NY,
-      NVL(l.OBSR_VALUE,0) AS OBSR_VALUE
-    FROM cats c
-    LEFT JOIN latest l
-      ON l.rn = 1
-     AND l.CATEGORY = c.CATEGORY
-    ORDER BY c.CATEGORY
-  </select>
+      NOWCAST_NO, BASE_DATE, BASE_TIME,
+      SIDO_NM, SIGNGU_NM, NX, NY,
+      /* 정규화된 카테고리 */
+      CASE
+        WHEN TRIM(UPPER(CATEGORY)) IN ('PCP','PRCP','RAIN','R1H','RAIN1H') THEN 'RN1'
+        ELSE TRIM(UPPER(CATEGORY))
+      END AS CAT,
+      OBSR_VALUE,
+      ( BASE_DATE
+        + NUMTODSINTERVAL(SUBSTR(BASE_TIME,1,2), 'HOUR')
+        + NUMTODSINTERVAL(SUBSTR(BASE_TIME,3,2), 'MINUTE')
+      ) AS TS
+    FROM NOWCAST
+    WHERE TRIM(UPPER(CATEGORY)) IN ('T1H','RN1','REH','WSD','PCP','PRCP','RAIN','R1H','RAIN1H')
+  ),
+  latest AS (
+    SELECT
+      NOWCAST_NO, BASE_DATE, BASE_TIME,
+      SIDO_NM, SIGNGU_NM, NX, NY,
+      CAT, OBSR_VALUE, TS,
+      ROW_NUMBER() OVER (
+        PARTITION BY SIDO_NM, SIGNGU_NM, CAT
+        ORDER BY TS DESC
+      ) rn
+    FROM base
+  ),
+  regions AS (SELECT DISTINCT SIDO_NM, SIGNGU_NM FROM NOWCAST),
+  cats AS (
+    SELECT 'T1H' AS CAT FROM dual UNION ALL
+    SELECT 'RN1'         FROM dual UNION ALL
+    SELECT 'REH'         FROM dual UNION ALL
+    SELECT 'WSD'         FROM dual
+  )
+  SELECT
+    r.SIDO_NM                                 AS SIDO_NM,
+    r.SIGNGU_NM                               AS SIGNGU_NM,
+    c.CAT                                     AS CATEGORY,
+    NVL(l.NOWCAST_NO, 0)                      AS NOWCAST_NO,
+    CASE WHEN l.BASE_DATE IS NOT NULL
+         THEN TO_CHAR(l.BASE_DATE,'YYYYMMDD')
+         ELSE NULL
+    END                                        AS BASE_DATE,
+    l.BASE_TIME                                AS BASE_TIME,
+    NVL(l.NX,0)                                AS NX,
+    NVL(l.NY,0)                                AS NY,
+    /* RN1만 NULL→0 보정 */
+    CASE WHEN c.CAT='RN1' THEN NVL(l.OBSR_VALUE,0) ELSE l.OBSR_VALUE END AS OBSR_VALUE
+  FROM regions r
+  CROSS JOIN cats c
+  LEFT JOIN latest l
+    ON l.rn = 1
+   AND l.SIDO_NM   = r.SIDO_NM
+   AND l.SIGNGU_NM = r.SIGNGU_NM
+   AND l.CAT       = c.CAT
+  ORDER BY r.SIDO_NM, r.SIGNGU_NM, c.CAT
+</select>
+
+<!-- 3) 특정 시군구: 4카테고리 최신값 (정규화 + RN1 NULL→0) -->
+<select id="selectLatest4ByRegion" resultMap="NowcastMap">
+  WITH base AS (
+    SELECT
+      NOWCAST_NO, BASE_DATE, BASE_TIME,
+      SIDO_NM, SIGNGU_NM, NX, NY,
+      CATEGORY, OBSR_VALUE,
+      ( BASE_DATE
+        + NUMTODSINTERVAL(SUBSTR(BASE_TIME,1,2), 'HOUR')
+        + NUMTODSINTERVAL(SUBSTR(BASE_TIME,3,2), 'MINUTE')
+      ) AS TS
+    FROM NOWCAST
+    WHERE TRIM(UPPER(CATEGORY)) IN ('T1H','RN1','REH','WSD')
+      AND TRIM(SIDO_NM) = #{sidoNm}
+      AND (
+           /* 완전 일치 (공백 무시) */
+           REPLACE(TRIM(SIGNGU_NM),' ','') = REPLACE(TRIM(#{signguNm}),' ','')
+        OR /* 마지막 토큰 일치: '포항시 북구' → '북구' */
+           REPLACE(TRIM(SIGNGU_NM),' ','') = REPLACE(TRIM(REGEXP_SUBSTR(#{signguNm},'[^ ]+$')),' ','')
+        OR /* DB가 '포항시북구' / 파라미터가 '북구' 같은 경우 */
+           REPLACE(TRIM(SIGNGU_NM),' ','') LIKE REPLACE(TRIM(#{signguNm}),' ','') || '%'
+        OR /* 반대 케이스: 파라미터가 더 길 때 */
+           REPLACE(TRIM(#{signguNm}),' ','') LIKE REPLACE(TRIM(SIGNGU_NM),' ','') || '%'
+      )
+  ),
+  latest AS (
+    SELECT
+      NOWCAST_NO, BASE_DATE, BASE_TIME,
+      SIDO_NM, SIGNGU_NM, NX, NY,
+      CATEGORY, OBSR_VALUE, TS,
+      ROW_NUMBER() OVER (
+        PARTITION BY SIDO_NM, SIGNGU_NM, CATEGORY
+        ORDER BY TS DESC
+      ) rn
+    FROM base
+  ),
+  cats AS (
+    SELECT 'T1H' AS CATEGORY FROM dual UNION ALL
+    SELECT 'RN1'             FROM dual UNION ALL
+    SELECT 'REH'             FROM dual UNION ALL
+    SELECT 'WSD'             FROM dual
+  )
+  SELECT
+    #{sidoNm}    AS SIDO_NM,
+    #{signguNm}  AS SIGNGU_NM,
+    c.CATEGORY   AS CATEGORY,
+    NVL(l.NOWCAST_NO, 0) AS NOWCAST_NO,
+    CASE WHEN l.BASE_DATE IS NOT NULL
+         THEN TO_CHAR(l.BASE_DATE,'YYYYMMDD')
+         ELSE NULL
+    END          AS BASE_DATE,
+    l.BASE_TIME  AS BASE_TIME,
+    NVL(l.NX,0)  AS NX,
+    NVL(l.NY,0)  AS NY,
+    NVL(l.OBSR_VALUE,0) AS OBSR_VALUE
+  FROM cats c
+  LEFT JOIN latest l
+    ON l.rn = 1
+   AND l.CATEGORY = c.CATEGORY
+  ORDER BY c.CATEGORY
+</select>
 
 </mapper>
