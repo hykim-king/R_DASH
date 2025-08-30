@@ -687,7 +687,7 @@ NowcastLayer.hud = (function(){
 
         var bubble = document.createElement('div');
         bubble.className = 'bubble';
-        bubble.textContent = '너네 마을은 이따가 비온대 ?\n 우리 마을은 비 많이 와  !!';
+        bubble.textContent = '너네 마을은 지금 비 오고 있어?\n 우리 마을은 지금 비 많이 와  !!';
 
         var btn = document.createElement('button');
         btn.type = 'button';
