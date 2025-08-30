@@ -12,7 +12,7 @@ import com.pcwk.ehr.domain.ChatDTO;
 import com.pcwk.ehr.domain.ChatSessionSummary;
 import com.pcwk.ehr.mapper.ChatMapper;
 
-@Service("chatService")
+@Service("ChatService")
 @Transactional(readOnly = true) // 기본은 조회 전용
 public class ChatServiceImpl implements ChatService {
 
@@ -92,4 +92,19 @@ public class ChatServiceImpl implements ChatService {
 	public boolean hasAnyUserLogs(String sessionId) {
 		return chatMapper.countUserBySession(sessionId) > 0;
 	}
+
+	@Transactional
+	@Override
+	public boolean deleteSessionForUser(String sessionId, int userNo) {
+		// 소유 확인
+		int owned = chatMapper.countSessionOwnedByUser(sessionId, userNo);
+		if (owned == 0)
+			return false;
+
+		// 메시지 -> 세션 순으로 삭제
+		chatMapper.deleteMessagesBySession(sessionId); // user_no 조건 없이 session 기준으로 싹 정리 (과거 null 섞임 대비)
+		chatMapper.deleteSessionByUser(sessionId, userNo);
+		return true;
+	}
+
 }
