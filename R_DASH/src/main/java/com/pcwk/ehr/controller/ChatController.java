@@ -66,19 +66,23 @@ public class ChatController {
 		}
 
 		// 3) 세션 성격/소유 확인 후 필요 시 분리
+		// 3) 세션 성격/소유 확인 후 필요 시 분리
 		boolean mustSplit = false;
 		try {
-			boolean hasGuestLogs = chatService.isGuestSession(sessionId); // USER_NO IS NULL 존재?
+			boolean hasGuestLogs = chatService.isGuestSession(sessionId);
+			boolean hasUserLogs = chatService.hasAnyUserLogs(sessionId);
 			boolean belongsToThisUser = (effectiveUserNo != null)
-					&& chatService.existsSessionForUser(sessionId, effectiveUserNo); // 내 세션인가?
-			boolean hasUserLogs = chatService.hasAnyUserLogs(sessionId); // USER_NO IS NOT NULL 존재?
+					&& chatService.existsSessionForUser(sessionId, effectiveUserNo);
 
-			log.debug("check session. guestLogs={}, belongsToThisUser={}, userLogs={}", hasGuestLogs, belongsToThisUser,
-					hasUserLogs);
+			boolean hasAnyLogs = hasGuestLogs || hasUserLogs;
+			log.debug("check session. guestLogs={}, belongsToThisUser={}, userLogs={}, anyLogs={}", hasGuestLogs,
+					belongsToThisUser, hasUserLogs, hasAnyLogs);
 
 			if (effectiveUserNo != null) {
-				if (hasGuestLogs || !belongsToThisUser)
+				// 기존 로그가 있을 때만 분리 판단
+				if (hasAnyLogs && (hasGuestLogs || !belongsToThisUser)) {
 					mustSplit = true;
+				}
 			} else {
 				if (hasUserLogs)
 					mustSplit = true;
@@ -181,13 +185,21 @@ public class ChatController {
 
 	/** 좌측 패널: 내 세션(방) 목록 (최근 대화 순) */
 	@GetMapping(value = "/sessions", produces = "application/json;charset=UTF-8")
-	public ResponseEntity<List<ChatSessionSummary>> sessions(@RequestHeader("X-User-No") Integer userNo,
-			@RequestParam(defaultValue = "100") int limit) {
+	public ResponseEntity<List<ChatSessionSummary>> sessions(
+			@RequestHeader(value = "X-User-No", required = false) Integer userNoHeader,
+			@AuthenticationPrincipal Object principal, @RequestParam(defaultValue = "100") int limit) {
+
+		Integer userNo = extractUserNo(principal);
+		if (userNo == null)
+			userNo = userNoHeader;
+		if (userNo == null)
+			return ResponseEntity.status(401).build();
+
 		return ResponseEntity.ok(chatService.listSessions(userNo, Math.max(1, Math.min(limit, 200))));
 	}
 
 	/** 새 세션 시작(프론트가 받은 세션ID를 이후 /send 호출시 X-Session-Id로 사용) */
-	@PostMapping(value = "/sessions/new", produces = "application/json;charset=UTF-8")
+	@PostMapping(value = "/sessions/new", produces = "text/plain;charset=UTF-8")
 	public ResponseEntity<String> newSession() {
 		return ResponseEntity.ok(chatService.newSessionId());
 	}
@@ -202,5 +214,25 @@ public class ChatController {
 				Math.max(1, Math.min(limit, 200)));
 		java.util.Collections.reverse(rows); // 오래된→최신으로 반환
 		return ResponseEntity.ok(rows);
+	}
+
+	@DeleteMapping("/sessions/{sid}")
+	public ResponseEntity<Void> deleteSession(@PathVariable String sid,
+			@RequestHeader(value = "X-User-No", required = false) Integer userNoHeader,
+			@AuthenticationPrincipal Object principal) {
+
+		// 1) 인증된 사용자 번호 우선
+		Integer userNo = extractUserNo(principal);
+		if (userNo == null)
+			userNo = userNoHeader;
+		if (userNo == null)
+			return ResponseEntity.status(401).build(); // 로그인 필요
+
+		// 2) 소유 확인 + 삭제
+		boolean ok = chatService.deleteSessionForUser(sid, userNo);
+		if (!ok)
+			return ResponseEntity.status(403).build(); // 내 소유 아님 or 없음
+
+		return ResponseEntity.noContent().build(); // 204
 	}
 }
