@@ -10,7 +10,7 @@
 		FROM FIRE_SAFE
 		GROUP BY MSTN_YR
 		ORDER BY MSTN_YR
-	</select>
+	</select>  
 
 
 </mapper>

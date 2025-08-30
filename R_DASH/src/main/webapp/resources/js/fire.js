@@ -292,7 +292,7 @@ jq36(document).ready(function() {
                     responsive: true,
                     plugins: {
                         title: { display: true,
-                                 text: '호선별 소화기 개수',
+                                 text: '호선별 소화기 개수 (1호선부터, 가나다 순)',
                                  font: {
                                      size: 18,          // 폰트 크기
                                      weight: 'bold'

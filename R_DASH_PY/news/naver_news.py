@@ -108,7 +108,7 @@ def get_press_name_for_url(url:str)->str:
         return CODE_TO_PRESS.get(code, f"Unknown({code})")
     return "Invalid URL"
 
-def naver_news_api(qeury):
+def naver_news_api(qeury,display):
     # 요청 URL (뉴스 검색)
     url = "https://openapi.naver.com/v1/search/news.json"
 
@@ -121,7 +121,7 @@ def naver_news_api(qeury):
     # 요청 파라미터
     params = {
         "query": qeury,
-        "display": 10,  # 결과 5개만
+        "display": display,  # 결과 5개만
         "start": 1,
         "sort": "date"  # 정확도순 , data : 날짜순 내림차순
     }
@@ -163,14 +163,15 @@ def naver_news_api(qeury):
 
 def main():
     all_results = []
-    all_results.extend(naver_news_api("한파"))
-    all_results.extend(naver_news_api("홍수"))
-    all_results.extend(naver_news_api("싱크홀"))
-    all_results.extend(naver_news_api("폭염"))
-    all_results.extend(naver_news_api("태풍"))
-    all_results.extend(naver_news_api("산사태"))
-    all_results.extend(naver_news_api("황사"))
-    all_results.extend(naver_news_api("화재"))
+    all_results.extend(naver_news_api("한파",10))
+    all_results.extend(naver_news_api("홍수",10))
+    all_results.extend(naver_news_api("싱크홀",10))
+    all_results.extend(naver_news_api("폭염",10))
+    all_results.extend(naver_news_api("태풍",10))
+    all_results.extend(naver_news_api("산사태",10))
+    all_results.extend(naver_news_api("황사",10))
+    all_results.extend(naver_news_api("화재",10))
+    all_results.extend(naver_news_api("전염병", 1))
 
     # 테스트
     #naver_news_api("한파")

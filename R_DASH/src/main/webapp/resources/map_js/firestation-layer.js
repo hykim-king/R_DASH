@@ -3,18 +3,14 @@
 (function (global) {
   'use strict';
 
-  // ── 페이지/레이어 가드: firestation 레이어에서만 동작 ─────────────────────────────
+  // ── 페이지/레이어 가드 ─────────────────────────────
   var qs = new URLSearchParams((typeof location !== 'undefined' && location.search) || '');
   var LAYER = (qs.get('layer') || '').toLowerCase();
   var BODY_LAYER = ((document.body && document.body.getAttribute('data-layer')) || '').toLowerCase();
   var IS_ME = (LAYER === 'firestation') || (BODY_LAYER === 'firestation');
 
-  // 다른 페이지면 혹시 떠 있는 UI들 정리 후 종료 (SPA/캐시 대비)
   if (!IS_ME) {
-    try {
-      var stray = ['fireLauncher','fsHud','fsFilterBar'];
-      stray.forEach(function(id){ var el = document.getElementById(id); if (el) el.remove(); });
-    } catch(_) {}
+    try { ['fireLauncher','fsHud','fsFilterBar'].forEach(function(id){ var el = document.getElementById(id); if (el) el.remove(); }); } catch(_) {}
     console.log('[Firestation] skip: not my layer');
     return;
   }
@@ -23,18 +19,33 @@
   if (global && global.AppMap) init();
   else global.addEventListener('appmap:ready', init, { once: true });
 
+  // === 헤더 동기화 유틸 (헤더 높이를 CSS 변수에 반영) ===
+  function getHeaderEl(){
+    return document.querySelector('#siteHeader') ||
+           document.querySelector('.site-header') ||
+           document.querySelector('#header') ||
+           document.querySelector('.tiles-header') ||
+           document.querySelector('header');
+  }
+  function ensureHeaderSync(){
+    var hdr = getHeaderEl();
+    var h = hdr ? Math.ceil(hdr.getBoundingClientRect().bottom) : 90;
+    document.documentElement.style.setProperty('--header-height', h + 'px');
+    if (hdr) { hdr.style.position = 'relative'; hdr.style.zIndex = '3000'; }
+  }
+
   function init() {
     var App = global.AppMap;
     if (!App || !App.map) { setTimeout(init, 80); return; }
     var map = App.map;
 
-    // ===== 위치/간격(요청 반영) =====
-    var UI = {
-      launcherTop: 30,  // ← 아이콘/말풍선 +10px (원래 20)
-      hudTop: 150,      // ← HUD +10px (원래 140)
-      right: 16,
-      filterBarBottom: 20 // ← 가운데 하단
-    };
+    // 헤더 보정
+    ensureHeaderSync();
+    window.addEventListener('resize', ensureHeaderSync);
+    if (window.ResizeObserver) {
+      var _hdr = getHeaderEl();
+      if (_hdr) new ResizeObserver(ensureHeaderSync).observe(_hdr);
+    }
 
     // ===== 공통 =====
     var BASE = (document.body && (document.body.getAttribute('data-context-path') || document.body.getAttribute('data-ctx'))) || '';
@@ -67,8 +78,9 @@
     var active = false;
     var markers = [];
     var clusterer = null;
+    var openedOverlay = null; // 현재 열린 CustomOverlay 1개 유지
 
-    // HUD
+    // HUD refs
     var hudEl = null, listEl = null, inputEl = null;
 
     // 요청/이벤트 안정화
@@ -76,9 +88,10 @@
     var inFlight = false;
     var lastFetchKey = '';
     var lastDrawKey  = '';
+    var skipNextIdleFetch = false; // 클릭 직후 1회 idle 스킵
 
-    // 레이어 API 등록
-    var firestationAPI = { title: '소방서', activate, deactivate, refresh, setType };
+    // ── 레이어 API 등록 (여기서 참조하는 함수들이 반드시 아래에 정의되어 있어야 함)
+    var firestationAPI = { title: '소방서', activate: activate, deactivate: deactivate, refresh: refresh, setType: setType };
     if (typeof App.registerLayer === 'function') App.registerLayer('firestation', firestationAPI);
     else global.FirestationLayer = firestationAPI;
 
@@ -96,12 +109,11 @@
       var wrap = document.createElement('div');
       wrap.className = 'layer-launcher';
       wrap.id = 'fireLauncher';
-     
 
       wrap.innerHTML =
         '<div class="bubble-beside">'+
           '<div class="bubble-wrap">'+
-            '<div class="bubble">지금 너가 있는 지역은 소방서 어디에 있어 ?</div>'+
+            '<div class="bubble">너네 마을에 소방서랑 119안전센터 어딨는지 궁금 하지 않아?</div>'+
             '<div class="bubble">궁금하면 날 클릭해 !</div>'+
           '</div>'+
           '<img id="fireBtnImg" class="launcher-img" alt="fire" src="'+ BTN_IMG +'" onerror="this.style.opacity=0">'+
@@ -125,10 +137,8 @@
 
       hudEl = document.createElement('div');
       hudEl.id = 'fsHud';
-      // 위치(요청 반영)
-    hudEl.style.display = 'none';
+      hudEl.style.display = 'none';
 
-      // 검색 영역
       var searchWrap = document.createElement('div');
       searchWrap.className = 'fs-search';
       searchWrap.style.display = 'flex';
@@ -157,14 +167,12 @@
       searchWrap.appendChild(inputEl);
       searchWrap.appendChild(clearBtn);
 
-      // 구분선
       var divider = document.createElement('div');
       divider.className = 'fs-divider';
       divider.style.height = '2px';
       divider.style.margin = '2px 10px 8px';
       divider.style.background = 'linear-gradient(to right, rgba(0,0,0,.08), rgba(0,0,0,0))';
 
-      // 지역 칩
       var chipsWrap = document.createElement('div');
       chipsWrap.className = 'fs-chips';
       Object.assign(chipsWrap.style, {display:'flex', flexWrap:'wrap', gap:'6px', padding:'6px 10px 8px'});
@@ -179,7 +187,6 @@
         return '<button type="button" class="chip-btn'+act+'" data-region="'+ (n==='전체'?'':n) +'">'+ n +'</button>';
       }).join('');
 
-      // 결과 리스트
       var list = document.createElement('div');
       listEl = list;
       list.className = 'fs-list';
@@ -267,16 +274,12 @@
           map.panTo(latlng);
 
           var mk = findNearestMarker(latlng, 30);
-          if (mk) {
-            mk.__info.setContent(infoHTML(dto));
-            mk.__info.open(map, mk);
-            mk.__opened = true;
-          }
+          if (mk) { openOverlayForMarker(mk, dto); }
         });
       }
     }
 
-    // ===== 하단 필터바 (가운데 정렬) =====
+    // ===== 하단 필터바 =====
     var filterBar = null;
     (function mountFilterBar(){
       if (document.getElementById('fsFilterBar')) {
@@ -291,15 +294,6 @@
         ].join('');
         document.body.appendChild(filterBar);
       }
-      // 가운데 하단 고정
-      filterBar.style.position = 'fixed';
-      filterBar.style.left = '50%';
-      filterBar.style.transform = 'translateX(-50%)';
-      filterBar.style.bottom = UI.filterBarBottom + 'px';
-      filterBar.style.zIndex = '9999';
-      filterBar.style.display = 'flex';
-      filterBar.style.gap = '10px';
-
       filterBar.addEventListener('click', function(e){
         var t = e.target.closest('.fs-btn'); if (!t) return;
         setType(t.getAttribute('data-type'));
@@ -311,25 +305,9 @@
     function updateFilterBarUI(){
       if (!filterBar) return;
       filterBar.querySelectorAll('.fs-btn').forEach(function(b){
-        // 공통 스타일
-        b.style.padding = '10px 16px';
-        b.style.border = '1px solid #ddd';
-        b.style.borderRadius = '9999px';
-        b.style.background = '#f9fafb';
-        b.style.fontSize = '13px';
-        b.style.cursor = 'pointer';
-
         var tp = b.getAttribute('data-type');
         var active = (tp === CURRENT_FIRE_TP);
-        if (active) {
-          b.style.background = '#111827';
-          b.style.color = '#fff';
-          b.style.borderColor = '#111827';
-        } else {
-          b.style.background = '#f9fafb';
-          b.style.color = '';
-          b.style.borderColor = '#ddd';
-        }
+        if (active) b.classList.add('is-active'); else b.classList.remove('is-active');
       });
     }
 
@@ -337,17 +315,13 @@
     function normalizeFireTp(dto){
       var raw = (dto && (dto.fireTp || dto.type || dto.stationNm || '')) + '';
       var s = raw.replace(/\s+/g, '').toUpperCase();
-
       if (/119?안전센(터|타)/.test(s) || s.includes('CENTER') || s.includes('지역대') || s.includes('파출')) return 'SAFETY';
       if (s.includes('소방서') || s.includes('FIRESTATION') || s.includes('본부')) return 'MAIN';
-
       var name = ((dto && dto.stationNm) || '').toUpperCase();
       if (/119?\s*안전센(터|타)/.test(name) || name.includes('CENTER') || name.includes('지역대') || name.includes('파출')) return 'SAFETY';
       if (name.includes('소방서') || name.includes('본부')) return 'MAIN';
-
       return 'MAIN';
     }
-
     function fetchJSON(url){
       return fetch(url, { headers: { 'Accept': 'application/json' } })
         .then(function(res){ if(!res.ok) throw new Error('HTTP '+res.status); return res.json(); });
@@ -362,16 +336,37 @@
         return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]);
       });
     }
-    function infoHTML(dto){
-      return (
-        '<div style="padding:10px;min-width:220px;line-height:1.45;">' +
-          '<div style="font-weight:700;margin-bottom:4px;">' + escapeHtml(dto.stationNm || '') + '</div>' +
-          (dto.area      ? '<div style="color:#666;font-size:12px;">'+ escapeHtml(dto.area) +'</div>' : '') +
-          (dto.fireNead  ? '<div style="color:#666;font-size:12px;">관할: '+ escapeHtml(dto.fireNead) +'</div>' : '') +
-          (dto.tel       ? '<div style="margin-top:6px;font-size:12px;">☎ ' + escapeHtml(dto.tel) + '</div>' : '') +
-          (dto.fireTp    ? '<div style="margin-top:6px;font-size:11px;color:#2563eb;">유형: ' + escapeHtml(dto.fireTp) + '</div>' : '') +
-        '</div>'
-      );
+
+    // ===== CustomOverlay 컨텐츠(유형 제거) =====
+    function buildFsContent(dto){
+      var el = document.createElement('div');
+      el.className = 'fs-bubble';
+      el.innerHTML =
+        '<div class="close" title="닫기">×</div>' +
+        '<div class="title">' + escapeHtml(dto.stationNm || '') + '</div>' +
+        (dto.area     ? '<div class="addr">' + escapeHtml(dto.area) + '</div>' : '') +
+        (dto.fireNead ? '<div class="row">관할: ' + escapeHtml(dto.fireNead) + '</div>' : '') +
+        (dto.tel      ? '<div class="row tel"><span>' + escapeHtml(dto.tel) + '</span></div>' : '');
+      return el;
+    }
+    function openOverlayForMarker(marker, dto){
+      if (openedOverlay) { openedOverlay.setMap(null); openedOverlay = null; }
+      var contentEl = buildFsContent(dto);
+      var ovl = new kakao.maps.CustomOverlay({
+        position: marker.getPosition(),
+        content: contentEl,
+        yAnchor: 1,
+        xAnchor: 0.5,
+        zIndex: 4
+      });
+      ovl.setMap(map);
+      openedOverlay = ovl;
+
+      var closeBtn = contentEl.querySelector('.close');
+      if (closeBtn) closeBtn.addEventListener('click', function(e){
+        e.stopPropagation();
+        if (openedOverlay) { openedOverlay.setMap(null); openedOverlay = null; }
+      });
     }
 
     // ===== 클러스터러 =====
@@ -386,7 +381,6 @@
       ].join('');
       return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(s);
     }
-
     function ensureClusterer(){
       if (clusterer !== null) return;
       var ok = !!(global.kakao && kakao.maps && kakao.maps.MarkerClusterer);
@@ -426,14 +420,11 @@
 
     // ===== 마커 렌더링 =====
     function clearMarkers(){
-      for (var i=0;i<markers.length;i++){
-        if (markers[i].__info) markers[i].__info.close();
-        markers[i].setMap(null);
-      }
+      for (var i=0;i<markers.length;i++){ markers[i].setMap(null); }
       if (clusterer) clusterer.clear();
       markers.length = 0;
+      if (openedOverlay) { openedOverlay.setMap(null); openedOverlay = null; }
     }
-
     function pickImageByType(tp){
       tp = (tp||'').toUpperCase();
       if (tp === 'MAIN')   return IMG_MAIN;
@@ -441,7 +432,6 @@
       if (tp === 'ONE19')  return IMG_119;
       return IMG_OTHER;
     }
-
     function draw(rows){
       clearMarkers();
       if (!Array.isArray(rows)) rows = [];
@@ -455,7 +445,6 @@
 
         var normTp = normalizeFireTp(d);
         d.__normTp = normTp;
-
         if (CURRENT_FIRE_TP !== 'ALL' && normTp !== CURRENT_FIRE_TP) continue;
 
         var img = pickImageByType(normTp);
@@ -465,20 +454,14 @@
           title: d.stationNm || '',
           image: img || undefined
         });
-
-        var info = new kakao.maps.InfoWindow({
-          content: infoHTML(Object.assign({}, d, { fireTp: normTp })),
-          removable: true,
-          zIndex: 3
-        });
-
-        marker.__dto  = d;
-        marker.__info = info;
+        marker.__dto = d;
 
         (function(mk){
           kakao.maps.event.addListener(mk, 'click', function(){
-            if (mk.__opened) { mk.__info.close(); mk.__opened = false; }
-            else { mk.__info.open(map, mk); mk.__opened = true; map.panTo(mk.getPosition()); }
+            // panTo 직후 발생하는 첫 idle은 건너뛰기
+            skipNextIdleFetch = true;
+            openOverlayForMarker(mk, mk.__dto);
+            map.panTo(mk.getPosition());
           });
         })(marker);
 
@@ -495,12 +478,13 @@
     // ===== 지도 이벤트 =====
     function onMapIdle(){
       if (!active) return;
+      if (skipNextIdleFetch) { skipNextIdleFetch = false; return; }
       if (idleTimer) clearTimeout(idleTimer);
       idleTimer = setTimeout(requestBBox, 160);
     }
     function onTilesLoadedOnce(){
       kakao.maps.event.removeListener(map, 'tilesloaded', onTilesLoadedOnce);
-      requestBBox(); // 초기 1회
+      requestBBox();
     }
 
     // ===== 데이터 요청(BBox) =====
@@ -519,7 +503,7 @@
       var url = API.bbox +
         '?minLat=' + b.minLat + '&maxLat=' + b.maxLat +
         '&minLon=' + b.minLon + '&maxLon=' + b.maxLon +
-        '&limit=' + (CURRENT_FIRE_TP==='ALL' ? 5000 : 5000) +
+        '&limit=' + 5000 +
         '&fireTp=' + encodeURIComponent(CURRENT_FIRE_TP) +
         '&fireTpLabel=' + encodeURIComponent(label);
 
@@ -554,14 +538,13 @@
       if (active) return;
       active = true;
 
-      // HUD 기본 닫힘
       if (hudEl) hudEl.style.display = 'none';
 
       kakao.maps.event.addListener(map, 'tilesloaded', onTilesLoadedOnce);
       kakao.maps.event.addListener(map, 'idle', onMapIdle);
 
       inFlight = false; lastFetchKey = ''; lastDrawKey = '';
-      requestBBox(); // 강제 1회
+      requestBBox();
       console.log('[firestation] activate');
     }
 
@@ -575,6 +558,8 @@
 
       clearMarkers();
       if (hudEl) hudEl.style.display = 'none';
+      if (openedOverlay) { openedOverlay.setMap(null); openedOverlay = null; }
+
       console.log('[firestation] deactivate');
     }
 

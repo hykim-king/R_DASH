@@ -34,11 +34,11 @@ document.addEventListener('DOMContentLoaded', function() {
         label: '통계 선택',
         data: [1, 1, 1, 1, 1],
         hoverOffset: hoverOff,
-        backgroundColor: [ // 색상을 명시적으로 지정하여 라벨 색상(white)과 대비되게 합니다.
+        backgroundColor: [
             'rgba(255, 40, 40,1)',
             'rgb(255, 159, 64)',
-            'rgb(75, 192, 192)',
-            'rgb(153, 102, 255)',
+            'rgba(46, 211, 82, 1)',
+            'rgba(110, 110, 110, 1)',
             'rgb(255, 205, 86)'
         ],
       }]
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
       responsive: true, // 반응형 차트 설정
       // 차트 클릭 시
       layout: {
-        // hoverOffset 만큼 내부 여백을 확보하면 튀어나와도 잘리지 않습니다.
+        // hoverOffset 만큼 내부 여백을 확보 튀어나와도 잘리지 않게
         padding: {
             top: hoverOff,
             bottom: hoverOff,
@@ -65,8 +65,8 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         datalabels: {
           display: true,
+          color: 'black',
           hoverOffset: hoverOff,
-          color: 'black', // 라벨 텍스트 색상
           textAlign: 'center', // 텍스트 정렬
           font: {
             weight: 'bold',

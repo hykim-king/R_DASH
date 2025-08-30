@@ -95,6 +95,7 @@
         .normal { background-color: #d0fb50 !important; color: black; }
         .good { background-color: #0ed13c !important; color: black; }
         
+
         body {
 		    display: flex;
 		    flex-direction: column;
@@ -110,15 +111,6 @@
 		.main-container {
 		    width: 100%; /* 또는 원하는 너비 */
 		    margin: 0 auto; /* 부모 안에서 중앙 정렬 */
-		}
-		
-		main {
-		    flex: 1; /* main 영역이 남은 공간을 차지하도록 */
-		    padding-bottom: 80px; /* footer 높이만큼 여백 확보 */
-		}
-		
-		footer {
-		    height: 80px;
 		}
 		
 		.menuChart {
@@ -206,7 +198,7 @@
             <c:when test="${type == 'fire'}">
                 <pre class = "typeMent">
                   본 페이지에서는 화재 관련 통계를 확인할 수 있습니다.
-		스크롤을 내려 자료를 확인할 수 있습니다.
+		     스크롤을 내려 자료를 확인할 수 있습니다.
                 </pre>
             </c:when>
             <c:when test="${type == 'landslide'}">
@@ -362,20 +354,20 @@
 			</div>
 	    </div>
 	    <div class="row mb-6">
-            <div class="col-md-6">
-                <h2>TOP 5 지역</h2>
-		        <table id="top5Table" class="topTable">
-		            <tr>
-		                <th>순위</th>
-		                <th>지역</th>
-		                <th>PM10</th>
-		                <th>등급</th>
-		            </tr>
-		        </table>
+	       <div class="col-md-6">
+                <h2>미세먼지 낮은 지역</h2>
+                <table id="bottom5Table" class="topTable">
+                    <tr>
+                        <th>순위</th>
+                        <th>지역</th>
+                        <th>PM10</th>
+                        <th>등급</th>
+                    </tr>
+                </table>
             </div>
             <div class="col-md-6">
-                <h2>BOTTOM 5 지역</h2>
-		        <table id="bottom5Table" class="topTable">
+                <h2>미세먼지 높은 지역</h2>
+		        <table id="top5Table" class="topTable">
 		            <tr>
 		                <th>순위</th>
 		                <th>지역</th>

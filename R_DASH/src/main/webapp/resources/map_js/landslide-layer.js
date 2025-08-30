@@ -194,36 +194,42 @@
       if (s.indexOf('주의')>-1) return '#f97316';
       return '#7c3aed';
     }
-    function drawDots(pointRows){
-      clearDots();
-      if (!pointRows || !pointRows.length) return;
-      var zoom = map.getLevel();
-      var size = (zoom>=9?6:(zoom>=7?8:(zoom>=5?10:12)));
-      for (var i=0;i<pointRows.length;i++){
-        var p = normPoint(pointRows[i]);
-        if (isNaN(p.lat) || isNaN(p.lon)) continue;
+function drawDots(pointRows){
+  clearDots();
+  if (!pointRows || !pointRows.length) return;
 
-        var el = document.createElement('div');
-        el.className = 'ls-dot';
-        el.style.cssText = [
-          'width:'+size+'px;height:'+size+'px;',
-          'margin-left:' + (-size/2) + 'px;',
-          'margin-top:'  + (-size/2) + 'px;',
-          'box-shadow:0 0 10px '+colorForLevel(p.level)+', 0 0 20px '+colorForLevel(p.level),
-          'background:'+colorForLevel(p.level)+';'
-        ].join('');
+  var zoom = map.getLevel();
+  var cap = (zoom>=9?400:(zoom>=7?600:900)); // 🔹 확대될수록 더 많이, 멀수록 덜
+  if (pointRows.length > cap) {
+    // 균등 샘플링
+    var step = Math.ceil(pointRows.length / cap);
+    var sampled = [];
+    for (var i=0;i<pointRows.length; i+=step) sampled.push(pointRows[i]);
+    pointRows = sampled;
+  }
+  var glow = (zoom <= 6); // 🔹 꽤 확대된 경우만 글로우 켜기
 
-        el.title = (p.date ? ('발생일: '+p.date+'\n') : '')
-                 + (p.level ? ('등급: '+p.level+'\n') : '')
-                 + (p.name ? ('위치: '+p.name) : '');
+  for (var i=0;i<pointRows.length;i++){
+    var p = normPoint(pointRows[i]);
+    if (isNaN(p.lat) || isNaN(p.lon)) continue;
 
-        var overlay = new kakao.maps.CustomOverlay({
-          position: new kakao.maps.LatLng(p.lat, p.lon),
-          content: el, yAnchor: 0.5, xAnchor: 0.5, zIndex: 1000
-        });
-        overlay.setMap(map);
-        dotOverlays.push(overlay);
-      }
+    var el = document.createElement('div');
+    el.className = 'ls-dot';
+    el.style.cssText = [
+      'width:'+size+'px;height:'+size+'px;',
+      'margin-left:' + (-size/2) + 'px;',
+      'margin-top:'  + (-size/2) + 'px;',
+      (glow ? 'box-shadow:0 0 10px '+colorForLevel(p.level)+', 0 0 20px '+colorForLevel(p.level)+';' : ''),
+      'background:'+colorForLevel(p.level)+';'
+    ].join('');
+
+    var overlay = new kakao.maps.CustomOverlay({
+      position: new kakao.maps.LatLng(p.lat, p.lon),
+      content: el, yAnchor: 0.5, xAnchor: 0.5, zIndex: 1000
+    });
+    overlay.setMap(map);
+    dotOverlays.push(overlay);
+  }
     }
 
     // ---------- 클라이언트 필터 ----------
@@ -399,14 +405,14 @@
 
     // ---------- 지도 고정 + 확대 프리셋 ----------
     function lockMap(){
-      map.setDraggable(false);
-      map.setZoomable(false);
+      map.setDraggable(true);
+      map.setZoomable(true);
 
       if (!document.getElementById('ls-lock-badge')) {
         var b = document.createElement('div');
         b.id = 'ls-lock-badge';
         b.className = 'ls-lock-badge';
-        b.textContent = '지도 고정됨 (버튼으로만 확대/축소)';
+     
         (document.querySelector('#map') || document.body).appendChild(b);
       }
     }
@@ -416,22 +422,12 @@
       var box = document.createElement('div');
       box.id = 'ls-zoom-presets';
       box.className = 'ls-zoom';
-      box.innerHTML = [
-        '<button class="ls-zoom__btn" data-scale="50">50%</button>',
-        '<button class="ls-zoom__btn" data-scale="70">70%</button>',
-        '<button class="ls-zoom__btn is-active" data-scale="100">100%</button>'
-      ].join('');
-      (document.querySelector('#map') || document.body).appendChild(box);
+     
 
       var baseCenter = map.getCenter();
       var baseLevel  = map.getLevel();
 
-      function levelFor(percent){
-        if (percent === 100) return baseLevel;
-        if (percent === 70)  return baseLevel + 1;
-        if (percent === 50)  return baseLevel + 2;
-        return baseLevel;
-      }
+      
       function setActive(pct){
         var btns = box.querySelectorAll('.ls-zoom__btn');
         for (var i=0;i<btns.length;i++){

@@ -44,7 +44,6 @@
 
     var AppMap = (global.AppMap = global.AppMap || {});
     AppMap.__initialized = true;
-
     AppMap.ctx = AppMap.ctx || detectCtx();
 
     // ready 콜백 지원
@@ -60,6 +59,73 @@
       var center = new kakao.maps.LatLng(36.5, 127.8);
       AppMap.map = new kakao.maps.Map(el, { center: center, level: 12 });
       console.log('[AppMap] map created');
+
+      // ?? 축소 한계(너무 멀리 못 가게)
+      AppMap.map.setMaxLevel(13);
+      // 필요 시 과도한 확대도 제한하려면 주석 해제
+      // AppMap.map.setMinLevel(2);
+
+      // ─────────────────────────────────────────────────────────
+      // ?? 이동 범위 제한: 대한민국(+제주+독도) 대략 경계
+      //   남서(33.0,124.0) ↔ 북동(39.6,132.5) 정도를 안전 여유 포함으로 설정
+      //   값은 화면/디자인에 맞게 미세조정 가능
+      // ─────────────────────────────────────────────────────────
+      var allowedBounds = new kakao.maps.LatLngBounds(
+        new kakao.maps.LatLng(33.0, 124.0),  // SW 
+        new kakao.maps.LatLng(39.6, 134.5)   // NE
+      );
+
+      // 마지막으로 유효했던 센터(경계 안)
+      var lastValidCenter = AppMap.map.getCenter();
+
+      function isInsideBounds(latlng) {
+        return allowedBounds.contain(latlng);
+      }
+
+      // 경계 밖으로 나가면 가장 가까운 점으로 "클램프"해서 센터를 되돌림
+      function clampToBounds(latlng) {
+        var lat = latlng.getLat();
+        var lng = latlng.getLng();
+
+        // bounds 경계값
+        var sw = allowedBounds.getSouthWest();
+        var ne = allowedBounds.getNorthEast();
+        var clampedLat = Math.max(sw.getLat(), Math.min(ne.getLat(), lat));
+        var clampedLng = Math.max(sw.getLng(), Math.min(ne.getLng(), lng));
+        return new kakao.maps.LatLng(clampedLat, clampedLng);
+      }
+
+      // 너무 자주 호출되는 center_changed 는 가볍게 스로틀
+      var throttleTimer = null;
+      kakao.maps.event.addListener(AppMap.map, 'center_changed', function () {
+        if (throttleTimer) return;
+        throttleTimer = setTimeout(function () {
+          throttleTimer = null;
+          var c = AppMap.map.getCenter();
+          if (isInsideBounds(c)) {
+            lastValidCenter = c;
+          } else {
+            // 부드럽게 끌어오기
+            AppMap.map.setCenter(clampToBounds(c));
+          }
+        }, 80); // 80ms 스로틀
+      });
+
+      // 드래그 종료/줌 변경 시에도 보정(보장)
+      kakao.maps.event.addListener(AppMap.map, 'dragend', function () {
+        var c = AppMap.map.getCenter();
+        if (!isInsideBounds(c)) AppMap.map.setCenter(clampToBounds(c));
+      });
+      kakao.maps.event.addListener(AppMap.map, 'zoom_changed', function () {
+        var c = AppMap.map.getCenter();
+        if (!isInsideBounds(c)) AppMap.map.setCenter(clampToBounds(c));
+      });
+
+      // 초기에도 혹시 벗어나 있으면 보정
+      (function ensureInitialInside(){
+        var c = AppMap.map.getCenter();
+        if (!isInsideBounds(c)) AppMap.map.setCenter(clampToBounds(c));
+      })();
     }
 
     // 레이어 레지스트리
