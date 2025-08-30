@@ -7,38 +7,40 @@
 <title>지도</title>
 
 <style>
-#map {
-  position: absolute;
-  top: calc(var(--header-height) - 20px); /* 20px 위로 올림 */
+#map{
+   position: fixed; 
+  top: var(--header-height);
   left: 0;
   width: 100%;
-  height: calc(100vh - var(--header-height) + 20px); /* 높이도 같이 늘려줌 */
+  height: calc(100vh - var(--header-height));
   z-index: 1;
 }
+:root{ --header-height: 90px; }  /* 초기값(임시) */
 
 html, body {
-    height: 100%;
+  height: 100%;
 }
 
 /* 로딩 / 오버레이 */
 .loading, .overlay {
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    transition: opacity .4s ease;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  transition: opacity .4s ease;
 }
 
 .overlay {
-    background: rgba(0, 0, 0, .5);
+  background: rgba(0, 0, 0, .5);
 }
 
 .loading {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  color: #fff;
 }
+
 </style>
 
 
