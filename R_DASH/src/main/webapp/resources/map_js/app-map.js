@@ -71,7 +71,7 @@
       //   값은 화면/디자인에 맞게 미세조정 가능
       // ─────────────────────────────────────────────────────────
       var allowedBounds = new kakao.maps.LatLngBounds(
-        new kakao.maps.LatLng(33.0, 128.0),  // SW 
+        new kakao.maps.LatLng(33.0, 124.0),  // SW 
         new kakao.maps.LatLng(39.6, 134.5)   // NE
       );
 
