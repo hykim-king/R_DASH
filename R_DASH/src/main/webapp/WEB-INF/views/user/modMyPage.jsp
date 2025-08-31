@@ -97,8 +97,9 @@
 		  filepoint = image.value.substring(pathpoint+1,image.length);
 		  filetype = filepoint.toLowerCase();
 		  
-		  if(filetype!='jpg'||filetype!='png'||filetype!='jpeg'||filetype!='gif'||filetype!='csv'){
+		  if(filetype!='jpg' && filetype!='png' && filetype!='jpeg' && filetype!='gif' && filetype!='csv'){
 			  alert('jpg, gif, png, jpeg, csv 파일만 선택할 수 있습니다.');
+			  console.log(filetype);
 			  return
 		  }
 
