@@ -9,7 +9,7 @@
 <style>
 #map{
    position: fixed; 
-  top: var(--header-height);
+  height: calc(100vh - var(--header-height) - 20);
   left: 0;
   width: 100%;
   height: calc(100vh - var(--header-height));
