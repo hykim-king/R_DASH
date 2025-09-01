@@ -19,10 +19,33 @@
   if (global && global.AppMap) init();
   else global.addEventListener('appmap:ready', init, { once: true });
 
+  // === 헤더 동기화 유틸 (헤더 높이를 CSS 변수에 반영) ===
+  function getHeaderEl(){
+    return document.querySelector('#siteHeader') ||
+           document.querySelector('.site-header') ||
+           document.querySelector('#header') ||
+           document.querySelector('.tiles-header') ||
+           document.querySelector('header');
+  }
+  function ensureHeaderSync(){
+    var hdr = getHeaderEl();
+    var h = hdr ? Math.ceil(hdr.getBoundingClientRect().bottom) : 90;
+    document.documentElement.style.setProperty('--header-height', h + 'px');
+    if (hdr) { hdr.style.position = 'relative'; hdr.style.zIndex = '3000'; }
+  }
+
   function init() {
     var App = global.AppMap;
     if (!App || !App.map) { setTimeout(init, 80); return; }
     var map = App.map;
+
+    // 헤더 보정
+    ensureHeaderSync();
+    window.addEventListener('resize', ensureHeaderSync);
+    if (window.ResizeObserver) {
+      var _hdr = getHeaderEl();
+      if (_hdr) new ResizeObserver(ensureHeaderSync).observe(_hdr);
+    }
 
     // ===== 공통 =====
     var BASE = (document.body && (document.body.getAttribute('data-context-path') || document.body.getAttribute('data-ctx'))) || '';
@@ -65,9 +88,10 @@
     var inFlight = false;
     var lastFetchKey = '';
     var lastDrawKey  = '';
+    var skipNextIdleFetch = false; // 클릭 직후 1회 idle 스킵
 
-    // 레이어 API 등록
-    var firestationAPI = { title: '소방서', activate, deactivate, refresh, setType };
+    // ── 레이어 API 등록 (여기서 참조하는 함수들이 반드시 아래에 정의되어 있어야 함)
+    var firestationAPI = { title: '소방서', activate: activate, deactivate: deactivate, refresh: refresh, setType: setType };
     if (typeof App.registerLayer === 'function') App.registerLayer('firestation', firestationAPI);
     else global.FirestationLayer = firestationAPI;
 
@@ -86,7 +110,6 @@
       wrap.className = 'layer-launcher';
       wrap.id = 'fireLauncher';
 
-      // 위치는 CSS가 관리 (inline 지정 안 함)
       wrap.innerHTML =
         '<div class="bubble-beside">'+
           '<div class="bubble-wrap">'+
@@ -114,10 +137,8 @@
 
       hudEl = document.createElement('div');
       hudEl.id = 'fsHud';
-      // 위치는 CSS가 관리 (inline 지정 안 함)
       hudEl.style.display = 'none';
 
-      // 검색 영역
       var searchWrap = document.createElement('div');
       searchWrap.className = 'fs-search';
       searchWrap.style.display = 'flex';
@@ -146,14 +167,12 @@
       searchWrap.appendChild(inputEl);
       searchWrap.appendChild(clearBtn);
 
-      // 구분선
       var divider = document.createElement('div');
       divider.className = 'fs-divider';
       divider.style.height = '2px';
       divider.style.margin = '2px 10px 8px';
       divider.style.background = 'linear-gradient(to right, rgba(0,0,0,.08), rgba(0,0,0,0))';
 
-      // 지역 칩
       var chipsWrap = document.createElement('div');
       chipsWrap.className = 'fs-chips';
       Object.assign(chipsWrap.style, {display:'flex', flexWrap:'wrap', gap:'6px', padding:'6px 10px 8px'});
@@ -168,7 +187,6 @@
         return '<button type="button" class="chip-btn'+act+'" data-region="'+ (n==='전체'?'':n) +'">'+ n +'</button>';
       }).join('');
 
-      // 결과 리스트
       var list = document.createElement('div');
       listEl = list;
       list.className = 'fs-list';
@@ -256,9 +274,7 @@
           map.panTo(latlng);
 
           var mk = findNearestMarker(latlng, 30);
-          if (mk) {
-            openOverlayForMarker(mk, dto);
-          }
+          if (mk) { openOverlayForMarker(mk, dto); }
         });
       }
     }
@@ -278,7 +294,6 @@
         ].join('');
         document.body.appendChild(filterBar);
       }
-      // 위치는 CSS가 관리 (inline 최소화)
       filterBar.addEventListener('click', function(e){
         var t = e.target.closest('.fs-btn'); if (!t) return;
         setType(t.getAttribute('data-type'));
@@ -300,17 +315,13 @@
     function normalizeFireTp(dto){
       var raw = (dto && (dto.fireTp || dto.type || dto.stationNm || '')) + '';
       var s = raw.replace(/\s+/g, '').toUpperCase();
-
       if (/119?안전센(터|타)/.test(s) || s.includes('CENTER') || s.includes('지역대') || s.includes('파출')) return 'SAFETY';
       if (s.includes('소방서') || s.includes('FIRESTATION') || s.includes('본부')) return 'MAIN';
-
       var name = ((dto && dto.stationNm) || '').toUpperCase();
       if (/119?\s*안전센(터|타)/.test(name) || name.includes('CENTER') || name.includes('지역대') || name.includes('파출')) return 'SAFETY';
       if (name.includes('소방서') || name.includes('본부')) return 'MAIN';
-
       return 'MAIN';
     }
-
     function fetchJSON(url){
       return fetch(url, { headers: { 'Accept': 'application/json' } })
         .then(function(res){ if(!res.ok) throw new Error('HTTP '+res.status); return res.json(); });
@@ -328,17 +339,16 @@
 
     // ===== CustomOverlay 컨텐츠(유형 제거) =====
     function buildFsContent(dto){
-  var el = document.createElement('div');
-  el.className = 'fs-bubble';
-  el.innerHTML =
-    '<div class="close" title="닫기">×</div>' +
-    '<div class="title">' + escapeHtml(dto.stationNm || '') + '</div>' +
-    (dto.area     ? '<div class="addr">' + escapeHtml(dto.area) + '</div>' : '') +
-    (dto.fireNead ? '<div class="row">관할: ' + escapeHtml(dto.fireNead) + '</div>' : '') +
-    (dto.tel      ? '<div class="row tel"><span>' + escapeHtml(dto.tel) + '</span></div>' : '');
-  return el;
-}
-
+      var el = document.createElement('div');
+      el.className = 'fs-bubble';
+      el.innerHTML =
+        '<div class="close" title="닫기">×</div>' +
+        '<div class="title">' + escapeHtml(dto.stationNm || '') + '</div>' +
+        (dto.area     ? '<div class="addr">' + escapeHtml(dto.area) + '</div>' : '') +
+        (dto.fireNead ? '<div class="row">관할: ' + escapeHtml(dto.fireNead) + '</div>' : '') +
+        (dto.tel      ? '<div class="row tel"><span>' + escapeHtml(dto.tel) + '</span></div>' : '');
+      return el;
+    }
     function openOverlayForMarker(marker, dto){
       if (openedOverlay) { openedOverlay.setMap(null); openedOverlay = null; }
       var contentEl = buildFsContent(dto);
@@ -371,7 +381,6 @@
       ].join('');
       return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(s);
     }
-
     function ensureClusterer(){
       if (clusterer !== null) return;
       var ok = !!(global.kakao && kakao.maps && kakao.maps.MarkerClusterer);
@@ -416,7 +425,6 @@
       markers.length = 0;
       if (openedOverlay) { openedOverlay.setMap(null); openedOverlay = null; }
     }
-
     function pickImageByType(tp){
       tp = (tp||'').toUpperCase();
       if (tp === 'MAIN')   return IMG_MAIN;
@@ -424,7 +432,6 @@
       if (tp === 'ONE19')  return IMG_119;
       return IMG_OTHER;
     }
-
     function draw(rows){
       clearMarkers();
       if (!Array.isArray(rows)) rows = [];
@@ -451,6 +458,8 @@
 
         (function(mk){
           kakao.maps.event.addListener(mk, 'click', function(){
+            // panTo 직후 발생하는 첫 idle은 건너뛰기
+            skipNextIdleFetch = true;
             openOverlayForMarker(mk, mk.__dto);
             map.panTo(mk.getPosition());
           });
@@ -469,6 +478,7 @@
     // ===== 지도 이벤트 =====
     function onMapIdle(){
       if (!active) return;
+      if (skipNextIdleFetch) { skipNextIdleFetch = false; return; }
       if (idleTimer) clearTimeout(idleTimer);
       idleTimer = setTimeout(requestBBox, 160);
     }
