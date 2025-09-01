@@ -327,7 +327,46 @@ body.home-page .navbar,
 .news-section .card .card-company {
 	color: #6b7280 !important;
 }
+/* === 카드 높이 동일 & 내용 정렬 === */
+.news-section .row > [class*="col-"]{ display:flex; align-items:stretch; }
 
+.news-rotator-wrap {                             /* 래퍼가 가로/세로 모두 꽉 차도록 */
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex:1 1 auto;
+}
+
+.news-section .card {                            /* 카드 자체를 세로 플렉스 */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  flex:1 1 auto;
+  height:auto;                                  /* col 높이 채우기 */
+}
+
+.news-section .card-body {                       /* 본문 영역을 아래까지 밀어줌 */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 110px;                             /* 제목+언론사 최소 공간 확보 */
+}
+
+/* 제목 2줄까지만 표시(말줄임) → 카드 높이 흔들림 방지 */
+.news-section .card-title .title-link {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* 언론사 한 줄 말줄임 */
+.news-section .card-company {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 .news-title {
 	text-align: center;
 	font-size: 1.8rem;
@@ -590,6 +629,7 @@ img.card-img-top {
 	box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
 	font-size: 1rem;
 	color: #111;
+	position: relative;
 }
 
 /* 사용자: 오른쪽 */
@@ -604,7 +644,25 @@ img.card-img-top {
 .chat-bubble.bot {
 	align-self: flex-start; /* ← 왼쪽 정렬 */
 	margin-right: auto;
-	background: #fff;
+	background: #e8fff4;
+	padding-left: 56px;
+}
+
+/* 봇 아이콘(이미지) */
+.chat-bubble.bot::before{
+  content: "";
+  position: absolute;
+  left: 12px; top: 12px;
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  /* ↓ 이미지 + 배경색을 '레이어'로 한 번에 지정 (이미지, 색 순서) */
+  background: url("${CP}/resources/image/hello_jm.png") center/cover no-repeat, #fff;
+  /* 또는 개별 속성:
+     background-image:url("/resources/image/jaemini_bo.jpg");
+     background-size:cover; background-position:center; background-repeat:no-repeat;
+     background-color:#fff;
+  */
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
 }
 
 .chat-time {
@@ -918,25 +976,45 @@ to {opacity: 1;	transform: translate3d(0, 0, 0) scale(1);}
 					<h2 class="accordion-header" id="headingOne">
 						<button class="accordion-button" type="button"
 							data-bs-toggle="collapse" data-bs-target="#faq1"
-							aria-expanded="true">대피소 위치는 어디서 확인할 수 있나요?</button>
+							aria-expanded="true">재민이 사이트에는 뭐가 있나요?</button>
 					</h2>
 					<div id="faq1" class="accordion-collapse collapse show"
 						data-bs-parent="#faqAccordion">
-						<div class="accordion-body">상단 '지도 페이지' 메뉴에서 확인 가능합니다.</div>
+						<div class="accordion-body">저희 사이트에는 '지도', '통계', '뉴스', '공지사항'등을 제공하고 있습니다.</div>
 					</div>
 				</div>
 				<div class="accordion-item">
 					<h2 class="accordion-header" id="headingTwo">
 						<button class="accordion-button collapsed" type="button"
-							data-bs-toggle="collapse" data-bs-target="#faq2">재난 종류에는
-							무엇이 있나요?</button>
+							data-bs-toggle="collapse" data-bs-target="#faq2">대피소 위치는 어디서 확인할 수 있나요?</button>
 					</h2>
 					<div id="faq2" class="accordion-collapse collapse"
 						data-bs-parent="#faqAccordion">
-						<div class="accordion-body">화재, 지진, 태풍, 폭염, 감염병 등 다양한 유형이
-							있습니다.</div>
+						<div class="accordion-body">상단 '지도 페이지' 메뉴에서 확인 가능합니다.
+						</div>
 					</div>
 				</div>
+				<div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#faq3">화재 데이터를 어디서 볼 수 있을까요?</button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse"
+                        data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">상단 '통계 페이지' 메뉴에서 확인 가능합니다.</div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#faq4">재민이에서는 다른 정보를 제공하는게 있나요?</button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse"
+                        data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">저희 사이트에서는 '뉴스'정보를 제공하고 있습니다.</div>
+                    </div>
+                </div>
+                
 			</div>
 		</div>
 	</div>
@@ -1096,11 +1174,11 @@ to {opacity: 1;	transform: translate3d(0, 0, 0) scale(1);}
 
     	  // 보험/재무 문맥: '화재'가 회사명/보험 기사일 때
     	  const insuranceCtx = /(삼성화재|메리츠화재|흥국화재|현대해상|DB손해|DB손해보험|KB손해|KB손해보험|한화손해|롯데손해|캐롯|농협손해|손해보험|보험|보험료|보험금|실손|실손보험|주가|실적|영업이익|순이익|배당)/i.test(t);
-    	  // 실제 화재 상황을 암시하는 단어들
-    	  const fireCtx = /(산불|불길|화염|연기|대피|진화|사망|사상|인명|피해|참사|소방|방화|폭발|누전|발화|화마|전소|불이|불로|화재 발생|화재로|화재 진압|화재 진화)/.test(t);
+    	// 화재 강한 키워드 + '불'이면서 화재 맥락 단서
+    	  const fireStrong = /(산불|화재)/;
+    	  const fireHints  = /(불길|화염|연기|대피|진화|진압|소방|방화|폭발|누전|발화|전소|화마|참사|사망|사상|인명피해|피해|꺼져)/;
 
-    	  // 🔥 화재: '산불'은 항상, '화재'는 문맥 있을 때만 (보험/재무 문맥이면 제외)
-    	  if (/산불/.test(t) || (/화재/.test(t) && fireCtx && !insuranceCtx)) {
+    	  if ((fireStrong.test(t) || (/불/.test(t) && fireHints.test(t))) && !insuranceCtx) {
     	    return CP + '/resources/image/fire.png';
     	  }
 
@@ -1285,7 +1363,7 @@ to {opacity: 1;	transform: translate3d(0, 0, 0) scale(1);}
     if(chatBody.querySelector('.jm-greeting')) return;
     var d=document.createElement('div');
     d.className='chat-bubble bot jm-greeting';
-    d.innerHTML='안녕하세요! 재난 알림 도우미 <b>재민이</b>입니다. 저는 재난 및 안전 정보를 제공할 수 있습니다. 기상 정보, 지진, 화재, 태풍 등 자연재해와 관련된 정보를 알려드릴 수 있으며, 안전 수칙이나 대처 방법도 안내해 드릴 수 있습니다. 궁금한 점이 있으면 말씀해 주세요.'
+    d.innerHTML='안녕하세요! 재난 알림 도우미 <b>재민이</b>입니다.</br> 저는 재난 및 안전 정보를 제공할 수 있습니다. 기상 정보, 지진, 화재, 태풍 등 자연재해와 관련된 정보를 알려드릴 수 있으며, 안전 수칙이나 대처 방법도 안내해 드릴 수 있습니다. 궁금한 점이 있으면 말씀해 주세요.'
                 +'<span class="chat-time">'+nowText()+'</span>';
     chatBody.appendChild(d);
     chatBody.scrollTop=chatBody.scrollHeight;
