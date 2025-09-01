@@ -1,81 +1,137 @@
 package com.pcwk.ehr.domain;
 
-import java.time.LocalDateTime;
-
 public class ChatDTO {
 
-	private String roomId;
-	private String sender;
-	private String message;
-	private LocalDateTime timestamp;
+	/** 기록 번호 (PK) */
+	private Long logNo;
+
+	/** 회원 번호 */
+	private Integer userNo;
+
+	/** 세션 아이디 */
+	private String sessionId;
+
+	/** 질문 */
+	private String question;
+
+	/** 답변 */
+	private String answer;
+
+	/** 등록일 */
+	private String regDt;
 
 	/**
 	 * 
 	 */
 	public ChatDTO() {
-		this.timestamp = LocalDateTime.now();
 	}
 
 	/**
-	 * @return the roomId
+	 * @param logNo
+	 * @param userNo
+	 * @param sessionId
+	 * @param question
+	 * @param answer
+	 * @param regDt
 	 */
-	public String getRoomId() {
-		return roomId;
+	public ChatDTO(Long logNo, Integer userNo, String sessionId, String question, String answer, String regDt) {
+		super();
+		this.logNo = logNo;
+		this.userNo = userNo;
+		this.sessionId = sessionId;
+		this.question = question;
+		this.answer = answer;
+		this.regDt = regDt;
 	}
 
 	/**
-	 * @param roomId the roomId to set
+	 * @return the logNo
 	 */
-	public void setRoomId(String roomId) {
-		this.roomId = roomId;
+	public Long getLogNo() {
+		return logNo;
 	}
 
 	/**
-	 * @return the sender
+	 * @param logNo the logNo to set
 	 */
-	public String getSender() {
-		return sender;
+	public void setLogNo(Long logNo) {
+		this.logNo = logNo;
 	}
 
 	/**
-	 * @param sender the sender to set
+	 * @return the userNo
 	 */
-	public void setSender(String sender) {
-		this.sender = sender;
+	public Integer getUserNo() {
+		return userNo;
 	}
 
 	/**
-	 * @return the message
+	 * @param userNo the userNo to set
 	 */
-	public String getMessage() {
-		return message;
+	public void setUserNo(Integer userNo) {
+		this.userNo = userNo;
 	}
 
 	/**
-	 * @param message the message to set
+	 * @return the sessionId
 	 */
-	public void setMessage(String message) {
-		this.message = message;
+	public String getSessionId() {
+		return sessionId;
 	}
 
 	/**
-	 * @return the timestamp
+	 * @param sessionId the sessionId to set
 	 */
-	public LocalDateTime getTimestamp() {
-		return timestamp;
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
 	}
 
 	/**
-	 * @param timestamp the timestamp to set
+	 * @return the question
 	 */
-	public void setTimestamp(LocalDateTime timestamp) {
-		this.timestamp = timestamp;
+	public String getQuestion() {
+		return question;
+	}
+
+	/**
+	 * @param question the question to set
+	 */
+	public void setQuestion(String question) {
+		this.question = question;
+	}
+
+	/**
+	 * @return the answer
+	 */
+	public String getAnswer() {
+		return answer;
+	}
+
+	/**
+	 * @param answer the answer to set
+	 */
+	public void setAnswer(String answer) {
+		this.answer = answer;
+	}
+
+	/**
+	 * @return the regDt
+	 */
+	public String getRegDt() {
+		return regDt;
+	}
+
+	/**
+	 * @param regDt the regDt to set
+	 */
+	public void setRegDt(String regDt) {
+		this.regDt = regDt;
 	}
 
 	@Override
 	public String toString() {
-		return "ChatDTO [roomId=" + roomId + ", sender=" + sender + ", message=" + message + ", timestamp=" + timestamp
-				+ "]";
+		return "ChatDTO [logNo=" + logNo + ", userNo=" + userNo + ", sessionId=" + sessionId + ", question=" + question
+				+ ", answer=" + answer + ", regDt=" + regDt + "]";
 	}
 
 }

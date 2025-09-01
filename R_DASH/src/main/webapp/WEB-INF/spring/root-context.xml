@@ -10,6 +10,20 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
 		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	
+	
+	<bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+        <property name="messageConverters">
+            <list>
+                <!-- XML 파싱용 JAXB 컨버터 -->
+                <bean class="org.springframework.http.converter.xml.Jaxb2RootElementHttpMessageConverter" />
+                
+                <!-- JSON 파싱용 Jackson 컨버터 (필요시) -->
+                <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+            </list>
+        </property>
+    </bean>
+	
 	<!-- message설정 
 	    등록시 주의 사항 : 이름이 messageSource로 고정되어 있다.
 	  id="messageSource"
@@ -158,15 +172,15 @@
         class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
         <property name="dataSource" ref="dataSource"></property>
     </bean>
-
-
+<!--218.144.130.138-->
+<!--192.168.100.30-->
     <bean id="dataSource" class="com.zaxxer.hikari.HikariDataSource">
         <property name="driverClassName"
             value="oracle.jdbc.driver.OracleDriver" />
         <property name="jdbcUrl"
             value="jdbc:oracle:thin:@192.168.100.30:1522:XE" />
-        <property name="username" value="scott" />
-        <property name="password" value="pcwk"></property>
+        <property name="username" value="jm" />
+        <property name="password" value="8864"></property>
         <!-- Optional settings -->
         <property name="maximumPoolSize" value="10"></property>
         <property name="minimumIdle" value="5"></property>
