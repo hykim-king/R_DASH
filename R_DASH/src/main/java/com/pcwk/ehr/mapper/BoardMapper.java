@@ -1,5 +1,7 @@
 package com.pcwk.ehr.mapper;
 
+import java.util.List;
+
 import com.pcwk.ehr.cmn.WorkDiv;
 import com.pcwk.ehr.domain.BoardDTO;
 
@@ -12,5 +14,7 @@ public interface BoardMapper extends WorkDiv<BoardDTO> {
 	public void deleteAll();
 	//전체 개수 조회(Test 용)
 	public int getCount();
+	//메인용
+	List<BoardDTO> boardMainList();
 	
 }

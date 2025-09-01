@@ -200,3 +200,11 @@ R_DASH/target/
 # Build output
 R_DASH/target/
 /target/
+R_DASH_PY.7z
+
+# Windows reserved names
+NUL
+nul
+R_DASH/logs/
+*.log
+*.gz

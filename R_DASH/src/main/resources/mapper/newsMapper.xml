@@ -1,6 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pcwk.ehr.mapper.NewsMapper">
+    <!-- 메인 화면 용: 오늘(pub_dt) + 키워드별 최신 3건 -->
+    <select id="newsMainList" parameterType="NewsDTO" resultType="NewsDTO">
+        SELECT 
+            news_no,
+            keyword,
+            title,
+            company,
+            url,
+            pub_dt AS pubDt,
+            reg_dt AS regDt
+        FROM news
+        WHERE keyword = #{keyword}
+        <![CDATA[
+            AND pub_dt >= TRUNC(SYSDATE)
+            AND pub_dt <  TRUNC(SYSDATE) + 1
+          ]]>
+        ORDER BY pub_dt DESC
+        FETCH FIRST 3 ROWS ONLY
+    </select>
+    <select id="doRetrieve" parameterType="SearchDTO" resultType="NewsDTO">
+       SELECT * FROM (
+	        SELECT ROWNUM AS rnum, t.*
+	        FROM (
+	            SELECT news_no, keyword, title, company, url, pub_dt AS pubDt, reg_dt AS regDt
+	            FROM news
+	            WHERE TRUNC(reg_dt)=TRUNC(SYSDATE)
+	            ORDER BY pub_dt DESC
+	        ) t
+	 <![CDATA[  WHERE ROWNUM <= #{pageSize} * #{pageNo}
+	    )
+	    WHERE rnum > #{pageSize} * (#{pageNo} - 1) ]]>
+	</select>
 
     <insert id="saveAll">
        INSERT INTO NEWS (
@@ -11,7 +43,7 @@
 		    '주제' || (LEVEL + 1) AS title,
 		    '신문사' || MOD(LEVEL, 3) AS company,
 		    'naver.com' || (LEVEL + 1) AS url,
-		    SYSDATE || (LEVEL - 1)AS pub_dt,
+		    SYSDATE + (LEVEL - 1) AS pub_dt,
 		    SYSDATE  AS reg_dt
 		FROM dual
 	<![CDATA[	CONNECT BY LEVEL <= 100 ]]>
@@ -25,19 +57,22 @@
         DELETE FROM NEWS
     </delete>
     
-    <select id="searchByKeyword" parameterType="NewsDTO" resultType="NewsDTO">
+    <select id="searchByKeyword" parameterType="String" resultType="NewsDTO">
         SELECT 
 		    news_no,
 		    keyword,
 		    title,
 		    company,
 		    url,
-		    pub_dt,
-		    reg_dt
+		    pub_dt AS pubDt,
+            reg_dt AS regDt
+<!-- 		    TO_CHAR(pub_dt,'YYYY/MM/DD HH24:MI') as pubDt,
+            TO_CHAR(reg_dt,'YYYY/MM/DD HH24:MI:SS') as regDt -->
 		FROM
 		    news
-		WHERE (TRUNC(reg_dt) = TRUNC(SYSDATE))AND keyword=#{keyword}
-		ORDER BY reg_dt DESC
+		WHERE (TRUNC(reg_dt) = TRUNC(SYSDATE))
+		AND keyword=#{keyword}
+		ORDER BY pub_dt DESC
     </select>
     <select id="doSelectOne" parameterType="NewsDTO" resultType="NewsDTO">
         SELECT
@@ -46,8 +81,8 @@
             title,
             company,
             url,
-            pub_dt,
-            reg_dt
+            pub_dt AS pubDt,
+            reg_dt AS regDt
         FROM
             news
         WHERE url = #{url}
@@ -70,7 +105,12 @@
 	            t1.reg_dt = SYSDATE
 	    WHEN NOT MATCHED THEN
 	        INSERT (keyword, title, company, url, pub_dt, reg_dt)
-	        VALUES (#{keyword}, #{title}, #{company}, #{url}, #{pubDt}, SYSDATE)
+	        VALUES (#{keyword}, 
+	        #{title}, 
+	        #{company}, 
+	        #{url}, 
+	        TO_DATE(#{pubDt}, 'YYYY-MM-DD'), 
+	        SYSDATE)
 	</update>
 
     <insert id="doSave" parameterType="NewsDTO" 
@@ -88,7 +128,11 @@
 		           #{title},
 		           #{company},
 		           #{url},
-		           #{pubDt},
+		           TO_DATE(#{pubDt}, 'YYYY-MM-DD'),
 		           SYSDATE )
     </insert>
+    <delete id="newsDelete" parameterType="NewsDTO">
+        DELETE FROM NEWS
+        WHERE news_no = #{newsNo, jdbcType=INTEGER}
+    </delete>
 </mapper>

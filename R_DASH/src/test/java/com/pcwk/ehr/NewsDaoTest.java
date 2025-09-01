@@ -18,13 +18,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import com.pcwk.ehr.cmn.SearchDTO;
+import com.pcwk.ehr.domain.BoardDTO;
 import com.pcwk.ehr.domain.NewsDTO;
 import com.pcwk.ehr.mapper.NewsMapper;
 
 @WebAppConfiguration
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/spring/root-context.xml"		
-									,"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context-test.xml"})
+@ContextConfiguration(locations = {"file:src/main/webapp/WEB-INF/spring/root-context.xml"	})
 class NewsDaoTest {
 	
 	Logger log = LogManager.getLogger(getClass());
@@ -39,6 +40,8 @@ class NewsDaoTest {
 	@Autowired
 	ApplicationContext context;
 	
+	SearchDTO search;
+	
 	// 1. 저장 0
 	// 2. merge(2.1 있으면 -> 업데이트, 2.2 없으면 -> 저장)0
 	// 3. 조회 (키워드 넣으면 조회 잘 되는지)
@@ -49,9 +52,11 @@ class NewsDaoTest {
 		log.debug("│ setUp()            │");
 		log.debug("└────────────────────┘");
 		
-		dto = new NewsDTO(0, "재난", "제목1", "naver.com123", "신문사1", "2025년8월15일", null);
-		dto1 = new NewsDTO(0, "폭우", "제목_업데이트", "naver.com123", "신문사2", "2025년8월15일", null);
-		dto2 = new NewsDTO(0, "홍수", "제목_삽입", "naver.com456", "신문사3", "2025년8월15일", null);
+		dto = new NewsDTO(0, "재난", "제목1", "naver.com123", "신문사1", "2025-08-15", null);
+		dto1 = new NewsDTO(0, "폭우", "제목_업데이트", "naver.com123", "신문사2", "2025-08-15", null);
+		dto2 = new NewsDTO(0, "홍수", "제목_삽입", "naver.com456", "신문사3", "2025-08-15", null);
+		
+		search = new SearchDTO();
 	}
 
 	@AfterEach
@@ -60,6 +65,53 @@ class NewsDaoTest {
 		log.debug("│ tearDown()         │");
 		log.debug("└────────────────────┘");
 	}
+	@Test
+	void newsMainList() {
+		//1. 전체를 삭제
+		mapper.deleteAll();
+		assertEquals(0, mapper.getCount());
+						
+		//2. 다 건 등록
+		int count = mapper.saveAll();
+		log.debug("count: {}"+count);
+		assertEquals(100, count);
+		
+		//3. 조회
+		List<NewsDTO> outVO = mapper.newsMainList(dto);
+		for (NewsDTO vo:outVO) {
+			log.debug(vo);
+		}
+	}
+	
+	@Test
+	void doRetrieve() {
+		//1. 전체 삭제
+		//2. 다 건 등록
+		//3. 다 건 조회
+		//4. 건수 확인
+		
+		//1. 전체를 삭제
+		mapper.deleteAll();
+		assertEquals(0, mapper.getCount());
+				
+		//2. 다 건 등록
+		int count = mapper.saveAll();
+		log.debug("count: {}"+count);
+		assertEquals(100, count);
+		
+		search.setPageSize(10);
+		search.setPageNo(1);
+		
+		//3. 다건 조회
+		List<NewsDTO> outVO = mapper.doRetrieve(search);
+		log.debug("outVO: {}"+outVO);
+		
+		for(NewsDTO dto : outVO) {
+			log.debug("dto :{}",dto);
+		}
+		
+	}
+	//@Disabled
 	@Test
 	void searchByKeyword() {
 		//1. 전체 삭제
@@ -82,7 +134,7 @@ class NewsDaoTest {
 		assertEquals(33, outVO.size());
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void merge() {
 		//1. 전체를 삭제
@@ -116,7 +168,7 @@ class NewsDaoTest {
 
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void doSave() {
 		//1. 전체를 삭제
@@ -134,7 +186,7 @@ class NewsDaoTest {
 
 	}
 	
-	@Disabled
+	//@Disabled
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");

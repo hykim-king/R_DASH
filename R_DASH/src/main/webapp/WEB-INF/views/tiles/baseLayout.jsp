@@ -4,7 +4,8 @@
 <html>
 <head>
 <meta charset="UTF-8">
-  <link rel="icon" href="/ehr/resources/template/dashboard/assets/img/brand/favicon.png" type="image/png">
+  <link rel="icon" href="/ehr/resources/image/Jaemini_face.ico"
+    type="image/x-icon" />
   <!-- Fonts -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
   <!-- Icons -->
@@ -16,8 +17,11 @@
   <!-- Argon CSS -->
   <link rel="stylesheet" href="/ehr/resources/template/dashboard/css/dashboard.css" type="text/css">
   <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+
 </head>
 <body>
+<jsp:include page="/WEB-INF/views/common/loading.jsp"></jsp:include>
+
 <tiles:insertAttribute name="header"/>
 <tiles:insertAttribute name="body"/>
 <tiles:insertAttribute name="footer"/>

@@ -9,9 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.ChatDTO;
+import com.pcwk.ehr.domain.ChatSessionSummary;
 import com.pcwk.ehr.mapper.ChatMapper;
 
-@Service("chatService")
+@Service("ChatService")
 @Transactional(readOnly = true) // 기본은 조회 전용
 public class ChatServiceImpl implements ChatService {
 
@@ -26,7 +27,7 @@ public class ChatServiceImpl implements ChatService {
 	@Override
 	@Transactional // 쓰기 작업만 트랜잭션
 	public int insertChat(ChatDTO chat) {
-		log.debug("inserChat 호출:{}", chat);
+		log.debug("insertChat 호출:{}", chat);
 		return chatMapper.insertChat(chat);
 	}
 
@@ -57,4 +58,53 @@ public class ChatServiceImpl implements ChatService {
 	public int deleteAll() {
 		return chatMapper.deleteAll();
 	}
+
+	@Override
+	public List<ChatDTO> findRecentBySession(String sessionId, Integer userNo, int limit) {
+		return chatMapper.findRecentBySession(sessionId, userNo, limit);
+	}
+
+	@Override
+	public List<ChatSessionSummary> listSessions(Integer userNo, int limit) {
+		return chatMapper.listSessions(userNo, Math.max(1, Math.min(limit, 200)));
+	}
+
+	@Override
+	public List<ChatDTO> listMessagesBySession(String sessionId, Integer userNo, Long beforeLogNo, int limit) {
+		return chatMapper.listMessagesBySession(sessionId, userNo, beforeLogNo, Math.max(1, Math.min(limit, 200)));
+	}
+
+	@Override
+	public boolean existsSessionForUser(String sessionId, Integer userNo) {
+		if (sessionId == null || userNo == null)
+			return false;
+		return chatMapper.countBySessionAndUser(sessionId, userNo) > 0;
+	}
+
+	@Override
+	public boolean isGuestSession(String sessionId) {
+		if (sessionId == null)
+			return false;
+		return chatMapper.countGuestBySession(sessionId) > 0;
+	}
+
+	@Override
+	public boolean hasAnyUserLogs(String sessionId) {
+		return chatMapper.countUserBySession(sessionId) > 0;
+	}
+
+	@Transactional
+	@Override
+	public boolean deleteSessionForUser(String sessionId, int userNo) {
+		// 소유 확인
+		int owned = chatMapper.countSessionOwnedByUser(sessionId, userNo);
+		if (owned == 0)
+			return false;
+
+		// 메시지 -> 세션 순으로 삭제
+		chatMapper.deleteMessagesBySession(sessionId); // user_no 조건 없이 session 기준으로 싹 정리 (과거 null 섞임 대비)
+		chatMapper.deleteSessionByUser(sessionId, userNo);
+		return true;
+	}
+
 }

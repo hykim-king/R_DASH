@@ -17,6 +17,14 @@
     <typeAlias alias="NewsDTO" type="com.pcwk.ehr.domain.NewsDTO"/>
     <typeAlias alias="TopicDTO" type="com.pcwk.ehr.domain.TopicDTO"/>
     <typeAlias alias="ChatDTO" type="com.pcwk.ehr.domain.ChatDTO"/>
+    <typeAlias alias="FireExitDTO" type="com.pcwk.ehr.domain.FireExitDTO"/>
+    <typeAlias alias="FireDisasterDTO" type="com.pcwk.ehr.domain.FireDisasterDTO"/>
+    <typeAlias alias="TopicWordsDTO" type="com.pcwk.ehr.domain.TopicWordsDTO"/>
+    <typeAlias alias="DustDTO" type="com.pcwk.ehr.domain.DustDTO"/>
+    <typeAlias alias="ShelterDTO" type="com.pcwk.ehr.domain.ShelterDTO"/>
+    <typeAlias alias="FirestationDTO" type="com.pcwk.ehr.domain.FirestationDTO"/>
+    <typeAlias alias="NowcastDTO" type="com.pcwk.ehr.domain.NowcastDTO"/>
+    
  </typeAliases>
  
  

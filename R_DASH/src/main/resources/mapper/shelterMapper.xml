@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.pcwk.ehr.mapper.ShelterMapper">
+
+  <!-- DTO 매핑 -->
+  <resultMap id="ShelterMap" type="com.pcwk.ehr.domain.ShelterDTO">
+    <id     property="shelterNo" column="SHELTER_NO"/>
+    <result property="reareNm"   column="REARE_NM"/>
+    <result property="ronaDaddr"    column="RONA_DADDR"/>
+    <result property="lat"       column="LAT"/>
+    <result property="lon"       column="LON"/>
+    <result property="shltCd"    column="SHLT_CD"/>
+    <result property="shltNm"    column="SHLT_NM"/>
+  </resultMap>
+
+  <!-- 공통 컬럼 -->
+  <sql id="ShelterColumns">
+    SHELTER_NO, REARE_NM, RONA_DADDR, LAT, LON, SHLT_CD, SHLT_NM
+  </sql>
+
+  <!-- BBox + 키워드 -->
+  <select id="selectByBBox" resultMap="ShelterMap">
+    SELECT
+      <include refid="ShelterColumns"/>
+    FROM SHELTER
+    WHERE LAT BETWEEN #{minLat} AND #{maxLat}
+      AND LON BETWEEN #{minLon} AND #{maxLon}
+      <if test="q != null and q != ''">
+        AND (
+              UPPER(REARE_NM) LIKE '%' || UPPER(#{q}) || '%'
+           OR UPPER(RONA_DADDR)   LIKE '%' || UPPER(#{q}) || '%'
+           OR UPPER(SHLT_NM)  LIKE '%' || UPPER(#{q}) || '%'
+        )
+      </if>
+    ORDER BY SHELTER_NO DESC
+    <if test="limit != null">
+      FETCH FIRST #{limit} ROWS ONLY
+    </if>
+  </select>
+
+  <!-- 단건 상세 -->
+<!-- ShelterMapper.xml -->
+<select id="selectOne" parameterType="integer" resultMap="ShelterMap">
+  SELECT
+    <include refid="ShelterColumns"/>
+  FROM SHELTER
+  WHERE SHELTER_NO = #{shelterNo}
+</select>
+
+  <!-- 단순 리스트 -->
+  <select id="selectList" resultMap="ShelterMap">
+    SELECT
+      <include refid="ShelterColumns"/>
+    FROM SHELTER
+    ORDER BY SHELTER_NO DESC
+    <if test="limit != null">
+      FETCH FIRST #{limit} ROWS ONLY
+    </if>
+  </select>
+
+  <!-- 자동완성 : 주소 -->
+  <select id="suggestAdress" parameterType="string" resultType="string">
+    SELECT RONA_DADDR
+    FROM SHELTER
+    WHERE RONA_DADDR IS NOT NULL
+      AND UPPER(RONA_DADDR) LIKE '%' || UPPER(#{q}) || '%'
+    GROUP BY RONA_DADDR
+    ORDER BY MIN(SHELTER_NO)
+    FETCH FIRST 10 ROWS ONLY
+  </select>
+
+  <!-- 자동완성 : 시설명 -->
+  <select id="suggestReareNm" parameterType="string" resultType="string">
+    SELECT REARE_NM
+    FROM SHELTER
+    WHERE REARE_NM IS NOT NULL
+      AND UPPER(REARE_NM) LIKE '%' || UPPER(#{q}) || '%'
+    GROUP BY REARE_NM
+    ORDER BY MIN(SHELTER_NO)
+    FETCH FIRST 10 ROWS ONLY
+  </select>
+
+</mapper>

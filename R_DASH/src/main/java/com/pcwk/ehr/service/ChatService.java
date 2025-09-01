@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.ChatDTO;
+import com.pcwk.ehr.domain.ChatSessionSummary;
 
 public interface ChatService {
 	/**
@@ -46,10 +47,29 @@ public interface ChatService {
 	 */
 	int deleteChat(Long logNo); // ✅ Integer → Long
 
+	boolean existsSessionForUser(String sessionId, Integer userNo);
+
+	boolean isGuestSession(String sessionId);
+	
+	boolean hasAnyUserLogs(String sessionId);
+	
+	boolean deleteSessionForUser(String sessionId, int userNo);
+
 	/**
 	 * 전체 채팅 로그 삭제 (테스트용)
 	 * 
 	 * @return 삭제 건수
 	 */
 	int deleteAll();
+
+	List<ChatDTO> findRecentBySession(String sessionId, Integer userNo, int limit);
+
+	List<ChatSessionSummary> listSessions(Integer userNo, int limit);
+
+	List<ChatDTO> listMessagesBySession(String sessionId, Integer userNo, Long beforeLogNo, int limit);
+
+	default String newSessionId() {
+		return java.util.UUID.randomUUID().toString();
+	}
+
 }

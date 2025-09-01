@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pcwk.ehr.mapper.FireSafeMapper">
+	
+	<select id="SelectFireSafe" parameterType="map">
+		SELECT 
+		    MSTN_YR AS year,
+		    SUM(CFMTN_AMT) AS totalDamage,
+		    SUM(CFMTN_RCRY) AS totalRecovery
+		FROM FIRE_SAFE
+		GROUP BY MSTN_YR
+		ORDER BY MSTN_YR
+	</select>  
+
+
+</mapper>

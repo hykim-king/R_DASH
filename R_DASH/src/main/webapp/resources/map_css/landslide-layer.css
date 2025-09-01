@@ -1,0 +1,77 @@
+/* ===== Landslide Layer (Heatmap) — 배치/스타일 공통 ===== */
+:root{
+  --ls-legend-bottom: 220px;   /* 범례(배너 카드) 위치 */
+  --ls-stack-gap: 14px;
+  --ls-zoom-height: 64px;
+  --ls-offset-up: 400px;       /* 배지 + 확대버튼 추가 상승량 */
+}
+
+/* Heatmap overlay roots */
+#ls-heat-container{ position:absolute; inset:0; pointer-events:none; z-index:25; width:100%; height:100%; }
+#ls-point-root{ position:absolute; inset:0; pointer-events:none; z-index:26; }
+
+/* ===== 범례(배너 카드) ===== */
+#ls-legend{
+	margin-bottom: 80px;  /* 버튼 공간 확보 */
+  position:absolute;
+  right:16px; bottom:var(--ls-legend-bottom); z-index:1000;
+  width:300px; border-radius:16px; background:#fff; border:1px solid #e5e7eb;
+  box-shadow:0 12px 28px rgba(0,0,0,.16); overflow:hidden; pointer-events:auto;
+}
+#ls-legend .legend-hero{  width: 100%;
+  width: 100%;
+  height: 200px;       /* 🔼 top 영역(배너) 크기를 키움 */
+  background: #eef2ff; 
+  overflow: hidden;    /* 이미지가 넘치면 잘라냄 */
+}
+#ls-legend .legend-hero img{ width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 25%;}
+#ls-legend .legend-body{ padding:16px 18px; font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif; color:#0f172a; }
+#ls-legend .legend-title{ margin:0 0 8px; font-weight:700; font-size:16px; }
+#ls-legend .legend-section-title{ margin:12px 0 6px; font-weight:700; font-size:14px; }
+#ls-legend .legend-grad{
+  height:14px; border-radius:999px;
+  background:linear-gradient(90deg,#2563eb 0%,#22d3ee 25%,#22c55e 50%,#fde047 75%,#ef4444 100%);
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.06);
+  margin:6px 0 6px;
+}
+#ls-legend .legend-scale{ display:flex; align-items:center; gap:10px; font-size:13px; color:#334155; }
+#ls-legend .legend-keys{ margin-top:6px; }
+#ls-legend .legend-key{ display:flex; align-items:center; gap:8px; margin:6px 0; }
+#ls-legend .dot{ width:10px; height:10px; border-radius:999px; display:inline-block; }
+#ls-legend .dot.red   { background:#ef4444; }
+#ls-legend .dot.orange{ background:#f59e0b; }
+#ls-legend .dot.purp  { background:#8b5cf6; }
+
+/* ===== 확대 프리셋 버튼 ===== */
+:root{
+  --ls-zoom-bottom: calc(var(--ls-legend-bottom) + 110px + var(--ls-stack-gap) + var(--ls-offset-up));
+  --ls-badge-bottom: calc(var(--ls-zoom-bottom) + var(--ls-zoom-height) + var(--ls-stack-gap));
+}
+.ls-zoom{
+  position:absolute; right:20px;    bottom: calc(var(--ls-legend-bottom) - 200px - var(--ls-zoom-gap)); /* HUD보다 80px 아래 */ z-index:1001;
+  display:flex; gap:12px; background:rgba(255,255,255,.98);
+  border-radius:14px; padding:12px 14px; box-shadow:0 12px 26px rgba(0,0,0,.15);
+}
+
+
+
+
+/* 포인트 점 */
+.ls-dot{ border-radius:999px; }
+
+/* 공통 버튼 (필터에서 사용 가능) */
+.ls-btn-primary{
+  padding:8px 10px; border-radius:10px; background:#111827; color:#fff; font-weight:700; border:none; cursor:pointer;
+}
+.ls-btn-ghost{
+  padding:8px 10px; border-radius:10px; background:#e5e7eb; color:#111827; font-weight:700; border:none; cursor:pointer;
+}
+
+/* 모바일 보정 */
+@media (max-width: 480px){
+  #ls-legend{ width:92vw; right:4vw; }
+  .ls-zoom{ flex-direction:column; gap:8px; }
+}

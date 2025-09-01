@@ -6,29 +6,33 @@ public class BoardDTO extends DTO{
 	private int boardNo      ;
 	private String title      ;
 	private String contents   ;
-	private String image ; //UUID로 저장     
 	private int viewCnt     ;
 	private String regDt     ;
 	private String regId     ;
 	private String modDt     ;
 	private String modId     ;
+	private String isNotice ;
 	
 	
 	public BoardDTO() {}
 
-	public BoardDTO(int boardNo, String title, String contents, String image, int views, String regDt, String regId,
-			String modDt, String modId) {
+	
+
+	public BoardDTO(int boardNo, String title, String contents, int viewCnt, String regDt, String regId, String modDt,
+			String modId,String isNotice) {
 		super();
 		this.boardNo = boardNo;
 		this.title = title;
 		this.contents = contents;
-		this.image = image;
-		this.viewCnt = views;
+		this.viewCnt = viewCnt;
 		this.regDt = regDt;
 		this.regId = regId;
 		this.modDt = modDt;
 		this.modId = modId;
+		this.isNotice = isNotice;
 	}
+
+
 
 	public int getBoardNo() {
 		return boardNo;
@@ -54,13 +58,6 @@ public class BoardDTO extends DTO{
 		this.contents = contents;
 	}
 
-	public String getImage() {
-		return image;
-	}
-
-	public void setImage(String image) {
-		this.image = image;
-	}
 
 	public int getViewCnt() {
 		return viewCnt;
@@ -97,17 +94,28 @@ public class BoardDTO extends DTO{
 	public String getModId() {
 		return modId;
 	}
-
+	
 	public void setModId(String modId) {
 		this.modId = modId;
 	}
+	public String getIsNotice() {
+		return isNotice;
+	}
+	
+	public void setIsNotice(String isNotice) {
+		this.isNotice = isNotice;
+	}
+
 
 
 	@Override
 	public String toString() {
-		return "BoardDTO [boardNo=" + boardNo + ", title=" + title + ", contents=" + contents + ", image=" + image
-				+ ", viewCnt=" + viewCnt + ", regDt=" + regDt + ", regId=" + regId + ", modDt=" + modDt + ", modId=" + modId
-				+ ", toString()=" + super.toString() + "]";
+		return "BoardDTO [boardNo=" + boardNo + ", title=" + title + ", contents=" + contents + ", viewCnt=" + viewCnt
+				+ ", regDt=" + regDt + ", regId=" + regId + ", modDt=" + modDt + ", modId=" + modId +", isNotice=" + isNotice + ", toString()="
+				+ super.toString() + "]";
 	}
+
+
+	
 	
 }

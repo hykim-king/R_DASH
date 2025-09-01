@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- 반드시 인터페이스 FQN과 동일 -->
+<mapper namespace="com.pcwk.ehr.mapper.LandslideMapper">
+
+  <!-- =========================================================
+       DTO 매핑: com.pcwk.ehr.domain.LandslideDTO
+       필드:
+         - int     lndApntCd
+         - String  lndApntNm
+         - String  lndApntStts
+         - String  lndApntDt
+         - String  lndInstNm
+         - double  lat
+         - double  lon
+         - Integer landslideNo
+       ========================================================= -->
+  <resultMap id="LandslideResultMap" type="com.pcwk.ehr.domain.LandslideDTO">
+    <id     property="landslideNo" column="LANDSLIDE_NO"/>
+    <result property="lndApntCd"   column="LND_APNT_CD"/>
+    <result property="lndApntNm"   column="LND_APNT_NM"/>
+    <result property="lndApntStts" column="LND_APNT_STTS"/>
+    <result property="lndApntDt"   column="LND_APNT_DT"/>
+    <result property="lndInstNm"   column="LND_INST_NM"/>
+    <result property="lat"         column="LAT"/>
+    <result property="lon"         column="LON"/>
+  </resultMap>
+
+  <!-- 공통 조건 -->
+  <sql id="bboxCond">
+    LAT BETWEEN #{minLat} AND #{maxLat}
+    AND LON BETWEEN #{minLon} AND #{maxLon}
+  </sql>
+
+  <sql id="qCond">
+    <if test="q != null and q != ''">
+      AND (LND_INST_NM LIKE '%' || #{q} || '%')
+    </if>
+  </sql>
+
+  <!-- LND_APNT_DT가 VARCHAR2(19)이므로 SUBSTR로 연도 매칭 -->
+  <sql id="yearCond">
+    <if test="year != null">
+      AND SUBSTR(LND_APNT_DT,1,4) = TO_CHAR(#{year,jdbcType=INTEGER})
+    </if>
+  </sql>
+
+  <!-- 히트맵/버블용 집계 (기관 위치 단위) -->
+  <select id="countByRegionInBBox" resultType="map">
+    SELECT
+      LND_INST_NM AS name,
+      LAT         AS lat,
+      LON         AS lon,
+      COUNT(*)    AS cnt
+    FROM LANDSLIDE
+    WHERE <include refid="bboxCond"/>
+      <include refid="qCond"/>
+      <include refid="yearCond"/>
+    GROUP BY LND_INST_NM, LAT, LON
+  </select>
+
+  <!-- 원시 포인트(마커/클러스터) -->
+  <select id="selectByBBox" resultMap="LandslideResultMap">
+    SELECT
+      LANDSLIDE_NO,
+      LND_APNT_CD, LND_APNT_NM, LND_APNT_STTS, LND_APNT_DT,
+      LND_INST_NM, LAT, LON
+    FROM LANDSLIDE
+    WHERE <include refid="bboxCond"/>
+      <include refid="qCond"/>
+      <include refid="yearCond"/>
+  </select>
+
+  <!-- 시·도 집계 -->
+  <select id="countBySidoInBBox" resultType="map">
+    SELECT
+      REGEXP_SUBSTR(LND_INST_NM, '^[^ ]+') AS sido,
+      COUNT(*) AS cnt
+    FROM LANDSLIDE
+    WHERE <include refid="bboxCond"/>
+      <include refid="qCond"/>
+      <include refid="yearCond"/>
+    GROUP BY REGEXP_SUBSTR(LND_INST_NM, '^[^ ]+')
+  </select>
+
+
+ 
+    
+    
+     <!-- 년도별 통계 -->
+    <select id="selectByYear" resultType="map">
+        SELECT 
+            TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY') AS year,
+            COUNT(*) AS total_count
+        FROM LANDSLIDE
+        GROUP BY TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'YYYY')
+        ORDER BY year
+    </select>
+
+ <!-- 지역별 통계 -->
+    <select id="selectByRegion" resultType="map">
+        SELECT 
+		    NVL(SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1), LND_INST_NM) AS region,
+		    COUNT(*) AS total_count
+		FROM LANDSLIDE
+		GROUP BY NVL(SUBSTR(LND_INST_NM, 1, INSTR(LND_INST_NM, ' ') - 1), LND_INST_NM)
+		ORDER BY total_count DESC
+    </select>
+
+    <!-- 월별 통계 -->
+    <select id="selectByMonth" resultType="map">
+        SELECT 
+            TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM') AS month,
+            COUNT(*) AS total_count
+        FROM LANDSLIDE
+        GROUP BY TO_CHAR(TO_DATE(LND_APNT_DT, 'YYYY-MM-DD HH24:MI:SS'), 'MM')
+        ORDER BY month
+    </select>
+
+    <!-- 주의보/경보 등 예보 상태별 통계 -->
+    <select id="selectByStatus" resultType="map">
+        SELECT 
+            LND_APNT_NM AS status,
+            COUNT(*) AS total_count
+        FROM LANDSLIDE
+        GROUP BY LND_APNT_NM
+        ORDER BY LND_APNT_NM DESC
+    </select>
+</mapper>

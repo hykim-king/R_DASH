@@ -1,21 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pcwk.ehr.mapper.BoardMapper">
+    <!-- 메인용 보드 리스트 -->
+    <select id="boardMainList" resultType="BoardDTO">
+        SELECT
+		    board_no,
+		    title,
+		    contents,
+		    view_cnt,
+		    reg_dt,
+		    reg_id,
+		    mod_dt,
+		    mod_id
+		FROM board
+		ORDER BY mod_dt DESC
+		FETCH FIRST 3 ROWS ONLY
+    </select>
+
     <sql id="boardWhere">
         <choose>
+            <when test="searchDiv ==''">
+                WHERE (title LIKE '%'||#{searchWord}||'%'
+                      OR 
+                      contents LIKE '%'||#{searchWord}||'%')
+            </when>
             <when test="searchDiv =='10'">
-                 WHERE title LIKE '%' ||#{searchWord} || '%'
+                 WHERE title LIKE '%'||#{searchWord}||'%'
             </when>
             <when test="searchDiv =='20'">
-                 WHERE contents LIKE '%' ||#{searchWord} || '%'
-            </when>
-            <when test="searchDiv =='30'">
-                 WHERE boardNo LIKE '%'||#{searchWord} || '%'
-            </when>
-            <when test="searchDiv =='40'">
-                  WHERE (title LIKE '%'||#{searchWord}||'%' 
-                       OR 
-                      contents LIKE '%'||#{searchWord}||'%')
+                 WHERE contents LIKE '%'||#{searchWord}||'%'
             </when>
         </choose>
     </sql>
@@ -26,7 +39,6 @@
         SELECT TT1.rnum AS no,
                TT1.board_no,
                TT1.title,
-               TT1.image,
                TT1.view_cnt,
                DECODE(TO_CHAR(SYSDATE, 'YYYY.MM.DD'), 
                      TO_CHAR(TT1.mod_dt, 'YYYY.MM.DD'),
@@ -66,7 +78,6 @@
             SELECT LEVEL board_no,
                     '제목'||LEVEL title,
                 '내용'||LEVEL contents,
-                '397839829850900'||LEVEL||'.png' image,
                 Level AS viewCnt,
                 sysdate - LEVEL reg_dt,
                 DECODE(MOD(LEVEL,2),1,'james','admin') reg_id,
@@ -81,7 +92,6 @@
             board_no,
             title,
             contents,
-            image,
             view_cnt,
             TO_CHAR(mod_dt,'YY.MM.DD HH24:MI') as modDt,
             mod_id
@@ -106,9 +116,9 @@
 		SET
 		    title = #{title, jdbcType=VARCHAR},
 		    contents = #{contents, jdbcType=VARCHAR},
-		    image = #{image, jdbcType=VARCHAR},
 		    mod_dt = SYSDATE,
-		    mod_id = #{modId, jdbcType=VARCHAR}
+		    mod_id = #{modId, jdbcType=VARCHAR},
+		    is_notice = #{isNotice, jdbcType=VARCHAR}
 		WHERE
 		        board_no = #{boardNo}
     </update>
@@ -120,21 +130,21 @@
 	  INSERT INTO board (
 	    title,
 	    contents,
-	    image,
 	    view_cnt,
 	    reg_dt,
 	    reg_id,
 	    mod_dt,
-	    mod_id
+	    mod_id,
+	    is_notice
 	  ) VALUES (
 	    #{title, jdbcType=VARCHAR},
 	    #{contents, jdbcType=VARCHAR},
-	    #{image, jdbcType=VARCHAR},
 	    0,
 	    SYSDATE,
 	    #{regId, jdbcType=VARCHAR},
 	    SYSDATE,
-	    #{modId, jdbcType=VARCHAR}
+	    #{modId, jdbcType=VARCHAR},
+	    #{isNotice, jdbcType=VARCHAR}
 	  )
 	</insert>
 

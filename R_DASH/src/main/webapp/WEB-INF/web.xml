@@ -4,9 +4,7 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  
     https://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
     
-    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
-	    <property name="maxUploadSize" value="10485760"/> <!-- 10MB -->
-	</bean>
+   
 	<!-- The definition of the Root Spring Container shared by all Servlets 
 		and Filters -->
 	<context-param>
@@ -25,6 +23,11 @@
 		<servlet-name>appServlet</servlet-name>
 		<servlet-class>org.springframework.web.servlet.DispatcherServlet
 		</servlet-class>
+		<!-- 404를 예외로 던지도록 -->
+		<init-param>
+		  <param-name>throwExceptionIfNoHandlerFound</param-name>
+		  <param-value>true</param-value>
+		</init-param>
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
 			<param-value>/WEB-INF/spring/appServlet/servlet-context.xml
@@ -52,5 +55,30 @@
 	<filter-mapping>
 		<filter-name>encodingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
+		<dispatcher>ERROR</dispatcher>
 	</filter-mapping>
+	
+	  <!-- Spring Security: 이름 = springSecurityFilterChain -->
+	<filter>
+	  <filter-name>springSecurityFilterChain</filter-name>
+	  <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	  <init-param>
+	    <param-name>contextAttribute</param-name>
+	    <param-value>org.springframework.web.servlet.FrameworkServlet.CONTEXT.appServlet</param-value>
+	  </init-param>
+	</filter>
+	<filter-mapping>
+	  <filter-name>springSecurityFilterChain</filter-name>
+	  <url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+	<error-page>
+	  <error-code>404</error-code>
+	  <location>/error/404</location> <!-- OK -->
+	</error-page>
+	<error-page>
+	  <error-code>500</error-code>
+	  <location>/boom</location> <!-- OK -->
+	</error-page>
+
 </web-app>
