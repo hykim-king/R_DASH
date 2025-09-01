@@ -21790,10 +21790,15 @@ button.bg-lighter:focus {
 .bg-gradient-info {
     background: linear-gradient(87deg, #11cdef 0, rgb(17, 112.5, 239) 100%) !important;
 }
-
+.bg-gradient-warning {
+    background: #fb6340 !important;
+}
+<!--
 .bg-gradient-warning {
     background: linear-gradient(87deg, #fb6340 0, rgb(251, 176.9166666667, 64) 100%) !important;
 }
+-->
+
 
 .bg-gradient-danger {
     background: linear-gradient(87deg, #f5365c 0, rgb(245, 95.5833333333, 54) 100%) !important;

@@ -7,17 +7,29 @@ import java.util.UUID;
 import com.google.common.base.Strings;
 
 public class PcwkString {
+	
+	/**
+	 * 이미지 확장자인지 확인 
+	 * @param fileName
+	 * @return
+	 */
+	public static boolean isImageExtension(String fileName) {
+	    if (fileName == null || fileName.isEmpty()) return false;
 
+	    // 앞뒤 공백/따옴표 제거
+	    fileName = fileName.trim().replace("\"", "");
 
+	    String ext = getExt(fileName).toLowerCase();
+	    return ext.equals("jpg") || ext.equals("jpeg") || ext.equals("png")
+	        || ext.equals("gif") || ext.equals("bmp") || ext.equals("webp");
+	}
 		
-	
-	
 	public static String getExt(String fileName) {
 		String ext = "";
 		
 		if(fileName.lastIndexOf(".")>-1) {
 			int dotWhich  =fileName.lastIndexOf(".");
-			ext = fileName.substring(dotWhich+1);
+			ext = fileName.substring(dotWhich);
 		}
 		
 		return ext;
