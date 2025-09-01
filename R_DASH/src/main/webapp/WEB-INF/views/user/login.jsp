@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta name="description" content="Start your development with a Dashboard for Bootstrap 4.">
   <meta name="author" content="Creative Tim">
-  <title>Login</title>
+  <title>로그인</title>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script>
   document.addEventListener('DOMContentLoaded',function(){
@@ -16,11 +16,7 @@
 	 const emailInput = document.querySelector("#email");
 	 //비밀번호 input
 	 const passwordInput = document.querySelector("#password");
-	 //이메일 형식 체크
-	 const valid_email = /^[A-Za-z0-9_\.\-]+@[A-Za-z0-9\-]+\.[A-Za-z0-9\-]+/;
-	 //비밀번호 형식 체크 (영문 대/소문자 하나이상 포함, 특수문자 하나이상 포함)
-	 const valid_password = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*()_+~`=\-{}\[\]:;"'<>,.?\/\\])\S{8,16}$/;
-	 
+
 	 loginForm.addEventListener("submit",function(event){
 		 event.preventDefault(); // 실제 폼 제출 막음
 		 
@@ -28,33 +24,7 @@
 			 alert('이메일을 입력하세요');
 			 emailInput.focus();
 			 return;
-		 }
-
-		 
-		 
-		 if(passwordInput.value === ''){
-			 alert('비밀번호를 입력하세요');
-			 passwordInput.focus();
-			 return;
-		 }
-		 //관리자일경우 pass
-		 if(emailInput.value !== 'admin'){
-			 
-			 if(valid_email.test(emailInput.value)===false){
-				 alert('이메일 형식이 올바르지 않습니다.');
-				 emailInput.focus();
-				 
-				 return;
-			 }
-			 
-			 if(valid_password.test(passwordInput.value)===false){
-				 alert('비밀번호 형식이 올바르지 않습니다.\n(영문 대/소문자 하나이상 포함, 특수문자 하나이상 포함)\n(8자 이상 16자 이하)');
-				 passwordInput.focus();
-				 return;
-			 }
-		 
-		 }
-		 
+		 } 
 		 
 		 
 		 $.ajax({
@@ -78,9 +48,8 @@
 	                } 
 	                	
 	            },
-	            error:function(result){//요청 실패
-	                console.log("error:"+result)
-	                alert(result);
+	            error:function(){//요청 실패
+	                alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
 	            }
 	            
 	            
@@ -99,8 +68,8 @@
         <div class="header-body text-center mb-7">
           <div class="row justify-content-center">
             <div class="col-xl-5 col-lg-6 col-md-8 px-5">
-              <h1 class="text-white">Welcome!</h1>
-              <p class="text-lead text-white">Use these awesome forms to login or create new account in your project for free.</p>
+              <h1 class="text-white">환영합니다!</h1>
+              <p class="text-lead text-white">재민이 사이트를 찾아주셔서 감사합니다! <br>즐거운 하루 되세요!</p>
             </div>
           </div>
         </div>
@@ -117,13 +86,13 @@
         <div class="col-lg-5 col-md-7">
           <div class="card bg-secondary border border-soft mb-0">
             <div class="card-header bg-transparent pb-5">
-              <div class="text-center mt-2 mb-3"><small>Sign in with</small></div>
+              <div class="text-center mt-2 mb-3"><small>소셜 로그인</small></div>
               <div class="btn-wrapper text-center">
-                <a href="#" class="btn btn-neutral btn-icon">
-                  <span class="btn-inner--icon"><img src="/ehr/resources/template/dashboard/assets/img/icons/common/github.svg"></span>
-                  <span class="btn-inner--text">Github</span>
+                <a href="/ehr/oauth2/authorization/kakao" class="btn btn-neutral btn-icon">
+                  <span class="btn-inner--icon"><img src="/ehr/resources/template/dashboard/assets/img/icons/common/kakao.png"></span>
+                  <span class="btn-inner--text">Kakao</span>
                 </a>
-                <a href="#" class="btn btn-neutral btn-icon">
+                <a href="/ehr/oauth2/authorization/google" class="btn btn-neutral btn-icon">
                   <span class="btn-inner--icon"><img src="/ehr/resources/template/dashboard/assets/img/icons/common/google.svg"></span>
                   <span class="btn-inner--text">Google</span>
                 </a>
@@ -131,7 +100,7 @@
             </div>
             <div class="card-body px-lg-5 py-lg-5">
               <div class="text-center mb-4">
-                <small>Or sign in with credentials</small>
+                 <small>가입한 계정으로 로그인하세요!</small> 
               </div>
               <form method="post" id="loginForm">
                 <div class="form-group mb-3">
@@ -139,7 +108,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-email-83"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Email" id="email" name="email">
+                    <input class="form-control" placeholder="이메일" id="email" name="email" maxlength="30">
                   </div>
                 </div>
                 <div class="form-group">
@@ -147,18 +116,18 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input class="form-control" placeholder="Password" id="password" type="password" name="password">
+                    <input class="form-control" placeholder="비밀번호" id="password" type="password" name="password" maxlength="20">
                   </div>
                 </div>
                 <div class="text-center">
-                  <button type="submit" id="loginButton" class="btn btn-default my-4">login</button>
+                  <button type="submit" id="loginButton" class="btn btn-default my-4">로그인</button>
                 </div>
               </form>
             </div>
           </div>
           <div class="row mt-3">
             <div class="col-6">
-              <a href="#" class="text-gray"><small>비밀번호 찾기</small></a>
+              <a href="findPw" class="text-gray"><small>비밀번호 찾기</small></a>
             </div>
             <div class="col-6 text-right">
               <a href="regist" class="text-gray"><small>회원가입</small></a>

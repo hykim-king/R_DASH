@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pcwk.ehr.mapper.FireExitMapper">
+
+    <!-- 호선별 소화기 개수 -->
+    <select id="selectSubwayFireExtCount" resultType="map">
+        SELECT SUB_NO,
+               SUM(EXIT_CNT) AS EXTINGUISHER_COUNT
+        FROM FIRE_EXIT
+        GROUP BY SUB_NO
+        ORDER BY SUB_NO
+    </select>
+    
+</mapper>

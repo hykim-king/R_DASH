@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pcwk.ehr.mapper.SinkholeMapper">
+
+
+
+  <!-- 1) 히트맵 포인트(전체) -->
+  <select id="selectAllPoints" resultType="map">
+    SELECT
+      LAT AS lat,
+      LON AS lon,
+      1   AS weight
+    FROM SINKHOLE
+    WHERE LAT IS NOT NULL
+      AND LON IS NOT NULL
+    <if test="stateNm != null and stateNm != ''">
+      AND "STATE NM" = #{stateNm}
+    </if>
+    <if test="year != null and year != ''">
+      AND "OCCUR DT" &gt;= TO_DATE(#{year} || '0101','YYYYMMDD')
+      AND "OCCUR DT" &lt;  ADD_MONTHS(TO_DATE(#{year} || '0101','YYYYMMDD'), 12)
+    </if>
+  </select>
+
+  <!-- 2) 히트맵 포인트(BBox, 최대 5000) -->
+ <select id="selectPointsByBBox" resultType="com.pcwk.ehr.domain.SinkholeDTO">
+  SELECT
+    "SINKHOLE_NO"                AS sinkholeNo,
+    "SIDO_NM"                    AS sidoNm,
+    "SIGNGU_NM"                  AS signguNm,
+    LAT                          AS lat,
+    LON                          AS lon,
+    TO_CHAR("OCCUR_DT",'YYYYMMDD') AS occurDt,  -- 말풍선용
+    "DPRS_CNT"                   AS dprsCnt,
+    "INJPSN_CNT"                 AS injpsnCnt,
+    "VEHCLE_CNT"                 AS vehcleCnt,
+    "STATE_NM"                   AS stateNm,    -- 말풍선용
+    TO_CHAR("COMPLT_DT",'YYYYMMDD') AS compltDt
+  FROM SINKHOLE
+  WHERE LAT BETWEEN #{minLat} AND #{maxLat}
+    AND LON BETWEEN #{minLon} AND #{maxLon}
+  <if test="stateNm != null and stateNm != ''">
+    AND "STATE_NM" = #{stateNm}
+  </if>
+  <if test="year != null and year != ''">
+    AND "OCCUR_DT" &gt;= TO_DATE(#{year} || '0101','YYYYMMDD')
+    AND "OCCUR_DT" &lt;  ADD_MONTHS(TO_DATE(#{year} || '0101','YYYYMMDD'), 12)
+  </if>
+  FETCH FIRST 5000 ROWS ONLY
+</select>
+
+  <!-- 3) 버블: 시/군/구 중심(평균 위경도) + 건수 -->
+  <select id="selectBubbleStats" resultType="com.pcwk.ehr.domain.SinkholeDTO">
+    SELECT
+      "SIDO NM"   AS sidoNm,
+      "SIGNGU NM" AS signguNm,
+      COUNT(*)    AS holeCount,
+      AVG(LAT)    AS lat,
+      AVG(LON)    AS lon
+    FROM SINKHOLE
+    <where>
+      <if test="sido != null and sido != ''">
+        AND "SIDO NM" = #{sido}
+      </if>
+      <if test="stateNm != null and stateNm != ''">
+        AND "STATE NM" = #{stateNm}
+      </if>
+      <if test="year != null and year != ''">
+        AND "OCCUR DT" &gt;= TO_DATE(#{year} || '0101','YYYYMMDD')
+        AND "OCCUR DT" &lt;  ADD_MONTHS(TO_DATE(#{year} || '0101','YYYYMMDD'), 12)
+      </if>
+    </where>
+    GROUP BY "SIDO NM", "SIGNGU NM"
+    ORDER BY holeCount DESC
+  </select>
+
+  <!-- 4) 버블: BBox 격자(ROUND) 집계 -->
+  <select id="selectBubblesByBBox" resultType="com.pcwk.ehr.domain.SinkholeDTO">
+    SELECT
+      ROUND(LAT, #{round}) AS lat,
+      ROUND(LON, #{round}) AS lon,
+      COUNT(*)             AS holeCount
+    FROM SINKHOLE
+    WHERE LAT BETWEEN #{minLat} AND #{maxLat}
+      AND LON BETWEEN #{minLon} AND #{maxLon}
+    <if test="stateNm != null and stateNm != ''">
+      AND "STATE NM" = #{stateNm}
+    </if>
+    <if test="year != null and year != ''">
+      AND "OCCUR DT" &gt;= TO_DATE(#{year} || '0101','YYYYMMDD')
+      AND "OCCUR DT" &lt;  ADD_MONTHS(TO_DATE(#{year} || '0101','YYYYMMDD'), 12)
+    </if>
+    GROUP BY ROUND(LAT, #{round}), ROUND(LON, #{round})
+    ORDER BY holeCount DESC
+  </select>
+
+  <!-- 통계용 -->
+  <!-- 년도별 발생 횟수 -->
+  <select id="selectYearlyCounts" resultType="map">
+    SELECT
+      TO_CHAR(OCCUR_DT, 'YYYY') AS YEAR,
+      COUNT(*) AS CNT
+    FROM SINKHOLE
+    GROUP BY TO_CHAR(OCCUR_DT, 'YYYY')
+    ORDER BY YEAR
+  </select>
+
+  <!-- 지역별 발생 횟수 (시도 단위) -->
+  <select id="selectSignguCounts" resultType="map">
+    SELECT
+      SIDO_NM AS SIDO_NM,
+      COUNT(*)  AS CNT
+    FROM SINKHOLE
+    GROUP BY SIDO_NM
+    ORDER BY SIDO_NM
+  </select>
+
+  <!-- 월별 발생 횟수 -->
+  <select id="selectMonthlyCounts" resultType="map">
+    SELECT
+      TO_CHAR(OCCUR_DT, 'MM') AS MONTH,
+      COUNT(*) AS CNT
+    FROM SINKHOLE
+    GROUP BY TO_CHAR(OCCUR_DT, 'MM')
+    ORDER BY TO_NUMBER(MONTH)
+  </select>
+
+  <!-- 년도별 피해 통계 -->
+  <select id="selectYearlyDamageStats" resultType="map">
+    SELECT
+      TO_CHAR(OCCUR_DT, 'YYYY') AS YEAR,
+      SUM(NVL(DPRS_CNT,   0)) AS DPRS_TOT,
+      SUM(NVL(INJPSN_CNT, 0)) AS INJ_TOT,
+      SUM(NVL(VEHCLE_CNT, 0)) AS VEH_TOT
+    FROM SINKHOLE
+    GROUP BY TO_CHAR(OCCUR_DT, 'YYYY')
+    ORDER BY YEAR
+  </select>
+</mapper>

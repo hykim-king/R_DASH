@@ -35,12 +35,10 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public BoardDTO doSelectOne(BoardDTO param) {
 		//admin -> role == 1 일 경우만 조회수 오름.
-		UserDTO user = (UserDTO) session.getAttribute("user"); 
+		UserDTO user = (UserDTO) session.getAttribute("loginUser"); 
 		
-		if(user == null) {
-			boardMapper.updateViews(param);
-		}else if(user.getRole() != 1) {
-			boardMapper.updateViews(param);
+		if(user == null || user.getRole() != 1) {
+			boardMapper.updateViews(param);	
 		}
 		
 		return boardMapper.doSelectOne(param);
@@ -59,6 +57,10 @@ public class BoardServiceImpl implements BoardService {
 	@Override
 	public int doDelete(BoardDTO param) {
 		return boardMapper.doDelete(param);
+	}
+	@Override
+	public List<BoardDTO> boardMainList() {
+		return boardMapper.boardMainList();
 	}
 
 }

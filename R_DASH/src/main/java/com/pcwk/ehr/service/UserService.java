@@ -2,6 +2,8 @@ package com.pcwk.ehr.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.UserDTO;
 
@@ -13,7 +15,7 @@ public interface UserService {
 	public UserDTO selectUser(int userNo);
 
 	// 회원 탈퇴
-	public int deleteUser(int userNo);
+	public int deleteUser(UserDTO param);
 
 	// 비밀번호 찾기
 	public String findPw(String email);
@@ -22,10 +24,10 @@ public interface UserService {
 	public int login(UserDTO param);
 
 	// 회원 정보 수정
-	public int updateUser(UserDTO param);
-
-	// 프로필 사진 수정
-	public int updateImage(UserDTO param);
+	public int updateUserInfo(UserDTO param);
+	
+	// 회원 이미지 수정
+	public int updateUserImage(UserDTO param, MultipartFile file);
 
 	// 회원 조회 (페이징)
 	public List<UserDTO> userList(SearchDTO param);
@@ -35,4 +37,7 @@ public interface UserService {
 	
 	// 이메일 중복 확인
 	public int checkEmail(String email);
+	
+	// 소셜 로그인 확인
+	public UserDTO socialLogin(String email,String name, String social);
 }
