@@ -208,3 +208,6 @@ nul
 R_DASH/logs/
 *.log
 *.gz
+
+/src/main/resources/application.properties
+/src/main/webapp/resources/application.properties
