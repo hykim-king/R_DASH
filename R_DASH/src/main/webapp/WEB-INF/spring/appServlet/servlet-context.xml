@@ -37,10 +37,10 @@ Cron 스케줄링
        <task:scheduled ref="newsCron" method="runNewsTask" cron="0 */1 * * * *"/>
     </task:scheduled-tasks> -->
 
-	<!-- <task:scheduler id="cronScheduler" pool-size="3"/>
+	<task:scheduler id="cronScheduler" pool-size="3"/>
 	<task:scheduled-tasks scheduler="cronScheduler">
 	  <task:scheduled ref="temperatureServiceImpl" method="insertNowcast" cron="0 45 * * * ?" />
-	</task:scheduled-tasks> -->
+	</task:scheduled-tasks>
 
 
 <!-- DispatcherServlet Context: defines this servlet's request-processing 
