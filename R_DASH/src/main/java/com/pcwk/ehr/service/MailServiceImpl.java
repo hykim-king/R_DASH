@@ -2,13 +2,11 @@ package com.pcwk.ehr.service;
 
 import java.security.SecureRandom;
 import java.time.Duration;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.pcwk.ehr.domain.UserDTO;
