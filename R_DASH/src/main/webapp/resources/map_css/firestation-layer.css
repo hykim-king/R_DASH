@@ -10,7 +10,7 @@
     right: 16px;
     top: calc(var(--header-height) + var(--hud-gap)) !important;
     z-index: 1700 !important;
-    width: 260px;
+    width: 360px;
     border-radius: 16px;
     background: #ffffff;
     box-shadow: 0 10px 30px rgba(0, 0, 0, .15);
@@ -96,12 +96,14 @@
     max-height: none;    /* 기존 vh 제한 제거 */
     overflow: auto;
     border-top: 1px solid #eee;
+    gap : 8px;
 }
 
 #fsHud .fs-item {
     padding: 9px 10px;
     border-bottom: 1px solid #f1f1f1;
     cursor: pointer;
+     gap : 8px;
 }
 
 #fsHud .fs-item:hover {
