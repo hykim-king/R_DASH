@@ -69,8 +69,8 @@ public class SecurityConfig {
 
 		// --- Kakao ---
 		ClientRegistration kakao = ClientRegistration.withRegistrationId("kakao")
-				.clientId("2a97c06fbd14887198938e9cfe27fced") // 카카오 앱의 REST API 키
-				.clientSecret("wjCqaQegefG4UlYxgnodsGi5iEBDihj6") // (선택/권장) 사용 중이면 입력
+				.clientId("dd84ad355ab58392195f5025411ef93b") // 카카오 앱의 REST API 키
+				.clientSecret("iDaG83N3GxPJYbtwsjcIBUss2pwlUNFX") // (선택/권장) 사용 중이면 입력
 				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
 				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST) // 카카오는 보통 POST 추천
 				.redirectUri("{baseUrl}/login/oauth2/code/{registrationId}").scope("profile_nickname", "account_email") // 필요한

@@ -84,8 +84,18 @@ console.log('DOMContentLoaded');
            alert("취소되었습니다.");
        }
    });
+   //언어 선택
+   const langSelect = document.querySelector("#lang");
+   const currentLang = "${empty lang ? 'ko' : lang}";
+   langSelect.value = currentLang;  // selected 반영
    
-   
+   // 언어 변경 이벤트
+   langSelect.addEventListener("change", function(){
+       selectLang = langSelect.value;
+
+
+       window.location.href = '/ehr/board/doSelectOne.do?boardNo='+boardNo+'&lang='+selectLang;
+   });
 });
    
 </script>
@@ -98,19 +108,19 @@ console.log('DOMContentLoaded');
                style="min-height:200px; position:relative; z-index:1;">
 		    <h1 class="display-2 text-white text-shadow mb-0">${vo.title}</h1>
 		    <div class="text-white mb-0 mt-2">
-		        <span>등록자: ${vo.modId}</span>
+		        <span>${msgs.admin}: ${vo.modId}</span>
                 <span> | </span>
-                <span>조회 ${vo.viewCnt}</span>
+                <span>${msgs.view} ${vo.viewCnt}</span>
                 <span> | </span>
                 <span>${vo.modDt}</span>
 		    </div>
 		  </div>
 		    <div class="boardBtns position-absolute" style="bottom:15px; right:20px;">
 		    <c:if test="${sessionScope.loginUser.role =='1'  }">
-		      <input type="button" id="moveToUpdate" class="btn btn-sm btn-primary" value="수정">
-              <input type="button" id="doDelete" class="btn btn-sm btn-primary" value="삭제">
+		      <input type="button" id="moveToUpdate" class="btn btn-sm btn-primary" value="${msgs.reg}">
+              <input type="button" id="doDelete" class="btn btn-sm btn-primary" value="${msgs.modi}">
             </c:if>
-              <input type="button" id="moveToList" class="btn btn-sm btn-primary" value="목록으로">
+              <input type="button" id="moveToList" class="btn btn-sm btn-primary" value="${msgs.toList}">
 		    </div>
 	</div><!-- //header -->
 

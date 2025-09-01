@@ -91,7 +91,7 @@
         <div class="row">
           <div class="col-lg-7 col-md-10">
             <h1 class="display-2 text-white">안녕하세요! ${sessionScope.loginUser.name}님</h1>
-            <p class="text-white mt-0 mb-5">This is your profile page. You can see the progress you've made with your work and manage your projects or assigned tasks</p>
+            <p class="text-white mt-0 mb-5">비밀번호를 변경하세요!</p>
           </div>
         </div>
       </div>

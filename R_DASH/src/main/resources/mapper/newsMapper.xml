@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.pcwk.ehr.mapper.NewsMapper">
-    <!-- 메인 화면 용 -->
+    <!-- 메인 화면 용: 오늘(pub_dt) + 키워드별 최신 3건 -->
     <select id="newsMainList" parameterType="NewsDTO" resultType="NewsDTO">
         SELECT 
-		  news_no,
-		  keyword,
-		  title,
-		  company,
-		  url,
-		  pub_dt AS pubDt,
-		  reg_dt AS regDt
-		FROM news
-		WHERE keyword=#{keyword}
-		AND TRUNC(reg_dt) = TRUNC(SYSDATE)
-		ORDER BY pub_dt DESC
-		FETCH FIRST 3 ROWS ONLY
+            news_no,
+            keyword,
+            title,
+            company,
+            url,
+            pub_dt AS pubDt,
+            reg_dt AS regDt
+        FROM news
+        WHERE keyword = #{keyword}
+        <![CDATA[
+            AND pub_dt >= TRUNC(SYSDATE)
+            AND pub_dt <  TRUNC(SYSDATE) + 1
+          ]]>
+        ORDER BY pub_dt DESC
+        FETCH FIRST 3 ROWS ONLY
     </select>
     <select id="doRetrieve" parameterType="SearchDTO" resultType="NewsDTO">
        SELECT * FROM (

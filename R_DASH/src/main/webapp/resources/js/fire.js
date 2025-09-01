@@ -47,7 +47,7 @@ jq36(document).ready(function() {
             console.error('AJAX 오류:', error);
         }
     });
-
+/*
     // 복구현황
     jq36.ajax({
         url: '/ehr/fire/fire-safe.do',
@@ -70,7 +70,8 @@ jq36(document).ready(function() {
                             data: damage,
                             backgroundColor: 'rgba(255, 99, 132, 0.6)',
                             borderColor: 'rgba(255, 99, 132, 1)',
-                            borderWidth: 1
+                            borderWidth: 1,
+                            yAxisID: 'y'
                         },
                         {
                             type: 'line',
@@ -80,7 +81,7 @@ jq36(document).ready(function() {
                             backgroundColor: 'rgba(54, 162, 235, 0.2)',
                             tension: 0.4,
                             fill: false,
-                            yAxisID: 'y'
+                            yAxisID: 'y1'
                         }
                     ]
                 },
@@ -89,7 +90,7 @@ jq36(document).ready(function() {
                     interaction: { mode: 'index', intersect: false },
                     plugins: {
                         title: { display: true,
-                                 text: '연도별 화재 피해금액 및 복구금액',
+                                 text: '연도별 피해금액 및 복구금액',
                                  font: {
                                      size: 18,          // 폰트 크기
                                      weight: 'bold'
@@ -100,7 +101,14 @@ jq36(document).ready(function() {
                     scales: {
                         y: {
                             beginAtZero: true,
-                            title: { display: true, text: '금액 (원)' }
+                            position: 'left',
+                            title: { display: true, text: '피해금액 (원)' }
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            position: 'right',
+                            grid: { drawOnChartArea: false }, // 겹치는 그리드 제거
+                            title: { display: true, text: '복구금액 (원)' }
                         },
                         x: { 
                             grid: {
@@ -118,7 +126,7 @@ jq36(document).ready(function() {
             console.error('AJAX 오류:', error);
         }
     });
-
+*/
     jq36.ajax({
         url: '/ehr/fire/fire-yearly',
         type: 'GET',
@@ -211,7 +219,7 @@ jq36(document).ready(function() {
                     datasets: [{
                         label: '재산피해 합계',
                         data: damage,
-                        backgroundColor: '#FF9333',
+                        backgroundColor: 'rgba(255, 182, 87, 0.8)',
                         borderColor: '#FFD1A6',
                         borderWidth: 1
                     }]
@@ -283,7 +291,7 @@ jq36(document).ready(function() {
                     datasets: [{
                         label: '소화기 개수',
                         data: counts,
-                        backgroundColor: '#FF9333',
+                        backgroundColor: 'rgba(255, 182, 87, 0.8)',
                         borderColor: '#FFD1A6',
                         borderWidth: 1
                     }]
@@ -292,20 +300,13 @@ jq36(document).ready(function() {
                     responsive: true,
                     plugins: {
                         title: { display: true,
-                                 text: '호선별 소화기 개수',
+                                 text: '호선별 소화기 개수 (1호선부터, 가나다 순)',
                                  font: {
                                      size: 18,          // 폰트 크기
                                      weight: 'bold'
                                  },
-                                 color: '#333' },
-                        datalabels: {
-                            anchor: "end",   // 데이터 레이블 위치
-                            align: "top",    // 막대 위쪽에 표시
-                            color: "black",  // 글자색
-                            font: {
-                            weight: "bold"
-                                }
-                            }
+                                 color: '#333'
+                             },
                     },
                     scales: {
                         y: { beginAtZero: true },
@@ -318,7 +319,6 @@ jq36(document).ready(function() {
                             }
                     }
                 },
-                plugins: [ChartDataLabels]
             });
         },
         error: function() { console.error('호선별 소화기 AJAX 오류'); }
