@@ -17,6 +17,9 @@ message.board.noBoard=등록된 게시글이 없습니다.
 message.board.no=번호
 message.board.title=제목
 message.board.reg=등록
+message.board.del=삭제
+message.board.del=delete
+
 # news_page 
 message.news.topicCount=관련 뉴스 건수
 message.news.summrTitle=재민이AI의 오늘의 토픽 요약
