@@ -54,11 +54,25 @@
     };
 
     if (AppMap.map && AppMap.map.getNode) {
-      console.log('[AppMap] map exists → reuse');
-    } else {
-      var center = new kakao.maps.LatLng(36.5, 127.8);
-      AppMap.map = new kakao.maps.Map(el, { center: center, level: 12 });
-      console.log('[AppMap] map created');
+  console.log('[AppMap] map exists → reuse');
+} else {
+  var center = new kakao.maps.LatLng(36.5, 127.8);
+  AppMap.map = new kakao.maps.Map(el, { center: center, level: 12 });
+  console.log('[AppMap] map created');
+
+  // ✅ 컨트롤 생성 (지도 타입/줌)
+  if (!AppMap.mapTypeControlAdded) {
+    var mapTypeControl = new kakao.maps.MapTypeControl();
+    AppMap.map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+    var zoomControl = new kakao.maps.ZoomControl();
+    AppMap.map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+    AppMap.mapTypeControlAdded = true; // 중복 생성 방지
+  }
+
+  // 축소 한계
+  AppMap.map.setMaxLevel(13);
 
       // ?? 축소 한계(너무 멀리 못 가게)
       AppMap.map.setMaxLevel(13);

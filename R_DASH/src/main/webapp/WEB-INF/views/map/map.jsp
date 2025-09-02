@@ -8,14 +8,16 @@
 
 <style>
 #map{
-   position: fixed; 
-  height: calc(100vh - var(--header-height) - 20);
-  left: 0;
+  position: fixed;
+  top: calc(var(--header-height) - 20px);
+  left: 0; right: 0;
+  bottom: calc(0px - var(--map-bottom-extra));  /* 음수 = 더 아래로 늘림 */
   width: 100%;
-  height: calc(100vh - var(--header-height));
-  z-index: 1;
+  height: auto;               /* bottom으로 높이 결정 */
+  z-index: 10;
 }
-:root{ --header-height: 90px; }  /* 초기값(임시) */
+:root{ --header-height: 90px; 
+ --map-bottom-extra: 60px; }  /* 초기값(임시) */
 
 html, body {
   height: 100%;
@@ -71,7 +73,7 @@ html, body {
 
     <!-- ? 로딩/오버레이 -->
     <div class="overlay"></div>
-    <div class="loading">Loading…</div>
+    <div class="loading"></div>
     <!-- ← fade-out에서 .loading을 참조하므로 추가 -->
     <div id="map"></div>
 

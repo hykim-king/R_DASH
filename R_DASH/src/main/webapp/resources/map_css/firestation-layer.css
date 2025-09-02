@@ -269,3 +269,14 @@ header, #header, .site-header {
   position: relative;
   z-index: 3000 !important;
 }
+
+
+/* ===== Shelter 전용 위치 오버라이드 ===== */
+body[data-layer="firestation"] .layer-launcher {
+  right: 40px !important;
+  left: auto !important;
+}
+body[data-layer="firestation"] #fsHud {
+  right: 40px !important;
+  left: auto !important;
+}
