@@ -117,8 +117,8 @@ console.log('DOMContentLoaded');
 		  </div>
 		    <div class="boardBtns position-absolute" style="bottom:15px; right:20px;">
 		    <c:if test="${sessionScope.loginUser.role =='1'  }">
-		      <input type="button" id="moveToUpdate" class="btn btn-sm btn-primary" value="${msgs.reg}">
-              <input type="button" id="doDelete" class="btn btn-sm btn-primary" value="${msgs.modi}">
+		      <input type="button" id="moveToUpdate" class="btn btn-sm btn-primary" value="${msgs.modi}">
+              <input type="button" id="doDelete" class="btn btn-sm btn-primary" value="${msgs.del}">
             </c:if>
               <input type="button" id="moveToList" class="btn btn-sm btn-primary" value="${msgs.toList}">
 		    </div>
