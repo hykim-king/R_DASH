@@ -1,6 +1,6 @@
 /* 전역: 한 번에 조절할 수 있는 오프셋 변수 */
-:root {  --dust-offset-y: 180px;   /* 아이콘/말풍선 내려가는 값 */
-  --dust-hud-offset-y: 90px; /* HUD 내려가는 값 */ }
+:root {  --dust-offset-y: 195px;   /* 아이콘/말풍선 내려가는 값 */
+  --dust-hud-offset-y: 110px; /* HUD 내려가는 값 */ }
 
 /* ===== Dust Layer HUD ===== */
 #dustHud {
@@ -72,7 +72,7 @@
 
 /* ===== Legend ===== */
 #dustLegend {
-  position: fixed; right: 14px; bottom: 18px; z-index: 10;
+  position: fixed; right: 35px; bottom: 20px; z-index: 10;
   background: #fff; border: 1px solid #e5e5e5; border-radius: 10px;
   padding: 10px 12px; box-shadow: 0 6px 18px rgba(0,0,0,.08); font-size: 12px;
 }
@@ -84,4 +84,15 @@
 #dustLegend .scale {
   display: flex; justify-content: space-between; color: #666;
   font-variant-numeric: tabular-nums;
+}
+
+
+/* ===== Shelter 전용 위치 오버라이드 ===== */
+body[data-layer="dust"] .layer-launcher {
+  right: 40px !important;
+  left: auto !important;
+}
+body[data-layer="dust"] #dustHud {
+  right: 40px !important;
+  left: auto !important;
 }
