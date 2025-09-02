@@ -31,8 +31,8 @@
     }
 
     // ───────── 아이콘(🚧) 설정 ─────────
-    var ICON_URL = 'https://img.icons8.com/emoji/48/construction-emoji.png';
-    var BASE = 28; // px
+    var ICON_URL = 'https://img.icons8.com/3d-fluency/100/under-construction.png';
+    var BASE = 40; // px
     function makeIcon(size){
       return new kakao.maps.MarkerImage(
         ICON_URL,
@@ -198,31 +198,28 @@ function mountRightPanel(){
     return;
   }
 
-  var PANEL_BANNER_URL = CTX + '/resources/image/jaeminsinkhole_7.png';
-  var BANNER_HEIGHT = 180;   // 배너 높이
-  var PANEL_TOP     = 220;   // ← 여기만 늘리면 패널이 더 아래로 이동 (예: 220, 260, 300)
+var PANEL_BANNER_URL = CTX + '/resources/image/jaeminsinkhole_7.png';
+var BANNER_HEIGHT = 180;   
+var PANEL_TOP     = 240;   // ← 세로 위치 (20px 내려줌)
+var PANEL_RIGHT   = 16;    // ← 가로 위치
 
-  var wrap = document.createElement('div');
-  wrap.id = 'sinkholeStat';
-  wrap.style.cssText = [
-    'position:fixed;right:16px;top:'+PANEL_TOP+'px;z-index:900;',
-    'width:220px;background:#ffffff;border:1px solid #e5e7eb;border-radius:14px;',
-    'box-shadow:0 10px 28px rgba(0,0,0,.15);overflow:hidden;font-family:inherit;'
-  ].join('');
+var wrap = document.createElement('div');
+wrap.id = 'sinkholeStat';
+wrap.style.top   = PANEL_TOP + 'px';
+wrap.style.right = PANEL_RIGHT + 'px';
 
-  wrap.innerHTML =
-    '<img src="'+PANEL_BANNER_URL+'" alt="Sinkhole banner" '+
-      'style="display:block;width:100%;height:'+BANNER_HEIGHT+'px;object-fit:cover;'+
-             'border-bottom:1px solid #f1f5f9;" '+
-      'onerror="this.style.display=\'none\'" />'+
-    '<div style="padding:10px 12px;border-bottom:1px solid #f1f5f9;font-weight:700;font-size:13px;">싱크홀 발생 현황</div>'+
-    '<div id="sinkholeStatBody" style="padding:10px 12px;font-size:12px;line-height:1.6">'+
-      '<div>총 건수: <b>0</b></div>'+
-      '<div style="margin-top:6px;opacity:.85">복구현황별</div>'+
-      '<ul id="sinkholeStateList" style="list-style:none;margin:6px 0 0;padding:0;"></ul>'+
-    '</div>';
+wrap.innerHTML =
+  '<img src="'+PANEL_BANNER_URL+'" alt="Sinkhole banner" '+
+    'class="sinkhole-banner" '+
+    'onerror="this.style.display=\'none\'" />'+
+  '<div class="sinkhole-title">싱크홀 발생 현황</div>'+
+  '<div id="sinkholeStatBody" class="sinkhole-body">'+
+    '<div>총 건수: <b>0</b></div>'+
+    '<div class="sinkhole-sub">복구현황별</div>'+
+    '<ul id="sinkholeStateList" class="sinkhole-list"></ul>'+
+  '</div>';
 
-  document.body.appendChild(wrap);
+document.body.appendChild(wrap);
 }
 
 

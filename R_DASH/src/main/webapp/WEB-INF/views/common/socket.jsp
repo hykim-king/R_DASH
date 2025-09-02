@@ -33,7 +33,7 @@
         width: 100%;
     }
 }
-<style>
+
   /* fade 효과 제거 */
   .moveToboard {
     display: inline-block;
@@ -66,6 +66,22 @@
   align-items : center;  /*세로축 정렬 */
   justify-content: center;
   padding: 10px 0;         /* 필요시 여백 조정 */
+}
+/* 공지사항 내용(이미지+글자) */
+.modal-body {
+    font-size: 1rem;
+    color: #333;
+
+    max-height: 60vh;   /* 화면 높이 기준으로 모달 본문 높이 제한 */
+    overflow-y: auto;   /* 내용이 넘치면 스크롤 */
+    word-wrap: break-word;
+}
+
+.modal-body img {
+    max-width: 100% !important;  /* 부모 폭을 넘어가지 않도록 강제 */
+    height: auto !important;      /* 비율 유지 */
+    display: block;
+    margin: 10px auto;            /* 가운데 정렬 + 위아래 여백 */
 }
 </style>
 
@@ -104,7 +120,7 @@
    stompClient.subscribe("/topic/notice",function(message){
 	   console.log("Connected: ",message);
 	   let notice = JSON.parse(message.body);
-	   console.log("Received boardNo:", message.boardNo);
+	   console.log("Received boardNo:", notice.boardNo);
 	   
 	   document.getElementById("noticeTitle").innerText = notice.title;
 	   document.getElementById("noticeContents").innerHTML = notice.contents;

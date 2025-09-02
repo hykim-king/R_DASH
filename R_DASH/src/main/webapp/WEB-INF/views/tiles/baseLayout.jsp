@@ -35,5 +35,7 @@
   <script src="/ehr/resources/template/dashboard/assets/js/dashboard.js?v=1.2.0"></script>
   <!-- Demo JS - remove this in your project -->
   <script src="/ehr/resources/template/dashboard/assets/js/demo.min.js"></script>
+  <!-- 소켓 JSP-->
+  <jsp:include page="/WEB-INF/views/common/socket.jsp"></jsp:include>
 </body>
 </html>
