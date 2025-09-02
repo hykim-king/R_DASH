@@ -8,7 +8,7 @@ function getGrade(pm10) {
 
 $(document).ready(function() {
     // 사용자 주소 (세션에서 내려준 값)
-    let userAddress = window.loginUserAddress;
+    let userAddress = window.loginUserAddress; 
 
     if (!userAddress || userAddress === "") {
         $.ajax({
@@ -30,8 +30,6 @@ $(document).ready(function() {
             method: "GET",
             data: { address: userAddress },
             success: function(data) {
-                console.log("위도:", data.lat, "경도:", data.lon);
-
                 const lat = (data.lat != null && data.lat !== '') ? data.lat : null;
                 const lon = (data.lon != null && data.lon !== '') ? data.lon : null;
 
@@ -40,8 +38,10 @@ $(document).ready(function() {
                     method: "GET",
                     data: { userLat: lat, userLon: lon },
                     success: function(res) {
+                        const parts = userAddress.split(" ");
+                        const shortAddress = parts[0] + " " + parts[1];
                         const grade = getGrade(res.value);
-                        const displayText = `${res.region}의 미세먼지 대기오염도(단위: μg/㎥): ${res.value}`;
+                        const displayText = `${shortAddress}의 미세먼지 대기오염도(단위: μg/㎥): ${res.value}`;
                         $("#avgCard").text(displayText)
                                     .removeClass()
                                     .addClass("card")

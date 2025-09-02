@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pcwk.ehr.cmn.SearchDTO;
 import com.pcwk.ehr.domain.NewsDTO;
 import com.pcwk.ehr.domain.UserDTO;
 import com.pcwk.ehr.mapper.NewsMapper;
@@ -42,6 +41,7 @@ public class MainController {
 	public String home(Model model,
 			@SessionAttribute(value = "loginUser", required = false) com.pcwk.ehr.domain.UserDTO loginUser,
 			HttpServletResponse response) {
+
 		log.debug("┌─────────────────────┐");
 		log.debug("│ home() 메서드 실행  │");
 		log.debug("└─────────────────────┘");
@@ -50,24 +50,32 @@ public class MainController {
 		response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
 		response.setHeader("Pragma", "no-cache");
 
-		// 오늘자(reg_dt) 최신 9건
-		SearchDTO s = new SearchDTO();
-		s.setPageNo(1);
-		s.setPageSize(9);
-		s.setSearchDiv("");
-		s.setSearchWord("");
+		// 오늘자(pub_dt) 기준: 키워드별 3건씩 총 9건
+		String[] keywords = { "화재", "지진", "홍수" };
+		List<NewsDTO> homeNews = new ArrayList<>();
 
-		List<NewsDTO> homeNews = newsMapper.doRetrieve(s);
+		for (String kw : keywords) {
+			try {
+				NewsDTO q = new NewsDTO();
+				q.setKeyword(kw);
+				List<NewsDTO> part = newsMapper.newsMainList(q); // ← NewsDTO 파라미터
+				if (part != null && !part.isEmpty()) {
+					homeNews.addAll(part);
+				}
+			} catch (Exception e) {
+				log.error("newsMainList 조회 실패 (kw={}): {}", kw, e.getMessage(), e);
+			}
+		}
 
+		// JSON 직렬화 (</script> 이슈 방지)
 		String homeNewsJson = "[]";
 		try {
-			homeNewsJson = new ObjectMapper().writeValueAsString(homeNews);
-			homeNewsJson = homeNewsJson.replace("</", "<\\/");
+			homeNewsJson = new ObjectMapper().writeValueAsString(homeNews).replace("</", "<\\/");
 		} catch (JsonProcessingException e) {
 			log.error("homeNews JSON 직렬화 실패", e);
 		}
 
-		// ★ 로그인 사용자 번호 바인딩
+		// 로그인 사용자 번호 바인딩
 		if (loginUser != null) {
 			model.addAttribute("loginUserNo", loginUser.getUserNo());
 			log.debug("loginUserNo in model: {}", loginUser.getUserNo());

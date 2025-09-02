@@ -1,6 +1,6 @@
 /* ===== Landslide Layer (Heatmap) — 배치/스타일 공통 ===== */
 :root{
-  --ls-legend-bottom: 220px;   /* 범례(배너 카드) 위치 */
+  --ls-legend-bottom: 150px;   /* 범례(배너 카드) 위치 */
   --ls-stack-gap: 14px;
   --ls-zoom-height: 64px;
   --ls-offset-up: 400px;       /* 배지 + 확대버튼 추가 상승량 */
@@ -12,13 +12,22 @@
 
 /* ===== 범례(배너 카드) ===== */
 #ls-legend{
+    margin-bottom: 80px;  /* 버튼 공간 확보 */
   position:absolute;
   right:16px; bottom:var(--ls-legend-bottom); z-index:1000;
-  width:300px; border-radius:16px; background:#fff; border:1px solid #e5e7eb;
+  width:220px; border-radius:16px; background:#fff; border:1px solid #e5e7eb;
   box-shadow:0 12px 28px rgba(0,0,0,.16); overflow:hidden; pointer-events:auto;
 }
-#ls-legend .legend-hero{ width:100%; height:120px; background:#eef2ff; }
-#ls-legend .legend-hero img{ width:100%; height:100%; object-fit:cover; display:block; }
+#ls-legend .legend-hero{  width: 100%;
+  width: 100%;
+  height: 180px;       /* 🔼 top 영역(배너) 크기를 키움 */
+  background: #eef2ff; 
+  overflow: hidden;    /* 이미지가 넘치면 잘라냄 */
+}
+#ls-legend .legend-hero img{ width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;}
 #ls-legend .legend-body{ padding:16px 18px; font:15px/1.6 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif; color:#0f172a; }
 #ls-legend .legend-title{ margin:0 0 8px; font-weight:700; font-size:16px; }
 #ls-legend .legend-section-title{ margin:12px 0 6px; font-weight:700; font-size:14px; }
@@ -42,23 +51,13 @@
   --ls-badge-bottom: calc(var(--ls-zoom-bottom) + var(--ls-zoom-height) + var(--ls-stack-gap));
 }
 .ls-zoom{
-  position:absolute; right:16px; bottom:var(--ls-zoom-bottom); z-index:1001;
+  position:absolute; right:20px;    bottom: calc(var(--ls-legend-bottom) - 200px - var(--ls-zoom-gap)); /* HUD보다 80px 아래 */ z-index:1001;
   display:flex; gap:12px; background:rgba(255,255,255,.98);
   border-radius:14px; padding:12px 14px; box-shadow:0 12px 26px rgba(0,0,0,.15);
 }
-.ls-zoom__btn{
-  padding:12px 18px; border-radius:12px; border:1px solid #e5e7eb;
-  background:#fff; color:#111827; cursor:pointer; font-weight:700; font-size:16px; min-width:78px; text-align:center;
-}
-.ls-zoom__btn.is-active{ background:#111827; color:#fff; border-color:#111827; }
 
-/* ===== 지도 고정 안내 배지 ===== */
-.ls-lock-badge{
-  position:absolute; right:16px; bottom:var(--ls-badge-bottom); z-index:1002;
-  background:rgba(59,130,246,.95); border-radius:12px; padding:8px 14px;
-  color:#fff; font:600 14px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Apple SD Gothic Neo,Malgun Gothic,sans-serif;
-  box-shadow:0 5px 14px rgba(0,0,0,.18);
-}
+
+
 
 /* 포인트 점 */
 .ls-dot{ border-radius:999px; }

@@ -19,9 +19,7 @@
       /* (요청) 우상단 요소들 120px 위치 */
       .sido-filter-host.top-right { position:absolute; top:120px; right:16px; z-index:50; }
 
-      /* 선택된 시군구 폴리곤 강조(입체 느낌) */
-      .__nc_selected_shadow { box-shadow: 0 8px 16px rgba(0,0,0,.2); }
-
+    
       /* NOWCAST 전용 아이콘 + 말풍선 */
       .nc-cta {
         position: absolute;
@@ -95,7 +93,6 @@
     var BASE = (document.body && document.body.getAttribute('data-context-path')) || '';
     var API = {
       nationLatest: function (cat) { return BASE + '/nowcast/latest.do?category=' + encodeURIComponent(cat); },
-      latest4All: BASE + '/nowcast/latest4',
       latest4Region: function (sido, sgg) {
         return BASE + '/nowcast/latest4-region?sidoNm=' + encodeURIComponent(sido) + '&signguNm=' + encodeURIComponent(sgg);
       }
@@ -108,6 +105,7 @@
     // ===== 상태 =====
     var cache = { T1H: null, RN1: null, REH: null, WSD: null };
     var currentCategory = (qs.get('category') || 'T1H').toUpperCase();
+    var currentSido = '';
 
     // 추가 상태: 선택 폴리곤/행정구역
     var __selectedPoly = null;
@@ -160,30 +158,160 @@
     (function(){
       var hudOverlay = null;
 
-      function nfmt(v){ if(v==null || isNaN(+v)) return '-'; return (Math.round(+v*10)/10); }
 
       function buildHudHTML(title, vals){
+      function nfmt(v){ if(v==null || isNaN(+v)) return '-'; return (Math.round(+v*10)/10); }
         var t = title || '';
         var temp = (vals && vals.T1H!=null) ? nfmt(vals.T1H)+' ℃' : '-';
         var rn1  = (vals && vals.RN1!=null) ? nfmt(vals.RN1)+' mm' : '-';
         var wsd  = (vals && vals.WSD!=null) ? nfmt(vals.WSD)+' m/s' : '-';
         var reh  = (vals && vals.REH!=null) ? nfmt(vals.REH)+'%' : '-';
+     
+     
+       // 아이콘 방어 (정의 전 호출될 수 있으니 안전하게)
+  var I = (NowcastLayer && NowcastLayer.icons) || {};
+  var sun  = I.sun  || '';
+  var rain = I.rain || '';
+  var wind = I.wind || '';
+  var humi = I.humi || '';   
+        
 
-        return ''
-        + '<div class="nc-wrap">'
-        + '  <div class="nc-card">'
-        + '    <div class="nc-hdr">'+ t +'</div>'
-        + '    <div class="nc-grid">'
-        + '      <div class="nc-chip c-temp">'+ NowcastLayer.icons.sun +' <span>기온</span><span class="v">'+ temp +'</span></div>'
-        + '      <div class="nc-chip c-rain">'+ NowcastLayer.icons.rain +' <span>강수</span><span class="v">'+ rn1 +'</span></div>'
-        + '      <div class="nc-chip c-wind">'+ NowcastLayer.icons.wind +' <span>풍속</span><span class="v">'+ wsd +'</span></div>'
-        + '      <div class="nc-chip c-humi">'+ NowcastLayer.icons.humi +' <span>습도</span><span class="v">'+ reh +'</span></div>'
-        + '    </div>'
-        + '  </div>'
-        + '  <div class="nc-close" title="닫기" aria-label="닫기">×</div>'
-        + '</div>';
-      }
+  return ''
+  + '<div class="nc-wrap">'
+  + '  <div class="nc-card">'
+  + '    <button type="button" class="nc-close" aria-label="닫기">✕</button>'
+  + '    <div class="nc-hdr">'+ t +'</div>'
+  + '    <div class="nc-grid">'
+  + '      <div class="nc-chip c-temp">'+ sun  +' <span>기온</span><span class="v">'+ temp +'</span></div>'
+  + '      <div class="nc-chip c-rain">'+ rain +' <span>강수</span><span class="v">'+ rn1  +'</span></div>'
+  + '      <div class="nc-chip c-wind">'+ wind +' <span>풍속</span><span class="v">'+ wsd  +'</span></div>'
+  + '      <div class="nc-chip c-humi">'+ humi +' <span>습도</span><span class="v">'+ reh  +'</span></div>'
+  + '    </div>'
+  + '  </div>'
+  + '</div>';
+}
 
+
+
+NowcastLayer.hud = (function(){
+  var hudOverlay = null;
+  var mapClickHandlerFn = null;
+  var escHandler = null;
+  var rebindTimer = null;
+
+
+
+function attachGlobalClosers(doClose){
+  // 이전 리스너/타이머 정리
+  if (rebindTimer){ clearTimeout(rebindTimer); rebindTimer = null; }
+  if (mapClickHandlerFn){
+    kakao.maps.event.removeListener(map, 'click', mapClickHandlerFn);
+    mapClickHandlerFn = null;
+  }
+  if (!escHandler){
+    escHandler = function(e){ if (e.key === 'Escape') doClose(); };
+    document.addEventListener('keydown', escHandler);
+  }
+  // HUD 표시 직후 같은 클릭이 닿지 않도록 약간 늦게 바인딩
+  rebindTimer = setTimeout(function(){
+    mapClickHandlerFn = function(){ doClose(); };
+    kakao.maps.event.addListener(map, 'click', mapClickHandlerFn);
+    rebindTimer = null;
+  }, 180);
+}
+
+function detachGlobalClosers(){
+  if (rebindTimer){ clearTimeout(rebindTimer); rebindTimer = null; }
+  if (mapClickHandlerFn){
+    kakao.maps.event.removeListener(map, 'click', mapClickHandlerFn);
+    mapClickHandlerFn = null;
+  }
+  if (escHandler){
+    document.removeEventListener('keydown', escHandler);
+    escHandler = null;
+  }
+}
+
+
+
+  
+
+  function doCloseWithAnim(rootEl){
+    // rootEl: .nc-wrap
+    if (!hudOverlay || !rootEl) { hardClose(); return; }
+    var card = rootEl.querySelector('.nc-card');
+    if (card){
+      card.classList.add('is-hiding');        // 애니 시작
+      setTimeout(function(){ hardClose(); }, 240); // CSS 시간과 맞춤
+    } else {
+      hardClose();
+    }
+  }
+
+
+
+function hardClose(){
+  if (hudOverlay){ hudOverlay.setMap(null); hudOverlay = null; }
+  if (typeof detachGlobalClosers === 'function') detachGlobalClosers();
+  // 선택 해제 (기존 코드 유지)
+  if (typeof elevatePolygon === 'function' && typeof __selectedPoly !== 'undefined' && __selectedPoly){
+    elevatePolygon(__selectedPoly, false);
+    __selectedPoly = null; __selectedSido = null; __selectedSgg = null;
+  }
+}
+
+return {
+isOpen: function(){
+  return !!hudOverlay;   // 열려 있으면 true
+},
+  show: function(mapObj, position, title, vals){
+    // 기존 HUD 제거
+    if (hudOverlay){ hudOverlay.setMap(null); hudOverlay = null; }
+
+    // 컨텐츠 생성
+    var wrapper = document.createElement('div');
+    // 💡 공백 텍스트 노드 회피
+    wrapper.innerHTML = (buildHudHTML(title, vals) || '').trim();
+    var rootEl = wrapper.firstElementChild;   // ✅ firstChild → firstElementChild
+    if (!rootEl){ console.error('[HUD] invalid HTML from buildHudHTML'); return; }
+
+    // 닫기 버튼 이벤트 연결 (안전 가드 포함)
+    var closeBtn = rootEl.querySelector('.nc-close');
+    if (closeBtn){
+      closeBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        if (typeof doCloseWithAnim === 'function') doCloseWithAnim(rootEl);
+        else hardClose();
+      });
+    }
+
+    // 커스텀 오버레이
+    hudOverlay = new kakao.maps.CustomOverlay({
+      position: position,     // ⚠️ 반드시 kakao.maps.LatLng 인스턴스여야 함
+      content: rootEl,
+      xAnchor: 0.5,
+      yAnchor: 1,             // ✅ 1.05 → 1 (0~1 범위)
+      map: mapObj
+    });
+
+    // ✨ 살짝 아래로 내리고 싶으면 transform으로
+    rootEl.style.transform = 'translateY(8px)'; // 필요시 px 조절
+
+    // 바깥(지도) 클릭/ESC로 닫기
+    if (typeof attachGlobalClosers === 'function'){
+      attachGlobalClosers(function(){
+        if (typeof doCloseWithAnim === 'function') doCloseWithAnim(rootEl);
+        else hardClose();
+      });
+    }
+  },
+
+  hide: function(){
+    hardClose();
+    },
+
+    atPolygon: function(poly, title, vals){
+      // 폴리곤 중심 계산은 기존 함수 사용
       function polygonCenter(poly){
         var paths = poly.__paths || [];
         var sumLat=0, sumLng=0, n=0;
@@ -193,47 +321,10 @@
         }
         return (n? new kakao.maps.LatLng(sumLat/n, sumLng/n) : new kakao.maps.LatLng(36.5,127.8));
       }
-
-      NowcastLayer.hud = {
-  show: function(map, position, title, vals){
-    if (hudOverlay){ hudOverlay.setMap(null); hudOverlay = null; }
-    var content = document.createElement('div');
-    content.innerHTML = buildHudHTML(title, vals);
-
-    // 🔽 여기서 yAnchor + offsetY 로 HUD 전체를 조금 아래로
-    hudOverlay = new kakao.maps.CustomOverlay({ 
-      position: position, 
-      content: content, 
-      xAnchor:0.5, 
-      yAnchor:1.05,
-      yAnchor:1.05,       // 기존 값
-      yAnchor:1.05,       // 유지
-      map: map
-    });
-
-    // 🔽 오프셋 직접 지정 (px 단위)
-    hudOverlay.setMap(map);
-    hudOverlay.setYOffset(-100);   // HUD를 화면에서 100px 내려줌
-
-    var closeBtn = content.querySelector('.nc-close');
-    if (closeBtn){
-      closeBtn.addEventListener('click', function(){
-        if (hudOverlay){ hudOverlay.setMap(null); hudOverlay = null; }
-        if (__selectedPoly) {
-          elevatePolygon(__selectedPoly, false);
-          __selectedPoly = null;
-          __selectedSido = null;
-          __selectedSgg  = null;
-        }
-      });
+      this.show(map, polygonCenter(poly), title, vals);
     }
-  },
-  hide: function(){ if (hudOverlay){ hudOverlay.setMap(null); hudOverlay = null; } },
-  atPolygon: function(poly, title, vals){
-    NowcastLayer.hud.show(map, polygonCenter(poly), title, vals);
-  }
-};
-
+  };
+})();
       NowcastLayer.icons = {
         sun:  '<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.8"/><path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>',
         rain: '<svg viewBox="0 0 24 24" fill="none"><path d="M7 15a5 5 0 0 1 0-10c1.7 0 3.2.84 4.1 2.12A4.5 4.5 0 1 1 17 15H7Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M8 20l1-2M12 21l1-2M16 20l1-2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>',
@@ -388,7 +479,7 @@
           '11':'서울특별시','26':'부산광역시','27':'대구광역시','28':'인천광역시',
           '29':'광주광역시','30':'대전광역시','31':'울산광역시','36':'세종특별자치시',
           '41':'경기도','42':'강원특별자치도','43':'충청북도','44':'충청남도',
-          '45':'전라북도','46':'전라남도','47':'경상북도','48':'경상남도',
+          '45':'전북특별자치도','46':'전라남도','47':'경상북도','48':'경상남도',
           '50':'제주특별자치도'
         };
         var sido = p.SIDO_NM || p.CTP_KOR_NM || p.CTPRVN_NM || p.sidoNm || p.SIDO || p.sido || '';
@@ -494,12 +585,7 @@
       var key = _slug(sidoNm, sggNm);
       return (App.layers && App.layers.sig && App.layers.sig._byKey) ? App.layers.sig._byKey[key] : null;
     }
-    function polygonBounds(poly){
-      var b = new kakao.maps.LatLngBounds();
-      var paths = poly.__paths || [];
-      for (var i=0;i<paths.length;i++) for (var j=0;j<paths[i].length;j++) b.extend(paths[i][j]);
-      return b;
-    }
+   
 
     function focusAndShowNowcast(sidoNm, sggNm){
       var poly = findPolygon(sidoNm, sggNm);
@@ -531,7 +617,7 @@
         "전체","강원특별자치도","경기도","경상남도","경상북도",
         "광주광역시","대구광역시","대전광역시","부산광역시",
         "서울특별시","세종특별자치시","울산광역시","인천광역시",
-        "전라남도","전라북도","제주특별자치도","충청남도","충청북도"
+        "전라남도","전북특별자치도","제주특별자치도","충청남도","충청북도"
       ];
 
       var host = document.getElementById('sido-filter');
@@ -549,51 +635,90 @@
 
       host.innerHTML = ''; host.appendChild(card);
 
-      function renderSggChips(sidoNm){
-        var list = listSggBySido(sidoNm);
-        sggWrap.innerHTML = '';
-        if (!list.length){ sggCard.style.display='none'; return; }
-        sggCard.style.display='block';
-        list.forEach(function(name, i){
-          var btn = document.createElement('button');
-          btn.type='button';
-          btn.className='sgg-chip' + (i===0?' active':'');
-          btn.textContent = name;
-          btn.addEventListener('click', function(){
-            [].forEach.call(sggWrap.querySelectorAll('.sgg-chip'), function(el){ el.classList.remove('active'); });
-            btn.classList.add('active');
-            focusAndShowNowcast(sidoNm, name);
-          });
-          sggWrap.appendChild(btn);
-        });
-        var first = sggWrap.querySelector('.sgg-chip'); if (first) first.click();
-      }
+function renderSggChips(sidoNm){
+  var list = listSggBySido(sidoNm);
+  sggWrap.innerHTML = '';
+  if (!list.length){ sggCard.style.display='none'; return; }
+  sggCard.style.display='block';
+
+  list.forEach(function(name, i){
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sgg-chip' + (i===0 ? ' active' : '');
+    btn.textContent = name;
+
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+
+      // UI 상태 갱신
+      [].forEach.call(sggWrap.querySelectorAll('.sgg-chip'), function(el){
+        el.classList.remove('active');
+      });
+      btn.classList.add('active');
+
+      // 선택한 시군구 HUD만 표시
+      focusAndShowNowcast(sidoNm, name);
+    });
+
+    sggWrap.appendChild(btn);
+  });
+
+  // 필요하면 첫 칩 자동 클릭 유지
+  var first = sggWrap.querySelector('.sgg-chip');
+  if (first) first.click();
+}
 
       // 시도 칩
-      SIDO_LIST.forEach(function(name, i){
-        var btn = document.createElement('button');
-        btn.type='button';
-        btn.className='sido-chip' + (i===0?' active':'');
-        btn.dataset.sido = (name==='전체'?'':name);
-        btn.textContent = name;
-        btn.addEventListener('click', function(){
-          [].forEach.call(wrap.querySelectorAll('.sido-chip'), function(el){ el.classList.remove('active'); });
-          btn.classList.add('active');
+SIDO_LIST.forEach(function(name, i){
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'sido-chip' + (i === 0 ? ' active' : '');
+  btn.dataset.sido = (name === '전체' ? '' : name);
+  btn.textContent = name;
 
-          var selected = btn.dataset.sido || '';
-          if (App.layers && App.layers.sig && typeof App.layers.sig.setSidoFilter === 'function'){
-            App.layers.sig.setSidoFilter(selected);
-          }
-          host.dispatchEvent(new CustomEvent('sido:change', { detail:{ value: selected }}));
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
 
-          if (selected){ renderSggChips(selected); }
-          else { 
-            sggWrap.innerHTML=''; sggCard.style.display='none'; NowcastLayer.hud.hide();
-            if (__selectedPoly) { elevatePolygon(__selectedPoly, false); __selectedPoly=null; }
-          }
-        });
-        wrap.appendChild(btn);
-      });
+    // 이미 활성화된 버튼이면 아무 것도 하지 않음 (불필요한 렌더 방지)
+    if (btn.classList.contains('active')) return;
+
+    // UI 상태 갱신
+    [].forEach.call(wrap.querySelectorAll('.sido-chip'), function(el){
+      el.classList.remove('active');
+    });
+    btn.classList.add('active');
+
+    var selected = btn.dataset.sido || '';
+    currentSido = selected;
+
+    // 지도 레이어 필터링 (있을 때만)
+    if (App.layers && App.layers.sig && typeof App.layers.sig.setSidoFilter === 'function'){
+      App.layers.sig.setSidoFilter(selected);
+    }
+
+    // 커스텀 이벤트 (필요하다면 유지)
+    host.dispatchEvent(new CustomEvent('sido:change', { detail:{ value: selected }}));
+
+    if (selected){
+      // 시군구 칩 렌더 → 첫 칩 자동 선택 → HUD 표시 (깜빡임 없음)
+      renderSggChips(selected);
+    } else {
+      // 전체 선택: 시군구 패널 닫기 + HUD 닫기 + 폴리곤 하이라이트 해제
+      sggWrap.innerHTML = '';
+      sggCard.style.display = 'none';
+
+      if (NowcastLayer && NowcastLayer.hud && NowcastLayer.hud.isOpen && NowcastLayer.hud.isOpen()){
+        NowcastLayer.hud.hide();
+      }
+      if (__selectedPoly){
+        elevatePolygon(__selectedPoly, false);
+        __selectedPoly = null;
+      }
+    }
+  });
+
+  wrap.appendChild(btn);
+});
 
       // NOWCAST 전용 아이콘+말풍선
       mountCTA();
@@ -608,41 +733,42 @@
         if (sidoNm){ renderSggChips(sidoNm); } else { sggWrap.innerHTML=''; sggCard.style.display='none'; }
       };
 
-      function mountCTA(){
-        if (document.getElementById('nc-cta')) return;
-        var box = document.createElement('div');
-        box.id = 'nc-cta';
-        box.className = 'nc-cta';
+function mountCTA(){
+  if (document.getElementById('nc-cta')) return;
+  var box = document.createElement('div');
+  box.id = 'nc-cta';
+  box.className = 'nc-cta';
 
-        var bubble = document.createElement('div');
-        bubble.className = 'bubble';
-        bubble.textContent = '너네 마을은 이따가 비온대 ?\n 우리 마을은 비 많이 와  !!';
+  var bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = '너네 마을은 지금 비 오고 있어?\n 우리 마을은 지금 비 많이 와  !!';
 
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'icon-btn';
-        var img = document.createElement('img');
-        img.alt = 'nowcast icon';
-        img.src = (BASE || '') + '/resources/image/jaeminsinkhole_4.png';
-        btn.appendChild(img);
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'icon-btn';
+  btn.setAttribute('aria-controls','sido-filter');   // 접근성
+  btn.setAttribute('aria-expanded','true');
 
-        function showHUDByCTA(){
-          if (__selectedSido && __selectedSgg) { focusAndShowNowcast(__selectedSido, __selectedSgg); return; }
-          var host = document.getElementById('sido-filter');
-          var activeSido = host && host.querySelector('.sido-chip.active');
-          var activeSgg  = host && host.querySelector('.sgg-chip.active');
-          var sidoNm = activeSido ? (activeSido.dataset.sido || '') : '';
-          var sggNm  = activeSgg ? activeSgg.textContent : '';
-          if (sidoNm && sggNm) focusAndShowNowcast(sidoNm, sggNm);
-          else alert('시/군/구를 먼저 선택해 주세요 🙂');
-        }
-        btn.addEventListener('click', showHUDByCTA);
-        bubble.addEventListener('click', showHUDByCTA);
+  var img = document.createElement('img');
+  img.alt = 'nowcast icon';
+  img.src = (BASE || '') + '/resources/image/jaeminsinkhole_4.png';
+  btn.appendChild(img);
 
-        box.appendChild(bubble);
-        box.appendChild(btn);
-        document.body.appendChild(box);
-      }
+  // ★ 여기! 패널 열고/닫기만 수행. HUD(지도 오버레이)에는 손대지 않음.
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
+    e.stopPropagation();
+
+    var panel = document.getElementById('sido-filter');
+    if (!panel) return;
+    var hidden = panel.classList.toggle('nc-hidden');
+    btn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+  });
+
+  box.appendChild(bubble);
+  box.appendChild(btn);
+  document.body.appendChild(box);
+}
     } // mountSidoSggFilterUI
   } // init
 })(window);

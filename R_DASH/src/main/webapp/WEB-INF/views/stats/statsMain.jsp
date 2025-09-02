@@ -22,7 +22,7 @@
     <style>
         .canvasContainer {
             width: 700px; 
-            height: 400px;
+            height: 500px;
             margin-top: 20px;
         }
         
@@ -95,6 +95,7 @@
         .normal { background-color: #d0fb50 !important; color: black; }
         .good { background-color: #0ed13c !important; color: black; }
         
+
         body {
 		    display: flex;
 		    flex-direction: column;
@@ -103,22 +104,13 @@
 		}
 		
 		.body-container {
-		    width: 80%;
+		    width: 90%;
 		    margin: 0 auto; /* 상하 0, 좌우 자동 중앙 정렬 */
 		}
 		
 		.main-container {
 		    width: 100%; /* 또는 원하는 너비 */
 		    margin: 0 auto; /* 부모 안에서 중앙 정렬 */
-		}
-		
-		main {
-		    flex: 1; /* main 영역이 남은 공간을 차지하도록 */
-		    padding-bottom: 80px; /* footer 높이만큼 여백 확보 */
-		}
-		
-		footer {
-		    height: 80px;
 		}
 		
 		.menuChart {
@@ -180,14 +172,49 @@
 	      font-weight: bold;
 		}
         
-		
+		.typeMent{
+		  font-family: "Do Hyeon", sans-serif;
+		  font-weight: bold;
+		  font-style: normal;
+		  font-size: 20px;
+		}
     </style>
 </head>
 <body>
 <div class="body-container">
 <c:set var="type" value="${not empty param.type ? param.type : (not empty pageType ? pageType : 'weather')}" />
-<div class="menuChart mt--7">
-    <canvas id="SelectTemperature"></canvas>
+<div class="d-flex align-items-center">
+    <div class="menuChart mt--7">
+        <canvas id="SelectTemperature"></canvas>
+    </div>
+    <div class="ml-3" style="white-space: nowrap;"> <!-- 차트 옆에 붙일 멘트 영역 -->
+        <c:choose>
+            <c:when test="${type == 'weather'}">
+                <pre class = "typeMent">
+                  본 페이지에서는 기온 관련 통계를 확인할 수 있습니다.
+                  스크롤을 내려 자료를 확인할 수 있습니다.
+                </pre>
+            </c:when>
+            <c:when test="${type == 'fire'}">
+                <pre class = "typeMent">
+                  본 페이지에서는 화재 관련 통계를 확인할 수 있습니다.
+		     스크롤을 내려 자료를 확인할 수 있습니다.
+                </pre>
+            </c:when>
+            <c:when test="${type == 'landslide'}">
+                <pre class = "typeMent">
+                  본 페이지에서는 산사태 관련 통계를 확인할 수 있습니다.
+                  스크롤을 내려 자료를 확인할 수 있습니다.
+                </pre>
+            </c:when>
+            <c:when test="${type == 'sinkhole'}">
+                <pre class = "typeMent">
+                  본 페이지에서는 싱크홀 관련 통계를 확인할 수 있습니다.   
+                  스크롤을 내려 자료를 확인할 수 있습니다.
+                </pre>
+            </c:when>
+        </c:choose>
+    </div>
 </div>
 <div class="main-container">
 <c:choose>
@@ -263,12 +290,12 @@
 	</c:when>
 	<c:when test="${type == 'fire'}">
         <div class="row mb-6">
-		    <div class="col-md-6 canvasContainer">
+		    <%-- <div class="col-md-6 canvasContainer">
 		      <canvas id="fireSafeChart"></canvas>
-		    </div>
-		    <div class="col-md-6 mt-n5 d-flex justify-content-end canvasContainer"> 
-			    <div style="width: 80%; height: 450px;">
-			      <canvas id="yearlyChart"></canvas>
+		    </div> --%>
+		    <div class="col-md-12 mt-n5 d-flex justify-content-center canvasContainer"> 
+			    <div>
+			      <canvas id="yearlyChart" style="width: 80%; height: 450px;"></canvas>
 			    </div>
 			  </div>
 		  </div>
@@ -327,20 +354,20 @@
 			</div>
 	    </div>
 	    <div class="row mb-6">
-            <div class="col-md-6">
-                <h2>TOP 5 지역</h2>
-		        <table id="top5Table" class="topTable">
-		            <tr>
-		                <th>순위</th>
-		                <th>지역</th>
-		                <th>PM10</th>
-		                <th>등급</th>
-		            </tr>
-		        </table>
+	       <div class="col-md-6">
+                <h2>미세먼지 낮은 지역</h2>
+                <table id="bottom5Table" class="topTable">
+                    <tr>
+                        <th>순위</th>
+                        <th>지역</th>
+                        <th>PM10</th>
+                        <th>등급</th>
+                    </tr>
+                </table>
             </div>
             <div class="col-md-6">
-                <h2>BOTTOM 5 지역</h2>
-		        <table id="bottom5Table" class="topTable">
+                <h2>미세먼지 높은 지역</h2>
+		        <table id="top5Table" class="topTable">
 		            <tr>
 		                <th>순위</th>
 		                <th>지역</th>

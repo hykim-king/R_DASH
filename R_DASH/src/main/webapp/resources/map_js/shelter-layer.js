@@ -101,8 +101,8 @@ function applyZIndices() {
   var launcher = document.getElementById('shelterLauncher');
   var hud = document.getElementById('shelterHud');
 
-  if (launcher) launcher.style.zIndex = String(z);
-  if (hud)      hud.style.zIndex      = String(z - 10);
+if (launcher) launcher.style.zIndex = String(z + 10); // ← 런처를 HUD 위로
+if (hud)      hud.style.zIndex      = String(z);      // HUD는 기본 z
   // 열린 버블이 있으면 같이 내림
   try { if (shelterBubble && shelterBubble.setZIndex) shelterBubble.setZIndex(z - 5); } catch(_) {}
 }

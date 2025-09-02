@@ -39,9 +39,6 @@ $(document).ready(function() {
                 let ctx = document.getElementById('patientsChart').getContext('2d');
                 let inOutdoorCtx = document.getElementById('inOutdoorChart').getContext('2d');
 
-                console.log(data);
-                console.log(filteredData);
-                console.log(totalValues, inValues, outValues);
                 // 1. 기존 차트 제거
                 if (chartInstance) {
                     chartInstance.destroy();
@@ -135,8 +132,7 @@ $(document).ready(function() {
                                     }  
                                 }
                         }
-                    },
-                    plugins: [ChartDataLabels]
+                    }
                 });
             }
         });

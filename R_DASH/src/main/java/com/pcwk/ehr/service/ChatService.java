@@ -52,6 +52,8 @@ public interface ChatService {
 	boolean isGuestSession(String sessionId);
 	
 	boolean hasAnyUserLogs(String sessionId);
+	
+	boolean deleteSessionForUser(String sessionId, int userNo);
 
 	/**
 	 * 전체 채팅 로그 삭제 (테스트용)
