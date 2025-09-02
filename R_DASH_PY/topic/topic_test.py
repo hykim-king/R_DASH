@@ -10,7 +10,8 @@ import asyncio
 from topic_dao import TopicDao
 from topic_insert import save_topic_to_db
 from topic_insert import save_word_to_db
-
+import schedule
+import time
 import topicWordCloud
 
 def main():
@@ -69,5 +70,9 @@ def main():
     #topicWordCloud.make_wordcloud(df)
 
 if __name__ == '__main__':
-    main()
+    schedule.every().day.at('11:47').do(main)
+
+    while True:
+        schedule.run_pending()  # 예약된 작업 실행
+        time.sleep(1)  # CPU 사용량 절약
 
