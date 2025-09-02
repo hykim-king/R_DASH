@@ -210,10 +210,13 @@ $(document).ready(function() {
             alert('내용을 입력하세요');
             return;
         }
+<<<<<<< HEAD
         if (!$('#title').val().trim()) {
             alert('제목을 입력하세요');
             return;
         }
+=======
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
         
         // 클릭 시점 체크박스 상태 읽기
         const is_notice = $('#checkbox').is(':checked') ? 'Y' : 'N';

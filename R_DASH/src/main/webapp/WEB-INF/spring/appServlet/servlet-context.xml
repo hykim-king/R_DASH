@@ -37,10 +37,17 @@ Cron 스케줄링
        <task:scheduled ref="newsCron" method="runNewsTask" cron="0 */1 * * * *"/>
     </task:scheduled-tasks> -->
 
+<<<<<<< HEAD
 	<!-- <task:scheduler id="cronScheduler" pool-size="3"/>
 	<task:scheduled-tasks scheduler="cronScheduler">
 	  <task:scheduled ref="temperatureServiceImpl" method="insertNowcast" cron="0 45 * * * ?" />
 	</task:scheduled-tasks> -->
+=======
+	<task:scheduler id="cronScheduler" pool-size="3"/>
+	<task:scheduled-tasks scheduler="cronScheduler">
+	  <task:scheduled ref="temperatureServiceImpl" method="insertNowcast" cron="0 45 * * * ?" />
+	</task:scheduled-tasks>
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 
 
 <!-- DispatcherServlet Context: defines this servlet's request-processing 
@@ -50,7 +57,13 @@ Cron 스케줄링
 <annotation-driven />
 
 <!-- Summernote 이미지 접근 매핑 -->
+<<<<<<< HEAD
 <resources mapping="/resources/image/summernote/**" location="file:///C:/image/summernote/" />
+=======
+<resources mapping="/summernote/**" location="file:///C:/images/summernote/" />
+
+
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 
 <!-- Handles HTTP GET requests for /resources/** by efficiently serving 
 		up static resources in the ${webappRoot}/resources directory -->

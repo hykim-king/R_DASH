@@ -290,12 +290,21 @@
 	</c:when>
 	<c:when test="${type == 'fire'}">
         <div class="row mb-6">
+<<<<<<< HEAD
 		    <div class="col-md-6 canvasContainer">
 		      <canvas id="fireSafeChart"></canvas>
 		    </div>
 		    <div class="col-md-6 mt-n5 d-flex justify-content-end canvasContainer"> 
 			    <div style="width: 80%; height: 450px;">
 			      <canvas id="yearlyChart"></canvas>
+=======
+		    <%-- <div class="col-md-6 canvasContainer">
+		      <canvas id="fireSafeChart"></canvas>
+		    </div> --%>
+		    <div class="col-md-12 mt-n5 d-flex justify-content-center canvasContainer"> 
+			    <div>
+			      <canvas id="yearlyChart" style="width: 80%; height: 450px;"></canvas>
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 			    </div>
 			  </div>
 		  </div>

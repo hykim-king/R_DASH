@@ -208,3 +208,14 @@ nul
 R_DASH/logs/
 *.log
 *.gz
+<<<<<<< HEAD
+=======
+
+
+# ignore application.properties (both src/main and under R_DASH)
+src/main/resources/application.properties
+src/main/webapp/resources/application.properties
+R_DASH/src/main/resources/application.properties
+R_DASH/src/main/webapp/resources/application.properties
+
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e

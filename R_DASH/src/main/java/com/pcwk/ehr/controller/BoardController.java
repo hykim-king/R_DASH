@@ -15,7 +15,10 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
+<<<<<<< HEAD
 import javax.servlet.ServletContext;
+=======
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -59,11 +62,17 @@ public class BoardController {
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
 	
+<<<<<<< HEAD
 	private static final String IMAGE_UPLOAD_PATH = "C:/image/summernote/";
 	
 	
 	//private static final String IMAGE_UPLOAD_PATH = "C:/Users/user/R_DASH/R_DASH/src/main/webapp/resources/image/summernote/";	
 	
+=======
+	private static final String IMAGE_UPLOAD_PATH = "C:/images/summernote/";
+	
+	
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 	public BoardController() {
 		log.debug("┌───────────────────────────┐");
 		log.debug("│ *BoardController()*       │");
@@ -100,7 +109,11 @@ public class BoardController {
 	    msgs.put("toList", messageSource.getMessage("message.board.toList", null, locale));
 	    msgs.put("admin", messageSource.getMessage("message.admin", null, locale));
 	    msgs.put("modi", messageSource.getMessage("message.news.mod", null, locale));
+<<<<<<< HEAD
 	    msgs.put("del", messageSource.getMessage("message.board.del", null, locale));	    
+=======
+	    
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 	    
 	    return msgs;
 	}
@@ -110,7 +123,11 @@ public class BoardController {
     public MessageDTO saveImageByUrl(@RequestBody Map<String, String> param) {
         String imageUrl = param.get("imageUrl");
         String publicUrl = "";
+<<<<<<< HEAD
         final long MAX_SIZE = 50L * 1024 * 1024; // 50MB 제한
+=======
+        
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
        
         try {
             if (imageUrl.startsWith("data:image")) {
@@ -122,6 +139,7 @@ public class BoardController {
                 if (ext.equals("jpeg")) ext = "jpg";
 
                 String saveName = UUID.randomUUID().toString() + "." + ext;
+<<<<<<< HEAD
                 //파일 없으면 생성
                 File uploadDir = new File("C:/image/summernote/");
         	    if (!uploadDir.exists()) uploadDir.mkdirs();
@@ -133,11 +151,23 @@ public class BoardController {
                 }
                 
                 File file = new File(uploadDir, saveName);
+=======
+                File uploadDir = new File("C:/images/summernote/");
+                if (!uploadDir.exists()) uploadDir.mkdirs();
+
+                File file = new File(uploadDir, saveName);
+                byte[] imageBytes = Base64.getDecoder().decode(base64Data);
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
                 try (OutputStream os = new FileOutputStream(file)) {
                     os.write(imageBytes);
                 }
 
+<<<<<<< HEAD
                 publicUrl = "/ehr/resources/image/summernote/" + saveName; // ResourceHandler 매핑 기준 URL
+=======
+
+                publicUrl = "/ehr/summernote/" + saveName; // ResourceHandler 매핑 기준 URL
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
             } else {
                 publicUrl = imageUrl;
             }
@@ -152,6 +182,7 @@ public class BoardController {
     @PostMapping("/uploadSummernoteImageFile")
 	@ResponseBody
 	public Map<String, Object> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
+<<<<<<< HEAD
     	long maxSize = 50L * 1024 * 1024; // 50MB
     	Map<String, Object> result = new HashMap<>();
     	
@@ -185,6 +216,26 @@ public class BoardController {
     		result.put("success", false);
             result.put("message", "업로드 실패: " + e.getMessage());
     	}
+=======
+	    String originalFilename = file.getOriginalFilename();
+	    String ext = PcwkString.getExt(originalFilename);
+	    if (ext == null) ext = "";
+	    if (!ext.startsWith(".")) ext = "." + ext;
+
+	    String saveName = UUID.randomUUID().toString() + ext;
+
+	    File uploadDir = new File("C:/images/summernote/");
+	    if (!uploadDir.exists()) uploadDir.mkdirs();
+
+	    File target = new File(uploadDir, saveName);
+	    file.transferTo(target);
+
+	    // 여기서 contextPath 기반이 아니라 ResourceHandler 기반 경로 리턴
+	    String publicUrl = "/ehr/summernote/" + saveName;
+
+	    Map<String, Object> result = new HashMap<>();
+	    result.put("url", publicUrl);
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 	    return result;
 	}
 	

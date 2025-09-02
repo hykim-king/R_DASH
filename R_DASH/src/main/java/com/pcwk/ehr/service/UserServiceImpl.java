@@ -161,13 +161,21 @@ public class UserServiceImpl implements UserService {
 			UserDTO user = mapper.selectUser(param.getUserNo());
 			if (user.getImage() != null && !user.getImage().equals("defaultProfile.jpg")) {
 
+<<<<<<< HEAD
 				String existingFilePath = "C:/Users/user/R_DASH/R_DASH/src/main/webapp/resources/image/profile/"
+=======
+				String existingFilePath = "/opt/tomcat/apache-tomcat-8.5.99/webapps/ehr/resources/image/profile/"
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 						+ user.getImage();
 				FileUtil.deleteFile(existingFilePath);
 
 			}
 			// 이미지 저장
+<<<<<<< HEAD
 			String uploadDir = "C:/Users/user/R_DASH/R_DASH/src/main/webapp/resources/image/profile";
+=======
+			String uploadDir = "/opt/tomcat/apache-tomcat-8.5.99/webapps/ehr/resources/image/profile";
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 			String savedFilename = FileUtil.saveFileWithUUID(file, uploadDir);
 
 			param.setImage(savedFilename);

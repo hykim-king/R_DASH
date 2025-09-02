@@ -8,6 +8,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+<<<<<<< HEAD
+=======
+import org.springframework.beans.factory.annotation.Value;
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +33,7 @@ import okhttp3.Response;
 public class GptBotService implements BotService {
 
 	private static final Logger log = LogManager.getLogger(GptBotService.class);
+<<<<<<< HEAD
 
 	private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 	private static final String API_URL = "https://api.openai.com/v1/chat/completions";
@@ -49,6 +54,41 @@ public class GptBotService implements BotService {
 
 	private final ChatMapper chatMapper; // 이력 조회용
 	private final ChatService chatService; // 저장용
+=======
+	private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+
+	// ===== application.properties에서 주입 =====
+	@Value("${openai.api-url:https://api.openai.com/v1/chat/completions}")
+	private String apiUrl;
+
+	@Value("${openai.model:gpt-4o}")
+	private String model;
+
+	@Value("${openai.temperature:0.7}")
+	private double temperature;
+
+	@Value("${openai.max-tokens:800}")
+	private int maxTokens;
+
+	// 조직 헤더가 필요한 경우만 사용
+	@Value("${openai.org:}")
+	private String organization;
+
+	// 프로퍼티 → 환경변수 → 시스템 프로퍼티 순으로 키 해석
+	@Value("${openai.api-key:}")
+	private String propApiKey;
+
+	// 컨텍스트/안전장치
+	private static final int HISTORY_LIMIT = 10;
+	private static final int SNIPPET_LIMIT = 2000;
+	private static final int DB_TEXT_LIMIT = 2000;
+
+	private final OkHttpClient http;
+	private final ObjectMapper om = new ObjectMapper();
+
+	private final ChatMapper chatMapper;
+	private final ChatService chatService;
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 
 	public GptBotService(ChatMapper chatMapper, ChatService chatService) {
 		this.chatMapper = chatMapper;
@@ -56,6 +96,7 @@ public class GptBotService implements BotService {
 
 		this.http = new OkHttpClient.Builder().connectTimeout(10, TimeUnit.SECONDS).readTimeout(30, TimeUnit.SECONDS)
 				.writeTimeout(30, TimeUnit.SECONDS).build();
+<<<<<<< HEAD
 
 		String k = System.getenv("OPENAI_API_KEY");
 		if (k == null || k.trim().isEmpty())
@@ -65,6 +106,18 @@ public class GptBotService implements BotService {
 		if (this.apiKey == null || this.apiKey.trim().isEmpty()) {
 			log.warn("OPENAI_API_KEY 미설정. GptBotService는 동작하지 않습니다.");
 		}
+=======
+	}
+
+	/** 키 우선순위: properties → env → system property */
+	private String resolveApiKey() {
+		String k = trimOrNull(propApiKey);
+		if (k == null)
+			k = trimOrNull(System.getenv("OPENAI_API_KEY"));
+		if (k == null)
+			k = trimOrNull(System.getProperty("OPENAI_API_KEY"));
+		return k;
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 	}
 
 	@Override
@@ -72,16 +125,25 @@ public class GptBotService implements BotService {
 		if (question == null || question.trim().isEmpty()) {
 			return "질문이 비어 있습니다. 다시 입력해 주세요.";
 		}
+<<<<<<< HEAD
 		if (apiKey == null || apiKey.trim().isEmpty()) {
 			return "AI 키가 설정되지 않아 답변을 생성할 수 없습니다.";
 		}
 
 		// Java 8: isBlank() 대신 trim().isEmpty()
+=======
+		String apiKey = resolveApiKey();
+		if (apiKey == null || apiKey.isEmpty()) {
+			return "AI 키가 설정되지 않아 답변을 생성할 수 없습니다.";
+		}
+
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 		if (sessionId == null || sessionId.trim().isEmpty()) {
 			sessionId = UUID.randomUUID().toString();
 		}
 
 		try {
+<<<<<<< HEAD
 			// 1) 세션 이력 로드 (오래된 → 최신)
 			List<ChatDTO> ctx = fetchHistory(sessionId, userNo, HISTORY_LIMIT);
 
@@ -97,6 +159,17 @@ public class GptBotService implements BotService {
 				log.debug("대화 저장 완료: logNo={}", row.getLogNo());
 			} catch (Exception e) {
 				log.error("대화 저장 실패", e); // 저장 실패해도 사용자 응답은 반환
+=======
+			List<ChatDTO> ctx = fetchHistory(sessionId, userNo, HISTORY_LIMIT);
+			String answer = callOpenAI(ctx, question, apiKey);
+
+			try {
+				ChatDTO row = new ChatDTO(null, userNo, sessionId, safeDb(question), safeDb(answer), null);
+				chatService.insertChat(row);
+				log.debug("대화 저장 완료: logNo={}", row.getLogNo());
+			} catch (Exception e) {
+				log.error("대화 저장 실패", e);
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 			}
 
 			return answer;
@@ -114,18 +187,26 @@ public class GptBotService implements BotService {
 		}
 	}
 
+<<<<<<< HEAD
 	/** 세션/사용자 기준 최근 N건을 오래된→최신 순으로 반환 */
+=======
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 	private List<ChatDTO> fetchHistory(String sessionId, Integer userNo, int limit) {
 		if (sessionId == null || sessionId.trim().isEmpty())
 			return Collections.emptyList();
 		List<ChatDTO> rows = chatMapper.findRecentBySession(sessionId, userNo, limit);
 		if (rows == null || rows.isEmpty())
 			return Collections.emptyList();
+<<<<<<< HEAD
 		Collections.reverse(rows); // 최신→오래된 으로 온 것을 뒤집어 오래된→최신으로
+=======
+		Collections.reverse(rows);
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 		return rows;
 	}
 
 	/** OpenAI 호출 (429/5xx 재시도 포함) */
+<<<<<<< HEAD
 	private String callOpenAI(List<ChatDTO> history, String question) throws IOException, InterruptedException {
 		String body = buildRequestBody(history, question);
 
@@ -133,6 +214,21 @@ public class GptBotService implements BotService {
 				.addHeader("Content-Type", "application/json").post(RequestBody.create(body, JSON)).build();
 
 		// 지수 백오프(0ms, 600ms, 1500ms)
+=======
+	private String callOpenAI(List<ChatDTO> history, String question, String apiKey)
+			throws IOException, InterruptedException {
+
+		String body = buildRequestBody(history, question);
+
+		Request.Builder rb = new Request.Builder().url(apiUrl).addHeader("Authorization", "Bearer " + apiKey)
+				.addHeader("Content-Type", "application/json");
+		if (organization != null && !organization.isEmpty()) {
+			rb.addHeader("OpenAI-Organization", organization);
+		}
+
+		Request req = rb.post(RequestBody.create(body, JSON)).build();
+
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 		int[] waits = { 0, 600, 1500 };
 		IOException last = null;
 
@@ -151,12 +247,19 @@ public class GptBotService implements BotService {
 				String err = resp.body() != null ? resp.body().string() : "";
 				log.warn("OpenAI HTTP {}: {}", code, err);
 
+<<<<<<< HEAD
 				// 429/5xx만 재시도
+=======
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 				if (!(code == 429 || code >= 500)) {
 					return mapHttpError(code);
 				}
 			} catch (IOException e) {
+<<<<<<< HEAD
 				last = e; // 네트워크 예외 → 재시도
+=======
+				last = e;
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 			} finally {
 				if (resp != null)
 					resp.close();
@@ -167,6 +270,7 @@ public class GptBotService implements BotService {
 		return "유효한 AI 응답을 받지 못했습니다.";
 	}
 
+<<<<<<< HEAD
 	/** 요청 바디 JSON 문자열 구성(ObjectMapper 사용) */
 	private String buildRequestBody(List<ChatDTO> history, String currentQuestion) {
 		ObjectNode root = om.createObjectNode();
@@ -177,11 +281,23 @@ public class GptBotService implements BotService {
 		ArrayNode messages = om.createArrayNode();
 
 		// system 프롬프트
+=======
+	/** 요청 바디 JSON */
+	private String buildRequestBody(List<ChatDTO> history, String currentQuestion) {
+		ObjectNode root = om.createObjectNode();
+		root.put("model", model);
+		root.put("temperature", temperature);
+		root.put("max_tokens", maxTokens);
+
+		ArrayNode messages = om.createArrayNode();
+
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 		messages.add(msg("system",
 				"You are a helpful assistant for a Korean disaster information site '재민이'. "
 						+ "Answer in Korean by default, concise but accurate. "
 						+ "If unsure, say you are unsure. Be safe and non-alarming."));
 
+<<<<<<< HEAD
 		// 과거 이력 user → assistant 페어
 		for (ChatDTO row : history) {
 			if (row.getQuestion() != null && !row.getQuestion().trim().isEmpty()) {
@@ -195,6 +311,22 @@ public class GptBotService implements BotService {
 		// 현재 질문
 		messages.add(msg("user", safeSnippet(currentQuestion)));
 
+=======
+		if (history != null) {
+			for (ChatDTO row : history) {
+				if (row == null)
+					continue;
+				if (row.getQuestion() != null && !row.getQuestion().trim().isEmpty()) {
+					messages.add(msg("user", safeSnippet(row.getQuestion())));
+				}
+				if (row.getAnswer() != null && !row.getAnswer().trim().isEmpty()) {
+					messages.add(msg("assistant", safeSnippet(row.getAnswer())));
+				}
+			}
+		}
+
+		messages.add(msg("user", safeSnippet(currentQuestion)));
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 		root.set("messages", messages);
 		return root.toString();
 	}
@@ -206,7 +338,10 @@ public class GptBotService implements BotService {
 		return n;
 	}
 
+<<<<<<< HEAD
 	/** OpenAI 응답에서 첫 메시지 content 추출 */
+=======
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 	private String extractAnswer(String json) throws IOException {
 		JsonNode root = om.readTree(json);
 		JsonNode choices = root.path("choices");
@@ -228,7 +363,10 @@ public class GptBotService implements BotService {
 		return "AI 호출 실패(" + code + ")";
 	}
 
+<<<<<<< HEAD
 	/** 이력/프롬프트용 안전 스니펫 */
+=======
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 	private String safeSnippet(String s) {
 		if (s == null)
 			return null;
@@ -236,10 +374,23 @@ public class GptBotService implements BotService {
 		return (t.length() > SNIPPET_LIMIT) ? (t.substring(0, SNIPPET_LIMIT) + "...") : t;
 	}
 
+<<<<<<< HEAD
 	/** DB 저장용 안전 컷(NVARCHAR2 2000) */
+=======
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 	private String safeDb(String s) {
 		if (s == null)
 			return null;
 		return (s.length() > DB_TEXT_LIMIT) ? s.substring(0, DB_TEXT_LIMIT) : s;
 	}
+<<<<<<< HEAD
+=======
+
+	private static String trimOrNull(String s) {
+		if (s == null)
+			return null;
+		String t = s.trim();
+		return t.isEmpty() ? null : t;
+	}
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 }

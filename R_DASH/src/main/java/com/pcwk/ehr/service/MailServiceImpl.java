@@ -2,13 +2,19 @@ package com.pcwk.ehr.service;
 
 import java.security.SecureRandom;
 import java.time.Duration;
+<<<<<<< HEAD
 import java.util.UUID;
+=======
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+<<<<<<< HEAD
 import org.springframework.security.crypto.password.PasswordEncoder;
+=======
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 import org.springframework.stereotype.Service;
 
 import com.pcwk.ehr.domain.UserDTO;

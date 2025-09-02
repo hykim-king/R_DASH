@@ -4,7 +4,6 @@ import schedule
 import time
 
 
-
 # 명사 추출 객체 생성
 kiwi = Kiwi()
 
@@ -51,11 +50,10 @@ def main():
     print(df)
 
 
-
-
 if __name__ == '__main__':
     schedule.every(10).seconds.do(main)
 
     while True:
         schedule.run_pending()  # 예약된 작업 실행
         time.sleep(1)  # CPU 사용량 절약
+

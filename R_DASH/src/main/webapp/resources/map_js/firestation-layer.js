@@ -79,6 +79,10 @@
     var markers = [];
     var clusterer = null;
     var openedOverlay = null; // 현재 열린 CustomOverlay 1개 유지
+<<<<<<< HEAD
+=======
+    var lastRowsOnMap = [];
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 
     // HUD refs
     var hudEl = null, listEl = null, inputEl = null;
@@ -126,7 +130,16 @@
         btn.addEventListener('click', function(e){
           e.preventDefault(); e.stopPropagation();
           if (!hudEl) ensureHUD();
+<<<<<<< HEAD
           hudEl.style.display = (hudEl.style.display === 'block') ? 'none' : 'block';
+=======
+          var opening = (hudEl.style.display !== 'block');
+ hudEl.style.display = opening ? 'block' : 'none';
+ if (opening) {
+   // HUD가 막 열렸다면 전체 목록을 즉시(또는 BBOX 후 자동) 채움
+   populateAllOnOpen();
+ }
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
         });
       }
     })();
@@ -205,6 +218,7 @@
       inputEl.addEventListener('input', function(){
         var q = inputEl.value.trim();
         if (debTimer) clearTimeout(debTimer);
+<<<<<<< HEAD
         debTimer = setTimeout(function(){
           if (!q) { listEl.innerHTML = ''; return; }
           var url = API.search + '?q=' + encodeURIComponent(q) + '&limit=200&offset=0' +
@@ -213,6 +227,30 @@
             .then(function(res){
               var rows = Array.isArray(res) ? res : (res && res.rows) ? res.rows : [];
               renderList(rows);
+=======
+       if (!q) {
+     // ✅ 검색어가 비었고, "전체" 칩이 활성화라면 전체 목록 그대로
+     var allActive = document.querySelector('#fsHud .fs-chips .chip-btn.is-active[data-region=""]');
+     if (allActive) {
+       var rows = (lastRowsOnMap || []).slice().sort(function(a,b){
+         return String(a.stationNm||'').localeCompare(String(b.stationNm||''), 'ko');
+       });
+       renderList(rows, { numbered: true });
+       return;
+     }
+     listEl.innerHTML = '';
+     return;
+   }
+        
+        debTimer = setTimeout(function(){
+          if (!q) { listEl.innerHTML = ''; return; }
+          var url = API.search + '?q=' + encodeURIComponent(q) + '&limit=200&offset=0' +
+                    '&fireTp=ALL';
+          fetchJSON(url)
+            .then(function(res){
+              var rows = Array.isArray(res) ? res : (res && res.rows) ? res.rows : [];
+              renderList(rows, { numbered: true });
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
             })
             .catch(function(e){ console.error('[firestation] search error', e); });
         }, 220);
@@ -228,6 +266,7 @@
         t.classList.add('is-active'); t.style.background='#111827'; t.style.color='#fff'; t.style.borderColor='#111827';
 
         var region = t.getAttribute('data-region') || '';
+<<<<<<< HEAD
         inputEl.value = region;
 
         if (!region){
@@ -235,6 +274,22 @@
           requestBBox();
           return;
         }
+=======
+        
+
+        if (!region){
+     // ✅ "전체" → 방금까지 지도에서 불러온 전체(BBOX) 결과를
+     // 바로 번호 매겨서 표시하고, 백그라운드로 최신화
+     var rows = (lastRowsOnMap || []).slice();
+     // (선호 시) 정렬: 이름순
+     rows.sort(function(a,b){
+       return String(a.stationNm||'').localeCompare(String(b.stationNm||''), 'ko');
+     });
+     renderList(rows, { numbered: true });
+     requestBBox();
+     return;
+   }
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 
         var url = API.search + '?q=' + encodeURIComponent(region) + '&limit=300&offset=0' +
                   '&fireTp=' + encodeURIComponent(CURRENT_FIRE_TP);
@@ -253,6 +308,7 @@
       });
     }
 
+<<<<<<< HEAD
     function renderList(rows){
       var html = (rows||[]).map(function(r, idx){
         return (
@@ -262,6 +318,28 @@
           '</div>'
         );
       }).join('');
+=======
+
+ function renderList(rows, opts){
+   opts = opts || {};
+   var numbered = (opts.numbered !== false); 
+    
+    var html = (rows||[]).map(function(r, idx){
+     var num = idx + 1;
+    var badge = numbered ? badgeHTML(num, r) : '';
+     return (
+       '<div class="fs-item" data-idx="'+ idx +'" style="padding:9px 10px;border-bottom:1px solid #f1f1f1;cursor:pointer;display:flex;gap:10px;align-items:flex-start;">' +
+         badge +
+         '<div style="min-width:0;">' +
+           '<div class="fs-item-title" style="font-weight:800;font-size:13px;letter-spacing:-.2px;">'+ escapeHtml(r.stationNm || '') +'</div>' +
+           '<div class="fs-item-sub" style="font-size:12px;color:#667085;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+
+              escapeHtml(r.area || '') + (r.fireTp ? ' · ' + escapeHtml(r.fireTp) : '') +
+           '</div>' +
+         '</div>' +
+       '</div>'
+     );
+   }).join('');
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
       listEl.innerHTML = html || '<div class="fs-empty" style="padding:18px;color:#94a3b8;text-align:center;">검색 결과가 없습니다.</div>';
 
       var items = listEl.querySelectorAll('.fs-item');
@@ -312,6 +390,43 @@
     }
 
     // ===== 유틸 =====
+<<<<<<< HEAD
+=======
+    function typeOfRow(dto){
+  // draw()에서 __normTp가 붙은 경우 우선 사용, 없으면 규칙으로 판정
+  return (dto && dto.__normTp) ? dto.__normTp : normalizeFireTp(dto);
+}
+function badgeHTML(num, dto){
+  var tp = typeOfRow(dto);
+  var bg  = (tp === 'MAIN')   ? '#ef4444' : (tp === 'SAFETY') ? '#f59e0b' : '#6b7280'; // 빨강 / 주황 / 회색
+  var ring= (tp === 'MAIN')   ? '#b91c1c' : (tp === 'SAFETY') ? '#b45309' : '#374151';
+  return '<div style="width:22px;height:22px;border-radius:50%;'
+       + 'background:'+bg+';border:2px solid '+ring+';color:#fff;'
+       + 'display:flex;align-items:center;justify-content:center;'
+       + 'font:800 12px/1 system-ui;flex:0 0 22px;">'+ num +'</div>';
+}
+    
+    
+    function populateAllOnOpen(){
+  // 검색어가 비어 있고 "전체" 칩이 활성화인 경우에만 동작
+  if (!inputEl || inputEl.value.trim()) return;
+  var allActive = document.querySelector('#fsHud .fs-chips .chip-btn.is-active[data-region=""]');
+  if (!allActive) return;
+
+  if (lastRowsOnMap && lastRowsOnMap.length){
+    var rows = lastRowsOnMap.slice().sort(function(a,b){
+      return String(a.stationNm||'').localeCompare(String(b.stationNm||''), 'ko');
+    });
+    renderList(rows, { numbered: true });
+  } else {
+    // 아직 캐시가 없으면 로딩 표시 후 BBOX 요청
+    if (listEl) listEl.innerHTML = '<div style="padding:18px;color:#94a3b8;text-align:center;">불러오는 중…</div>';
+    requestBBox(); // then()에서 자동으로 목록 채움
+  }
+}
+    
+    
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
     function normalizeFireTp(dto){
       var raw = (dto && (dto.fireTp || dto.type || dto.stationNm || '')) + '';
       var s = raw.replace(/\s+/g, '').toUpperCase();
@@ -423,7 +538,10 @@
       for (var i=0;i<markers.length;i++){ markers[i].setMap(null); }
       if (clusterer) clusterer.clear();
       markers.length = 0;
+<<<<<<< HEAD
       if (openedOverlay) { openedOverlay.setMap(null); openedOverlay = null; }
+=======
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
     }
     function pickImageByType(tp){
       tp = (tp||'').toUpperCase();
@@ -457,6 +575,7 @@
         marker.__dto = d;
 
         (function(mk){
+<<<<<<< HEAD
           kakao.maps.event.addListener(mk, 'click', function(){
             // panTo 직후 발생하는 첫 idle은 건너뛰기
             skipNextIdleFetch = true;
@@ -465,6 +584,17 @@
           });
         })(marker);
 
+=======
+            kakao.maps.event.addListener(mk, 'click', function(){
+            // ✅ panTo로 인해 곧바로 idle가 발생하며 재조회가 트리거되는데,
+            // 그 1회만 건너뛰도록 플래그 설정
+            skipNextIdleFetch = true;
+
+         openOverlayForMarker(mk, mk.__dto);
+         map.panTo(mk.getPosition());
+        });
+      })(marker);
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
         newMarkers.push(marker);
       }
 
@@ -478,7 +608,14 @@
     // ===== 지도 이벤트 =====
     function onMapIdle(){
       if (!active) return;
+<<<<<<< HEAD
       if (skipNextIdleFetch) { skipNextIdleFetch = false; return; }
+=======
+        if (skipNextIdleFetch) {
+    skipNextIdleFetch = false;
+    return;
+  }
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
       if (idleTimer) clearTimeout(idleTimer);
       idleTimer = setTimeout(requestBBox, 160);
     }
@@ -497,6 +634,7 @@
 
       lastFetchKey = key; inFlight = true;
 
+<<<<<<< HEAD
       var label = (CURRENT_FIRE_TP==='MAIN') ? '소방서'
                 : (CURRENT_FIRE_TP==='SAFETY') ? '119안전센터' : '';
 
@@ -505,15 +643,46 @@
         '&minLon=' + b.minLon + '&maxLon=' + b.maxLon +
         '&limit=' + 5000 +
         '&fireTp=' + encodeURIComponent(CURRENT_FIRE_TP) +
+=======
+      var label = '';
+      var url = API.bbox +
+
+        '?minLat=' + b.minLat + '&maxLat=' + b.maxLat +
+        '&minLon=' + b.minLon + '&maxLon=' + b.maxLon +
+        '&limit=' + 5000 +
+        '&fireTp=ALL' +
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
         '&fireTpLabel=' + encodeURIComponent(label);
 
       console.log('[firestation] bbox fetch start', { tp: CURRENT_FIRE_TP, bbox: b });
       fetchJSON(url)
         .then(function(rows){
+<<<<<<< HEAD
           console.log('[firestation] bbox rows:', Array.isArray(rows) ? rows.length : rows);
           draw(rows || []);
           lastDrawKey = key;
         })
+=======
+          rows = rows || [];
+           console.log('[firestation] bbox rows:', Array.isArray(rows) ? rows.length : rows);
+           // ✅ 최신 지도 결과 캐시
+           lastRowsOnMap = Array.isArray(rows) ? rows : [];
+           // 마커 렌더
+           draw(lastRowsOnMap);
+          lastDrawKey = key;
+  try {
+     var allActive = document.querySelector('#fsHud .fs-chips .chip-btn.is-active[data-region=""]');
+     var hasQuery  = (inputEl && inputEl.value.trim().length > 0);
+     if (allActive && !hasQuery) {
+        var listRows = lastRowsOnMap.slice().sort(function(a,b){
+           return String(a.stationNm||'').localeCompare(String(b.stationNm||''), 'ko');
+         });
+     
+        renderList(listRows, { numbered: true });
+     }
+   } catch (_) {}
+})
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
         .catch(function(e){ console.error('[firestation] bbox error', e); })
         .finally(function(){ inFlight = false; });
     }
@@ -569,4 +738,8 @@
       console.log('[firestation] refresh');
     }
   }
+<<<<<<< HEAD
 })(window);
+=======
+})(window);
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e

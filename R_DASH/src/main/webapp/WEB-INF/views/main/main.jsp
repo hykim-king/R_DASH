@@ -1014,6 +1014,7 @@ to {opacity: 1;	transform: translate3d(0, 0, 0) scale(1);}
                         <div class="accordion-body">저희 사이트에서는 '뉴스'정보를 제공하고 있습니다.</div>
                     </div>
                 </div>
+<<<<<<< HEAD
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingTwo">
                         <button class="accordion-button collapsed" type="button"
@@ -1024,6 +1025,9 @@ to {opacity: 1;	transform: translate3d(0, 0, 0) scale(1);}
                         <div class="accordion-body">공지사항 들어가기!</div>
                     </div>
                 </div>
+=======
+                
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
 			</div>
 		</div>
 	</div>
@@ -1372,7 +1376,11 @@ to {opacity: 1;	transform: translate3d(0, 0, 0) scale(1);}
     if(chatBody.querySelector('.jm-greeting')) return;
     var d=document.createElement('div');
     d.className='chat-bubble bot jm-greeting';
+<<<<<<< HEAD
     d.innerHTML='안녕하세요! 재난 알림 도우미 <b>재민이</b>입니다. 저는 재난 및 안전 정보를 제공할 수 있습니다. 기상 정보, 지진, 화재, 태풍 등 자연재해와 관련된 정보를 알려드릴 수 있으며, 안전 수칙이나 대처 방법도 안내해 드릴 수 있습니다. 궁금한 점이 있으면 말씀해 주세요.'
+=======
+    d.innerHTML='안녕하세요! 재난 알림 도우미 <b>재민이</b>입니다.</br> 저는 재난 및 안전 정보를 제공할 수 있습니다. 기상 정보, 지진, 화재, 태풍 등 자연재해와 관련된 정보를 알려드릴 수 있으며, 안전 수칙이나 대처 방법도 안내해 드릴 수 있습니다. 궁금한 점이 있으면 말씀해 주세요.'
+>>>>>>> a76d822e155237841302239ac2dbc91ab4e3722e
                 +'<span class="chat-time">'+nowText()+'</span>';
     chatBody.appendChild(d);
     chatBody.scrollTop=chatBody.scrollHeight;
