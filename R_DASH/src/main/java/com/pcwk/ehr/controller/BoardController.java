@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -58,8 +59,10 @@ public class BoardController {
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
 	
-	private static final String IMAGE_UPLOAD_PATH = "C:/images/summernote/";
+	private static final String IMAGE_UPLOAD_PATH = "C:/image/summernote/";
 	
+	
+	//private static final String IMAGE_UPLOAD_PATH = "C:/Users/user/R_DASH/R_DASH/src/main/webapp/resources/image/summernote/";	
 	
 	public BoardController() {
 		log.debug("┌───────────────────────────┐");
@@ -119,8 +122,9 @@ public class BoardController {
                 if (ext.equals("jpeg")) ext = "jpg";
 
                 String saveName = UUID.randomUUID().toString() + "." + ext;
-                File uploadDir = new File("C:/images/summernote/");
-                if (!uploadDir.exists()) uploadDir.mkdirs();
+                //파일 없으면 생성
+                File uploadDir = new File("C:/image/summernote/");
+        	    if (!uploadDir.exists()) uploadDir.mkdirs();
                 
                 byte[] imageBytes = Base64.getDecoder().decode(base64Data);
                 // 용량 체크
@@ -133,8 +137,7 @@ public class BoardController {
                     os.write(imageBytes);
                 }
 
-
-                publicUrl = "/ehr/summernote/" + saveName; // ResourceHandler 매핑 기준 URL
+                publicUrl = "/ehr/resources/image/summernote/" + saveName; // ResourceHandler 매핑 기준 URL
             } else {
                 publicUrl = imageUrl;
             }
@@ -166,14 +169,14 @@ public class BoardController {
 	
 		    String saveName = UUID.randomUUID().toString() + ext;
 	
-		    File uploadDir = new File("C:/images/summernote/");
+		    File uploadDir = new File("C:/image/summernote/");
 		    if (!uploadDir.exists()) uploadDir.mkdirs();
 	
 		    File target = new File(uploadDir, saveName);
 		    file.transferTo(target);
 	
 		    // 여기서 contextPath 기반이 아니라 ResourceHandler 기반 경로 리턴
-		    String publicUrl = "/ehr/summernote/" + saveName;
+		    String publicUrl = "/ehr/resources/image/summernote/" + saveName;
 		    
 		    result.put("success", true);
 	        result.put("url", publicUrl);

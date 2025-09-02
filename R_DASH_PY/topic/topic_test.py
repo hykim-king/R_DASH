@@ -10,12 +10,14 @@ import asyncio
 from topic_dao import TopicDao
 from topic_insert import save_topic_to_db
 from topic_insert import save_word_to_db
+import schedule
+import time
 
 import topicWordCloud
 
 def main():
     # 1) 크롤링: 뉴스 데이터 가져오기
-    c = crawler(query='재난', max_link=100)  # 인스턴스 생성하면서 인자 전달
+    c = crawler(query='재난', max_link=50)  # 인스턴스 생성하면서 인자 전달
     df = asyncio.run(c.naver_crawler())  # 인스턴스 메서드 호출
 
     # 2) 명사 추출: df에 'nouns' 컬럼 추가
@@ -69,5 +71,10 @@ def main():
     #topicWordCloud.make_wordcloud(df)
 
 if __name__ == '__main__':
-    main()
+
+    schedule.every().day.at('11:47').do(main)
+
+    while True:
+        schedule.run_pending()  # 예약된 작업 실행
+        time.sleep(1)  # CPU 사용량 절약
 

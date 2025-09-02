@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 import os
 from news_insert import save_news_to_db
 from news_insert import update_news_to_db
+import schedule
+import time
 
 load_dotenv()
 client_id = os.getenv('CLIENT_ID')
@@ -190,5 +192,10 @@ def main():
         )
 
 if __name__ == "__main__":
-    main()
+    schedule.every().day.at('11:47').do(main)
+    schedule.every().day.at('18:47').do(main)
+
+    while True:
+        schedule.run_pending()  # 예약된 작업 실행
+        time.sleep(1)  # CPU 사용량 절약
 

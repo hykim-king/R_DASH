@@ -1,6 +1,7 @@
 import pandas as pd
 from kiwipiepy import Kiwi
-
+import schedule
+import time
 
 
 
@@ -51,5 +52,10 @@ def main():
 
 
 
+
 if __name__ == '__main__':
-    main()
+    schedule.every(10).seconds.do(main)
+
+    while True:
+        schedule.run_pending()  # 예약된 작업 실행
+        time.sleep(1)  # CPU 사용량 절약
