@@ -3,7 +3,7 @@
 <%@ page import="java.util.Date"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <c:set var="CP" value="${pageContext.request.contextPath}" />
 <c:set var="now" value="<%=new java.util.Date()%>" />
@@ -20,7 +20,36 @@
 	type="image/x-icon" />
 <link rel="stylesheet"
 	href="${CP}/resources/template/Animate/backInUp.css" />
+<c:set var="rawImg" value="${sessionScope.loginUser != null ? sessionScope.loginUser.image : ''}" />
+<c:choose>
+  <%-- 절대 URL --%>
+  <c:when test="${not empty rawImg and (fn:startsWith(rawImg,'http://') or fn:startsWith(rawImg,'https://'))}">
+    <c:set var="avatarUrl" value="${rawImg}" />
+  </c:when>
 
+  <%-- 루트(/)로 시작하면 컨텍스트패스만 붙여줌 --%>
+  <c:when test="${not empty rawImg and fn:startsWith(rawImg,'/')}">
+    <c:set var="avatarUrl" value="${CP}${rawImg}" />
+  </c:when>
+
+  <%-- 파일명만 있는 경우 정적 폴더 --%>
+  <c:when test="${not empty rawImg}">
+    <c:set var="avatarUrl" value="${CP}/resources/image/profile/${rawImg}" />
+  </c:when>
+
+  <%-- 비로그인/이미지 없음: (원하면 비우기) --%>
+  <c:otherwise>
+    <%-- ① 손님도 기본이미지 보이게 하려면 ↓ --%>
+    <c:set var="avatarUrl" value="${CP}/resources/image/profile/defaultProfile.jpg" />
+    <%-- ② 손님은 아예 아바타 없이 하려면 ↓ (위 줄 대신 이 줄 사용)
+    <c:set var="avatarUrl" value="" />
+    --%>
+  </c:otherwise>
+</c:choose>
+
+<script>
+  window.USER_AVATAR_URL = '<c:out value="${avatarUrl}" />';
+</script>
 <style>
 /* =========================
    Base (공통)
@@ -50,249 +79,256 @@ html, body {
 ========================================================= */
 
 /* 공통 변수 */
-:root {
-  --topbar-h: 64px;
-  --z-header: 2000;
-  --z-sidebar: 99999;
+:root { 
+    --topbar-h: 64px;
+	--z-header: 2000;
+	--z-sidebar: 99999;
 }
 
 /* =========================
    Header (홈에서 투명)
 ========================= */
 body.home-page header {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: var(--topbar-h);
-  background: transparent !important;
-  box-shadow: none !important;
-  z-index: var(--z-header) !important;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: var(- -topbar-h);
+	background: transparent !important;
+	box-shadow: none !important;
+	z-index: var(- -z-header) !important;
 }
+
 body.home-page header.scrolled {
-  background: rgba(0,0,0,.35) !important;
-  backdrop-filter: blur(4px);
-  box-shadow: 0 2px 10px rgba(0,0,0,.2);
+	background: rgba(0, 0, 0, .35) !important;
+	backdrop-filter: blur(4px);
+	box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
 }
 
 /* Argon 상단바 투명 고정 */
-body.home-page .navbar.navbar-top.bg-warning,
-body.home-page .navbar.navbar-horizontal.bg-warning {
-  background: transparent !important;
-  box-shadow: none !important;
-  border-bottom: 0 !important;
+body.home-page .navbar.navbar-top.bg-warning, body.home-page .navbar.navbar-horizontal.bg-warning
+	{
+	background: transparent !important;
+	box-shadow: none !important;
+	border-bottom: 0 !important;
 }
-body.home-page .navbar.navbar-top,
-body.home-page .navbar.navbar-horizontal {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: var(--topbar-h);
-  z-index: var(--z-header) !important; /* 사이드바보다 낮음 */
+
+body.home-page .navbar.navbar-top, body.home-page .navbar.navbar-horizontal
+	{
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: var(- -topbar-h);
+	z-index: var(- -z-header) !important; /* 사이드바보다 낮음 */
 }
 
 /* 헤더 글자 흰색 */
-body.home-page .navbar .navbar-nav .nav-link,
-body.home-page .navbar .media-body span {
-  color: #fff !important;
+body.home-page .navbar .navbar-nav .nav-link, body.home-page .navbar .media-body span
+	{
+	color: #fff !important;
 }
 
 /* 토글은 항상 클릭 가능 */
-body.home-page .sidenav-toggler,
-body.home-page .sidenav-toggler * {
-  pointer-events: auto !important;
+body.home-page .sidenav-toggler, body.home-page .sidenav-toggler * {
+	pointer-events: auto !important;
 }
 
 /* =========================
    Sidebar (항상 최상단 + 가독성 복구)
 ========================= */
 body.home-page #sidenav-main {
-  position: fixed !important;
-  top: 0; bottom: 0; left: 0;
-  z-index: var(--z-sidebar) !important;     /* 무엇보다 위 */
-  pointer-events: auto !important;
-  will-change: transform;                   /* 토글 성능 */
-  background: #fff !important;              /* Argon 기본 */
-  color: #344767 !important;                /* Argon 기본 텍스트 */
+	position: fixed !important;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	z-index: var(- -z-sidebar) !important; /* 무엇보다 위 */
+	pointer-events: auto !important;
+	will-change: transform; /* 토글 성능 */
+	background: #fff !important; /* Argon 기본 */
+	color: #344767 !important; /* Argon 기본 텍스트 */
 }
 
 /* 사이드바 내부 텍스트/링크 기본색 복구 */
-body.home-page #sidenav-main .navbar-brand,
-body.home-page #sidenav-main .nav-link,
-body.home-page #sidenav-main .nav-link .nav-link-text,
-body.home-page #sidenav-main .sidenav-normal,
-body.home-page #sidenav-main .sidenav-mini-icon,
-body.home-page #sidenav-main .dropdown-item,
-body.home-page #sidenav-main .form-control,
-body.home-page #sidenav-main select {
-  color: #344767 !important;
+body.home-page #sidenav-main .navbar-brand, body.home-page #sidenav-main .nav-link,
+	body.home-page #sidenav-main .nav-link .nav-link-text, body.home-page #sidenav-main .sidenav-normal,
+	body.home-page #sidenav-main .sidenav-mini-icon, body.home-page #sidenav-main .dropdown-item,
+	body.home-page #sidenav-main .form-control, body.home-page #sidenav-main select
+	{
+	color: #344767 !important;
 }
 
 /* 아이콘은 원래 색 유지(Primary 등) / 필요 시 톤 다운 */
 body.home-page #sidenav-main .nav-link i {
-  opacity: .9;
+	opacity: .9;
 }
 
 /* hover/active 상태 가독성 */
 body.home-page #sidenav-main .nav-link:hover {
-  background: #f6f9fc !important;
-  color: #111827 !important;
+	background: #f6f9fc !important;
+	color: #111827 !important;
 }
-body.home-page #sidenav-main .nav-link.active,
-body.home-page #sidenav-main .nav-link[aria-expanded="true"] {
-  background: #eef3ff !important;
-  color: #111827 !important;
+
+body.home-page #sidenav-main .nav-link.active, body.home-page #sidenav-main .nav-link[aria-expanded="true"]
+	{
+	background: #eef3ff !important;
+	color: #111827 !important;
 }
 
 /* collapse 안쪽 링크도 동일 팔레트 */
 body.home-page #sidenav-main .nav .nav-link {
-  color: #344767 !important;
+	color: #344767 !important;
 }
 
 /* 언어 셀렉트 드롭다운 가독성 */
-body.home-page #sidenav-main .form-control,
-body.home-page #sidenav-main select {
-  background: #fff;
-  border: 1px solid #e9ecef;
+body.home-page #sidenav-main .form-control, body.home-page #sidenav-main select
+	{
+	background: #fff;
+	border: 1px solid #e9ecef;
 }
 
 /* 사이드바 내부는 모두 클릭 가능 */
 body.home-page #sidenav-main * {
-  pointer-events: auto !important;
+	pointer-events: auto !important;
 }
 
 /* =========================
    메인 영역/패널
 ========================= */
-body.home-page .main-content,
-body.home-page #panel {
-  position: relative;
-  z-index: 0 !important; /* 사이드바 뒤 */
+body.home-page .main-content, body.home-page #panel {
+	position: relative;
+	z-index: 0 !important; /* 사이드바 뒤 */
 }
 
 /* =========================
    오버레이/백드롭 무력화
 ========================= */
-body.home-page .modal-backdrop,
-body.home-page .sidenav-backdrop,
-body.home-page .sidenav-mask,
-body.home-page .backdrop,
-body.home-page .mask,
-body.home-page .page-overlay {
-  pointer-events: none !important;
-  background: transparent !important;
-  z-index: -1 !important;
+body.home-page .modal-backdrop, body.home-page .sidenav-backdrop, body.home-page .sidenav-mask,
+	body.home-page .backdrop, body.home-page .mask, body.home-page .page-overlay
+	{
+	pointer-events: none !important;
+	background: transparent !important;
+	z-index: -1 !important;
 }
 
 /* =========================
    배경(히어로/비디오) 클릭 차단
 ========================= */
-body.home-page .main-section,
-body.home-page #bg-video,
-body.home-page .main-section > video,
-body.home-page .main-section::before {
-  pointer-events: none !important; /* 배경은 클릭 금지 */
-  z-index: 0 !important;
+body.home-page .main-section, body.home-page #bg-video, body.home-page .main-section>video,
+	body.home-page .main-section::before {
+	pointer-events: none !important; /* 배경은 클릭 금지 */
+	z-index: 0 !important;
 }
 
 /* 히어로/상단바/플로팅 버튼만 다시 클릭 허용 */
-body.home-page .hero-text,
-body.home-page .navbar,
-body.home-page .floating-icon {
-  pointer-events: auto !important;
+body.home-page .hero-text, body.home-page .navbar, body.home-page .floating-icon
+	{
+	pointer-events: auto !important;
 }
-
 
 /* =========================
    Hero(비디오 영역)
 ========================= */
 .main-section {
-  height: 100vh;
-  width: 100%;
-  margin: 0 !important;
-  padding: 0 !important;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  overflow: hidden;
-  z-index: 0 !important;
-  pointer-events: none;
+	height: 100vh;
+	width: 100%;
+	margin: 0 !important;
+	padding: 0 !important;
+	position: relative;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	overflow: hidden;
+	z-index: 0 !important;
+	pointer-events: none;
 }
-.main-section.main-background { background: none; }
+
+.main-section.main-background {
+	background: none;
+}
 
 /* 4) 비디오/오버레이는 기본적으로 클릭 막기(겹침 방지) */
-.main-section,
-#bg-video,
-.main-section > video,
-.main-section::before{
-  pointer-events: none !important;
-  z-index: 0 !important;
+.main-section, #bg-video, .main-section>video, .main-section::before {
+	pointer-events: none !important;
+	z-index: 0 !important;
 }
 
-#bg-video, .main-section > video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: -1;
+#bg-video, .main-section>video {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	z-index: -1;
 }
+
 .main-section::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(0,0,0,.25);
-  z-index: 0;
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, .25);
+	z-index: 0;
 }
 
 /* 히어로 텍스트만 클릭 가능 */
 .hero-text {
-  position: relative;
-  z-index: 1;
-  color: #fff;
-  padding: 0 20px;
-  max-width: 920px;
-  pointer-events: auto;
+	position: relative;
+	z-index: 1;
+	color: #fff;
+	padding: 0 20px;
+	max-width: 920px;
+	pointer-events: auto;
 }
+
 .hero-text h1 {
-  font-size: clamp(2rem, 5vw, 2.8rem);
-  font-weight: 800;
-  margin: 0 0 12px;
-  text-shadow: 2px 2px 8px rgba(0,0,0,.6);
+	font-size: clamp(2rem, 5vw, 2.8rem);
+	font-weight: 800;
+	margin: 0 0 12px;
+	text-shadow: 2px 2px 8px rgba(0, 0, 0, .6);
 }
-.hero-text .white-text { color: #fff; }
-.hero-text .accent { color: #ff4d4d; }
+
+.hero-text .white-text {
+	color: #fff;
+}
+
+.hero-text .accent {
+	color: #ff4d4d;
+}
+
 .hero-text p {
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  line-height: 1.6;
-  margin: 0;
-  text-shadow: 0 2px 8px rgba(0,0,0,.5);
+	font-size: clamp(1rem, 2vw, 1.2rem);
+	line-height: 1.6;
+	margin: 0;
+	text-shadow: 0 2px 8px rgba(0, 0, 0, .5);
 }
 /* 5) 실제로 눌러야 하는 것들은 다시 클릭 가능 */
-.hero-text,
-body.home-page .navbar,
-.floating-icon{
-  pointer-events: auto !important;
+.hero-text, body.home-page .navbar, .floating-icon {
+	pointer-events: auto !important;
 }
+
 .hero-btn {
-  display: inline-block;
-  margin-top: 18px;
-  padding: 12px 28px;
-  border-radius: 28px;
-  background: #ff6b6b;
-  color: #fff;
-  text-decoration: none;
-  font-weight: 600;
-  transition: .25s;
-  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+	display: inline-block;
+	margin-top: 18px;
+	padding: 12px 28px;
+	border-radius: 28px;
+	background: #ff6b6b;
+	color: #fff;
+	text-decoration: none;
+	font-weight: 600;
+	transition: .25s;
+	box-shadow: 0 6px 18px rgba(0, 0, 0, .25);
 }
 
 .hero-btn:hover {
-  background: #ff4757;
-  transform: translateY(-2px);
+	background: #ff4757;
+	transform: translateY(-2px);
 }
 
 /* 히어로 아래 첫 섹션이 가리지 않도록 */
-.after-hero { padding-top: var(--topbar-h); }
+.after-hero {
+	padding-top: var(- -topbar-h);
+}
 
 /* =========================
    News (섹션/카드)
@@ -328,45 +364,49 @@ body.home-page .navbar,
 	color: #6b7280 !important;
 }
 /* === 카드 높이 동일 & 내용 정렬 === */
-.news-section .row > [class*="col-"]{ display:flex; align-items:stretch; }
-
-.news-rotator-wrap {                             /* 래퍼가 가로/세로 모두 꽉 차도록 */
-  display: flex;
-  width: 100%;
-  height: 100%;
-  flex:1 1 auto;
+.news-section .row>[class*="col-"] {
+	display: flex;
+	align-items: stretch;
 }
 
-.news-section .card {                            /* 카드 자체를 세로 플렉스 */
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  flex:1 1 auto;
-  height:auto;                                  /* col 높이 채우기 */
+.news-rotator-wrap { /* 래퍼가 가로/세로 모두 꽉 차도록 */
+	display: flex;
+	width: 100%;
+	height: 100%;
+	flex: 1 1 auto;
 }
 
-.news-section .card-body {                       /* 본문 영역을 아래까지 밀어줌 */
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  min-height: 110px;                             /* 제목+언론사 최소 공간 확보 */
+.news-section .card { /* 카드 자체를 세로 플렉스 */
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	flex: 1 1 auto;
+	height: auto; /* col 높이 채우기 */
+}
+
+.news-section .card-body { /* 본문 영역을 아래까지 밀어줌 */
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	min-height: 110px; /* 제목+언론사 최소 공간 확보 */
 }
 
 /* 제목 2줄까지만 표시(말줄임) → 카드 높이 흔들림 방지 */
 .news-section .card-title .title-link {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
 }
 
 /* 언론사 한 줄 말줄임 */
 .news-section .card-company {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
+
 .news-title {
 	text-align: center;
 	font-size: 1.8rem;
@@ -619,25 +659,43 @@ img.card-img-top {
 	height: 52px;
 }
 
+/* 공통 */
 .chat-bubble {
-	max-width: 86%;
-	margin: 8px 0;
-	padding: 12px 14px;
-	border-radius: 14px;
-	line-height: 1.5;
-	word-break: break-word;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
-	font-size: 1rem;
-	color: #111;
-	position: relative;
+  max-width: 86%;
+  margin: 8px 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  line-height: 1.5;
+  word-break: break-word;
+  box-shadow: 0 1px 2px rgba(0,0,0,.06);
+  font-size: 1rem;
+  color: #111;
+  position: relative;
 }
 
-/* 사용자: 오른쪽 */
-.chat-bubble.user {
-	align-self: flex-end; /* ← 오른쪽 정렬(핵심) */
-	margin-left: auto; /* ← 안전망(있어도 무방) */
-	background: #ffdfe3;
-	color: #222;
+/* 사용자 말풍선(오른쪽) */
+.chat-bubble.user{
+  align-self: flex-end;
+  margin-left: auto;
+  background: #ffdfe3;
+  color: #222;
+  position: relative;         /* ⬅️ 아바타 고정용 */
+}
+
+/* 아바타가 있을 때만 오른쪽 여백 확보 */
+.chat-bubble.user.has-avatar{ padding-right:56px; }
+
+/* 동그라미 오버레이 */
+.chat-bubble.user .ua{
+  position:absolute; right:12px; top:12px;
+  width:28px; height:28px; border-radius:50%;
+  background:#fff;                           /* 바탕 흰색 */
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  box-shadow:0 1px 2px rgba(0,0,0,.08);
+  pointer-events:none;                       /* 클릭 방해 X */
+  display:inline-block;
 }
 
 /* 봇: 왼쪽 */
@@ -649,20 +707,23 @@ img.card-img-top {
 }
 
 /* 봇 아이콘(이미지) */
-.chat-bubble.bot::before{
-  content: "";
-  position: absolute;
-  left: 12px; top: 12px;
-  width: 28px; height: 28px;
-  border-radius: 50%;
-  /* ↓ 이미지 + 배경색을 '레이어'로 한 번에 지정 (이미지, 색 순서) */
-  background: url("${CP}/resources/image/hello_jm.png") center/cover no-repeat, #fff;
-  /* 또는 개별 속성:
+.chat-bubble.bot::before {
+	content: "";
+	position: absolute;
+	left: 12px;
+	top: 12px;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	/* ↓ 이미지 + 배경색을 '레이어'로 한 번에 지정 (이미지, 색 순서) */
+	background: url("${CP}/resources/image/hello_jm.png") center/cover
+		no-repeat, #fff;
+	/* 또는 개별 속성:
      background-image:url("/resources/image/jaemini_bo.jpg");
      background-size:cover; background-position:center; background-repeat:no-repeat;
      background-color:#fff;
   */
-  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .08);
 }
 
 .chat-time {
@@ -876,7 +937,19 @@ img.card-img-top {
 @
 keyframes backInUp {
 from { opacity:0; transform: translate3d(0, 60px, 0) scale(.98);}
-to {opacity: 1;	transform: translate3d(0, 0, 0) scale(1);}
+to {opacity: 1; transform: translate3d(0, 0, 0) scale(1);}
+}
+
+/* 헤더가 메인 비주얼 위에 보이도록 */
+header, .navbar, #navbar-main, .main-header {
+  position: relative;      /* 필요 시 sticky/fixed 사용 가능 */
+  z-index: 2000;           /* 비주얼/오버레이보다 크게 */
+}
+
+/* 메인 비주얼/오버레이 레이어는 아래로 */
+#main-visual, .hero, .video-bg, .video-overlay {
+  position: relative;
+  z-index: 0;
 }
 </style>
 <!-- 서버에서 내려준 JSON을 실행되지 않는 데이터 블록으로 주입 -->
@@ -889,8 +962,7 @@ to {opacity: 1;	transform: translate3d(0, 0, 0) scale(1);}
 	data-login-user-no="${empty loginUserNo ? '' : loginUserNo}">
 	<!-- Hero -->
 	<div class="main-section main-background">
-		<video id="bg-video" autoplay muted loop preload="auto"
-			poster="${CP}/resources/image/mainboard.png">
+		<video id="bg-video" autoplay muted loop preload="auto">
 			<source src="${CP}/resources/video/jaemini.mp4" type="video/mp4" />
 		</video>
 		<!-- 소개 문구 -->
@@ -980,41 +1052,44 @@ to {opacity: 1;	transform: translate3d(0, 0, 0) scale(1);}
 					</h2>
 					<div id="faq1" class="accordion-collapse collapse show"
 						data-bs-parent="#faqAccordion">
-						<div class="accordion-body">저희 사이트에는 '지도', '통계', '뉴스', '공지사항'등을 제공하고 있습니다.</div>
+						<div class="accordion-body">저희 사이트에는 '지도', '통계', '뉴스',
+							'공지사항'등을 제공하고 있습니다.</div>
 					</div>
 				</div>
 				<div class="accordion-item">
 					<h2 class="accordion-header" id="headingTwo">
 						<button class="accordion-button collapsed" type="button"
-							data-bs-toggle="collapse" data-bs-target="#faq2">대피소 위치는 어디서 확인할 수 있나요?</button>
+							data-bs-toggle="collapse" data-bs-target="#faq2">대피소 위치는
+							어디서 확인할 수 있나요?</button>
 					</h2>
 					<div id="faq2" class="accordion-collapse collapse"
 						data-bs-parent="#faqAccordion">
-						<div class="accordion-body">상단 '지도 페이지' 메뉴에서 확인 가능합니다.
-						</div>
+						<div class="accordion-body">상단 '지도 페이지' 메뉴에서 확인 가능합니다.</div>
 					</div>
 				</div>
 				<div class="accordion-item">
-                    <h2 class="accordion-header" id="headingTwo">
-                        <button class="accordion-button collapsed" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#faq3">화재 데이터를 어디서 볼 수 있을까요?</button>
-                    </h2>
-                    <div id="faq3" class="accordion-collapse collapse"
-                        data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">상단 '통계 페이지' 메뉴에서 확인 가능합니다.</div>
-                    </div>
-                </div>
-                <div class="accordion-item">
-                    <h2 class="accordion-header" id="headingTwo">
-                        <button class="accordion-button collapsed" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#faq4">재민이에서는 다른 정보를 제공하는게 있나요?</button>
-                    </h2>
-                    <div id="faq4" class="accordion-collapse collapse"
-                        data-bs-parent="#faqAccordion">
-                        <div class="accordion-body">저희 사이트에서는 '뉴스'정보를 제공하고 있습니다.</div>
-                    </div>
-                </div>
-                
+					<h2 class="accordion-header" id="headingTwo">
+						<button class="accordion-button collapsed" type="button"
+							data-bs-toggle="collapse" data-bs-target="#faq3">화재 데이터를
+							어디서 볼 수 있을까요?</button>
+					</h2>
+					<div id="faq3" class="accordion-collapse collapse"
+						data-bs-parent="#faqAccordion">
+						<div class="accordion-body">상단 '통계 페이지' 메뉴에서 확인 가능합니다.</div>
+					</div>
+				</div>
+				<div class="accordion-item">
+					<h2 class="accordion-header" id="headingTwo">
+						<button class="accordion-button collapsed" type="button"
+							data-bs-toggle="collapse" data-bs-target="#faq4">재민이에서는
+							다른 정보를 제공하는게 있나요?</button>
+					</h2>
+					<div id="faq4" class="accordion-collapse collapse"
+						data-bs-parent="#faqAccordion">
+						<div class="accordion-body">저희 사이트에서는 '뉴스'정보를 제공하고 있습니다.</div>
+					</div>
+				</div>
+
 			</div>
 		</div>
 	</div>
@@ -1173,7 +1248,7 @@ to {opacity: 1;	transform: translate3d(0, 0, 0) scale(1);}
     	  const t = String(raw || '');
 
     	  // 보험/재무 문맥: '화재'가 회사명/보험 기사일 때
-    	  const insuranceCtx = /(삼성화재|메리츠화재|흥국화재|현대해상|DB손해|DB손해보험|KB손해|KB손해보험|한화손해|롯데손해|캐롯|농협손해|손해보험|보험|보험료|보험금|실손|실손보험|주가|실적|영업이익|순이익|배당)/i.test(t);
+    	  const insuranceCtx = /(삼성화재|메리츠화재|흥국화재|현대해상|DB손해|DB손해보험|KB손해|KB손해보험|한화손해|롯데손해|캐롯|농협손해|은행권|손해보험|보험|보험료|보험금|실손|실손보험|주가|실적|영업이익|순이익|배당)/i.test(t);
     	// 화재 강한 키워드 + '불'이면서 화재 맥락 단서
     	  const fireStrong = /(산불|화재)/;
     	  const fireHints  = /(불길|화염|연기|대피|진화|진압|소방|방화|폭발|누전|발화|전소|화마|참사|사망|사상|인명피해|피해|꺼져)/;
@@ -1194,8 +1269,8 @@ to {opacity: 1;	transform: translate3d(0, 0, 0) scale(1);}
       // 5) 폭설/대설/눈보라
       if (/폭설|대설|눈보라|적설/.test(t)) return CP + '/resources/image/snow.png';
 
-      // 6) 폭염/열대야/고온(기온/재난 제거)
-      if (/폭염|열대야|고온|온열/.test(t)) return CP + '/resources/image/temper.png';
+      // 6) 폭염/열대야/고온/가뭄(기온/재난 제거)
+      if (/폭염|열대야|고온|가뭄|온열/.test(t)) return CP + '/resources/image/temper.png';
 
       // 7) 싱크홀/땅꺼짐/지반침하
       if (/싱크홀|땅꺼짐|지반침하/.test(t)) return CP + '/resources/image/sinkhole.png';
@@ -1370,13 +1445,44 @@ to {opacity: 1;	transform: translate3d(0, 0, 0) scale(1);}
   }
 
   function escapeHtml(s){ return (s||'').replace(/[&<>\"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
-  function appendBubble(text,who){
-    if(!chatBody) return;
-    var d=document.createElement('div');
-    d.className='chat-bubble '+(who==='bot'?'bot':'user');
-    d.innerHTML=text+'<span class="chat-time">'+nowText()+'</span>';
-    chatBody.appendChild(d); chatBody.scrollTop=chatBody.scrollHeight;
-  }
+  function appendBubble(text, who){
+	  if (!chatBody) return;
+
+	  const isBot = (who === 'bot');
+	  const d = document.createElement('div');
+	  d.className = 'chat-bubble ' + (isBot ? 'bot' : 'user');
+
+	  if (isBot) {
+	    const p = document.createElement('p');
+	    p.innerHTML = text;
+	    const t = document.createElement('span');
+	    t.className = 'chat-time';
+	    t.textContent = nowText();
+	    d.appendChild(p);
+	    d.appendChild(t);
+	  } else {
+	    // ✅ 동그라미 전용 요소만 추가 (이미지 태그 안 씀)
+	    if (window.USER_AVATAR_URL) {
+	      d.classList.add('has-avatar');
+	      const dot = document.createElement('span');
+	      dot.className = 'ua';
+	      const u = String(window.USER_AVATAR_URL).replace(/"/g, '\\"');
+	      dot.style.backgroundImage =
+	        'url("' + u + '"), url("' + CP + '/resources/image/profile/${rawImg}")';
+	      d.appendChild(dot);
+	    }
+	    const p = document.createElement('p');
+	    p.innerHTML = text;                // 이미 escape/BR 처리된 텍스트
+	    const t = document.createElement('span');
+	    t.className = 'chat-time';
+	    t.textContent = nowText();
+	    d.appendChild(p);
+	    d.appendChild(t);
+	  }
+
+	  chatBody.appendChild(d);
+	  chatBody.scrollTop = chatBody.scrollHeight;
+	}
 
   /* login → 네임스페이스 */
   var LOGIN_USER_NO_RAW=(document.body.dataset.loginUserNo||'').trim();

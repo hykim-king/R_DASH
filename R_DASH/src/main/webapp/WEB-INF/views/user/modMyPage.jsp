@@ -216,7 +216,7 @@ function submitPassword() {
       <!-- Header container -->
       <div class="container-fluid d-flex align-items-center">
         <div class="row">
-          <div class="col-lg-7 col-md-10">
+          <div style="margin-left:100px;">
             <h1 class="display-2 text-white">안녕하세요! ${sessionScope.loginUser.name}님</h1>
             <p class="text-white mt-0 mb-5">프로필 이미지, 회원 정보를 수정하세요!</p>
           </div>
