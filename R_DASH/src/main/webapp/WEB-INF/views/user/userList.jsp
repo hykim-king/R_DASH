@@ -71,6 +71,7 @@ function selectDiv(div){
 		selectDivButton.innerText = '전체';
 		selectDivButton.value='';
 		searchWord.disabled = true;
+		searchWord.value='';
 	}
 	
 }
