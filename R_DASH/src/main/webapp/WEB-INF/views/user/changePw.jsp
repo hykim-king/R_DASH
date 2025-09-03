@@ -89,7 +89,7 @@
       <!-- Header container -->
       <div class="container-fluid d-flex align-items-center">
         <div class="row">
-          <div class="col-lg-7 col-md-10">
+          <div style="margin-left:100px;">
             <h1 class="display-2 text-white">안녕하세요! ${sessionScope.loginUser.name}님</h1>
             <p class="text-white mt-0 mb-5">비밀번호를 변경하세요!</p>
           </div>
@@ -150,7 +150,7 @@
                     <div class="col-lg-6">
                       <div class="form-group">
                         <label class="form-control-label" for="password">변경할 비밀번호</label>
-                        <input type="password" id="password" name="password" class="form-control">
+                        <input type="password" id="password" name="password" class="form-control" maxlength="16">
                       </div>
                     </div>
                   </div>
@@ -158,7 +158,7 @@
                     <div class="col-lg-6">
                       <div class="form-group">
                         <label class="form-control-label" for="checkPassword">비밀번호 확인</label>
-                        <input type="password" id="checkPassword" name="checkPassword" class="form-control">
+                        <input type="password" id="checkPassword" name="checkPassword" class="form-control" maxlength="16">
                       </div>
                     </div>
                   </div>

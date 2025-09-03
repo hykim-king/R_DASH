@@ -222,8 +222,8 @@
         <div class = "groupselect">
 			<!-- 그룹 타입 선택 -->
 			<select id="groupType">
-			    <option value="region">지역</option>
-			    <option value="year">연도</option>
+			    <option value="region">지역별</option>
+			    <option value="year">연도별</option>
 			</select>
 			
 			<!-- 년도 선택 (항상 DOM에 존재) -->
@@ -253,7 +253,7 @@
             </div>
 		</div>
 		<div class="row mb-6">
-		  <div class="col-md-6">
+		  <div class="col-md-4">
 			<h2>기온 Top5</h2>
 	        <table class="topTable">
 	            <thead>
@@ -268,22 +268,36 @@
 	            </tbody>
 	        </table>
 	      </div>
-	      <div class="col-md-6">
-	        <h2>습도와 강수량 Top5</h2>
+	      <div class="col-md-4">
+	        <h2>습도 Top5</h2>
 	        <table class="topTable">
 	            <thead>
 	                <tr>
 	                    <th>순위</th>
 	                    <th>지역</th>
 	                    <th>습도(%)</th>
-	                    <th>강수량(mm)</th>
 	                </tr>
 	            </thead>
-	            <tbody id="rehRn1Table">
+	            <tbody id="rehTable">
 	                <!-- JS에서 채움 -->
 	            </tbody>
 	        </table>
 	      </div>
+	      <div class="col-md-4">
+            <h2>강수량 Top5</h2>
+            <table class="topTable">
+                <thead>
+                    <tr>
+                        <th>순위</th>
+                        <th>지역</th>
+                        <th>강수량(mm)</th>
+                    </tr>
+                </thead>
+                <tbody id="rn1Table">
+                    <!-- JS에서 채움 -->
+                </tbody>
+            </table>
+          </div>
 		</div>
 		<script src="${pageContext.request.contextPath}/resources/js/patients.js"></script>
 		<script src="${pageContext.request.contextPath}/resources/js/nowcast.js"></script>

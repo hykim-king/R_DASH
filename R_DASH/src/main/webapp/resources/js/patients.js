@@ -65,7 +65,7 @@ $(document).ready(function() {
                         plugins: {
                             title: {
                                 display: true,         // 제목 보이기
-                                text: '지역별 온열질환자 수 (2016~2024)', // 제목 내용
+                                text: '지역/연도별 온열질환자 수', // 제목 내용
                                 font: {
                                     size: 18,          // 폰트 크기
                                     weight: 'bold'
@@ -110,7 +110,7 @@ $(document).ready(function() {
                         plugins: {
                             title: {
                                 display: true, 
-                                text: '실내외별 온열질환자 수 (2016~2024)',
+                                text: '실내외별 온열질환자 수',
                                 font: {
                                     size: 18,
                                     weight: 'bold'
