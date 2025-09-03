@@ -100,6 +100,13 @@ public class GptBotService implements BotService {
 	}
 
 	@Override
+	public String reply(String question, String sessionId, Integer userNo) {
+		// 로그인 유저면 저장, 게스트면 미저장 등의 기본 정책
+		boolean persist = (userNo != null);
+		return reply(question, sessionId, userNo, persist);
+	}
+
+	@Override
 	public String reply(String question, String sessionId, Integer userNo, boolean persist) {
 		if (question == null || question.trim().isEmpty())
 			return "질문이 비어 있습니다. 다시 입력해 주세요.";
@@ -275,11 +282,11 @@ public class GptBotService implements BotService {
 		String t = s.trim();
 		return t.isEmpty() ? null : t;
 	}
-	
+
 	@PostConstruct
 	public void bootCheck() {
-	  log.info("[BOOT] propApiKeyDash={}",
-	    (propApiKeyDash==null? "<null>" : "****" + propApiKeyDash.substring(Math.max(0, propApiKeyDash.length()-4))));
+		log.info("[BOOT] propApiKeyDash={}", (propApiKeyDash == null ? "<null>"
+				: "****" + propApiKeyDash.substring(Math.max(0, propApiKeyDash.length() - 4))));
 	}
-	
+
 }

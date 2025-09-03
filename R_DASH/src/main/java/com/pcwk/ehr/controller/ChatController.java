@@ -34,7 +34,7 @@ public class ChatController {
 	private final ChatService chatService;
 	private final BotService botService;
 
-	public ChatController(ChatService chatService, @Qualifier("GptBotService") BotService botService) {
+	public ChatController(ChatService chatService, @Qualifier("gptBotService") BotService botService) {
 		this.chatService = chatService;
 		this.botService = botService;
 	}
@@ -54,6 +54,7 @@ public class ChatController {
 
 		// 1) 사용자 번호: principal 최우선 → body/header 보강
 		Integer effectiveUserNo = extractUserNo(principal);
+
 		if (effectiveUserNo == null) {
 			effectiveUserNo = (chat.getUserNo() != null) ? chat.getUserNo() : userNoHeader;
 		}
