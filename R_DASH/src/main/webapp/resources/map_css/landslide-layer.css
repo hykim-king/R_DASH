@@ -14,7 +14,7 @@
 #ls-legend{
     margin-bottom: 80px;  /* 버튼 공간 확보 */
   position:absolute;
-  right:16px; bottom:var(--ls-legend-bottom); z-index:1000;
+  right:35px; bottom:var(--ls-legend-bottom); z-index:1000;
   width:220px; border-radius:16px; background:#fff; border:1px solid #e5e7eb;
   box-shadow:0 12px 28px rgba(0,0,0,.16); overflow:hidden; pointer-events:auto;
 }

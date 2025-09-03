@@ -4,7 +4,11 @@
 	<select id="top100" resultType="TopicWordsDTO">
 	        SELECT WORD_NO,WORD, FREQ, PREV_FREQ,TO_CHAR(REG_DT,'YYYY/MM/DD') as regDt
 			FROM TOPIC_WORDS
-			WHERE TRUNC(REG_DT) = TRUNC(SYSDATE)
+			WHERE TRUNC(reg_dt) = (
+                        SELECT MAX(TRUNC(reg_dt)) 
+                        FROM news 
+            <![CDATA[   WHERE TRUNC(reg_dt) <= TRUNC(SYSDATE)]]>
+                    )   
 			ORDER BY FREQ DESC NULLS LAST
 			FETCH FIRST 100 ROWS ONLY
     </select>
@@ -12,7 +16,11 @@
     <select id="top10" resultType="TopicWordsDTO">
         SELECT WORD_NO,WORD, FREQ, PREV_FREQ,TO_CHAR(REG_DT,'YYYY/MM/DD') as regDt
 		FROM TOPIC_WORDS
-		WHERE TRUNC(REG_DT) = TRUNC(SYSDATE)
+		WHERE TRUNC(reg_dt) = (
+                        SELECT MAX(TRUNC(reg_dt)) 
+                        FROM news 
+            <![CDATA[   WHERE TRUNC(reg_dt) <= TRUNC(SYSDATE)]]>
+                    )   
 		ORDER BY FREQ DESC NULLS LAST
 		FETCH FIRST 10 ROWS ONLY
     </select>
@@ -23,7 +31,11 @@
 		       DECODE(PREV_FREQ,0,1,PREV_FREQ))*100,2) 
 		       AS CHANGE_RATE
 		FROM TOPIC_WORDS
-		WHERE TRUNC(REG_DT) = TRUNC(SYSDATE)
+		WHERE TRUNC(reg_dt) = (
+                        SELECT MAX(TRUNC(reg_dt)) 
+                        FROM news 
+            <![CDATA[   WHERE TRUNC(reg_dt) <= TRUNC(SYSDATE)]]>
+                    )
 		ORDER BY FREQ DESC NULLS LAST
 		FETCH FIRST 5 ROWS ONLY
     </select>

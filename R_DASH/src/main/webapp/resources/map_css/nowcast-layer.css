@@ -1,15 +1,17 @@
 /* =========================================================
    Nowcast Layer CSS (정리 버전)
-   - 중복/불필요 제거
-   - 누락된 .nc-cta .bubble 추가
-   - 접근성(포커스·모션감소) 보완
-   - 색/간격 변수화
+   - 중복/불필요 제거, 공통화(.sido-chip/.sgg-chip 묶음)
+   - 누락된 .nc-cta .bubble 포함
+   - 접근성: :focus-visible, 모션 감소 대응
+   - 색/간격 변수 유지
 ========================================================= */
 
 :root{
+  /* z-index */
   --z-cta: 6000;
   --z-filter: 5000;
 
+  /* colors */
   --c-border: #e5e7eb;
   --c-border-soft: #ececec;
   --c-text: #0f172a;
@@ -19,65 +21,68 @@
   --c-primary: #2563eb;
   --c-primary-shadow: rgba(37, 99, 235, .25);
 
+  /* surfaces & shadows */
   --card-bg: #fff;
   --hud-bg: #dff0f5;
   --shadow-lg: 0 8px 18px rgba(0, 0, 0, .14);
   --shadow-md: 0 8px 18px rgba(0, 0, 0, .12);
   --shadow-sm: 0 1px 0 rgba(0, 0, 0, .04);
 
+  /* radii */
   --radius-lg: 14px;
   --radius-md: 12px;
   --radius-pill: 999px;
 
+  /* motion */
   --trans-fast: .22s ease;
 
+  /* font */
   --font-ui: 600 13px/1 system-ui, -apple-system, Segoe UI, Roboto,
              "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
 }
 
-*,
-*::before,
-*::after { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; }
 
-/* === 우측 상단 위치 === */
-.sido-filter-host.top-right {
+/* =========================
+   우측 상단(시·도/시군구 필터)
+========================= */
+.sido-filter-host.top-right{
   position: fixed;
-  top: 270px;            /* 헤더 높이에 맞춰 조절 */
+  top: 290px;        /* 헤더 높이에 맞춰 조절 */
   right: 24px;
   z-index: var(--z-filter);
 }
 
-/* === 카드 박스 === */
-.sido-filter-card {
+.sido-filter-card{
   width: 340px;
   max-width: 90vw;
+  padding: 10px 12px;
   background: var(--card-bg);
+  border: 1px solid rgba(0,0,0,.06);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
-  border: 1px solid rgba(0, 0, 0, .06);
-  padding: 10px 12px;
 }
 
-/* === 시·도 칩 영역 === */
-.sido-filter {
+/* 시·도 칩 영역 */
+.sido-filter{
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
   align-items: center;
+  gap: 10px;
   max-height: 220px;
-  overflow-y: auto;
   padding: 6px 2px 4px;
+  overflow-y: auto;
 }
 
-/* === 시군구 카드/칩 영역 === */
-.sgg-filter-card {
+/* 시군구 카드/칩 영역 */
+.sgg-filter-card{
   margin-top: 8px;
   padding: 10px 12px;
-  border-radius: var(--radius-md);
   background: #fafafa;
   border: 1px solid var(--c-border-soft);
+  border-radius: var(--radius-md);
 }
-.sgg-filter {
+.sgg-filter{
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -85,31 +90,34 @@
   overflow-y: auto;
 }
 
-/* === 칩 공통 === */
+/* 칩 공통 */
 .sido-chip,
-.sgg-chip {
+.sgg-chip{
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: 28px;
   padding: 0 12px;
-  border-radius: var(--radius-pill);
   white-space: nowrap;
   font: var(--font-ui);
-  border: 1px solid var(--c-border);
-  background: var(--c-chip);
   color: #111827;
-  cursor: pointer;
+  background: var(--c-chip);
+  border: 1px solid var(--c-border);
+  border-radius: var(--radius-pill);
   box-shadow: var(--shadow-sm);
-  transition: background var(--trans-fast), box-shadow var(--trans-fast), color var(--trans-fast), border-color var(--trans-fast);
+  cursor: pointer;
+  transition: background var(--trans-fast),
+              box-shadow var(--trans-fast),
+              color var(--trans-fast),
+              border-color var(--trans-fast);
 }
 .sido-chip:hover,
-.sgg-chip:hover { background: var(--c-chip-hover); }
+.sgg-chip:hover{ background: var(--c-chip-hover); }
 
 .sido-chip.active,
-.sgg-chip.active {
-  background: var(--c-primary);
+.sgg-chip.active{
   color: #fff;
+  background: var(--c-primary);
   border-color: var(--c-primary);
   box-shadow: 0 2px 6px var(--c-primary-shadow);
 }
@@ -117,44 +125,46 @@
 /* 키보드 포커스 접근성 */
 .sido-chip:focus-visible,
 .sgg-chip:focus-visible,
-.nc-close:focus-visible {
+.nc-close:focus-visible{
   outline: 2px solid var(--c-primary);
   outline-offset: 2px;
   border-radius: var(--radius-pill);
 }
 
-/* === HUD 래퍼/카드 === */
-.nc-wrap { position: relative; }
+/* =========================
+   HUD 카드
+========================= */
+.nc-wrap{ position: relative; }
 
-.nc-card {
+.nc-card{
   min-width: 240px;
   max-width: 300px;
+  padding-top: 7px;
+  color: var(--c-text);
   background: var(--hud-bg);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  color: var(--c-text);
   font: var(--font-ui);
-  padding-top: 7px;
-  transition: transform var(--trans-fast), opacity var(--trans-fast);
-  transform: translateY(0);
   opacity: 1;
+  transform: translateY(0);
+  transition: transform var(--trans-fast), opacity var(--trans-fast);
 }
 .nc-card.is-hiding{
-  transform: translateY(12px);
   opacity: 0;
+  transform: translateY(12px);
   pointer-events: none;
 }
 
-/* HUD 헤더 & 그리드 */
+/* HUD 헤더 & 지표 그리드 */
 .nc-hdr{
-  background: rgba(255,255,255,.8);
   margin: 8px;
   padding: 12px;
-  border-radius: var(--radius-md);
-  text-align: center;
   font-weight: 700;
   font-size: 18px;
   color: var(--c-text-strong);
+  background: rgba(255,255,255,.8);
+  border-radius: var(--radius-md);
+  text-align: center;
 }
 .nc-grid{
   display: grid;
@@ -168,9 +178,9 @@
   justify-content: space-between;
   gap: 8px;
   padding: 8px 10px;
+  background: #f8fbff;
   border: 1px solid var(--c-border);
   border-radius: 10px;
-  background: #f8fbff;
 }
 .nc-chip svg{ width: 18px; height: 18px; }
 .nc-chip .v{ font-weight: 700; }
@@ -182,88 +192,100 @@
   right: 6px;
   width: 28px;
   height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   border-radius: 8px;
   background: var(--c-chip-hover);
   color: #000;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   box-shadow: 0 2px 6px rgba(0,0,0,.08);
   transition: background var(--trans-fast), transform var(--trans-fast);
 }
-.nc-close:hover { background: #e5e7eb; }
-.nc-close:active { transform: scale(0.96); }
+.nc-close:hover{ background: #e5e7eb; }
+.nc-close:active{ transform: scale(0.96); }
 
-/* === 아이콘/말풍선 (CTA) === */
-.nc-cta {
+/* =========================
+   CTA 아이콘 & 말풍선
+========================= */
+.nc-cta{
   position: fixed;
-  top: 200px;   /* 필요 시 조정 */
+  top: 200px;         /* 필요 시 조정 */
   right: 24px;
   display: flex;
   align-items: center;
   gap: 10px;
   z-index: var(--z-cta);
 }
-.nc-cta .icon-btn {
+.nc-cta .icon-btn{
   width: auto;
   height: auto;
-  background: none;
-  border: none;
-  box-shadow: none;
   padding: 0;
+  border: none;
+  background: none;
+  box-shadow: none;
   cursor: pointer;
 }
-.nc-cta .icon-btn:focus { outline: none; box-shadow: none; }
-.nc-cta .icon-btn img {
+.nc-cta .icon-btn:focus{ outline: none; box-shadow: none; }
+.nc-cta .icon-btn img{
   width: 90px;
   height: 90px;
   display: block;
 }
 
-/* 말풍선 (JS에서 생성됨) */
-.nc-cta .bubble {
+/* 말풍선 (JS 생성) */
+.nc-cta .bubble{
   max-width: 260px;
-  background: #ffffff;
-  border: 1px solid #d6e2f0;
-  box-shadow: 0 6px 14px rgba(23, 50, 93, .15);
-  border-radius: 12px;
   padding: 10px 12px;
+  color: #123;
+  background: #fff;
+  border: 1px solid #d6e2f0;
+  border-radius: 12px;
+  box-shadow: 0 6px 14px rgba(23,50,93,.15);
   font: var(--font-ui);
   line-height: 1.35;
-  color: #123;
   white-space: pre-line;
   position: relative;
 }
-.nc-cta .bubble::after {
+.nc-cta .bubble::after{
   content: "";
   position: absolute;
-  right: -8px;
   top: 16px;
-  border-width: 8px;
+  right: -8px;
   border-style: solid;
-  border-color: transparent transparent transparent #ffffff;
+  border-width: 8px;
+  border-color: transparent transparent transparent #fff;
   filter: drop-shadow(0 1px 1px rgba(23,50,93,.12));
 }
 
-.nc-hidden { display: none !important; }
+.nc-hidden{ display: none !important; }
 
-/* 반응형 */
-@media (max-width: 640px) {
-  .sido-filter-host.top-right {
+/* =========================
+   반응형 & 모션 감소
+========================= */
+@media (max-width: 640px){
+  .sido-filter-host.top-right{
+    top: 70px;
     right: 12px;
-    top: 64px;
   }
-  .sido-filter-card { width: 300px; }
+  .sido-filter-card{ width: 300px; }
 }
 
-/* 사용자 환경: 모션 줄임 */
 @media (prefers-reduced-motion: reduce){
   .nc-card,
   .sido-chip,
   .sgg-chip,
-  .nc-close {
+  .nc-close{
     transition: none !important;
   }
+}
+/* ===== Shelter 전용 위치 오버라이드 ===== */
+body[data-layer="nowcast"] .nc-cta {
+  right: 40px !important;
+  left: auto !important;
+}
+body[data-layer="nowcast"] .sido-filter-host.top-right {
+  right: 40px !important;
+  left: auto !important;
 }

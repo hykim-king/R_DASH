@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
@@ -58,8 +59,10 @@ public class BoardController {
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
 	
-	private static final String IMAGE_UPLOAD_PATH = "C:/images/summernote/";
+	private static final String IMAGE_UPLOAD_PATH = "C:/image/summernote/";
 	
+	
+	//private static final String IMAGE_UPLOAD_PATH = "C:/Users/user/R_DASH/R_DASH/src/main/webapp/resources/image/summernote/";	
 	
 	public BoardController() {
 		log.debug("┌───────────────────────────┐");
@@ -97,7 +100,7 @@ public class BoardController {
 	    msgs.put("toList", messageSource.getMessage("message.board.toList", null, locale));
 	    msgs.put("admin", messageSource.getMessage("message.admin", null, locale));
 	    msgs.put("modi", messageSource.getMessage("message.news.mod", null, locale));
-	    
+	    msgs.put("del", messageSource.getMessage("message.board.del", null, locale));	    
 	    
 	    return msgs;
 	}
@@ -107,7 +110,7 @@ public class BoardController {
     public MessageDTO saveImageByUrl(@RequestBody Map<String, String> param) {
         String imageUrl = param.get("imageUrl");
         String publicUrl = "";
-        
+        final long MAX_SIZE = 50L * 1024 * 1024; // 50MB 제한
        
         try {
             if (imageUrl.startsWith("data:image")) {
@@ -119,17 +122,22 @@ public class BoardController {
                 if (ext.equals("jpeg")) ext = "jpg";
 
                 String saveName = UUID.randomUUID().toString() + "." + ext;
-                File uploadDir = new File("C:/images/summernote/");
-                if (!uploadDir.exists()) uploadDir.mkdirs();
-
-                File file = new File(uploadDir, saveName);
+                //파일 없으면 생성
+                File uploadDir = new File("C:/image/summernote/");
+        	    if (!uploadDir.exists()) uploadDir.mkdirs();
+                
                 byte[] imageBytes = Base64.getDecoder().decode(base64Data);
+                // 용량 체크
+                if (imageBytes.length > MAX_SIZE) {
+                    return new MessageDTO(0, "파일 크기 초과 (최대 50MB)");
+                }
+                
+                File file = new File(uploadDir, saveName);
                 try (OutputStream os = new FileOutputStream(file)) {
                     os.write(imageBytes);
                 }
 
-
-                publicUrl = "/ehr/summernote/" + saveName; // ResourceHandler 매핑 기준 URL
+                publicUrl = "/ehr/resources/image/summernote/" + saveName; // ResourceHandler 매핑 기준 URL
             } else {
                 publicUrl = imageUrl;
             }
@@ -144,24 +152,39 @@ public class BoardController {
     @PostMapping("/uploadSummernoteImageFile")
 	@ResponseBody
 	public Map<String, Object> uploadImage(@RequestParam("file") MultipartFile file) throws IOException {
-	    String originalFilename = file.getOriginalFilename();
-	    String ext = PcwkString.getExt(originalFilename);
-	    if (ext == null) ext = "";
-	    if (!ext.startsWith(".")) ext = "." + ext;
-
-	    String saveName = UUID.randomUUID().toString() + ext;
-
-	    File uploadDir = new File("C:/images/summernote/");
-	    if (!uploadDir.exists()) uploadDir.mkdirs();
-
-	    File target = new File(uploadDir, saveName);
-	    file.transferTo(target);
-
-	    // 여기서 contextPath 기반이 아니라 ResourceHandler 기반 경로 리턴
-	    String publicUrl = "/ehr/summernote/" + saveName;
-
-	    Map<String, Object> result = new HashMap<>();
-	    result.put("url", publicUrl);
+    	long maxSize = 50L * 1024 * 1024; // 50MB
+    	Map<String, Object> result = new HashMap<>();
+    	
+    	try {
+	    	if (file.getSize() > maxSize) {
+	    		result.put("success", false);
+	            result.put("message", "파일 크기 초과 (최대 50MB)");
+	            return result;
+	        }
+	    	
+	    	String originalFilename = file.getOriginalFilename();
+		    String ext = PcwkString.getExt(originalFilename);
+		    if (ext == null) ext = "";
+		    if (!ext.startsWith(".")) ext = "." + ext;
+	
+		    String saveName = UUID.randomUUID().toString() + ext;
+	
+		    File uploadDir = new File("C:/image/summernote/");
+		    if (!uploadDir.exists()) uploadDir.mkdirs();
+	
+		    File target = new File(uploadDir, saveName);
+		    file.transferTo(target);
+	
+		    // 여기서 contextPath 기반이 아니라 ResourceHandler 기반 경로 리턴
+		    String publicUrl = "/ehr/resources/image/summernote/" + saveName;
+		    
+		    result.put("success", true);
+	        result.put("url", publicUrl);
+	    
+    	} catch(Exception e) {
+    		result.put("success", false);
+            result.put("message", "업로드 실패: " + e.getMessage());
+    	}
 	    return result;
 	}
 	

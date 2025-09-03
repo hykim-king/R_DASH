@@ -300,7 +300,6 @@ document.body.appendChild(balloon);
     window.addEventListener('resize', function(){ if (active) redraw(); });
 
     // ===== Activate/Deactivate =====
-    var active=false, currentType='ALL', dataCache=null;
     function activate(opts){
       active = true;
       heatCanvas.style.display = 'block';
@@ -319,9 +318,8 @@ document.body.appendChild(balloon);
       var bounds = new kakao.maps.LatLngBounds();
       bounds.extend(new kakao.maps.LatLng(33.0, 124.5));
       bounds.extend(new kakao.maps.LatLng(38.7, 132.0));
-      map.setBounds(bounds);
-      map.setZoomable(false);
-      map.setDraggable(false);
+      map.setZoomable(true);
+      map.setDraggable(true);
 
       ensureHeat();
       fetchAndRender(currentType);
