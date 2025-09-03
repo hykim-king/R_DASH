@@ -26,7 +26,7 @@
 			 return;
 		 } 
 		 if(passwordInput.value === ''){
-             alert('이메일을 입력하세요');
+             alert('비밀번호를 입력하세요');
              emailInput.focus();
              return;
          } 
@@ -121,7 +121,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input class="form-control" placeholder="비밀번호" id="password" type="password" name="password" maxlength="20">
+                    <input class="form-control" placeholder="비밀번호" id="password" type="password" name="password" maxlength="16">
                   </div>
                 </div>
                 <div class="text-center">
