@@ -13,7 +13,7 @@
 
 	<!-- application.properties 우선: classpath → (없으면) webapp/resources -->
 	<context:property-placeholder
-		location="classpath:application.properties, servletContext:/resources/application.properties"
+		location="classpath*:application.properties, /resources/application.properties"
 		ignore-resource-not-found="true" ignore-unresolvable="true" />
 	<!-- Redis -->
 	<bean id="redisConnectionFactory"

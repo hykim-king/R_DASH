@@ -34,7 +34,7 @@ public class ChatController {
 	private final ChatService chatService;
 	private final BotService botService;
 
-	public ChatController(ChatService chatService, @Qualifier("gptBotService") BotService botService) {
+	public ChatController(ChatService chatService, @Qualifier("GptBotService") BotService botService) {
 		this.chatService = chatService;
 		this.botService = botService;
 	}
