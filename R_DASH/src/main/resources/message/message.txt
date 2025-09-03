@@ -40,7 +40,7 @@ message.news.newspaper=신문사
 message.news.pub=발행일자
 Date of publication=발행일자
 
-
+message.board.del=삭제
 
 message.news.topicCount=ratio
 message.news.summrTitle=Jaemin AI's Summary of Today's Topics

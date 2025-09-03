@@ -463,7 +463,6 @@ document.addEventListener('DOMContentLoaded', function(){
 </script>
 </head>
 <body>
-<jsp:include page="/WEB-INF/views/common/socket.jsp"></jsp:include>
 <div class="main-content" id="panel">
 	<div class="header bg-warning pb-6">
 		<div class="container-fluid">

@@ -50,7 +50,7 @@ Cron 스케줄링
 <annotation-driven />
 
 <!-- Summernote 이미지 접근 매핑 -->
-<resources mapping="/summernote/**" location="file:///C:/images/summernote/" />
+<resources mapping="/resources/image/summernote/**" location="file:///C:/image/summernote/" />
 
 
 

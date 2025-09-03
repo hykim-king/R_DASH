@@ -11,8 +11,11 @@
 		            FROM
 		                topic
 		            WHERE
-		                TRUNC(reg_dt) = TRUNC(SYSDATE)
-		            
+		                TRUNC(reg_dt) = (
+					    SELECT MAX(TRUNC(reg_dt)) 
+					    FROM news 
+		 	<![CDATA[   WHERE TRUNC(reg_dt) <= TRUNC(SYSDATE)]]>
+					)		       
 		            ORDER BY
 		                topic_ratio DESC NULLS LAST 
 		                 ) t1
@@ -31,7 +34,11 @@
 		FROM
 		    topic
 		WHERE topic_no = #{topicNo, jdbcType=INTEGER}
-		AND TRUNC(reg_dt) = TRUNC(SYSDATE)
+		AND  TRUNC(reg_dt) = (
+                        SELECT MAX(TRUNC(reg_dt)) 
+                        FROM news 
+            <![CDATA[   WHERE TRUNC(reg_dt) <= TRUNC(SYSDATE)]]>
+                    )       
     </select>
     
     <insert id="doSave" useGeneratedKeys="true" 

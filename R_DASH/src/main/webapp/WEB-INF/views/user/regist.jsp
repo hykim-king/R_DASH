@@ -341,7 +341,7 @@ function verify(){
                   	<div class="input-group-prepend" >
                       <span class="input-group-text" style="background-color:#ededed"><i class="ni ni-world-2"></i></span>
                     </div>
-					  <input type="text" class="form-control"" name="zipCode" id="zipCode" placeholder="우편번호(선택사항)" readonly>
+					  <input type="text" class="form-control" name="zipCode" id="zipCode" placeholder="우편번호(선택사항)" readonly>
 					  <input type="button" class="btn btn-default btn-sm" onclick="searchAddress()" value="우편번호 찾기" style="margin-left: 10px;">
                   </div>
                    	  
