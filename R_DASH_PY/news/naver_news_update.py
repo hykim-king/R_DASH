@@ -192,10 +192,12 @@ def main():
         )
 
 if __name__ == "__main__":
-    schedule.every().day.at('11:47').do(main)
+    schedule.every().day.at('12:18').do(main)
     schedule.every().day.at('18:47').do(main)
 
     while True:
         schedule.run_pending()  # 예약된 작업 실행
         time.sleep(1)  # CPU 사용량 절약
+
+
 

@@ -70,7 +70,7 @@ def main():
     #topicWordCloud.make_wordcloud(df)
 
 if __name__ == '__main__':
-    schedule.every().day.at('11:47').do(main)
+    schedule.every().day.at('12:19').do(main)
 
     while True:
         schedule.run_pending()  # 예약된 작업 실행
