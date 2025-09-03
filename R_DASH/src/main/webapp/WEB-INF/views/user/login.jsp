@@ -25,6 +25,11 @@
 			 emailInput.focus();
 			 return;
 		 } 
+		 if(passwordInput.value === ''){
+             alert('이메일을 입력하세요');
+             emailInput.focus();
+             return;
+         } 
 		 
 		 
 		 $.ajax({
