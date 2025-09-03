@@ -59,8 +59,11 @@ public class BoardController {
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
 	
-	private static final String IMAGE_UPLOAD_PATH = "C:/image/summernote/";
+	//로컬용
+	//private static final String IMAGE_UPLOAD_PATH = "C:/image/summernote/";
 	
+	//배포용 -> 파일 만들어야함.
+	private static final String IMAGE_UPLOAD_PATH = "/var/www/ehr/upload/summernote/";
 	
 	//private static final String IMAGE_UPLOAD_PATH = "C:/Users/user/R_DASH/R_DASH/src/main/webapp/resources/image/summernote/";	
 	
@@ -123,7 +126,7 @@ public class BoardController {
 
                 String saveName = UUID.randomUUID().toString() + "." + ext;
                 //파일 없으면 생성
-                File uploadDir = new File("C:/image/summernote/");
+                File uploadDir = new File(IMAGE_UPLOAD_PATH);
         	    if (!uploadDir.exists()) uploadDir.mkdirs();
                 
                 byte[] imageBytes = Base64.getDecoder().decode(base64Data);
@@ -169,7 +172,7 @@ public class BoardController {
 	
 		    String saveName = UUID.randomUUID().toString() + ext;
 	
-		    File uploadDir = new File("C:/image/summernote/");
+		    File uploadDir = new File(IMAGE_UPLOAD_PATH);
 		    if (!uploadDir.exists()) uploadDir.mkdirs();
 	
 		    File target = new File(uploadDir, saveName);
@@ -431,14 +434,14 @@ public class BoardController {
 	    log.debug("title: {}", param.getTitle());
 	    log.debug("isNotice: {}", param.getIsNotice());
 	    
+	    
 	    String message = "";
-
-	    if (1 == flag) {
+		if (1 == flag) {
 			message = "등록 되었습니다.";
 		} else {
 			message = "등록 실패!";
 		}
-	    MessageDTO messageDTO = new MessageDTO(flag, message);
+		MessageDTO messageDTO = new MessageDTO(flag, message);
 	    return new Gson().toJson(messageDTO);
 	}
 	
