@@ -3,8 +3,9 @@ package com.pcwk.ehr.service;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PostConstruct;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,9 +50,12 @@ public class GptBotService implements BotService {
 	@Value("${openai.org:}")
 	private String organization;
 
-	// 프로퍼티 → 환경변수 → 시스템 프로퍼티 순으로 키 해석
+	// 빈 값으로 두세요(하드코딩한 기본값 제거)
 	@Value("${openai.api-key:}")
-	private String propApiKey;
+	private String propApiKeyDash;
+
+	@Value("${openai.api.key:}")
+	private String propApiKeyDot;// 점 표기도 대비
 
 	// 컨텍스트/안전장치
 	private static final int HISTORY_LIMIT = 10;
@@ -72,42 +76,57 @@ public class GptBotService implements BotService {
 				.writeTimeout(30, TimeUnit.SECONDS).build();
 	}
 
-	/** 키 우선순위: properties → env → system property */
+	/** 키 우선순위: properties(dash→dot) → env → system properties(dash/dot/upper) */
 	private String resolveApiKey() {
-		String k = trimOrNull(propApiKey);
+
+		String k = trimOrNull(propApiKeyDash);
 		if (k == null)
-			k = trimOrNull(System.getenv("OPENAI_API_KEY"));
+			k = trimOrNull(propApiKeyDot);
+
 		if (k == null)
-			k = trimOrNull(System.getProperty("OPENAI_API_KEY"));
+			k = trimOrNull(System.getenv("OPENAI_API_KEY")); // env
+		if (k == null)
+			k = trimOrNull(System.getProperty("openai.api-key")); // -Dopenai.api-key=...
+		if (k == null)
+			k = trimOrNull(System.getProperty("openai.api.key")); // -Dopenai.api.key=...
+		if (k == null)
+			k = trimOrNull(System.getProperty("OPENAI_API_KEY")); // -DOPENAI_API_KEY=...
+
+		if (k != null) {
+			String tail = k.length() >= 4 ? k.substring(k.length() - 4) : k;
+			log.info("OpenAI API key resolved: ****{}", tail); // 마스킹 로그
+		}
 		return k;
 	}
 
 	@Override
-	public String reply(String question, String sessionId, Integer userNo) {
-		if (question == null || question.trim().isEmpty()) {
+	public String reply(String question, String sessionId, Integer userNo, boolean persist) {
+		if (question == null || question.trim().isEmpty())
 			return "질문이 비어 있습니다. 다시 입력해 주세요.";
-		}
-		String apiKey = resolveApiKey();
-		if (apiKey == null || apiKey.isEmpty()) {
-			return "AI 키가 설정되지 않아 답변을 생성할 수 없습니다.";
-		}
 
-		if (sessionId == null || sessionId.trim().isEmpty()) {
-			sessionId = UUID.randomUUID().toString();
-		}
+		String apiKey = resolveApiKey();
+		if (apiKey == null || apiKey.isEmpty())
+			return "AI 키가 설정되지 않아 답변을 생성할 수 없습니다.";
+		if (sessionId == null || sessionId.trim().isEmpty())
+			sessionId = java.util.UUID.randomUUID().toString();
 
 		try {
-			List<ChatDTO> ctx = fetchHistory(sessionId, userNo, HISTORY_LIMIT);
+			final boolean isMember = (userNo != null);
+			List<ChatDTO> ctx = isMember ? fetchHistory(sessionId, userNo, HISTORY_LIMIT)
+					: java.util.Collections.emptyList();
+
 			String answer = callOpenAI(ctx, question, apiKey);
 
-			try {
-				ChatDTO row = new ChatDTO(null, userNo, sessionId, safeDb(question), safeDb(answer), null);
-				chatService.insertChat(row);
-				log.debug("대화 저장 완료: logNo={}", row.getLogNo());
-			} catch (Exception e) {
-				log.error("대화 저장 실패", e);
+			// ★ persist 플래그에 따라 저장 제어 (회원 + persist=true 에서만 저장)
+			if (persist && isMember) {
+				try {
+					ChatDTO row = new ChatDTO(null, userNo, sessionId, safeDb(question), safeDb(answer), null);
+					chatService.insertChat(row);
+					log.debug("대화 저장 완료: logNo={}", row.getLogNo());
+				} catch (Exception e) {
+					log.error("대화 저장 실패", e);
+				}
 			}
-
 			return answer;
 
 		} catch (IOException e) {
@@ -136,17 +155,6 @@ public class GptBotService implements BotService {
 	/** OpenAI 호출 (429/5xx 재시도 포함) */
 	private String callOpenAI(List<ChatDTO> history, String question, String apiKey)
 			throws IOException, InterruptedException {
-
-		String body = buildRequestBody(history, question);
-
-		Request.Builder rb = new Request.Builder().url(apiUrl).addHeader("Authorization", "Bearer " + apiKey)
-				.addHeader("Content-Type", "application/json");
-		if (organization != null && !organization.isEmpty()) {
-			rb.addHeader("OpenAI-Organization", organization);
-		}
-
-		Request req = rb.post(RequestBody.create(body, JSON)).build();
-
 		int[] waits = { 0, 600, 1500 };
 		IOException last = null;
 
@@ -154,15 +162,23 @@ public class GptBotService implements BotService {
 			if (waits[i] > 0)
 				Thread.sleep(waits[i]);
 
+			String body = buildRequestBody(history, question); // ★ 루프 안에서 생성
+			Request.Builder rb = new Request.Builder().url(apiUrl).addHeader("Authorization", "Bearer " + apiKey)
+					.addHeader("Content-Type", "application/json");
+			if (organization != null && !organization.isEmpty()) {
+				rb.addHeader("OpenAI-Organization", organization);
+			}
+			Request req = rb.post(RequestBody.create(body, JSON)).build();
+
 			Response resp = null;
 			try {
 				resp = http.newCall(req).execute();
 				if (resp.isSuccessful()) {
-					String json = resp.body() != null ? resp.body().string() : "";
+					String json = (resp.body() != null) ? resp.body().string() : "";
 					return extractAnswer(json);
 				}
 				int code = resp.code();
-				String err = resp.body() != null ? resp.body().string() : "";
+				String err = (resp.body() != null) ? resp.body().string() : "";
 				log.warn("OpenAI HTTP {}: {}", code, err);
 
 				if (!(code == 429 || code >= 500)) {
@@ -259,4 +275,11 @@ public class GptBotService implements BotService {
 		String t = s.trim();
 		return t.isEmpty() ? null : t;
 	}
+	
+	@PostConstruct
+	public void bootCheck() {
+	  log.info("[BOOT] propApiKeyDash={}",
+	    (propApiKeyDash==null? "<null>" : "****" + propApiKeyDash.substring(Math.max(0, propApiKeyDash.length()-4))));
+	}
+	
 }
