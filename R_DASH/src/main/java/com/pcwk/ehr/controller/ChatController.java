@@ -114,7 +114,9 @@ public class ChatController {
 		// 6) 봇 호출(저장 포함)
 		final String answer;
 		try {
-			answer = botService.reply(chat.getQuestion(), chat.getSessionId(), chat.getUserNo());
+			// 로그인 사용자만 DB 저장
+			final boolean persist = (effectiveUserNo != null);
+			answer = botService.reply(chat.getQuestion(), chat.getSessionId(), chat.getUserNo(), persist);
 		} catch (Exception e) {
 			log.error("BotService.reply error", e);
 			return ResponseEntity.status(502).build();

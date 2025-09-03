@@ -22,14 +22,12 @@ import org.springframework.web.context.WebApplicationContext;
 
 @ExtendWith(SpringExtension.class) // JUnit5 + Spring 연동
 @WebAppConfiguration // WebApplicationContext 로드
-@ContextConfiguration(locations = {
-		"file:src/main/webapp/WEB-INF/spring/root-context.xml",
-		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml"
-})
+@ContextConfiguration(locations = { "file:src/main/webapp/WEB-INF/spring/root-context.xml",
+		"file:src/main/webapp/WEB-INF/spring/appServlet/servlet-context.xml" })
 class MainControllerTest {
 
 	Logger log = LogManager.getLogger(getClass());
-	
+
 	@Autowired
 	WebApplicationContext webApplicationContext;
 
@@ -40,7 +38,7 @@ class MainControllerTest {
 		log.debug("┌────────────────────┐");
 		log.debug("│ setUp()            │");
 		log.debug("└────────────────────┘");
-		
+
 		mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
 	}
 
@@ -51,21 +49,19 @@ class MainControllerTest {
 		log.debug("└────────────────────┘");
 	}
 
-	//@Disabled
+	// @Disabled
 	@Test
 	void testHome() throws Exception {
 		log.debug("┌────────────────────┐");
 		log.debug("│ testHome() 실행    │");
 		log.debug("└────────────────────┘");
 
-		mockMvc.perform(get("/home"))
-				.andExpect(status().isOk())
-				.andExpect(view().name("main/main"))
+		mockMvc.perform(get("/home")).andExpect(status().isOk()).andExpect(view().name("main/main"))
 				.andExpect(model().attributeExists("msg"))
 				.andExpect(model().attribute("msg", "저희 재난 알림 사이트를 방문해주셔서 감사합니다."));
 	}
-	
-	//@Disabled
+
+	// @Disabled
 	@Test
 	void testSearch() throws Exception {
 		log.debug("┌────────────────────┐");
@@ -74,29 +70,24 @@ class MainControllerTest {
 
 		String keyword = "지진";
 
-		mockMvc.perform(get("/search").param("keyword", keyword))
-				.andExpect(status().isOk())
-				.andExpect(view().name("searchResults"))
-				.andExpect(model().attributeExists("keyword"))
-				.andExpect(model().attribute("keyword", keyword))
-				.andExpect(model().attributeExists("results"));
+		mockMvc.perform(get("/search").param("keyword", keyword)).andExpect(status().isOk())
+				.andExpect(view().name("searchResults")).andExpect(model().attributeExists("keyword"))
+				.andExpect(model().attribute("keyword", keyword)).andExpect(model().attributeExists("results"));
 	}
-	
-	
-	//@Disabled
+
+	// @Disabled
 	@Test
 	void beans() {
 		log.debug("┌────────────────────┐");
 		log.debug("│ beans()            │");
 		log.debug("└────────────────────┘");
-		
+
 		assertNotNull(webApplicationContext);
 		assertNotNull(mockMvc);
-		
-		
-		log.debug("webApplicationContext: {}"+webApplicationContext);
-		log.debug("mockMvc: {}"+mockMvc);
-		
+
+		log.debug("webApplicationContext: {}" + webApplicationContext);
+		log.debug("mockMvc: {}" + mockMvc);
+
 	}
 
 }

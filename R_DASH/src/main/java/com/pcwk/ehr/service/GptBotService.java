@@ -53,6 +53,13 @@ public class GptBotService implements BotService {
 	@Value("${openai.api-key:}")
 	private String propApiKey;
 
+	// 빈 값으로 두세요(하드코딩한 기본값 제거)
+	@Value("${openai.api-key:}")
+	private String propApiKeyDash;
+
+	@Value("${openai.api.key:}")
+	private String propApiKeyDot;// 점 표기도 대비
+
 	// 컨텍스트/안전장치
 	private static final int HISTORY_LIMIT = 10;
 	private static final int SNIPPET_LIMIT = 2000;
@@ -72,13 +79,26 @@ public class GptBotService implements BotService {
 				.writeTimeout(30, TimeUnit.SECONDS).build();
 	}
 
-	/** 키 우선순위: properties → env → system property */
+	/** 키 우선순위: properties(dash→dot) → env → system properties(dash/dot/upper) */
 	private String resolveApiKey() {
-		String k = trimOrNull(propApiKey);
+
+		String k = trimOrNull(propApiKeyDash);
 		if (k == null)
-			k = trimOrNull(System.getenv("OPENAI_API_KEY"));
+			k = trimOrNull(propApiKeyDot);
+
 		if (k == null)
-			k = trimOrNull(System.getProperty("OPENAI_API_KEY"));
+			k = trimOrNull(System.getenv("OPENAI_API_KEY")); // env
+		if (k == null)
+			k = trimOrNull(System.getProperty("openai.api-key")); // -Dopenai.api-key=...
+		if (k == null)
+			k = trimOrNull(System.getProperty("openai.api.key")); // -Dopenai.api.key=...
+		if (k == null)
+			k = trimOrNull(System.getProperty("OPENAI_API_KEY")); // -DOPENAI_API_KEY=...
+
+		if (k != null) {
+			String tail = k.length() >= 4 ? k.substring(k.length() - 4) : k;
+			log.info("OpenAI API key resolved: ****{}", tail); // 마스킹 로그
+		}
 		return k;
 	}
 
@@ -91,21 +111,27 @@ public class GptBotService implements BotService {
 		if (apiKey == null || apiKey.isEmpty()) {
 			return "AI 키가 설정되지 않아 답변을 생성할 수 없습니다.";
 		}
-
 		if (sessionId == null || sessionId.trim().isEmpty()) {
 			sessionId = UUID.randomUUID().toString();
 		}
 
 		try {
-			List<ChatDTO> ctx = fetchHistory(sessionId, userNo, HISTORY_LIMIT);
+			// ★ 게스트면 히스토리 조회 스킵(어차피 저장 X)
+			final boolean isMember = (userNo != null);
+			List<ChatDTO> ctx = isMember ? fetchHistory(sessionId, userNo, HISTORY_LIMIT)
+					: java.util.Collections.emptyList();
+
 			String answer = callOpenAI(ctx, question, apiKey);
 
-			try {
-				ChatDTO row = new ChatDTO(null, userNo, sessionId, safeDb(question), safeDb(answer), null);
-				chatService.insertChat(row);
-				log.debug("대화 저장 완료: logNo={}", row.getLogNo());
-			} catch (Exception e) {
-				log.error("대화 저장 실패", e);
+			// ★ 로그인 사용자만 저장
+			if (isMember) {
+				try {
+					ChatDTO row = new ChatDTO(null, userNo, sessionId, safeDb(question), safeDb(answer), null);
+					chatService.insertChat(row);
+					log.debug("대화 저장 완료: logNo={}", row.getLogNo());
+				} catch (Exception e) {
+					log.error("대화 저장 실패", e);
+				}
 			}
 
 			return answer;
@@ -259,4 +285,5 @@ public class GptBotService implements BotService {
 		String t = s.trim();
 		return t.isEmpty() ? null : t;
 	}
+
 }
