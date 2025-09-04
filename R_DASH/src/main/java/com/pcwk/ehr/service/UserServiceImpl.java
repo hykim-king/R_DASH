@@ -194,8 +194,8 @@ public class UserServiceImpl implements UserService {
 		
 		int userNo = mapper.getUserNo(email);
 		user = mapper.selectUser(userNo);
-		if (user.getSocial() == null || user.getSocial() == "") {
-			user.setSocial("google");
+		if (user.getSocial() == null || user.getSocial().equals("")) {
+			user.setSocial(social);
 			mapper.updateUser(user);
 		}
 		
