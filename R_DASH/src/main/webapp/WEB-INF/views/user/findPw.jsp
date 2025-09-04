@@ -30,41 +30,63 @@
           return;
       }
       
-      codeBox.style.display='block'; 
-      emailInput.readOnly = true;
-      document.querySelector('#sendMailButton').disabled = true;
 	  
-	  $.ajax({
-	        method:"POST",    //GET/POST
-	        url:"/ehr/user/sendMail", //서버측 URL
-	        dataType:"json",//서버에서 받을 데이터 타입
-	        data:{          //파라메터
-	            "email": emailInput.value
-	        },
-	        success:function(result){//요청 성공
+      $.ajax({
+          method:"POST",    //GET/POST
+          url:"/ehr/user/checkEmail", //서버측 URL
+          dataType:"json",//서버에서 받을 데이터 타입
+          data:{          //파라메터
+              "email": emailInput.value
+          },
+          success:function(result){//요청 성공
+              if(true === result.success){
+                  alert('존재하지 않는 이메일 입니다.');
+                  return;
+              }else{
+                  codeBox.style.display='block'; 
+                  emailInput.readOnly = true;
+                  document.querySelector('#sendMailButton').disabled = true;
+                  
+                  $.ajax({
+                        method:"POST",    //GET/POST
+                        url:"/ehr/user/sendMail", //서버측 URL
+                        dataType:"json",//서버에서 받을 데이터 타입
+                        data:{          //파라메터
+                            "email": emailInput.value
+                        },
+                        success:function(result){//요청 성공
 
-	             // 3분 카운트다운
-	            let t = result.expiresInSec||180;
-	            codeTimer = setInterval(()=>{
-	              const timerEl = document.querySelector('#timer');
-	              const m = Math.floor(t/60);
-	              const s = String(t%60).padStart(2,'0');
-	              timerEl.textContent = `남은 시간: \${m}:\${s}`;
-	              timerEl.style.color = 'red';
-	              if (--t < 0) { 
-	            	  clearInterval(codeTimer); 
-	            	  timerEl.textContent = '만료됨';
-	            	  
-	              }
-	            }, 1000);
-	            
-	        },
-	        error:function(result){//요청 실패
-	        	alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
-	        }
-	        
-	        
-	    });
+                             // 3분 카운트다운
+                            let t = result.expiresInSec||180;
+                            codeTimer = setInterval(()=>{
+                              const timerEl = document.querySelector('#timer');
+                              const m = Math.floor(t/60);
+                              const s = String(t%60).padStart(2,'0');
+                              timerEl.textContent = `남은 시간: \${m}:\${s}`;
+                              timerEl.style.color = 'red';
+                              if (--t < 0) { 
+                                  clearInterval(codeTimer); 
+                                  timerEl.textContent = '만료됨';
+                                  
+                              }
+                            }, 1000);
+                            
+                        },
+                        error:function(result){//요청 실패
+                            alert('문제가 발생했습니다. 다음에 다시 요청해주세요.');
+                        }
+                        
+                        
+                    });
+              }
+          },
+          error:function(result){//요청 실패
+              alert('서버와의 문제가 생겼습니다.\n다음에 다시 시도해 주세요');
+          }
+          
+          
+      });   
+
   }
   function verify(){
 	  const emailInput = document.querySelector('#email');
