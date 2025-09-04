@@ -10,13 +10,13 @@ $(document).ready(function() {
     // 사용자 주소 (세션에서 내려준 값)
     let userAddress = window.loginUserAddress; 
 
-    if (!userAddress || userAddress === "") {
+    if (!userAddress || userAddress === ""  || userAddress === null || userAddress === "null" || userAddress === "undefined") {
         $.ajax({
             url: "/ehr/dust/dust-avg",
             method: "GET",
             success: function(res) {
                 const grade = getGrade(res.value);
-                const displayText = `${res.region}의 미세먼지 대기오염도(단위: μg/㎥): ${res.value}`;
+                const displayText = `전국의 미세먼지 대기오염도(단위: μg/㎥): ${res.value}`;
                 $("#avgCard").text(displayText)
                             .removeClass()
                             .addClass("card")
