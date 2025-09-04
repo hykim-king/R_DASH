@@ -18,24 +18,42 @@ function loadT1HTable() {
     });
 }
 
-// REH + RN1
-function loadREHRN1Table() {
-    $.when(
-        $.ajax({ url: '/ehr/temperature/weather.do', data: { category: 'REH' } }),
-        $.ajax({ url: '/ehr/temperature/weather.do', data: { category: 'RN1' } })
-    ).done(function(rehData, rn1Data) {
-        let tbody = $('#rehRn1Table');
-        tbody.empty();
-        let rehValues = rehData[0];
-        let rn1Values = rn1Data[0];
+// REH (습도)
+function loadREHTable() {
+    $.ajax({
+        url: '/ehr/temperature/weather.do',
+        type: 'GET',
+        data: { category: 'REH' },
+        success: function(data) {
+            let tbody = $('#rehTable'); // REH용 테이블 tbody
+            tbody.empty();
+            data.forEach((d, idx) => {
+                tbody.append(`<tr>
+                  <td>${idx + 1}</td>
+                  <td>${d.sidoNm} ${d.signguNm}</td>
+                  <td>${d.obsrValue}</td>
+                </tr>`);
+            });
+        }
+    });
+}
 
-        for(let i=0; i<rehValues.length; i++){
-            tbody.append(`<tr>
-                <td>${i + 1}</td>
-                <td>${rehValues[i].sidoNm} ${rehValues[i].signguNm}</td>
-                <td>${rehValues[i].obsrValue}</td>
-                <td>${rn1Values[i].obsrValue}</td>
-            </tr>`);
+// RN1 (강수량)
+function loadRN1Table() {
+    $.ajax({
+        url: '/ehr/temperature/weather.do',
+        type: 'GET',
+        data: { category: 'RN1' },
+        success: function(data) {
+            let tbody = $('#rn1Table'); // RN1용 테이블 tbody
+            tbody.empty();
+            data.forEach((d, idx) => {
+                tbody.append(`<tr>
+                  <td>${idx + 1}</td>
+                  <td>${d.sidoNm} ${d.signguNm}</td>
+                  <td>${d.obsrValue}</td>
+                </tr>`);
+            });
         }
     });
 }
@@ -43,5 +61,6 @@ function loadREHRN1Table() {
 // 페이지 로딩 시
 $(document).ready(function() {
     loadT1HTable();
-    loadREHRN1Table();
+    loadREHTable()
+    loadRN1Table()
 });

@@ -25,6 +25,11 @@
 			 emailInput.focus();
 			 return;
 		 } 
+		 if(passwordInput.value === ''){
+             alert('비밀번호를 입력하세요');
+             emailInput.focus();
+             return;
+         } 
 		 
 		 
 		 $.ajax({
@@ -43,8 +48,8 @@
 	                }else{
 	                	alert(result.message);
 	                	
-	                	//로그인 페이지로 이동(임시)
-	                	window.location.href='/ehr/user/myPage';
+	                	//메인페이지 이동
+	                	window.location.href='/ehr/home';
 	                } 
 	                	
 	            },
@@ -116,7 +121,7 @@
                     <div class="input-group-prepend">
                       <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
                     </div>
-                    <input class="form-control" placeholder="비밀번호" id="password" type="password" name="password" maxlength="20">
+                    <input class="form-control" placeholder="비밀번호" id="password" type="password" name="password" maxlength="16">
                   </div>
                 </div>
                 <div class="text-center">

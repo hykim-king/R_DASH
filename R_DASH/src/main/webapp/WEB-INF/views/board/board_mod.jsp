@@ -199,11 +199,20 @@ $(document).ready(function() {
     $summernote.on('summernote.init', function() {
         console.log('Summernote is ready!');
     });
+    function isEmpty(value) {
+        return value === null || value === undefined || value.trim() === "";
+    }
     
     $('#doUpdate').on('click',function(){
+    	const titleInput = document.querySelector('#title');
     	const summernoteContent = $summernote.summernote('code'); // 안전하게 접근
         if (!summernoteContent || summernoteContent === '<p><br></p>') {
             alert('내용을 입력하세요');
+            return;
+        }
+        if (isEmpty(titleInput.value)) {
+            alert('제목을 입력 하세요');
+            titleInput.focus();
             return;
         }
         // 클릭 시점 체크박스 상태 읽기

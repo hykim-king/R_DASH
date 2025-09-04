@@ -68,6 +68,7 @@
              <div class="pl-lg-4 w-100">
                 <div class="card-body d-flex flex-column justify-content-center align-items-center">
                 <form action="doSave" method="post" class="w-100" enctype="multipart/form-data">
+                    <input type="hidden" id="boardNo" name="boardNo">
                     <div class="form-group w-100">
                         <label for="title" class="mr-2"></label>
                         <input type="text" class="form-control w-100" id="title" name="title" autocomplete="title" maxlength="50" required placeholder="제목을 입력해주세요." >
@@ -202,12 +203,22 @@ $(document).ready(function() {
         console.log('Summernote is ready!');
     });
     
+    function isEmpty(value) {
+        return value === null || value === undefined || value.trim() === "";
+    }
+    
 
     // 등록 버튼 클릭 이벤트도 여기 안에 넣기
     $('#doSave').on('click', function() {
+    	const titleInput = document.querySelector('#title');
         const summernoteContent = $summernote.summernote('code'); // 안전하게 접근
         if (!summernoteContent || summernoteContent === '<p><br></p>') {
             alert('내용을 입력하세요');
+            return;
+        }
+        if (isEmpty(titleInput.value)) {
+            alert('제목을 입력 하세요');
+            titleInput.focus();
             return;
         }
         

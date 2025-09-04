@@ -83,15 +83,21 @@ public class UserController {
 	
 	@GetMapping("userList")
 	public String userList(HttpServletRequest request,Model model,HttpSession session) {
-		int userNo = ((UserDTO) session.getAttribute("loginUser")).getUserNo();
-		//db에서 다시 조회 (권한이 바뀌었을 수 있음)
-		UserDTO user = service.selectUser(userNo);
-		//접근 제한
-		if(user == null || user.getRole()!=1) {
-			session.setAttribute("loginUser", user);
+		
+		try {
+			int userNo = ((UserDTO) session.getAttribute("loginUser")).getUserNo();
+			//db에서 다시 조회 (권한이 바뀌었을 수 있음)
+			UserDTO user = service.selectUser(userNo);
+			//접근 제한
+			if(user == null || user.getRole()!=1) {
+				session.setAttribute("loginUser", user);
+				throw new AccessDeniedException("관리자만 접속 가능");
+			}
+		}catch(Exception e){
 			throw new AccessDeniedException("관리자만 접속 가능");
 		}
 		
+
 		String viewName = "user/userList";
 		SearchDTO search = new SearchDTO();
 		//pageNo 설정
