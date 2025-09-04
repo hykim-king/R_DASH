@@ -56,7 +56,7 @@
 		location="file:///C:/image/summernote/" /> -->
 		
     <resources mapping="/resources/image/summernote/**"
-        location="file:/var/www/ehr/upload/summernote/" />
+        location="file:/image/" />
 
 
 

@@ -63,7 +63,8 @@ public class BoardController {
 	//private static final String IMAGE_UPLOAD_PATH = "C:/image/summernote/";
 	
 	//배포용 -> 파일 만들어야함.
-	private static final String IMAGE_UPLOAD_PATH = "/var/www/ehr/upload/summernote/";
+	//private static final String IMAGE_UPLOAD_PATH = "/var/www/ehr/upload/summernote/";
+	private static final String IMAGE_UPLOAD_PATH ="/image/";
 	
 	//private static final String IMAGE_UPLOAD_PATH = "C:/Users/user/R_DASH/R_DASH/src/main/webapp/resources/image/summernote/";	
 	
