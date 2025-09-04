@@ -48,8 +48,8 @@
 	                }else{
 	                	alert(result.message);
 	                	
-	                	//로그인 페이지로 이동(임시)
-	                	window.location.href='/ehr/user/myPage';
+	                	//메인페이지 이동
+	                	window.location.href='/ehr/home';
 	                } 
 	                	
 	            },
