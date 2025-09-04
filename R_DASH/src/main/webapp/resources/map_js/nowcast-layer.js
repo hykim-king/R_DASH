@@ -409,6 +409,8 @@
         return { sido: (sido || '').trim(), sgg: (sgg || '').trim() };
       }
 
+
+     //GeoJSON을 Ajax(비동기)로 불러와 폴리곤 시각화
       function toPaths(g) {
         var paths = [];
         if (!g) return paths;
@@ -427,17 +429,17 @@
       }
 
       function addFeature(f) {
-        var p = f.properties || {};
+        var p = f.properties || {};  //시도/시군구 이름 추출
         var n = pickNames(p);
         if (!n.sido || !n.sgg) {
           if (!App._missingNameWarned) { App._missingNameWarned = 1; console.warn('[NowcastLayer] name missing in properties sample:', p); }
           return;
         }
 
-        var key = _slug(n.sido, n.sgg);
+        var key = _slug(n.sido, n.sgg);  //"시도|시군구" 키 만들기
         if (polyByKey[key]) return;
 
-        var paths = toPaths(f.geometry);
+        var paths = toPaths(f.geometry); //GeoJSON -> 폴리곤 path변환
         if (!paths.length) {
           if (!App._noPathWarned) { App._noPathWarned = 1; console.warn('[NowcastLayer] no paths for', key); }
           return;
@@ -458,7 +460,8 @@
         poly.__sidoSlug = _sidoSlug(n.sido);
         poly.__fillHex  = '#BFD7FF';
         polyByKey[key] = poly;
-
+        
+        // 폴리곤 클릭 -> 해당 지역 실황 4개 카테고리 호출  + HUD  표시
         kakao.maps.event.addListener(poly, 'click', function () {
           if (__selectedPoly && __selectedPoly !== poly) elevatePolygon(__selectedPoly, false);
           __selectedPoly = poly; __selectedSido = n.sido; __selectedSgg = n.sgg;

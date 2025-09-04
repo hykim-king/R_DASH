@@ -56,14 +56,14 @@ public class DustController {
             @RequestParam(required = false) Double maxLat,
             @RequestParam(required = false) Double minLon,
             @RequestParam(required = false) Double maxLon,
-            @RequestParam(required = false, defaultValue = "500") Integer limit
+            @RequestParam(required = false, defaultValue = "600") Integer limit
     ) {
         boolean hasBBox = (minLat != null && maxLat != null && minLon != null && maxLon != null);
         if (hasBBox && minLat > maxLat) { double t = minLat; minLat = maxLat; maxLat = t; }
         if (hasBBox && minLon > maxLon) { double t = minLon; minLon = maxLon; maxLon = t; }
 
         String dayStr = (day == null || day.trim().isEmpty()) ? null : day.trim();
-        int lim = (limit == null || limit <= 0) ? 500 : limit;
+        int lim = (limit == null || limit <= 0) ? 600 : limit;
 
         String raw = airType == null ? "" : airType.trim();
         String key = raw.replaceAll("\\s+", "").toLowerCase();
