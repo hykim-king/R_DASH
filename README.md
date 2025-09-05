@@ -67,7 +67,7 @@ R_DASH
 - Browser  
 ![Google Chrome](https://img.shields.io/badge/Google%20Chrome-4285F4?style=for-the-badge&logo=GoogleChrome&logoColor=white)
 
-## ✒️ ERD
+## ✒️ 산출물
 ✔️ WBS
 <img src = "src/main/webapp/resources/image/wbs.png">
 
