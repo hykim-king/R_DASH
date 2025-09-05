@@ -25,23 +25,26 @@ R_DASH
 ✔️ WBS
 <img src = "src/main/webapp/resources/image/wbs.png">
 
-✔️ WBS
-<img src = "https://github.com/hykim-king/R_DASH/src/main/webapp/resources/image/mv">
+✔️ 회의록
+<img src = "src/main/webapp/resources/image/scr.png">
 
-✔️ WBS
-<img src = "https://github.com/hykim-king/THEKING/blob/main/doc/WBS.png">
+✔️ 요구사항 정의서
+<img src = "src/main/webapp/resources/image/rdash.png">
 
-✔️ WBS
-<img src = "https://github.com/hykim-king/THEKING/blob/main/doc/WBS.png">
+✔️ 프로그램 사양서
+<img src = "src/main/webapp/resources/image/program.png">
 
-✔️ WBS
-<img src = "https://github.com/hykim-king/THEKING/blob/main/doc/WBS.png">
+✔️ ERD 및 화면 구성
+<img src = "src/main/webapp/resources/image/erd.png">
 
-✔️ WBS
-<img src = "https://github.com/hykim-king/THEKING/blob/main/doc/WBS.png">
+✔️ 화면 설계서
+<img src = "src/main/webapp/resources/image/screen.png">
 
-✔️ WBS
-<img src = "https://github.com/hykim-king/THEKING/blob/main/doc/WBS.png">
+✔️ Spring MVC 기반 계층형 아키텍처
+<img src = "src/main/webapp/resources/image/mvc.png">
+
+✔️ 통합 테스트 결과
+<img src = "src/main/webapp/resources/image/totaltest.png">
 
 ## 📌 프로젝트 기능
 + 메인 페이지
