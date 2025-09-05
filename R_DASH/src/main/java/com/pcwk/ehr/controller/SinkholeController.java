@@ -4,6 +4,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,15 +24,11 @@ import com.pcwk.ehr.service.SinkholeService;
 @RequestMapping("/sinkholes")
 public class SinkholeController {
 
+	Logger log = LogManager.getLogger(getClass());
 	@Autowired
 	private SinkholeService sinkholeService;
 
-	 // 간단 헬스체크
-    @GetMapping("/ping")
-    @ResponseBody
-    public String ping() {
-        return "ok";
-    }
+
 
 
     // 1) 히트맵 포인트 (전체) : optional year/stateNm
@@ -83,7 +81,12 @@ public class SinkholeController {
         double minLo = Math.min(minLon, maxLon);
         double maxLo = Math.max(minLon, maxLon);
 
-        return sinkholeService.selectBubblesByBBox(minLa, maxLa, minLo, maxLo, round, year, stateNm);
+     // ★ 보정 결과 로그
+        log.info("BBox 보정 결과: lat({} ~ {}), lon({} ~ {})", 
+        		minLa, maxLa, minLo, maxLo);
+        
+        return sinkholeService.selectBubblesByBBox
+        		(minLa, maxLa, minLo, maxLo, round, year, stateNm);
     }
 
     // 4) 버블(행정구역) 집계: 시·도 선택(optional), 연도/상태 필터

@@ -52,8 +52,11 @@
 	<annotation-driven />
 
 	<!-- Summernote 이미지 접근 매핑 -->
-	<resources mapping="/resources/image/summernote/**"
-		location="file:///C:/image/summernote/" />
+<!-- 	<resources mapping="/resources/image/summernote/**"
+		location="file:///C:/image/summernote/" /> -->
+		
+    <resources mapping="/resources/image/summernote/**"
+        location="file:/image/" />
 
 
 

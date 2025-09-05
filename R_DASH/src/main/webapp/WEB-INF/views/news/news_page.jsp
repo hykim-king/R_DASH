@@ -166,6 +166,7 @@ document.addEventListener('DOMContentLoaded', function(){
     $('#allBtn').on('click',function(){
     	$("#allNewsTable").show();
         $("#keywordNewsTable").hide();
+        $('#newsLoadMore').show();
     	
     });
     
@@ -458,7 +459,6 @@ document.addEventListener('DOMContentLoaded', function(){
         });
     });
 });
-
 
 </script>
 </head>

@@ -20,7 +20,8 @@
     var IS_DUST_CTX   = IS_DUST_PATH || IS_DUST_QUERY;
 
     // ===== Constants =====
-    var CTX = (document.body && document.body.getAttribute('data-context-path')) || '';
+   var CTX = (App && App.ctx) ||
+           ((document.body && document.body.getAttribute('data-context-path')) || '');
     var HUD_TOP = 68 + 120;  // 페이지 기준 내려놓은 위치
     var HUD_RIGHT = 12;
 
@@ -265,17 +266,28 @@ document.body.appendChild(balloon);
       return t;
     }
     function buildUrl(airType, bbox, limit){
-      var s = new URLSearchParams({ airType: airType, limit: (limit || 1000) });
-      if (bbox && isFinite(bbox.minLat) && isFinite(bbox.maxLat) && isFinite(bbox.minLon) && isFinite(bbox.maxLon)) {
-        s.set('minLat', bbox.minLat); s.set('maxLat', bbox.maxLat);
-        s.set('minLon', bbox.minLon); s.set('maxLon', bbox.maxLon);
-      }
-      return CTX + '/dust/latest?' + s.toString();
-    }
+   var type = canonicalType(airType);
+   var s = new URLSearchParams({ limit: (limit || 5000) });
+
+   // 컨트롤러가 airType 필수인 현재 구조를 유지
+   s.set('airType', type || 'ALL');
+
+   // 줌 레벨이 낮을수록(숫자 큼 = 멀리) 전국 뷰: BBox 붙이지 않음
+   var useBBox = map.getLevel() < 8;
+   if (useBBox && bbox &&
+       isFinite(bbox.minLat) && isFinite(bbox.maxLat) &&
+       isFinite(bbox.minLon) && isFinite(bbox.maxLon)) {
+     s.set('minLat', bbox.minLat); s.set('maxLat', bbox.maxLat);
+     s.set('minLon', bbox.minLon); s.set('maxLon', bbox.maxLon);
+   }
+   return CTX + '/dust/latest?' + s.toString();
+ }
+    
+    
     function fetchAndRender(airType){
       var bbox = (App && App.getBBox) ? App.getBBox() : null;
-      var url  = buildUrl(airType, bbox, 1200);
-      console.log('[dust] fetch:', url);
+      var url  = buildUrl(airType, bbox, 1900);
+      console.log('[dust] fetch:', url, 'level=', map.getLevel());
       return fetch(url, { headers: { 'Accept': 'application/json' } })
         .then(function(r){ if (!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
         .then(function(list){

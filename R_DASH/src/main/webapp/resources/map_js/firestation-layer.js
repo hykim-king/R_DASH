@@ -529,8 +529,6 @@ function badgeHTML(num, dto){
 
         (function(mk){
             kakao.maps.event.addListener(mk, 'click', function(){
-            // ✅ panTo로 인해 곧바로 idle가 발생하며 재조회가 트리거되는데,
-            // 그 1회만 건너뛰도록 플래그 설정
             skipNextIdleFetch = true;
 
          openOverlayForMarker(mk, mk.__dto);
@@ -540,12 +538,15 @@ function badgeHTML(num, dto){
         newMarkers.push(marker);
       }
 
+
+        // 새 마커 배열 생성 해서 이전 마커 . 클러스터 정리는 clearMarkers()에서 처리
       if (clusterer) clusterer.addMarkers(newMarkers);
       else newMarkers.forEach(function(m){ m.setMap(map); });
-
       markers = newMarkers;
       console.log('[firestation] draw markers:', newMarkers.length, 'type:', CURRENT_FIRE_TP);
     }
+    
+    
 
     // ===== 지도 이벤트 =====
     function onMapIdle(){
