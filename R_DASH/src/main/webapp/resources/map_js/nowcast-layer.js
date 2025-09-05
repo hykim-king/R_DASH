@@ -366,6 +366,9 @@
             var entry = self._values[k];
             var v = entry ? Number(entry.value) : NaN;
 
+
+
+            //기온에 따라 색상 변경
             var targetHex = '#BFD7FF';
             if (!isNaN(v)) {
               targetHex = (v >= 25) ? '#004AAD' :
