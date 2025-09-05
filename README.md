@@ -23,6 +23,24 @@ R_DASH
 |발표 |7/8~7/11 |7/11 일 최종 발표|
 
 ✔️ WBS
+<img src = "https://github.com/hykim-king/R_DASH/erd.png">
+
+✔️ WBS
+<img src = "https://github.com/hykim-king/THEKING/blob/main/doc/WBS.png">
+
+✔️ WBS
+<img src = "https://github.com/hykim-king/THEKING/blob/main/doc/WBS.png">
+
+✔️ WBS
+<img src = "https://github.com/hykim-king/THEKING/blob/main/doc/WBS.png">
+
+✔️ WBS
+<img src = "https://github.com/hykim-king/THEKING/blob/main/doc/WBS.png">
+
+✔️ WBS
+<img src = "https://github.com/hykim-king/THEKING/blob/main/doc/WBS.png">
+
+✔️ WBS
 <img src = "https://github.com/hykim-king/THEKING/blob/main/doc/WBS.png">
 
 ## 📌 프로젝트 기능
