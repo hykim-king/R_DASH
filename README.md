@@ -22,29 +22,6 @@ R_DASH
 |개발 |6/16~7/9 |DB 구축,Source Coding,단위/최종 테스트|
 |발표 |7/8~7/11 |7/11 일 최종 발표|
 
-✔️ WBS
-<img src = "src/main/webapp/resources/image/wbs.png">
-
-✔️ 회의록
-<img src = "src/main/webapp/resources/image/scr.png">
-
-✔️ 요구사항 정의서
-<img src = "src/main/webapp/resources/image/rdash.png">
-
-✔️ 프로그램 사양서
-<img src = "src/main/webapp/resources/image/program.png">
-
-✔️ ERD 및 화면 구성
-<img src = "src/main/webapp/resources/image/erd.png">
-
-✔️ 화면 설계서
-<img src = "src/main/webapp/resources/image/screen.png">
-
-✔️ Spring MVC 기반 계층형 아키텍처
-<img src = "src/main/webapp/resources/image/mvc.png">
-
-✔️ 통합 테스트 결과
-<img src = "src/main/webapp/resources/image/totaltest.png">
 
 ## 📌 프로젝트 기능
 + 메인 페이지
@@ -91,7 +68,29 @@ R_DASH
 ![Google Chrome](https://img.shields.io/badge/Google%20Chrome-4285F4?style=for-the-badge&logo=GoogleChrome&logoColor=white)
 
 ## ✒️ ERD
-<img src = "https://github.com/hykim-king/THEKING/blob/main/doc/ERD.png">
+✔️ WBS
+<img src = "src/main/webapp/resources/image/wbs.png">
+
+✔️ 회의록
+<img src = "src/main/webapp/resources/image/scr.png">
+
+✔️ 요구사항 정의서
+<img src = "src/main/webapp/resources/image/rdash.png">
+
+✔️ 프로그램 사양서
+<img src = "src/main/webapp/resources/image/program.png">
+
+✔️ ERD 및 화면 구성
+<img src = "src/main/webapp/resources/image/erd.png">
+
+✔️ 화면 설계서
+<img src = "src/main/webapp/resources/image/screen.png">
+
+✔️ Spring MVC 기반 계층형 아키텍처
+<img src = "src/main/webapp/resources/image/mvc.png">
+
+✔️ 통합 테스트 결과
+<img src = "src/main/webapp/resources/image/totaltest.png">
 
 ## 🖼️ 결과 화면
 ### 메인페이지
