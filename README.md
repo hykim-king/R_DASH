@@ -23,7 +23,7 @@ R_DASH
 |발표 |7/8~7/11 |7/11 일 최종 발표|
 
 ✔️ WBS
-<img src = "https://github.com/hykim-king/R_DASH/src/main/webapp/resources/image/erd.png">
+<img src = "https://github.com/hykim-king/R_DASH/src/main/webapp/resources/image/wbs.png">
 
 ✔️ WBS
 <img src = "https://github.com/hykim-king/R_DASH/src/main/webapp/resources/image/mv">
