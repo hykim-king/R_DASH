@@ -127,50 +127,90 @@ R_DASH
 
 ## 🖼️ 결과 화면
 ### 메인페이지
-![메인페이지](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/Main1.png)
-![메인페이지](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/Main2.png)
-![메인페이지](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/Main3.png)
+![메인페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Main.png)
+![메인페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Main2.png)
+
+### 챗봇
+![메인페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Chat.png)
 
 ### 회원 가입
-![회원가입](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/SignUpPage.png)
+![회원가입](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Regist.png)
 
 ### 로그인
-![로그인](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/LoginPage.png)
-
-### 관광지 메인
-![관광지메인](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/TourMain.png)
-
-### 관광지 지도
-![관광지지도](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/TourMap.png)
-
-### 관광지 상세페이지
-![관광지 상세페이지](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/TourDetail1.png)
-![관광지 상세페이지](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/TourDetail2.png)
-
-### 관광지 등록
-![관광지 등록](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/TourSave.png)
-
-### 축제 메인
-![축제 메인](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/FestivalMain.png)
-
-### 축제 상세페이지
-![축제 상세페이지](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/FestivalDetail.png)
-
-### 축제 등록
-![축제 등록](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/FestivalSave.png)
+![로그인](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Login1.png)
 
 ### 마이페이지
-![마이페이지](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/MyPage1.png)
-![마이페이지](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/MyPage2.png)
+![마이페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/MyPage1.png)
+![마이페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/MyPage2.png)
 
-### 정보 수정
-![정보 수정](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/UserUpdate.png)
-![비밀번호 변경](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/PasswordChange.png)
+### 비밀번호 찾기
+![비밀번호 찾기](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Password.png)
 
-### 회원 조회 및 강퇴
-![회원 조회](https://github.com/hykim-king/THEKING/blob/main/doc/ScreenShot/UserSelect.png)
+### 회원 관리
+![회원 관리](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/UserList.png)
 
+### 지도
+#### 날씨
+![지도 날씨](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/MapTem.png)
 
+#### 산사태
+![지도 산사태](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Map2.png)
 
-## 참고 사이트
-[대한민국 구석구석](https://korean.visitkorea.or.kr/main/main.do)
+#### 싱크홀
+![지도 싱크홀](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Map3.png)
+
+#### 황사
+![지도 황사](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Map4.png)
+
+#### 소방서
+![지도 소방서](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Map5.png)
+
+#### 대피소
+![지도 대피소](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Map6.png)
+
+### 통계
+#### 화재
+![통계 화재](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats1.png)
+![통계 화재](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/stats2-1.png)
+![통계 화재](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats3.png)
+
+#### 기온
+![통계 기온](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats4.png)
+![통계 기온](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats5.png)
+
+#### 황사
+![통계 황사](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats6.png)
+
+#### 싱크홀
+![통계 싱크홀](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats7.png)
+![통계 싱크홀](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats8.png)
+
+#### 산사태
+![통계 산사태](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats9.png)
+![통계 산사태](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats10.png)
+
+### 뉴스 페이지
+![뉴스 페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/News.png)
+![뉴스 페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/NewsEn.png)
+
+### 토픽
+![토픽](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Topic.png)
+
+#### 토픽 등록
+![토픽](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Topic2.png)
+
+#### 토픽 수정
+![토픽](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Topic1.png)
+
+### 공지사항
+![공지사항](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Board.png)
+![공지사항](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/BoardEn.png)
+
+#### 공지사항 등록
+![공지사항 등록](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Notice1.png)
+
+#### 공지사항 상세
+![공지사항 상세](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Board1.png)
+
+#### 공지사항 알림
+![공지사항 상세](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Notice2.png)
