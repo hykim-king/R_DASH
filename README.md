@@ -195,6 +195,12 @@ https://youtu.be/NWZwiC8SHBw
 ![통계 산사태](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats9.png)
 ![통계 산사태](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats10.png)
 
+#### 소방서
+![지도 소방서](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Map5.png)
+
+#### 대피소
+![지도 대피소](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Map6.png)
+
 ### 뉴스 페이지
 ![뉴스 페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/News.png)
 ![뉴스 페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/NewsEn.png)
@@ -220,12 +226,6 @@ https://youtu.be/NWZwiC8SHBw
 
 #### 공지사항 알림
 ![공지사항 상세](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Notice2.png)
-
-#### 소방서
-![지도 소방서](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Map5.png)
-
-#### 대피소
-![지도 대피소](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Map6.png)
 
 ### 통계
 #### 화재
