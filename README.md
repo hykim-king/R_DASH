@@ -3,7 +3,7 @@ R_DASH
 # 🗺️ R_DASH (재민이)
 <div align="center">
   <p><재난 정보 통합 웹 사이트 제작 프로젝트></p>
-  <img src = "src/main/webapp/resources/image/main.png">
+  <img src = "R_DASH/src/main/webapp/resources/image/main.png">
 </div>
 
 
