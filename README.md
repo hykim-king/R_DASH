@@ -48,7 +48,7 @@ R_DASH
 |기획|7/15~7/28 |주제 선정,WBS 및 기획서,요구사항 정의서 작성|
 |설계|7/28~8/8 |파일 및 화면서 작성,테이블 설계|
 |개발 |8/6~8/26 |DB 구축,Source Coding|
-|     |8/18~9/2 |공동 tiles 및 웹 제작,단위/최종 테스트|
+|테스트|8/18~9/2 |공동 tiles 및 웹 제작,단위/최종 테스트|
 |발표 |9/2~9/4 |PPT 최종 검토 및 9/5 일 최종 발표|
 
 
@@ -89,7 +89,7 @@ R_DASH
 ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
 - BackEnd  
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
-![Python](https://img.shields.io/badge/python-#3776AB.svg?style=for-the-badge&logo=openjdk&logoColor=white)
+![Python](https://img.shields.io/badge/python-3776AB.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
 ![Redis](https://img.shields.io/badge/redis-FF4438?style=for-the-badge&logo=springboot&logoColor=white)
 - DATABASE  
