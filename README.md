@@ -1,9 +1,9 @@
 # R_DASH
 R_DASH
-# 🗺️ GGMAP (떠나볼지도)
+# 🗺️ R_DASH (재민이)
 <div align="center">
-  <p><관광 정보 웹 사이트 제작 프로젝트></p>
-  <img src = "TheKing/sw_theking/src/main/webapp/resources/images/logo2.png">
+  <p><재난 정보 통합 웹 사이트 제작 프로젝트></p>
+  <img src = "src/main/webapp/resources/image/main.png">
 </div>
 
 
