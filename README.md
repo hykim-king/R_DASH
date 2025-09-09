@@ -128,6 +128,9 @@ R_DASH
 ✔️ 통합 테스트 결과
 <img src = "src/main/webapp/resources/image/totaltest.png">
 
+## 🔗WEB 영상 소개
+https://youtu.be/NWZwiC8SHBw
+
 ## 🖼️ 결과 화면
 ### 메인페이지
 ![메인페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Main.png)
@@ -218,7 +221,7 @@ R_DASH
 #### 공지사항 알림
 ![공지사항 상세](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Notice2.png)
 
-## 🔗WEB 영상 소개#### 소방서
+#### 소방서
 ![지도 소방서](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Map5.png)
 
 #### 대피소
@@ -270,6 +273,3 @@ R_DASH
 
 #### 공지사항 알림
 ![공지사항 상세](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Notice2.png)
-
-## 🔗WEB 영상 소개
-https://youtu.be/NWZwiC8SHBw
