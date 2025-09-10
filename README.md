@@ -201,6 +201,7 @@ https://youtu.be/NWZwiC8SHBw
 
 ### 뉴스 페이지
 ![뉴스 페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/News.png)
+#### 뉴스 페이지(영어)
 ![뉴스 페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/NewsEn.png)
 
 ### 토픽
@@ -214,53 +215,7 @@ https://youtu.be/NWZwiC8SHBw
 
 ### 공지사항
 ![공지사항](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Board.png)
-![공지사항](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/BoardEn.png)
-
-#### 공지사항 등록
-![공지사항 등록](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Notice1.png)
-
-#### 공지사항 상세
-![공지사항 상세](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Board1.png)
-
-#### 공지사항 알림
-![공지사항 상세](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Notice2.png)
-
-### 통계
-#### 화재
-![통계 화재](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats1.png)
-![통계 화재](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/stats2-1.png)
-![통계 화재](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats3.png)
-
-#### 기온
-![통계 기온](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats4.png)
-![통계 기온](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats5.png)
-
-#### 황사
-![통계 황사](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats6.png)
-
-#### 싱크홀
-![통계 싱크홀](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats7.png)
-![통계 싱크홀](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats8.png)
-
-#### 산사태
-![통계 산사태](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats9.png)
-![통계 산사태](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Stats10.png)
-
-### 뉴스 페이지
-![뉴스 페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/News.png)
-![뉴스 페이지](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/NewsEn.png)
-
-### 토픽
-![토픽](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Topic.png)
-
-#### 토픽 등록
-![토픽](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Topic2.png)
-
-#### 토픽 수정
-![토픽](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Topic1.png)
-
-### 공지사항
-![공지사항](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/Board.png)
+#### 공지사항(영어)
 ![공지사항](https://github.com/hykim-king/R_DASH/blob/main/R_DASH/src/main/webapp/resources/image/ResultPic/BoardEn.png)
 
 #### 공지사항 등록
