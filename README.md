@@ -1,6 +1,6 @@
 ## 🙌 안녕하세요 R_DASH를 개발한 재민이팀입니다 !
 <div align="center">
-  <img src = "R_DASH/src/main/webapp/resources/image/main.gif">
+  <img src = "R_DASH/src/main/webapp/resources/image/main.png">
 </div>
 
 <br>
